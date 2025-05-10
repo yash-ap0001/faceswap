@@ -836,14 +836,45 @@
             
             // Category accordion functionality
             const categoryTitles = document.querySelectorAll('.category-title');
+            
+            // First, let's close all categories initially except Bride
+            categoryTitles.forEach(title => {
+                const targetId = title.getAttribute('data-target');
+                const contentElement = document.getElementById(targetId);
+                
+                if (contentElement) {
+                    // Keep bride category open initially, close others
+                    if (targetId === 'bride-content') {
+                        contentElement.classList.add('expanded');
+                        title.classList.remove('collapsed');
+                    } else {
+                        contentElement.classList.remove('expanded');
+                        title.classList.add('collapsed');
+                    }
+                }
+            });
+            
+            // Then set up the click handlers
             categoryTitles.forEach(title => {
                 title.addEventListener('click', function() {
                     const targetId = this.getAttribute('data-target');
                     const contentElement = document.getElementById(targetId);
+                    const isCurrentlyExpanded = contentElement.classList.contains('expanded');
                     
-                    if (contentElement) {
-                        contentElement.classList.toggle('expanded');
-                        this.classList.toggle('collapsed');
+                    // First, close all categories
+                    categoryTitles.forEach(t => {
+                        const tId = t.getAttribute('data-target');
+                        const tContent = document.getElementById(tId);
+                        if (tContent) {
+                            tContent.classList.remove('expanded');
+                            t.classList.add('collapsed');
+                        }
+                    });
+                    
+                    // Then, if the clicked category wasn't already expanded, open it
+                    if (!isCurrentlyExpanded) {
+                        contentElement.classList.add('expanded');
+                        this.classList.remove('collapsed');
                     }
                 });
             });
