@@ -411,7 +411,37 @@ def index():
 
 @app.route('/bridal-gallery')
 def bridal_gallery():
-    return render_template('bridal_gallery_new.html')
+    # Get all template images organized by ceremony type and template type
+    template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
+    
+    # Define ceremony types and template types
+    ceremony_types = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
+    template_types = ['real', 'natural', 'ai']
+    
+    # Scan for available templates
+    templates = {}
+    for ceremony in ceremony_types:
+        templates[ceremony] = {}
+        for template_type in template_types:
+            # Look for the template in the main directory
+            main_path = os.path.join(template_dir, f"{ceremony}_{template_type}.jpg")
+            # Look for the template in the type-specific subdirectory
+            subdir_path = os.path.join(template_dir, template_type, f"{ceremony}.jpg")
+            
+            if os.path.exists(main_path):
+                templates[ceremony][template_type] = f"/uploads/templates/{ceremony}_{template_type}.jpg"
+            elif os.path.exists(subdir_path):
+                templates[ceremony][template_type] = f"/uploads/templates/{template_type}/{ceremony}.jpg"
+            else:
+                # Use a placeholder if no template is available
+                templates[ceremony][template_type] = None
+    
+    return render_template(
+        'bridal_gallery_organized.html',
+        templates=templates,
+        ceremony_types=ceremony_types,
+        template_types=template_types
+    )
 
 # Bride section routes
 @app.route('/bridal-outfits')
@@ -625,133 +655,108 @@ def get_bridal_template(style, template_type='natural'):
     Get the template image for the selected bridal style and template type.
     
     Args:
-        style (str): The bridal style ('haldi', 'mehendi', 'wedding', or 'reception')
+        style (str): The bridal style ('haldi', 'mehendi', 'sangeeth', 'wedding', or 'reception')
         template_type (str): The template type ('real', 'natural' or 'ai')
         
     Returns:
         tuple: (template_img, template_path)
     """
-    # Create directory for template images if it doesn't exist
-    template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
-    real_dir = os.path.join(template_dir, 'real')
-    os.makedirs(template_dir, exist_ok=True)
-    os.makedirs(real_dir, exist_ok=True)
+    # Validate style name
+    valid_styles = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
+    if style not in valid_styles:
+        logger.warning(f"Invalid style: {style}. Using 'wedding' as fallback.")
+        style = 'wedding'
     
-    # Define paths for template images based on style and type
-    if template_type == 'real':
-        # Real photo templates
-        # Map the style to specific real image files
-        if style == 'haldi':
-            real_files = ['weeding saree.jpg']
-        elif style == 'mehendi':
-            real_files = ['halfhand.jpg']
-        elif style == 'wedding':
-            real_files = ['voni dress.jpg', 'full dress.jpg']
-        elif style == 'reception':
-            real_files = ['jewellary.jpg']
-        else:
-            real_files = []
-            
-        # Use the first available file for the style
-        if real_files:
-            template_path = os.path.join(real_dir, real_files[0])
-            if os.path.exists(template_path):
-                return cv2.imread(template_path), template_path
-        
-        # Fallback to natural if real image not found
-        logger.warning(f"Real template for {style} not found, falling back to natural template.")
+    # Validate template type
+    valid_types = ['real', 'natural', 'ai']
+    if template_type not in valid_types:
+        logger.warning(f"Invalid template type: {template_type}. Using 'natural' as fallback.")
         template_type = 'natural'
     
-    if template_type == 'natural':
-        # Natural image templates
-        template_paths = {
-            'haldi': os.path.join(template_dir, 'haldi_natural.jpg'),
-            'mehendi': os.path.join(template_dir, 'mehendi_natural.jpg'),
-            'wedding': os.path.join(template_dir, 'wedding_natural.jpg'),
-            'reception': os.path.join(template_dir, 'reception_natural.jpg')
-        }
-    else:
-        # AI-generated templates
-        template_paths = {
-            'haldi': os.path.join(template_dir, 'haldi_ai.jpg'),
-            'mehendi': os.path.join(template_dir, 'mehendi_ai.jpg'),
-            'wedding': os.path.join(template_dir, 'wedding_ai.jpg'),
-            'reception': os.path.join(template_dir, 'reception_ai.jpg')
-        }
+    # Create template directories if they don't exist
+    template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
+    type_dir = os.path.join(template_dir, template_type)
+    os.makedirs(template_dir, exist_ok=True)
+    os.makedirs(type_dir, exist_ok=True)
     
-    # Check if template image exists, if not, create a placeholder
-    if not os.path.exists(template_paths[style]):
-        # Create a placeholder image with text
-        img_height, img_width = 1024, 768
-        template_img = np.zeros((img_height, img_width, 3), dtype=np.uint8)
-        
-        # Set background color based on style
-        if style == 'haldi':
-            # Yellow for Haldi
-            template_img[:] = (0, 215, 255)  # BGR for yellow
-        elif style == 'mehendi':
-            # Green for Mehendi
-            template_img[:] = (0, 128, 0)  # BGR for green
-        elif style == 'wedding':
-            # Red for Wedding
-            template_img[:] = (0, 0, 255)  # BGR for red
-        elif style == 'reception':
-            # Maroon for Reception
-            template_img[:] = (0, 0, 128)  # BGR for maroon
-        
-        # Add a label indicating which template type this is
-        template_type_label = "Natural" if template_type == "natural" else "AI-Generated"
-        
-        # Add text
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        text = f"{style.capitalize()} {template_type_label} Template"
-        text_size = cv2.getTextSize(text, font, 1, 2)[0]
-        text_x = (img_width - text_size[0]) // 2
-        text_y = (img_height + text_size[1]) // 2
-        cv2.putText(template_img, text, (text_x, text_y), font, 1, (255, 255, 255), 2)
-        
-        # Save the template
-        cv2.imwrite(template_paths[style], template_img)
-        
-        logger.warning(f"Created placeholder template for {style} ({template_type})")
-        
-        # If this is an initial setup and we created placeholder images, 
-        # use our nice templates instead if they exist
-        template_placeholder = os.path.join(template_dir, f'{style}_template.jpg')
-        if os.path.exists(template_placeholder):
-            logger.info(f"Found existing template for {style}, using it instead of placeholder")
-            template_img = cv2.imread(template_placeholder)
-            cv2.imwrite(template_paths[style], template_img)
-        else:
-            # Add a face to the template for testing
-            # Draw a simple face outline
-            face_center_x, face_center_y = img_width // 2, img_height // 3
-            face_radius = min(img_width, img_height) // 6
-            
-            # Draw face circle
-            cv2.circle(template_img, (face_center_x, face_center_y), face_radius, (255, 255, 255), 2)
-            
-            # Draw eyes
-            eye_radius = face_radius // 5
-            left_eye_x = face_center_x - face_radius // 3
-            right_eye_x = face_center_x + face_radius // 3
-            eyes_y = face_center_y - face_radius // 4
-            
-            cv2.circle(template_img, (left_eye_x, eyes_y), eye_radius, (255, 255, 255), 2)
-            cv2.circle(template_img, (right_eye_x, eyes_y), eye_radius, (255, 255, 255), 2)
-            
-            # Draw mouth
-            mouth_y = face_center_y + face_radius // 3
-            cv2.ellipse(template_img, (face_center_x, mouth_y), 
-                       (face_radius // 3, face_radius // 6), 
-                       0, 0, 180, (255, 255, 255), 2)
-            
-            # Save the template with face
-            cv2.imwrite(template_paths[style], template_img)
+    # First try the direct combination of style and type
+    template_filename = f"{style}_{template_type}.jpg"
+    template_path = os.path.join(template_dir, template_filename)
     
-    # Load and return the template image
-    template_img = cv2.imread(template_paths[style])
-    return template_img, template_paths[style]
+    # Check if the file exists
+    if os.path.exists(template_path):
+        template_img = cv2.imread(template_path)
+        if template_img is not None:
+            logger.info(f"Using template: {template_path}")
+            return template_img, template_path
+    
+    # If direct file doesn't exist, check in type subdirectory
+    subdir_template_path = os.path.join(type_dir, f"{style}.jpg")
+    if os.path.exists(subdir_template_path):
+        template_img = cv2.imread(subdir_template_path)
+        if template_img is not None:
+            logger.info(f"Using template from subdirectory: {subdir_template_path}")
+            return template_img, subdir_template_path
+    
+    # If still not found, try legacy template format
+    legacy_template = f"{style}_template.jpg"
+    legacy_path = os.path.join(template_dir, legacy_template)
+    if os.path.exists(legacy_path):
+        template_img = cv2.imread(legacy_path)
+        if template_img is not None:
+            logger.info(f"Using legacy template: {legacy_path}")
+            return template_img, legacy_path
+    
+    # If all else fails, look for another style of the same type
+    logger.warning(f"No template found for {style}_{template_type}. Trying fallback.")
+    for fallback_style in valid_styles:
+        if fallback_style != style:
+            fallback_path = os.path.join(template_dir, f"{fallback_style}_{template_type}.jpg")
+            if os.path.exists(fallback_path):
+                template_img = cv2.imread(fallback_path)
+                if template_img is not None:
+                    logger.info(f"Using fallback template: {fallback_path}")
+                    return template_img, fallback_path
+    
+    # Last resort: create a blank colored template
+    logger.warning(f"No fallback template found. Creating blank template for {style}.")
+    img_height, img_width = 1024, 768
+    template_img = np.zeros((img_height, img_width, 3), dtype=np.uint8)
+    
+    # Set background color based on style
+    if style == 'haldi':
+        # Yellow for Haldi
+        template_img[:] = (0, 215, 255)  # BGR for yellow
+    elif style == 'mehendi':
+        # Green for Mehendi
+        template_img[:] = (0, 128, 0)  # BGR for green
+    elif style == 'sangeeth':
+        # Blue for Sangeeth
+        template_img[:] = (255, 100, 0)  # BGR for blue-orange
+    elif style == 'wedding':
+        # Red for Wedding
+        template_img[:] = (0, 0, 255)  # BGR for red
+    elif style == 'reception':
+        # Purple for Reception
+        template_img[:] = (128, 0, 128)  # BGR for purple
+    
+    # Add a label indicating which template type this is
+    template_type_label = "Natural" if template_type == "natural" else ("Real" if template_type == "real" else "AI-Generated")
+    
+    # Add text
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    text = f"{style.capitalize()} {template_type_label} Template"
+    text_size = cv2.getTextSize(text, font, 1, 2)[0]
+    text_x = (img_width - text_size[0]) // 2
+    text_y = (img_height + text_size[1]) // 2
+    cv2.putText(template_img, text, (text_x, text_y), font, 1, (255, 255, 255), 2)
+    
+    # Save the template
+    backup_path = os.path.join(template_dir, f"{style}_{template_type}.jpg")
+    cv2.imwrite(backup_path, template_img)
+    logger.info(f"Created and saved blank template: {backup_path}")
+    
+    return template_img, backup_path
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
