@@ -834,6 +834,20 @@
                 });
             }
             
+            // Category accordion functionality
+            const categoryTitles = document.querySelectorAll('.category-title');
+            categoryTitles.forEach(title => {
+                title.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const contentElement = document.getElementById(targetId);
+                    
+                    if (contentElement) {
+                        contentElement.classList.toggle('expanded');
+                        this.classList.toggle('collapsed');
+                    }
+                });
+            });
+            
             // Layout buttons
             const layoutBtns = document.querySelectorAll('[data-layout]');
             layoutBtns.forEach(btn => {
