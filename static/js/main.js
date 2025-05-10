@@ -178,19 +178,33 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('/check-models')
             .then(response => response.json())
             .then(data => {
+                const modelUploadContainer = document.getElementById('model-upload-container');
+                
                 if (!data.face_detection) {
                     modelStatusAlert.classList.remove('d-none');
                     modelStatusMessage.textContent = 'Face detection model is not loaded. The application cannot work properly.';
-                } else if (data.demo_mode) {
+                } else if (data.demo_mode || !data.face_swap) {
                     modelStatusAlert.classList.remove('d-none');
-                    modelStatusAlert.classList.remove('alert-warning');
-                    modelStatusAlert.classList.add('alert-info');
-                    modelStatusMessage.textContent = 'Running in demonstration mode. Face detection works, but face swapping will show visual indicators instead of actual face swaps.';
-                } else if (!data.face_swap) {
-                    modelStatusAlert.classList.remove('d-none');
-                    modelStatusMessage.textContent = 'Face swap model is not loaded. The application will only detect faces but cannot swap them.';
+                    
+                    if (data.demo_mode) {
+                        modelStatusAlert.classList.remove('alert-warning');
+                        modelStatusAlert.classList.add('alert-info');
+                        modelStatusMessage.textContent = 'Running in demonstration mode. Face detection works, but face swapping will show visual indicators instead of actual face swaps.';
+                    } else {
+                        modelStatusMessage.textContent = 'Face swap model is not loaded. The application will only detect faces but cannot swap them.';
+                    }
+                    
+                    // Show the model upload button when in demo mode or face swap model is missing
+                    if (modelUploadContainer) {
+                        modelUploadContainer.classList.remove('d-none');
+                    }
                 } else {
                     modelStatusAlert.classList.add('d-none');
+                    
+                    // Hide the model upload container when everything is working
+                    if (modelUploadContainer) {
+                        modelUploadContainer.classList.add('d-none');
+                    }
                 }
             })
             .catch(error => {

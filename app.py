@@ -127,7 +127,7 @@ def download_face_swap_model():
         model_path = os.path.join('models', 'inswapper_128.onnx')
         os.makedirs('models', exist_ok=True)
         
-        # Clear any existing model file if it's invalid
+        # Check if we already have a valid model
         if os.path.exists(model_path):
             try:
                 # Test if the file is a valid ONNX model
@@ -139,27 +139,52 @@ def download_face_swap_model():
                 logger.warning(f"Existing model file at {model_path} is invalid. Removing it.")
                 os.remove(model_path)
         
-        if not os.path.exists(model_path):
-            logger.info("Attempting to download face swap model...")
-            success = False
+        # At this point we need to download the model
+        logger.info("Attempting to download face swap model...")
+        success = False
+        
+        # Get Hugging Face token from environment variables
+        hf_token = os.environ.get("HUGGINGFACE_TOKEN")
+        if not hf_token:
+            logger.warning("HUGGINGFACE_TOKEN environment variable not set")
+        
+        # Set up headers
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        
+        # Add authorization if token is available
+        if hf_token:
+            headers['Authorization'] = f'Bearer {hf_token}'
             
-            # Get Hugging Face token from environment variables
-            hf_token = os.environ.get("HUGGINGFACE_TOKEN")
-            if not hf_token:
-                logger.warning("HUGGINGFACE_TOKEN environment variable not set")
-            
-            # Use the provided Hugging Face repository
-            url = "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/resolve/main/inswapper_128.onnx"
-            
-            # Set up headers
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            }
-            
-            # Add authorization if token is available
-            if hf_token:
-                headers['Authorization'] = f'Bearer {hf_token}'
-            
+            # Try to query the repository info to see its structure
+            repo_info_url = "https://huggingface.co/api/models/Olek03282255/faceswap_inswapper128_MVP"
+            logger.info(f"Checking repository info: {repo_info_url}")
+            try:
+                repo_info_response = requests.get(repo_info_url, headers=headers)
+                if repo_info_response.status_code == 200:
+                    logger.info("Successfully accessed repository info")
+                    # Parse repository info 
+                    repo_info = repo_info_response.json()
+                    logger.info(f"Repository info: {repo_info}")
+                else:
+                    logger.warning(f"Failed to access repository info: {repo_info_response.status_code}")
+                    logger.warning(f"Response: {repo_info_response.text}")
+            except Exception as e:
+                logger.warning(f"Error accessing repository info: {str(e)}")
+        
+        # Try different possible paths and filenames for the Hugging Face model
+        possible_urls = [
+            "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/resolve/main/inswapper_128.onnx",
+            "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/resolve/main/insightface/inswapper_128.onnx", 
+            "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/resolve/main/models/inswapper_128.onnx",
+            "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/resolve/main/inswapper_128.onnx.bin",
+            "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/resolve/main/inswapper.onnx",
+            "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/blob/main/inswapper_128.onnx"
+        ]
+        
+        # Try each possible URL
+        for url in possible_urls:
             logger.info(f"Trying to download model from {url}")
             try:
                 response = requests.get(url, headers=headers, stream=True)
@@ -172,41 +197,46 @@ def download_face_swap_model():
                                 f.write(chunk)
                     logger.info("Face swap model downloaded and saved successfully")
                     success = True
+                    break
                 else:
-                    logger.warning(f"Failed to download from provided repository, status code: {response.status_code}")
-                    logger.warning(f"Response: {response.text}")
+                    logger.warning(f"Failed to download from {url}, status code: {response.status_code}")
+                    if response.text:
+                        logger.warning(f"Response: {response.text}")
             except Exception as e:
-                logger.warning(f"Error downloading from provided repository: {str(e)}")
+                logger.warning(f"Error downloading from {url}: {str(e)}")
+        
+        if not success:
+            logger.warning("Failed to download from any of the Hugging Face URLs")
+        
+        # If Hugging Face download failed, try fallback URLs
+        if not success:
+            fallback_urls = [
+                "https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128.onnx",
+                "https://github.com/deepinsight/insightface/releases/download/v0.7/inswapper_128.onnx"
+            ]
             
-            # If Hugging Face download failed, try fallback URLs
-            if not success:
-                fallback_urls = [
-                    "https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128.onnx",
-                    "https://github.com/deepinsight/insightface/releases/download/v0.7/inswapper_128.onnx"
-                ]
-                
-                for url in fallback_urls:
-                    try:
-                        logger.info(f"Trying fallback URL: {url}")
-                        response = requests.get(url, headers=headers, stream=True)
-                        
-                        if response.status_code == 200:
-                            logger.info("Model download successful, saving file...")
-                            with open(model_path, 'wb') as f:
-                                for chunk in response.iter_content(chunk_size=8192):
-                                    if chunk:
-                                        f.write(chunk)
-                            logger.info("Face swap model downloaded and saved successfully")
-                            success = True
-                            break
-                        else:
-                            logger.warning(f"Failed to download from {url}, status code: {response.status_code}")
-                    except Exception as e:
-                        logger.warning(f"Error downloading from {url}: {str(e)}")
-            
-            if not success:
-                logger.error("Failed to download model from all sources")
-                raise Exception("Failed to download face swap model from all available sources")
+            for url in fallback_urls:
+                try:
+                    logger.info(f"Trying fallback URL: {url}")
+                    response = requests.get(url, headers=headers, stream=True)
+                    
+                    if response.status_code == 200:
+                        logger.info("Model download successful, saving file...")
+                        with open(model_path, 'wb') as f:
+                            for chunk in response.iter_content(chunk_size=8192):
+                                if chunk:
+                                    f.write(chunk)
+                        logger.info("Face swap model downloaded and saved successfully")
+                        success = True
+                        break
+                    else:
+                        logger.warning(f"Failed to download from {url}, status code: {response.status_code}")
+                except Exception as e:
+                    logger.warning(f"Error downloading from {url}: {str(e)}")
+        
+        if not success:
+            logger.error("Failed to download model from all sources")
+            raise Exception("Failed to download face swap model from all available sources")
         
         return model_path
     except Exception as e:
@@ -350,3 +380,53 @@ def check_models():
         'demo_mode': demo_mode
     }
     return jsonify(status)
+
+@app.route('/upload-model', methods=['GET', 'POST'])
+def upload_model():
+    global swapper, demo_mode
+    
+    if request.method == 'POST':
+        if 'model_file' not in request.files:
+            return render_template('upload_model.html', error='No file part')
+        
+        model_file = request.files['model_file']
+        
+        if model_file.filename == '':
+            return render_template('upload_model.html', error='No selected file')
+        
+        # Check that it's an ONNX file
+        if not model_file.filename.endswith('.onnx'):
+            return render_template('upload_model.html', error='File must be an ONNX model (.onnx)')
+        
+        # Save the model file
+        model_path = os.path.join('models', 'inswapper_128.onnx')
+        os.makedirs('models', exist_ok=True)
+        
+        try:
+            model_file.save(model_path)
+            logger.info(f"Model file saved to {model_path}")
+            
+            # Validate the model file
+            import onnx
+            try:
+                onnx.load(model_path)
+                logger.info("Model file validated successfully")
+                
+                # Load the model
+                providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
+                swapper = get_model(model_path, providers=providers)
+                logger.info("Face swap model loaded successfully")
+                
+                # Update demo mode
+                demo_mode = False
+                
+                return render_template('upload_model.html', success=True, message="Model uploaded and loaded successfully!")
+            except Exception as e:
+                logger.error(f"Failed to validate model: {str(e)}")
+                return render_template('upload_model.html', error=f"Invalid model file: {str(e)}")
+                
+        except Exception as e:
+            logger.error(f"Error saving model file: {str(e)}")
+            return render_template('upload_model.html', error=f"Error saving model: {str(e)}")
+    
+    return render_template('upload_model.html')
