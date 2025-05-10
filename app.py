@@ -427,7 +427,7 @@ def bridal_gallery():
     
     # Define ceremony types and template types
     ceremony_types = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
-    template_types = ['real', 'natural', 'ai']
+    template_types = ['real', 'natural', 'ai', 'pinterest']
     
     # Scan for available templates
     templates = {}
@@ -593,6 +593,75 @@ def event_managers():
         selected_rating=rating,
         selected_service_category=service_category
     )
+
+@app.route('/bulk-upload')
+def bulk_upload_page():
+    """Display the bulk template upload page."""
+    return render_template('bulk_upload.html')
+
+@app.route('/upload-bulk-templates', methods=['POST'])
+def upload_bulk_templates():
+    """
+    Handle bulk template upload.
+    Process multiple images for a specific ceremony type.
+    """
+    if 'files' not in request.files:
+        return jsonify({'error': 'No files part'}), 400
+    
+    ceremony_type = request.form.get('ceremony_type')
+    if not ceremony_type:
+        return jsonify({'error': 'Ceremony type is required'}), 400
+        
+    if ceremony_type not in ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']:
+        return jsonify({'error': 'Invalid ceremony type'}), 400
+    
+    files = request.files.getlist('files')
+    if not files or len(files) == 0:
+        return jsonify({'error': 'No files selected'}), 400
+    
+    # Base path for template directory
+    template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
+    os.makedirs(template_dir, exist_ok=True)
+    
+    # Directory for 'pinterest' template type
+    pinterest_dir = os.path.join(template_dir, 'pinterest')
+    os.makedirs(pinterest_dir, exist_ok=True)
+    
+    # Directory specific to this ceremony type
+    ceremony_dir = os.path.join(pinterest_dir, ceremony_type)
+    os.makedirs(ceremony_dir, exist_ok=True)
+    
+    # Process each file
+    uploaded_count = 0
+    main_template_updated = False
+    
+    for i, file in enumerate(files):
+        if file and allowed_file(file.filename):
+            # Create a secure filename
+            filename = f"{ceremony_type}_{i+1}.jpg"
+            filepath = os.path.join(ceremony_dir, filename)
+            
+            # Save the file
+            file.save(filepath)
+            uploaded_count += 1
+            
+            # If it's the first file, also set it as the main template
+            if i == 0 and not main_template_updated:
+                # Main ceremony template in the pinterest directory
+                main_path = os.path.join(ceremony_dir, f"{ceremony_type}.jpg")
+                shutil.copy(filepath, main_path)
+                
+                # Also update as the main pinterest template in the templates root
+                template_path = os.path.join(template_dir, f"{ceremony_type}_pinterest.jpg")
+                shutil.copy(filepath, template_path)
+                main_template_updated = True
+    
+    return jsonify({
+        'success': True,
+        'uploaded_count': uploaded_count,
+        'ceremony_type': ceremony_type,
+        'main_template_updated': main_template_updated
+    })
 
 @app.route('/bridal-multi-swap', methods=['GET'])
 def bridal_multi_swap():
