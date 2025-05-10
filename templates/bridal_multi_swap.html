@@ -666,6 +666,35 @@ document.addEventListener('DOMContentLoaded', function() {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
     
+    // Function to check localStorage for updates from the bulk upload page
+    function checkForTemplateUpdates() {
+        const shouldRefresh = localStorage.getItem('refreshTemplates') === 'true';
+        const updateTimestamp = localStorage.getItem('updateTimestamp');
+        const lastProcessedTimestamp = localStorage.getItem('lastProcessedMultiTimestamp') || '0';
+        
+        // Check if either the refresh flag is set or there's a new timestamp
+        if (shouldRefresh || (updateTimestamp && updateTimestamp !== lastProcessedTimestamp)) {
+            console.log('Template update detected from bulk upload page');
+            console.log('Update timestamp:', updateTimestamp);
+            console.log('Last processed timestamp:', lastProcessedTimestamp);
+            
+            const updatedCeremony = localStorage.getItem('lastUpdatedCeremony');
+            
+            // Update the processed timestamp to avoid redundant refreshes
+            localStorage.setItem('lastProcessedMultiTimestamp', updateTimestamp || Date.now().toString());
+            
+            // Clear the flag immediately to avoid repeated refreshes
+            localStorage.removeItem('refreshTemplates');
+            
+            // Add debugging information to the console
+            console.log('Refreshing templates after upload detected');
+            
+            // Refresh all templates for all ceremonies
+            const ceremonyTypes = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'];
+            ceremonyTypes.forEach(ceremony => loadTemplates(ceremony));
+        }
+    }
+    
     function getCeremonyIcon(ceremony) {
         switch (ceremony) {
             case 'haldi': return 'sun';
