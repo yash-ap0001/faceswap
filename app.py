@@ -594,6 +594,49 @@ def event_managers():
         selected_service_category=service_category
     )
 
+@app.route('/delete-templates', methods=['POST'])
+def delete_templates():
+    """
+    Delete selected templates.
+    Expected JSON payload: { template_paths: [path1, path2, ...] }
+    """
+    if not request.is_json:
+        return jsonify({"success": False, "message": "Expected JSON payload"}), 400
+    
+    data = request.get_json()
+    template_paths = data.get('template_paths', [])
+    
+    if not template_paths:
+        return jsonify({"success": False, "message": "No template paths provided"}), 400
+    
+    deleted_count = 0
+    errors = []
+    
+    for path in template_paths:
+        try:
+            # Validate the path - ensure it starts with static/templates
+            if not path or not path.startswith('static/templates/'):
+                errors.append(f"Invalid path: {path}")
+                continue
+                
+            # Ensure the path exists
+            if not os.path.exists(path):
+                errors.append(f"File not found: {path}")
+                continue
+                
+            # Delete the file
+            os.remove(path)
+            deleted_count += 1
+            
+        except Exception as e:
+            errors.append(f"Error deleting {path}: {str(e)}")
+    
+    return jsonify({
+        "success": True,
+        "deleted_count": deleted_count,
+        "errors": errors
+    })
+
 @app.route('/bulk-upload')
 def bulk_upload_page():
     """Display the bulk template upload page."""
