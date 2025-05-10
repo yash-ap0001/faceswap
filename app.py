@@ -848,24 +848,26 @@ def get_templates():
         # Check in main directory
         main_path = os.path.join(template_dir, f"{ceremony_type}_{template_type}.jpg")
         if os.path.exists(main_path):
+            app.logger.info(f"Found main template: {main_path}")
             templates.append({
                 'id': f"{ceremony_type}_{template_type}_{template_id}",
                 'template_type': template_type,
                 'ceremony': ceremony_type,
                 'path': main_path,
-                'url': f"/uploads/templates/{ceremony_type}_{template_type}.jpg"
+                'url': f"/uploads/templates/{ceremony_type}_{template_type}.jpg?t={int(time.time())}"
             })
             template_id += 1
             
         # Check in type subdirectory
         subdir_path = os.path.join(template_dir, template_type, f"{ceremony_type}.jpg")
         if os.path.exists(subdir_path):
+            app.logger.info(f"Found subdir template: {subdir_path}")
             templates.append({
                 'id': f"{ceremony_type}_{template_type}_{template_id}",
                 'template_type': template_type,
                 'ceremony': ceremony_type,
                 'path': subdir_path,
-                'url': f"/uploads/templates/{template_type}/{ceremony_type}.jpg"
+                'url': f"/uploads/templates/{template_type}/{ceremony_type}.jpg?t={int(time.time())}"
             })
             template_id += 1
     
@@ -873,26 +875,30 @@ def get_templates():
     pinterest_dir = os.path.join(template_dir, 'pinterest', ceremony_type)
     if os.path.exists(pinterest_dir):
         for file in os.listdir(pinterest_dir):
-            if file.lower().endswith(('.jpg', '.jpeg', '.png')):
+            if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
                 file_path = os.path.join(pinterest_dir, file)
+                template_id_str = f"{ceremony_type}_pinterest_{template_id}"
+                app.logger.info(f"Found Pinterest template: {file_path}")
+                
                 templates.append({
-                    'id': f"{ceremony_type}_pinterest_{template_id}",
+                    'id': template_id_str,
                     'template_type': 'pinterest',
                     'ceremony': ceremony_type,
                     'path': file_path,
-                    'url': f"/uploads/templates/pinterest/{ceremony_type}/{file}"
+                    'url': f"/uploads/templates/pinterest/{ceremony_type}/{file}?t={int(time.time())}"
                 })
                 template_id += 1
     
     # Also check for main Pinterest template
     main_pinterest_path = os.path.join(template_dir, f"{ceremony_type}_pinterest.jpg")
     if os.path.exists(main_pinterest_path):
+        app.logger.info(f"Found main Pinterest template: {main_pinterest_path}")
         templates.append({
             'id': f"{ceremony_type}_pinterest_{template_id}",
             'template_type': 'pinterest',
             'ceremony': ceremony_type,
             'path': main_pinterest_path,
-            'url': f"/uploads/templates/{ceremony_type}_pinterest.jpg"
+            'url': f"/uploads/templates/{ceremony_type}_pinterest.jpg?t={int(time.time())}"
         })
         template_id += 1
     
