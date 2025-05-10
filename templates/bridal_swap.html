@@ -136,6 +136,84 @@
             </div>
         </div>
 
+        <!-- Available Templates Section -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark d-flex justify-content-between align-items-center">
+                <h2 class="h4 mb-0">Available Templates</h2>
+                <button id="refreshTemplatesBtn" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            <div class="card-body">
+                <ul class="nav nav-tabs" id="templateTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="haldi-tab" data-bs-toggle="tab" data-bs-target="#haldi-templates" type="button" role="tab">Haldi</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="mehendi-tab" data-bs-toggle="tab" data-bs-target="#mehendi-templates" type="button" role="tab">Mehendi</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="sangeeth-tab" data-bs-toggle="tab" data-bs-target="#sangeeth-templates" type="button" role="tab">Sangeeth</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="wedding-tab" data-bs-toggle="tab" data-bs-target="#wedding-templates" type="button" role="tab">Wedding</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reception-tab" data-bs-toggle="tab" data-bs-target="#reception-templates" type="button" role="tab">Reception</button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content pt-4" id="templateTabContent">
+                    <div class="tab-pane fade show active" id="haldi-templates" role="tabpanel">
+                        <div class="template-container row g-3">
+                            <div class="col-12 text-center">
+                                <div class="spinner-border text-light" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="mehendi-templates" role="tabpanel">
+                        <div class="template-container row g-3">
+                            <div class="col-12 text-center">
+                                <div class="spinner-border text-light" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="sangeeth-templates" role="tabpanel">
+                        <div class="template-container row g-3">
+                            <div class="col-12 text-center">
+                                <div class="spinner-border text-light" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="wedding-templates" role="tabpanel">
+                        <div class="template-container row g-3">
+                            <div class="col-12 text-center">
+                                <div class="spinner-border text-light" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="reception-templates" role="tabpanel">
+                        <div class="template-container row g-3">
+                            <div class="col-12 text-center">
+                                <div class="spinner-border text-light" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- About Indian Bridal Styles -->
         <div class="card shadow-sm">
             <div class="card-header bg-dark">
                 <h2 class="h4 mb-0">About Indian Bridal Styles</h2>
@@ -345,6 +423,116 @@ document.addEventListener('DOMContentLoaded', function() {
                 modelStatusMessage.textContent = 'Could not check model status. There might be connection issues.';
             });
     }
+    
+    // Template preview functionality
+    const refreshTemplatesBtn = document.getElementById('refreshTemplatesBtn');
+    
+    // Function to load templates for a specific ceremony type
+    function loadTemplates(ceremonyType) {
+        const templateContainer = document.querySelector(`#${ceremonyType}-templates .template-container`);
+        
+        if (!templateContainer) {
+            console.error(`Template container for ${ceremonyType} not found`);
+            return;
+        }
+        
+        // Display loading state
+        templateContainer.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        
+        // Fetch templates for this ceremony type
+        fetch(`/get-templates?ceremony_type=${ceremonyType}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.templates && data.templates.length > 0) {
+                    // Clear loading state
+                    templateContainer.innerHTML = '';
+                    
+                    // Add each template
+                    data.templates.forEach(template => {
+                        const col = document.createElement('div');
+                        col.className = 'col-md-3 col-sm-4 col-6 mb-3';
+                        
+                        const card = document.createElement('div');
+                        card.className = 'card h-100 bg-secondary template-card';
+                        card.dataset.templateUrl = template.url;
+                        
+                        const img = document.createElement('img');
+                        img.src = template.url;
+                        img.className = 'card-img-top';
+                        img.alt = 'Template';
+                        img.style.height = '150px';
+                        img.style.objectFit = 'cover';
+                        
+                        const cardBody = document.createElement('div');
+                        cardBody.className = 'card-body p-2';
+                        
+                        const typeLabel = document.createElement('p');
+                        typeLabel.className = 'card-text small mb-0';
+                        typeLabel.textContent = template.template_type || 'pinterest';
+                        
+                        // Add selection indicator (can be used later for direct selection)
+                        const selectBtn = document.createElement('button');
+                        selectBtn.className = 'btn btn-sm btn-outline-light mt-2 w-100';
+                        selectBtn.textContent = 'Select';
+                        selectBtn.onclick = function() {
+                            // Auto-select the corresponding ceremony type and template type in the form
+                            document.getElementById(ceremonyType).checked = true;
+                            const templateType = template.template_type || 'natural';
+                            if (document.getElementById(templateType)) {
+                                document.getElementById(templateType).checked = true;
+                            }
+                            
+                            // Visual indication of selection
+                            document.querySelectorAll('.template-card').forEach(card => {
+                                card.classList.remove('border-primary');
+                                card.classList.remove('border-3');
+                            });
+                            card.classList.add('border-primary');
+                            card.classList.add('border-3');
+                        };
+                        
+                        cardBody.appendChild(typeLabel);
+                        cardBody.appendChild(selectBtn);
+                        card.appendChild(img);
+                        card.appendChild(cardBody);
+                        col.appendChild(card);
+                        
+                        templateContainer.appendChild(col);
+                    });
+                } else {
+                    // No templates found
+                    templateContainer.innerHTML = `<div class="col-12 text-center text-muted"><p>No ${ceremonyType} templates found</p></div>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading templates:', error);
+                templateContainer.innerHTML = `<div class="col-12 text-center text-danger"><p>Error loading templates: ${error.message}</p></div>`;
+            });
+    }
+    
+    // Load all ceremony type templates
+    function loadAllTemplates() {
+        const ceremonyTypes = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'];
+        ceremonyTypes.forEach(type => loadTemplates(type));
+    }
+    
+    // Refresh button functionality
+    refreshTemplatesBtn.addEventListener('click', loadAllTemplates);
+    
+    // Load templates when page loads
+    loadAllTemplates();
+    
+    // Also update template display when radio buttons change
+    document.querySelectorAll('input[name="bridalStyle"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const selectedStyle = this.value;
+            // Show the corresponding tab
+            const tab = document.getElementById(`${selectedStyle}-tab`);
+            if (tab) {
+                new bootstrap.Tab(tab).show();
+            }
+        });
+    });
 });
 </script>
 {% endblock %}
