@@ -933,23 +933,19 @@ def get_templates():
     # Add template count to the logging
     app.logger.info(f"Found {len(templates)} templates for {ceremony_type}")
     
-    # If no templates found, create dummy templates for testing
+    # If no templates found, add a note to the response but don't create fake templates
+    # This is better for debugging and ensures clients only see real templates
     if not templates:
-        # For each template type, create a dummy entry
-        for template_type in template_types:
-            templates.append({
-                'id': f"{ceremony_type}_{template_type}_{template_id}",
-                'template_type': template_type,
-                'ceremony': ceremony_type,
-                'path': "",  # No actual file
-                'url': f"/static/placeholder_{template_type}.jpg"  # This would be a placeholder image
-            })
-            template_id += 1
+        app.logger.warning(f"No templates found for {ceremony_type} ceremony")
+        # We'll return an empty array, but set a flag in the response
+        # The client can handle this appropriately
     
     return jsonify({
         'success': True,
         'ceremony': ceremony_type,
-        'templates': templates
+        'templates': templates,
+        'has_templates': len(templates) > 0,
+        'timestamp': int(time.time())
     })
 
 def get_bridal_template(style, template_type='natural'):
