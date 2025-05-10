@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
         templateContainer.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div></div>';
         
         // Fetch templates for this ceremony type
-        fetch(`/get-templates?ceremony_type=${ceremonyType}`)
+        fetch(`/api/templates?ceremony_type=${ceremonyType}`)
             .then(response => response.json())
             .then(data => {
                 if (data.templates && data.templates.length > 0) {

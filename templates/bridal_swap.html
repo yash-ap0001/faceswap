@@ -520,6 +520,31 @@ document.addEventListener('DOMContentLoaded', function() {
         ceremonyTypes.forEach(type => loadTemplates(type));
     }
     
+    // Function to check localStorage for updates from the bulk upload page
+    function checkForTemplateUpdates() {
+        const shouldRefresh = localStorage.getItem('refreshTemplates') === 'true';
+        if (shouldRefresh) {
+            console.log('Template update detected from bulk upload page');
+            const updatedCeremony = localStorage.getItem('lastUpdatedCeremony');
+            
+            // Clear the flag immediately to avoid repeated refreshes
+            localStorage.removeItem('refreshTemplates');
+            
+            // Refresh all templates
+            loadAllTemplates();
+            
+            // If we know which ceremony was updated, switch to that tab
+            if (updatedCeremony) {
+                const tab = document.getElementById(`${updatedCeremony}-tab`);
+                if (tab) {
+                    setTimeout(() => {
+                        new bootstrap.Tab(tab).show();
+                    }, 500); // Short delay to ensure templates are loaded
+                }
+            }
+        }
+    }
+    
     // Initialize template loading on page load
     document.addEventListener('DOMContentLoaded', function() {
         // Get refresh button after DOM is loaded
@@ -541,6 +566,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     new bootstrap.Tab(tab).show();
                 }
             });
+        });
+        
+        // Check for updates immediately
+        checkForTemplateUpdates();
+        
+        // Also check for updates every time the page becomes visible again
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                checkForTemplateUpdates();
+            }
         });
     });
 });
