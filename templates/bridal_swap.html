@@ -523,7 +523,10 @@ function initializePage() {
                 return response.json();
             })
             .then(data => {
+                console.log(`Received template data for ${ceremonyType}:`, data);
                 if (data.templates && data.templates.length > 0) {
+                    console.log(`Found ${data.templates.length} templates for ${ceremonyType}`);
+                    
                     // Clear loading state
                     templateContainer.innerHTML = '';
                     
@@ -542,7 +545,9 @@ function initializePage() {
                     templateContainer.appendChild(templateCount);
                     
                     // Add each template
-                    data.templates.forEach(template => {
+                    data.templates.forEach((template, index) => {
+                        console.log(`Creating template element ${index+1}/${data.templates.length} for ${ceremonyType}:`, template);
+                        
                         const col = document.createElement('div');
                         col.className = 'col-md-3 col-sm-4 col-6 mb-3';
                         
@@ -571,6 +576,13 @@ function initializePage() {
                         img.alt = 'Template';
                         img.style.height = '150px';
                         img.style.objectFit = 'cover';
+                        
+                        // Add error handling for image loading
+                        img.onerror = function() {
+                            console.error(`Failed to load image for template ${template.id} from URL: ${template.url}`);
+                            img.src = '/static/img/placeholder.jpg';
+                            img.alt = 'Image load failed';
+                        };
                         
                         const cardBody = document.createElement('div');
                         cardBody.className = 'card-body p-2';
