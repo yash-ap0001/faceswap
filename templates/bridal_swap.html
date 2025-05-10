@@ -645,12 +645,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Load templates when page loads
         loadAllTemplates();
         
-        // Set up periodic check for template updates (every 5 seconds)
-        setInterval(checkForTemplateUpdates, 5000);
-        
-        // Do an immediate check for any pending template updates
-        checkForTemplateUpdates();
-        
         // Also update template display when radio buttons change
         document.querySelectorAll('input[name="bridalStyle"]').forEach(radio => {
             radio.addEventListener('change', function() {
@@ -663,18 +657,25 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        // Check for updates immediately
-        checkForTemplateUpdates();
+        // Set up periodic check for template updates (every 3 seconds)
+        const updateInterval = setInterval(checkForTemplateUpdates, 3000);
+        console.log('Template update checker interval started');
+        
+        // Also check for updates immediately
+        setTimeout(checkForTemplateUpdates, 500);
         
         // Also check for updates every time the page becomes visible again
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
+                console.log('Page visibility changed to visible, checking for templates');
                 checkForTemplateUpdates();
             }
         });
         
-        // Set up periodic checks for template updates from other pages (every 5 seconds)
-        setInterval(checkForTemplateUpdates, 5000);
+        // Cleanup interval on page unload
+        window.addEventListener('beforeunload', function() {
+            clearInterval(updateInterval);
+        });
         
         // Template selection mode toggle
         const toggleSelectModeBtn = document.getElementById('toggleSelectModeBtn');
