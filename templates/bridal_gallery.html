@@ -227,21 +227,37 @@
                     <h4 class="mb-0"><i class="fas fa-user me-2"></i>Your Photo</h4>
                 </div>
                 <div class="card-body">
-                    <div class="image-preview-container mb-3 d-flex align-items-center justify-content-center">
-                        <img id="source-preview" class="img-fluid d-none" alt="Your photo preview">
-                        <div id="source-placeholder" class="placeholder-container">
-                            <i class="fas fa-user-circle fa-4x mb-3"></i>
-                            <p class="text-center">Upload your photo to begin</p>
+                    <div class="upload-container mb-4">
+                        <div class="upload-icon">
+                            <i class="fas fa-user"></i>
                         </div>
-                    </div>
-                    <form id="upload-form" enctype="multipart/form-data">
-                        <div class="input-group mb-3">
-                            <input type="file" class="form-control" id="source-input" name="source" accept=".jpg,.jpeg,.png" required>
-                            <button class="btn btn-outline-secondary" type="button" id="source-clear-btn">
-                                <i class="fas fa-times"></i>
+                        <h5 class="mb-3">Upload Your Photo</h5>
+                        <p class="text-secondary mb-4">Select a clear photo of your face to get started</p>
+                        
+                        <div class="image-preview-container mb-3 d-flex align-items-center justify-content-center">
+                            <img id="source-preview" class="img-fluid d-none rounded-circle shadow" style="width: 150px; height: 150px; object-fit: cover;" alt="Your photo preview">
+                            <div id="source-placeholder" class="placeholder-container">
+                                <svg width="120" height="120" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-3">
+                                    <path opacity="0.4" d="M12 22.01C17.5228 22.01 22 17.5329 22 12.01C22 6.48716 17.5228 2.01001 12 2.01001C6.47715 2.01001 2 6.48716 2 12.01C2 17.5329 6.47715 22.01 12 22.01Z" fill="rgba(126, 87, 194, 0.3)"/>
+                                    <path d="M12 6.94001C9.93 6.94001 8.25 8.62001 8.25 10.69C8.25 12.72 9.84 14.37 11.95 14.43C11.98 14.43 12.02 14.43 12.04 14.43C12.06 14.43 12.09 14.43 12.11 14.43C12.12 14.43 12.13 14.43 12.13 14.43C14.15 14.36 15.74 12.72 15.75 10.69C15.75 8.62001 14.07 6.94001 12 6.94001Z" fill="rgba(126, 87, 194, 0.7)"/>
+                                    <path d="M18.7802 19.36C17.0002 21 14.6202 22.01 12.0002 22.01C9.38022 22.01 7.00021 21 5.22021 19.36C5.46021 18.45 6.11022 17.62 7.06021 16.98C9.79022 15.16 14.2302 15.16 16.9402 16.98C17.9002 17.62 18.5402 18.45 18.7802 19.36Z" fill="rgba(126, 87, 194, 0.7)"/>
+                                </svg>
+                                <p class="text-center text-secondary">No photo selected yet</p>
+                            </div>
+                        </div>
+                        
+                        <form id="upload-form" enctype="multipart/form-data">
+                            <div class="upload-input">
+                                <input type="file" id="source-input" name="source" accept=".jpg,.jpeg,.png" required>
+                                <div class="upload-btn">
+                                    <i class="fas fa-cloud-upload-alt me-2"></i> Choose Photo
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-secondary mt-3 d-none" type="button" id="source-clear-btn">
+                                <i class="fas fa-times me-1"></i> Remove Photo
                             </button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
             
@@ -505,6 +521,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 sourcePreview.src = e.target.result;
                 sourcePreview.classList.remove('d-none');
                 sourcePlaceholder.classList.add('d-none');
+                sourceClearBtn.classList.remove('d-none');
             };
             
             reader.readAsDataURL(this.files[0]);
@@ -516,6 +533,7 @@ document.addEventListener('DOMContentLoaded', function() {
         sourceInput.value = '';
         sourcePreview.classList.add('d-none');
         sourcePlaceholder.classList.remove('d-none');
+        sourceClearBtn.classList.add('d-none');
     });
     
     // Generate all previews
