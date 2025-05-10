@@ -458,7 +458,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function loadTemplates(ceremony) {
-        fetch(`/api/templates?ceremony=${ceremony}`)
+        // Add cache busting parameter
+        const timestamp = Date.now();
+        fetch(`/api/templates?ceremony=${ceremony}&_t=${timestamp}`)
             .then(response => response.json())
             .then(data => {
                 const galleryEl = document.getElementById(`${ceremony}-templates`);
@@ -472,7 +474,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 
+                // Add template count information with timestamp
+                const countInfoEl = document.createElement('div');
+                countInfoEl.className = 'mb-3 small text-muted';
+                countInfoEl.innerHTML = `
+                    <i class="fas fa-info-circle me-1"></i>
+                    Found ${data.templates.length} templates for ${capitalize(ceremony)} ceremony.
+                    <span class="ms-2">Last updated: ${new Date().toLocaleTimeString()}</span>
+                `;
+                
                 galleryEl.innerHTML = '';
+                galleryEl.appendChild(countInfoEl);
                 
                 // Add templates to the gallery
                 data.templates.forEach(template => {
