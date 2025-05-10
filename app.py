@@ -51,21 +51,48 @@ def download_face_detection_model():
         raise
 
 def download_face_swap_model():
+    """
+    Download the face swap model from Hugging Face using the provided token.
+    """
     try:
         model_path = os.path.join('models', 'inswapper_128.onnx')
         os.makedirs('models', exist_ok=True)
         
         if not os.path.exists(model_path):
-            logger.info("Downloading face swap model...")
-            url = "https://huggingface.co/inswapper/inswapper_128.onnx/resolve/main/inswapper_128.onnx"
-            response = requests.get(url, stream=True)
+            logger.info("Downloading face swap model from Hugging Face...")
+            
+            # Get Hugging Face token from environment variables
+            hf_token = os.environ.get("HUGGINGFACE_TOKEN")
+            if not hf_token:
+                logger.error("HUGGINGFACE_TOKEN environment variable not set")
+                raise Exception("HUGGINGFACE_TOKEN not found in environment variables")
+            
+            # URL for the model on Hugging Face
+            url = "https://huggingface.co/deepinsight/inswapper/resolve/main/inswapper_128.onnx"
+            
+            # Set up headers with authorization
+            headers = {
+                'Authorization': f'Bearer {hf_token}',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+            
+            # Download the model
+            logger.info(f"Requesting model from {url}")
+            response = requests.get(url, headers=headers, stream=True)
+            
             if response.status_code == 200:
+                logger.info("Model download successful, saving file...")
                 with open(model_path, 'wb') as f:
-                    response.raw.decode_content = True
-                    shutil.copyfileobj(response.raw, f)
-                logger.info("Face swap model downloaded successfully")
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+                logger.info("Face swap model downloaded and saved successfully")
             else:
+                logger.error(f"Failed to download model, status code: {response.status_code}")
+                logger.error(f"Response text: {response.text}")
                 raise Exception(f"Failed to download face swap model. Status code: {response.status_code}")
+        else:
+            logger.info(f"Model already exists at {model_path}")
         
         return model_path
     except Exception as e:
