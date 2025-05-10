@@ -834,50 +834,79 @@
                 });
             }
             
-            // Category accordion functionality
-            const categoryTitles = document.querySelectorAll('.category-title');
+            // Category accordion functionality - direct execution
+            console.log("Setting up accordion");
             
-            // First, let's close all categories initially except Bride
-            categoryTitles.forEach(title => {
-                const targetId = title.getAttribute('data-target');
-                const contentElement = document.getElementById(targetId);
-                
-                if (contentElement) {
-                    // Keep bride category open initially, close others
-                    if (targetId === 'bride-content') {
-                        contentElement.classList.add('expanded');
-                        title.classList.remove('collapsed');
-                    } else {
-                        contentElement.classList.remove('expanded');
-                        title.classList.add('collapsed');
+            // Get all category titles
+            const accordionCategoryTitles = document.querySelectorAll('.category-title');
+            console.log("Found category titles:", accordionCategoryTitles.length);
+            
+            // Close all sections initially except Bride
+            const accordionAllContents = document.querySelectorAll('.category-content');
+            accordionAllContents.forEach(content => {
+                if (content.id !== 'bride-content') {
+                    content.classList.remove('expanded');
+                    
+                    // Find and collapse the corresponding title
+                    const matchingTitle = document.querySelector(`[data-target="${content.id}"]`);
+                    if (matchingTitle) {
+                        matchingTitle.classList.add('collapsed');
                     }
                 }
             });
             
-            // Then set up the click handlers
-            categoryTitles.forEach(title => {
-                title.addEventListener('click', function() {
-                    const targetId = this.getAttribute('data-target');
-                    const contentElement = document.getElementById(targetId);
-                    const isCurrentlyExpanded = contentElement.classList.contains('expanded');
+            // Make sure Bride section is open
+            const brideSectionContent = document.getElementById('bride-content');
+            if (brideSectionContent) {
+                brideSectionContent.classList.add('expanded');
+                const brideTitle = document.querySelector('[data-target="bride-content"]');
+                if (brideTitle) {
+                    brideTitle.classList.remove('collapsed');
+                }
+            }
+            
+            // Manual click handler setup
+            accordionCategoryTitles.forEach(title => {
+                title.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     
-                    // First, close all categories
-                    categoryTitles.forEach(t => {
-                        const tId = t.getAttribute('data-target');
-                        const tContent = document.getElementById(tId);
-                        if (tContent) {
-                            tContent.classList.remove('expanded');
-                            t.classList.add('collapsed');
-                        }
+                    console.log("Category title clicked");
+                    const targetId = this.getAttribute('data-target');
+                    
+                    if (!targetId) {
+                        console.warn("Missing data-target on clicked title");
+                        return;
+                    }
+                    
+                    const contentToToggle = document.getElementById(targetId);
+                    if (!contentToToggle) {
+                        console.warn("Missing content element for ID:", targetId);
+                        return;
+                    }
+                    
+                    const isCurrentlyExpanded = contentToToggle.classList.contains('expanded');
+                    console.log("Current state of", targetId, "is expanded:", isCurrentlyExpanded);
+                    
+                    // Close all categories
+                    accordionAllContents.forEach(content => {
+                        content.classList.remove('expanded');
+                    });
+                    accordionCategoryTitles.forEach(t => {
+                        t.classList.add('collapsed');
                     });
                     
-                    // Then, if the clicked category wasn't already expanded, open it
+                    // Toggle current category
                     if (!isCurrentlyExpanded) {
-                        contentElement.classList.add('expanded');
+                        contentToToggle.classList.add('expanded');
                         this.classList.remove('collapsed');
                     }
-                });
+                    
+                    return false;
+                };
             });
+            
+            console.log("Accordion setup completed");
             
             // Layout buttons
             const layoutBtns = document.querySelectorAll('[data-layout]');
