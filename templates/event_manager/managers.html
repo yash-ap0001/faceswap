@@ -378,23 +378,47 @@
                 </div>
                 
                 <div class="filter-group">
-                    <div class="filter-label">City</div>
-                    <select class="form-select" id="citySelect">
-                        <option value="">All Cities</option>
-                        <option value="mumbai">Mumbai</option>
-                        <option value="delhi">Delhi</option>
-                        <option value="bangalore">Bangalore</option>
-                        <option value="hyderabad">Hyderabad</option>
-                        <option value="chennai">Chennai</option>
-                        <option value="kolkata">Kolkata</option>
-                        <option value="jaipur">Jaipur</option>
-                        <option value="ahmedabad">Ahmedabad</option>
-                        <option value="pune">Pune</option>
+                    <div class="filter-label">Location</div>
+                    <select class="form-select" id="locationSelect" name="location">
+                        <option value="">All Locations</option>
+                        {% for location in locations %}
+                        <option value="{{ location }}" {% if selected_location == location %}selected{% endif %}>{{ location }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 
-                <button class="btn btn-primary w-100 mt-3">Apply Filters</button>
-                <button class="btn btn-outline-secondary w-100 mt-2">Reset Filters</button>
+                <div class="filter-group">
+                    <div class="filter-label">Specialization</div>
+                    <select class="form-select" id="specializationSelect" name="specialization">
+                        <option value="">All Specializations</option>
+                        {% for specialization in specializations %}
+                        <option value="{{ specialization }}" {% if selected_specialization == specialization %}selected{% endif %}>{{ specialization }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <div class="filter-label">Service Category</div>
+                    <select class="form-select" id="serviceCategorySelect" name="service_category">
+                        <option value="">All Categories</option>
+                        {% for category in service_categories %}
+                        <option value="{{ category }}" {% if selected_service_category == category %}selected{% endif %}>{{ category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <div class="filter-label">Price Range</div>
+                    <select class="form-select" id="priceRangeSelect" name="price_range">
+                        <option value="">All Price Ranges</option>
+                        {% for price in price_ranges %}
+                        <option value="{{ price }}" {% if selected_price_range == price %}selected{% endif %}>{{ price }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <button class="btn btn-primary w-100 mt-3" type="submit">Apply Filters</button>
+                <a href="{{ url_for('event_managers') }}" class="btn btn-outline-secondary w-100 mt-2">Reset Filters</a>
             </div>
         </div>
         

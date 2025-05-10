@@ -344,7 +344,85 @@ def booking_management():
 # Event Manager section routes
 @app.route('/event-managers')
 def event_managers():
-    return render_template('event_manager/managers.html')
+    # Import the EventManager model
+    from models import EventManager
+    
+    # Get filter parameters from query string
+    location = request.args.get('location', '')
+    price_range = request.args.get('price_range', '')
+    specialization = request.args.get('specialization', '')
+    rating = request.args.get('rating', '')
+    service_category = request.args.get('service_category', '')
+    
+    # Start with all event managers
+    query = EventManager.query
+    
+    # Apply filters if provided
+    if location:
+        query = query.filter(EventManager.location.ilike(f'%{location}%'))
+    if price_range:
+        query = query.filter(EventManager.price_range == price_range)
+    if specialization:
+        query = query.filter(EventManager.specialization.ilike(f'%{specialization}%'))
+    if rating:
+        # Convert rating to float and filter for managers with that rating or higher
+        try:
+            min_rating = float(rating)
+            query = query.filter(EventManager.rating >= min_rating)
+        except ValueError:
+            pass
+    if service_category:
+        # Filter by service category (comma-separated list in database)
+        query = query.filter(EventManager.service_categories.ilike(f'%{service_category}%'))
+    
+    # Get all event managers after applying filters
+    event_managers = query.all()
+    
+    # Get unique locations, specializations, and service categories for filter dropdowns
+    all_managers = EventManager.query.all()
+    locations = set()
+    specializations = set()
+    service_categories = set()
+    price_ranges = set()
+    
+    for manager in all_managers:
+        # Add locations
+        if manager.location:
+            for loc in manager.location.split(','):
+                locations.add(loc.strip())
+        
+        # Add specialization
+        if manager.specialization:
+            specializations.add(manager.specialization)
+        
+        # Add service categories
+        if manager.service_categories:
+            for cat in manager.service_categories.split(','):
+                service_categories.add(cat.strip())
+        
+        # Add price ranges
+        if manager.price_range:
+            price_ranges.add(manager.price_range)
+    
+    # Sort the sets for consistent display
+    locations = sorted(list(locations))
+    specializations = sorted(list(specializations))
+    service_categories = sorted(list(service_categories))
+    price_ranges = sorted(list(price_ranges))
+    
+    return render_template(
+        'event_manager/managers.html',
+        event_managers=event_managers,
+        locations=locations,
+        specializations=specializations,
+        service_categories=service_categories,
+        price_ranges=price_ranges,
+        selected_location=location,
+        selected_price_range=price_range,
+        selected_specialization=specialization,
+        selected_rating=rating,
+        selected_service_category=service_category
+    )
 
 @app.route('/bridal-swap', methods=['GET', 'POST'])
 def bridal_swap():

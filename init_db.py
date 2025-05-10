@@ -404,6 +404,184 @@ def init_db():
                 db.session.add(task)
             
             db.session.commit()
+        # Add sample event managers if they don't exist
+        from models import EventManager
+        if EventManager.query.count() == 0:
+            print("Creating sample event managers...")
+            event_managers = [
+                {
+                    'name': 'Priya Sharma',
+                    'profile_photo': 'static/images/event_managers/priya_sharma.jpg',
+                    'email': 'priya@weddingplanners.com',
+                    'phone': '555-789-1234',
+                    'website': 'www.priyasharmaevents.com',
+                    'bio': 'With over 10 years of experience in planning luxury Indian weddings, Priya specializes in creating unforgettable ceremonies that blend tradition with modern elegance.',
+                    'rating': 4.8,
+                    'price_range': '$$$',
+                    'service_categories': 'Full Planning,Day-of Coordination,Destination Weddings',
+                    'location': 'Mumbai, Delhi NCR',
+                    'experience_years': 10,
+                    'specialization': 'Luxury Weddings',
+                    'languages': 'Hindi, English, Punjabi'
+                },
+                {
+                    'name': 'Arjun Patel',
+                    'profile_photo': 'static/images/event_managers/arjun_patel.jpg',
+                    'email': 'arjun@celebrateindia.com',
+                    'phone': '555-234-5678',
+                    'website': 'www.celebrateindia.com',
+                    'bio': 'Arjun brings creativity and precision to every wedding he plans. His background in hospitality ensures that no detail is overlooked.',
+                    'rating': 4.6,
+                    'price_range': '$$',
+                    'service_categories': 'Full Planning,Vendor Management,Decor Design',
+                    'location': 'Bengaluru, Chennai',
+                    'experience_years': 7,
+                    'specialization': 'South Indian Ceremonies',
+                    'languages': 'English, Tamil, Telugu, Kannada'
+                },
+                {
+                    'name': 'Meera Kapoor',
+                    'profile_photo': 'static/images/event_managers/meera_kapoor.jpg',
+                    'email': 'meera@royalweddings.com',
+                    'phone': '555-456-7890',
+                    'website': 'www.meerakapoorweddings.com',
+                    'bio': 'Meera specializes in royal-themed weddings that capture the grandeur of Indian heritage while incorporating contemporary elements.',
+                    'rating': 4.9,
+                    'price_range': '$$$$',
+                    'service_categories': 'Luxury Planning,Royal Venue Selection,Celebrity Management',
+                    'location': 'Jaipur, Udaipur',
+                    'experience_years': 12,
+                    'specialization': 'Royal Rajasthani Weddings',
+                    'languages': 'Hindi, English, Rajasthani'
+                },
+                {
+                    'name': 'Vikram Singh',
+                    'profile_photo': 'static/images/event_managers/vikram_singh.jpg',
+                    'email': 'vikram@destinationweddings.com',
+                    'phone': '555-345-6789',
+                    'website': 'www.vikramsinghweddings.com',
+                    'bio': 'Vikram is known for his expertise in planning destination weddings across India and internationally, creating bespoke experiences for couples.',
+                    'rating': 4.7,
+                    'price_range': '$$$',
+                    'service_categories': 'Destination Weddings,Travel Arrangements,Beach Ceremonies',
+                    'location': 'Goa, Kerala',
+                    'experience_years': 9,
+                    'specialization': 'Beach Weddings',
+                    'languages': 'English, Hindi, Konkani'
+                },
+                {
+                    'name': 'Anjali Desai',
+                    'profile_photo': 'static/images/event_managers/anjali_desai.jpg',
+                    'email': 'anjali@intimateweddings.com',
+                    'phone': '555-890-1234',
+                    'website': 'www.anjalidesaiweddings.com',
+                    'bio': 'Anjali focuses on creating intimate, personalized wedding experiences that tell each couple\'s unique story.',
+                    'rating': 4.5,
+                    'price_range': '$',
+                    'service_categories': 'Intimate Weddings,Budget Planning,DIY Coordination',
+                    'location': 'Pune, Ahmedabad',
+                    'experience_years': 5,
+                    'specialization': 'Intimate Ceremonies',
+                    'languages': 'Gujarati, Hindi, English'
+                },
+                {
+                    'name': 'Raj Malhotra',
+                    'profile_photo': 'static/images/event_managers/raj_malhotra.jpg',
+                    'email': 'raj@modernweddings.com',
+                    'phone': '555-123-9876',
+                    'website': 'www.rajmalhotraweddings.com',
+                    'bio': 'Raj specializes in modern, tech-integrated weddings that combine traditional elements with contemporary innovation.',
+                    'rating': 4.4,
+                    'price_range': '$$',
+                    'service_categories': 'Modern Planning,Tech Integration,Live Streaming',
+                    'location': 'Hyderabad, Mumbai',
+                    'experience_years': 6,
+                    'specialization': 'Tech-Integrated Events',
+                    'languages': 'English, Hindi'
+                },
+                {
+                    'name': 'Nisha Mehta',
+                    'profile_photo': 'static/images/event_managers/nisha_mehta.jpg',
+                    'email': 'nisha@traditionweddings.com',
+                    'phone': '555-567-8901',
+                    'website': 'www.nishamehtaevents.com',
+                    'bio': 'Nisha is dedicated to preserving cultural traditions while creating beautiful, meaningful wedding ceremonies.',
+                    'rating': 4.7,
+                    'price_range': '$$',
+                    'service_categories': 'Traditional Ceremonies,Cultural Consulting,Ritual Planning',
+                    'location': 'Kolkata, Varanasi',
+                    'experience_years': 11,
+                    'specialization': 'Traditional Bengali Weddings',
+                    'languages': 'Bengali, Hindi, English'
+                },
+                {
+                    'name': 'Sanjay Verma',
+                    'profile_photo': 'static/images/event_managers/sanjay_verma.jpg',
+                    'email': 'sanjay@luxeweddings.com',
+                    'phone': '555-678-9012',
+                    'website': 'www.sanjayvermaevents.com',
+                    'bio': 'Sanjay brings his background in luxury hospitality to create opulent wedding experiences for high-profile clients.',
+                    'rating': 4.8,
+                    'price_range': '$$$$',
+                    'service_categories': 'Celebrity Weddings,Luxury Planning,High-Profile Security',
+                    'location': 'Delhi, Mumbai',
+                    'experience_years': 15,
+                    'specialization': 'Celebrity Weddings',
+                    'languages': 'Hindi, English, French'
+                }
+            ]
+            
+            # Create an uploads/images/event_managers directory if it doesn't exist
+            import os
+            event_managers_dir = os.path.join('static', 'images', 'event_managers')
+            os.makedirs(event_managers_dir, exist_ok=True)
+            
+            # Create placeholder profile images if they don't exist
+            for manager in event_managers:
+                # Check if the profile photo exists
+                photo_path = manager['profile_photo']
+                if not os.path.exists(photo_path):
+                    # Create a placeholder image with the manager's initials
+                    import cv2
+                    import numpy as np
+                    
+                    # Create a colored background with manager's initials
+                    img = np.zeros((400, 400, 3), dtype=np.uint8)
+                    
+                    # Generate a color based on the name (for consistent colors)
+                    name_hash = sum(ord(c) for c in manager['name'])
+                    color = (name_hash % 180 + 50, 180, 200)  # Ensure good hue, saturation, value
+                    
+                    # Fill the background
+                    img[:] = color
+                    
+                    # Get initials
+                    name_parts = manager['name'].split()
+                    initials = ''.join([name[0] for name in name_parts])
+                    
+                    # Add text
+                    font = cv2.FONT_HERSHEY_SIMPLEX
+                    text_size = cv2.getTextSize(initials, font, 2, 3)[0]
+                    text_x = (img.shape[1] - text_size[0]) // 2
+                    text_y = (img.shape[0] + text_size[1]) // 2
+                    
+                    # White text
+                    cv2.putText(img, initials, (text_x, text_y), font, 2, (255, 255, 255), 3)
+                    
+                    # Convert HSV to BGR for saving
+                    if color[0] > 0:  # If we used HSV
+                        img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
+                    
+                    # Save the image
+                    os.makedirs(os.path.dirname(photo_path), exist_ok=True)
+                    cv2.imwrite(photo_path, img)
+            
+            # Add the event managers to the database
+            for manager_data in event_managers:
+                manager = EventManager(**manager_data)
+                db.session.add(manager)
+            
+            db.session.commit()
         
         print("Database initialization complete!")
 
