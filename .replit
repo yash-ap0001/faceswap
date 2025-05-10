@@ -2,7 +2,7 @@ modules = ["python-3.11"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["libGL", "libGLU", "oneDNN", "openssl", "postgresql", "re2"]
+packages = ["abseil-cpp", "gtest", "libGL", "libGLU", "oneDNN", "openssl", "postgresql", "re2"]
 
 [deployment]
 deploymentTarget = "autoscale"

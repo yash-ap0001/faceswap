@@ -50,49 +50,86 @@ def download_face_detection_model():
         logger.error(traceback.format_exc())
         raise
 
+def create_demo_result(source_img, target_img, source_face, target_face):
+    """
+    Create a simple visualization of what a face swap would look like.
+    This is used when the face swap model cannot be downloaded.
+    """
+    # Create a simple face blend for demonstration
+    result_img = target_img.copy()
+    
+    # Get the bounding boxes
+    x1, y1, x2, y2 = [int(coord) for coord in target_face.bbox]
+    
+    # Draw a rectangle around the face to indicate where the swap would happen
+    cv2.rectangle(result_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    
+    # Add text indicating this is a demo
+    cv2.putText(
+        result_img, 
+        "Demo Mode - Model unavailable", 
+        (x1, y1-10), 
+        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2
+    )
+    
+    return result_img
+
 def download_face_swap_model():
     """
-    Download the face swap model from Hugging Face using the provided token.
+    Download the face swap model from various sources.
     """
     try:
         model_path = os.path.join('models', 'inswapper_128.onnx')
         os.makedirs('models', exist_ok=True)
         
+        # Clear any existing model file if it's invalid
+        if os.path.exists(model_path):
+            try:
+                # Test if the file is a valid ONNX model
+                import onnx
+                onnx.load(model_path)
+                logger.info(f"Existing model file at {model_path} is valid.")
+                return model_path
+            except Exception:
+                logger.warning(f"Existing model file at {model_path} is invalid. Removing it.")
+                os.remove(model_path)
+        
         if not os.path.exists(model_path):
-            logger.info("Downloading face swap model from Hugging Face...")
+            logger.info("Attempting to download face swap model...")
+            success = False
             
-            # Get Hugging Face token from environment variables
-            hf_token = os.environ.get("HUGGINGFACE_TOKEN")
-            if not hf_token:
-                logger.error("HUGGINGFACE_TOKEN environment variable not set")
-                raise Exception("HUGGINGFACE_TOKEN not found in environment variables")
+            # List of URLs to try
+            urls = [
+                # Try various mirrors
+                "https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128.onnx"
+            ]
             
-            # URL for the model on Hugging Face
-            url = "https://huggingface.co/deepinsight/inswapper/resolve/main/inswapper_128.onnx"
-            
-            # Set up headers with authorization
             headers = {
-                'Authorization': f'Bearer {hf_token}',
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             }
             
-            # Download the model
-            logger.info(f"Requesting model from {url}")
-            response = requests.get(url, headers=headers, stream=True)
+            for url in urls:
+                try:
+                    logger.info(f"Trying to download model from {url}")
+                    response = requests.get(url, headers=headers, stream=True)
+                    
+                    if response.status_code == 200:
+                        logger.info("Model download successful, saving file...")
+                        with open(model_path, 'wb') as f:
+                            for chunk in response.iter_content(chunk_size=8192):
+                                if chunk:
+                                    f.write(chunk)
+                        logger.info("Face swap model downloaded and saved successfully")
+                        success = True
+                        break
+                    else:
+                        logger.warning(f"Failed to download from {url}, status code: {response.status_code}")
+                except Exception as e:
+                    logger.warning(f"Error downloading from {url}: {str(e)}")
             
-            if response.status_code == 200:
-                logger.info("Model download successful, saving file...")
-                with open(model_path, 'wb') as f:
-                    for chunk in response.iter_content(chunk_size=8192):
-                        if chunk:
-                            f.write(chunk)
-                logger.info("Face swap model downloaded and saved successfully")
-            else:
-                logger.error(f"Failed to download model, status code: {response.status_code}")
-                logger.error(f"Response text: {response.text}")
-                raise Exception(f"Failed to download face swap model. Status code: {response.status_code}")
-        else:
-            logger.info(f"Model already exists at {model_path}")
+            if not success:
+                logger.error("Failed to download model from all sources")
+                raise Exception("Failed to download face swap model from all available sources")
         
         return model_path
     except Exception as e:
@@ -101,6 +138,7 @@ def download_face_swap_model():
         raise
 
 # Initialize models
+demo_mode = False
 try:
     # First download and initialize face detection model
     logger.info("Starting model initialization...")
@@ -113,13 +151,19 @@ try:
     faceapp.prepare(ctx_id=0, det_size=(640, 640))
     logger.info("Face detection model initialized successfully")
     
-    # Then download and initialize face swap model
-    swap_model_path = download_face_swap_model()
-    logger.info(f"Face swap model path: {swap_model_path}")
-    
-    swapper = get_model(swap_model_path, providers=providers)
-    logger.info("Face swap model initialized successfully")
-    print("All models loaded successfully!")
+    try:
+        # Then download and initialize face swap model
+        swap_model_path = download_face_swap_model()
+        logger.info(f"Face swap model path: {swap_model_path}")
+        
+        swapper = get_model(swap_model_path, providers=providers)
+        logger.info("Face swap model initialized successfully")
+        print("All models loaded successfully!")
+    except Exception as e:
+        logger.warning(f"Failed to initialize face swap model: {str(e)}")
+        logger.warning("Running in demonstration mode with visual indicators instead of actual face swapping")
+        swapper = None
+        demo_mode = True
 except Exception as e:
     logger.error(f"Error loading models: {str(e)}")
     logger.error(traceback.format_exc())
@@ -137,8 +181,8 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    if faceapp is None or swapper is None:
-        return jsonify({'error': 'Models not loaded. Please check server logs.'}), 500
+    if faceapp is None:
+        return jsonify({'error': 'Face detection model not loaded. Please check server logs.'}), 500
 
     if 'source' not in request.files or 'target' not in request.files:
         return jsonify({'error': 'No file part'}), 400
@@ -177,8 +221,14 @@ def upload_file():
         if not target_faces:
             return jsonify({'error': 'No face detected in target image'}), 400
         
-        # Perform face swap
-        result_img = swapper.get(target_img, target_faces[0], source_faces[0])
+        # Check if we're running in demo mode or with actual face swap
+        if demo_mode or swapper is None:
+            logger.info("Using demo mode for face visualization")
+            result_img = create_demo_result(source_img, target_img, source_faces[0], target_faces[0])
+        else:
+            # Perform actual face swap with the model
+            logger.info("Performing face swap with the model")
+            result_img = swapper.get(target_img, target_faces[0], source_faces[0])
         
         # Save result
         output_filename = 'result_' + secure_filename(target_file.filename)
@@ -191,7 +241,8 @@ def upload_file():
         
         return jsonify({
             'success': True,
-            'result_image': output_filename
+            'result_image': output_filename,
+            'demo_mode': demo_mode
         })
         
     except Exception as e:
@@ -212,6 +263,7 @@ def uploaded_file(filename):
 def check_models():
     status = {
         'face_detection': faceapp is not None,
-        'face_swap': swapper is not None
+        'face_swap': swapper is not None,
+        'demo_mode': demo_mode
     }
     return jsonify(status)

@@ -149,17 +149,17 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('/check-models')
             .then(response => response.json())
             .then(data => {
-                if (!data.face_detection || !data.face_swap) {
+                if (!data.face_detection) {
                     modelStatusAlert.classList.remove('d-none');
-                    modelStatusMessage.textContent = 'Some AI models are not loaded properly. The application may not work correctly.';
-                    
-                    if (!data.face_detection && !data.face_swap) {
-                        modelStatusMessage.textContent = 'Face detection and face swap models are not loaded. Please check server logs.';
-                    } else if (!data.face_detection) {
-                        modelStatusMessage.textContent = 'Face detection model is not loaded. Please check server logs.';
-                    } else if (!data.face_swap) {
-                        modelStatusMessage.textContent = 'Face swap model is not loaded. Please check server logs.';
-                    }
+                    modelStatusMessage.textContent = 'Face detection model is not loaded. The application cannot work properly.';
+                } else if (data.demo_mode) {
+                    modelStatusAlert.classList.remove('d-none');
+                    modelStatusAlert.classList.remove('alert-warning');
+                    modelStatusAlert.classList.add('alert-info');
+                    modelStatusMessage.textContent = 'Running in demonstration mode. Face detection works, but face swapping will show visual indicators instead of actual face swaps.';
+                } else if (!data.face_swap) {
+                    modelStatusAlert.classList.remove('d-none');
+                    modelStatusMessage.textContent = 'Face swap model is not loaded. The application will only detect faces but cannot swap them.';
                 } else {
                     modelStatusAlert.classList.add('d-none');
                 }
