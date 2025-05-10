@@ -52,27 +52,72 @@ def download_face_detection_model():
 
 def create_demo_result(source_img, target_img, source_face, target_face):
     """
-    Create a simple visualization of what a face swap would look like.
-    This is used when the face swap model cannot be downloaded.
+    Create a side-by-side visualization showing both the source and target images
+    with face detection boxes. This is used when the face swap model is unavailable.
     """
-    # Create a simple face blend for demonstration
-    result_img = target_img.copy()
+    # Create copies of both images to draw on
+    source_copy = source_img.copy()
+    target_copy = target_img.copy()
     
     # Get the bounding boxes
-    x1, y1, x2, y2 = [int(coord) for coord in target_face.bbox]
+    sx1, sy1, sx2, sy2 = [int(coord) for coord in source_face.bbox]
+    tx1, ty1, tx2, ty2 = [int(coord) for coord in target_face.bbox]
     
-    # Draw a rectangle around the face to indicate where the swap would happen
-    cv2.rectangle(result_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    # Draw rectangles around the faces
+    cv2.rectangle(source_copy, (sx1, sy1), (sx2, sy2), (0, 255, 0), 2)  # Green for source
+    cv2.rectangle(target_copy, (tx1, ty1), (tx2, ty2), (0, 0, 255), 2)  # Red for target
     
-    # Add text indicating this is a demo
+    # Add labels
+    cv2.putText(source_copy, "Source Face", (sx1, sy1-10), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+    cv2.putText(target_copy, "Target Face", (tx1, ty1-10), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+    
+    # Create a side-by-side image
+    # Resize images to the same height
+    height = max(source_copy.shape[0], target_copy.shape[0])
+    width_source = int(source_copy.shape[1] * height / source_copy.shape[0])
+    width_target = int(target_copy.shape[1] * height / target_copy.shape[0])
+    
+    source_resized = cv2.resize(source_copy, (width_source, height))
+    target_resized = cv2.resize(target_copy, (width_target, height))
+    
+    # Create the combined image
+    total_width = width_source + width_target
+    combined_img = np.zeros((height, total_width, 3), dtype=np.uint8)
+    
+    # Add both images to the combined one
+    combined_img[:, :width_source] = source_resized
+    combined_img[:, width_source:] = target_resized
+    
+    # Add a vertical line to separate the images
+    cv2.line(combined_img, (width_source, 0), (width_source, height), (255, 255, 255), 2)
+    
+    # Add a title banner at the top
+    banner_height = 60
+    combined_with_banner = np.zeros((height + banner_height, total_width, 3), dtype=np.uint8)
+    combined_with_banner[banner_height:, :] = combined_img
+    
+    # Add banner text
     cv2.putText(
-        result_img, 
-        "Demo Mode - Model unavailable", 
-        (x1, y1-10), 
-        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2
+        combined_with_banner, 
+        "DEMONSTRATION MODE - Face Swap Model Not Available", 
+        (20, 40), 
+        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2
     )
     
-    return result_img
+    # Add arrow pointing from source face to target face
+    arrow_start_x = width_source - 50
+    arrow_end_x = width_source + 50
+    arrow_y = height // 2
+    cv2.arrowedLine(
+        combined_with_banner, 
+        (arrow_start_x, arrow_y), 
+        (arrow_end_x, arrow_y), 
+        (0, 255, 255), 2, tipLength=0.3
+    )
+    
+    return combined_with_banner
 
 def download_face_swap_model():
     """
@@ -271,11 +316,17 @@ def upload_file():
         os.remove(source_path)
         os.remove(target_path)
         
-        return jsonify({
+        response_data = {
             'success': True,
             'result_image': output_filename,
             'demo_mode': demo_mode
-        })
+        }
+        
+        # Add more information when in demo mode
+        if demo_mode:
+            response_data['message'] = 'Running in demonstration mode. The image shows detected faces with boxes instead of actual face swapping.'
+            
+        return jsonify(response_data)
         
     except Exception as e:
         logger.error(f"Error in upload_file: {str(e)}")

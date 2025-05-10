@@ -99,7 +99,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 resultImage.src = `/uploads/${data.result_image}`;
                 downloadBtn.href = `/uploads/${data.result_image}`;
                 downloadBtn.download = data.result_image;
+                
+                // Show result container
                 resultContainer.classList.remove('d-none');
+                
+                // If in demo mode, display an additional message
+                if (data.demo_mode) {
+                    // Check if we already have a demo mode alert
+                    let demoAlert = document.getElementById('demo-result-alert');
+                    if (!demoAlert) {
+                        // Create a new alert element
+                        demoAlert = document.createElement('div');
+                        demoAlert.id = 'demo-result-alert';
+                        demoAlert.className = 'alert alert-info mt-3';
+                        demoAlert.textContent = data.message || 'Running in demonstration mode. The image shows detected faces instead of actual face swapping.';
+                        
+                        // Insert it before the result image
+                        resultContainer.insertBefore(demoAlert, resultImage.parentNode);
+                    } else {
+                        // Update existing alert
+                        demoAlert.textContent = data.message || 'Running in demonstration mode. The image shows detected faces instead of actual face swapping.';
+                        demoAlert.classList.remove('d-none');
+                    }
+                } else {
+                    // Hide the demo alert if it exists
+                    const existingAlert = document.getElementById('demo-result-alert');
+                    if (existingAlert) {
+                        existingAlert.classList.add('d-none');
+                    }
+                }
+                
                 window.scrollTo({
                     top: resultContainer.offsetTop,
                     behavior: 'smooth'
