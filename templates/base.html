@@ -292,19 +292,32 @@
             transition: transform 0.3s ease;
         }
         
-        .category-title.collapsed .chevron-icon {
-            transform: rotate(-90deg);
+        /* Custom accordion styling */
+        .accordion-button {
+            font-size: 1.1rem;
+            color: var(--light-purple) !important;
+            font-weight: 600;
+            padding: 10px;
+            border-radius: 0.35rem;
+            background-color: rgba(255, 255, 255, 0.05) !important;
         }
         
-        .category-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
+        .accordion-button:not(.collapsed) {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
         }
         
-        .category-content.expanded {
-            max-height: 300px;
-            padding-top: 10px;
+        .accordion-button:focus {
+            box-shadow: none;
+            border-color: transparent;
+        }
+        
+        .accordion-button::after {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%239c4dcc'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        }
+        
+        .accordion-button:not(.collapsed)::after {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
         }
         
         .sidebar-menu {
@@ -603,105 +616,139 @@
             </button>
         </div>
         <div class="sidebar-content">
-            <div class="sidebar-section">
-                <h6 class="category-title" data-target="bride-content">
-                    <div>
-                        <i class="fas fa-female me-2"></i>Bride
-                    </div>
-                    <i class="fas fa-chevron-down chevron-icon"></i>
-                </h6>
-                <div class="category-content expanded" id="bride-content">
-                    <ul class="sidebar-menu">
-                        <li><a href="/bridal-gallery"><i class="fas fa-angle-right me-2"></i>Bridal Face Swap</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Bridal Outfits</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Jewelry Collections</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Makeup Styles</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="sidebar-section">
-                <h6 class="category-title" data-target="groom-content">
-                    <div>
-                        <i class="fas fa-male me-2"></i>Groom
-                    </div>
-                    <i class="fas fa-chevron-down chevron-icon"></i>
-                </h6>
-                <div class="category-content expanded" id="groom-content">
-                    <ul class="sidebar-menu">
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Groom Face Swap</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Traditional Wear</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Modern Suits</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Accessories</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="sidebar-section">
-                <h6 class="category-title" data-target="event-manager-content">
-                    <div>
-                        <i class="fas fa-user-tie me-2"></i>Event Manager
-                    </div>
-                    <i class="fas fa-chevron-down chevron-icon"></i>
-                </h6>
-                <div class="category-content expanded" id="event-manager-content">
-                    <ul class="sidebar-menu">
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Event Planner</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Guest Management</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Timeline Creator</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Budget Calculator</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="sidebar-section">
-                <h6 class="category-title" data-target="convention-halls-content">
-                    <div>
-                        <i class="fas fa-building me-2"></i>Convention Halls
-                    </div>
-                    <i class="fas fa-chevron-down chevron-icon"></i>
-                </h6>
-                <div class="category-content expanded" id="convention-halls-content">
-                    <ul class="sidebar-menu">
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Venue Search</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Hall Comparison</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Virtual Tours</a></li>
-                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Booking Management</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="sidebar-section">
-                <h6 class="category-title" data-target="settings-content">
-                    <div>
-                        <i class="fas fa-cog me-2"></i>Settings
-                    </div>
-                    <i class="fas fa-chevron-down chevron-icon"></i>
-                </h6>
-                <div class="category-content expanded" id="settings-content">
-                    <div class="setting-item mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>Theme</span>
-                            <label class="switch">
-                                <input type="checkbox" id="themeSwitch">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <small class="text-secondary">Light Purple</small>
-                            <small class="text-secondary">Deep Purple</small>
-                        </div>
-                    </div>
-                    
-                    <div class="setting-item">
-                        <div class="mb-2">Layout Style</div>
-                        <div class="btn-group w-100">
-                            <button class="btn btn-sm btn-outline-light active" data-layout="grid">Grid</button>
-                            <button class="btn btn-sm btn-outline-light" data-layout="list">List</button>
+            <!-- Bootstrap Accordion -->
+            <div class="accordion" id="sidebarAccordion">
+                <!-- Bride Section -->
+                <div class="accordion-item bg-transparent border-0 mb-2">
+                    <h6 class="accordion-header" id="headingBride">
+                        <button class="accordion-button bg-transparent text-white shadow-none" 
+                                type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#collapseBride" aria-expanded="true" 
+                                aria-controls="collapseBride">
+                            <i class="fas fa-female me-2"></i>Bride
+                        </button>
+                    </h6>
+                    <div id="collapseBride" class="accordion-collapse collapse show" 
+                         aria-labelledby="headingBride" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0 pt-2">
+                            <ul class="sidebar-menu">
+                                <li><a href="/bridal-gallery"><i class="fas fa-angle-right me-2"></i>Bridal Face Swap</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Bridal Outfits</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Jewelry Collections</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Makeup Styles</a></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
+                
+                <!-- Groom Section -->
+                <div class="accordion-item bg-transparent border-0 mb-2">
+                    <h6 class="accordion-header" id="headingGroom">
+                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
+                                type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#collapseGroom" aria-expanded="false" 
+                                aria-controls="collapseGroom">
+                            <i class="fas fa-male me-2"></i>Groom
+                        </button>
+                    </h6>
+                    <div id="collapseGroom" class="accordion-collapse collapse" 
+                         aria-labelledby="headingGroom" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0 pt-2">
+                            <ul class="sidebar-menu">
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Groom Face Swap</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Traditional Wear</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Modern Suits</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Accessories</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Event Manager Section -->
+                <div class="accordion-item bg-transparent border-0 mb-2">
+                    <h6 class="accordion-header" id="headingEventManager">
+                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
+                                type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#collapseEventManager" aria-expanded="false" 
+                                aria-controls="collapseEventManager">
+                            <i class="fas fa-user-tie me-2"></i>Event Manager
+                        </button>
+                    </h6>
+                    <div id="collapseEventManager" class="accordion-collapse collapse" 
+                         aria-labelledby="headingEventManager" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0 pt-2">
+                            <ul class="sidebar-menu">
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Event Planner</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Guest Management</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Timeline Creator</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Budget Calculator</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Convention Halls Section -->
+                <div class="accordion-item bg-transparent border-0 mb-2">
+                    <h6 class="accordion-header" id="headingConventionHalls">
+                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
+                                type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#collapseConventionHalls" aria-expanded="false" 
+                                aria-controls="collapseConventionHalls">
+                            <i class="fas fa-building me-2"></i>Convention Halls
+                        </button>
+                    </h6>
+                    <div id="collapseConventionHalls" class="accordion-collapse collapse" 
+                         aria-labelledby="headingConventionHalls" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0 pt-2">
+                            <ul class="sidebar-menu">
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Venue Search</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Hall Comparison</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Virtual Tours</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Booking Management</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Section -->
+                <div class="accordion-item bg-transparent border-0 mb-2">
+                    <h6 class="accordion-header" id="headingSettings">
+                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
+                                type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#collapseSettings" aria-expanded="false" 
+                                aria-controls="collapseSettings">
+                            <i class="fas fa-cog me-2"></i>Settings
+                        </button>
+                    </h6>
+                    <div id="collapseSettings" class="accordion-collapse collapse" 
+                         aria-labelledby="headingSettings" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0 pt-2">
+                            <div class="setting-item mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Theme</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="themeSwitch">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-secondary">Light Purple</small>
+                                    <small class="text-secondary">Deep Purple</small>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="mb-2">Layout Style</div>
+                                <div class="btn-group w-100">
+                                    <button class="btn btn-sm btn-outline-light active" data-layout="grid">Grid</button>
+                                    <button class="btn btn-sm btn-outline-light" data-layout="list">List</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
         </div>
     </div>
 
