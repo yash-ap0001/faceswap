@@ -2,22 +2,30 @@ import os
 import sys
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash
-from app_updated import app, db
+from db import db
 from models import (
     User, WeddingEvent, Guest, Vendor, 
     UserImage, TemplateImage, GeneratedImage, 
     EventImage, Task, BudgetItem
 )
 
-def init_db():
+def init_db(app=None):
     """Initialize the database with some sample data for demonstration."""
-    with app.app_context():
+    # Create all tables if app is provided, otherwise assume we're in app context already
+    if app:
+        with app.app_context():
+            db.create_all()
+            _init_sample_data()
+            return
+    else:
         # Create all tables
         db.create_all()
+        _init_sample_data()
         
-        print("Creating admin user...")
-        # Create admin user if it doesn't exist
-        admin = User.query.filter_by(email='admin@bridalvision.com').first()
+def _init_sample_data():
+    print("Creating admin user...")
+    # Create admin user if it doesn't exist
+    admin = User.query.filter_by(email='admin@bridalvision.com').first()
         if not admin:
             admin = User(
                 username='admin',

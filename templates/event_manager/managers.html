@@ -294,132 +294,64 @@
     <div class="row">
         <!-- Filter Sidebar -->
         <div class="col-lg-3 mb-4">
-            <div class="filter-sidebar">
-                <h4 class="filter-heading">Filter Results</h4>
-                
-                <div class="filter-group">
-                    <div class="filter-label">Ceremony Type</div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="weddingCheck" checked>
-                        <label class="form-check-label" for="weddingCheck">
-                            Wedding
-                        </label>
+            <form action="{{ url_for('event_managers') }}" method="get">
+                <div class="filter-sidebar">
+                    <h4 class="filter-heading">Filter Results</h4>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Rating</div>
+                        <select class="form-select" id="ratingSelect" name="rating">
+                            <option value="">Any Rating</option>
+                            <option value="5" {% if selected_rating == '5' %}selected{% endif %}>5 Stars</option>
+                            <option value="4" {% if selected_rating == '4' %}selected{% endif %}>4+ Stars</option>
+                            <option value="3" {% if selected_rating == '3' %}selected{% endif %}>3+ Stars</option>
+                        </select>
                     </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="haldiCheck" checked>
-                        <label class="form-check-label" for="haldiCheck">
-                            Haldi
-                        </label>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Location</div>
+                        <select class="form-select" id="locationSelect" name="location">
+                            <option value="">All Locations</option>
+                            {% for location in locations %}
+                            <option value="{{ location }}" {% if selected_location == location %}selected{% endif %}>{{ location }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="mehendiCheck" checked>
-                        <label class="form-check-label" for="mehendiCheck">
-                            Mehendi
-                        </label>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Specialization</div>
+                        <select class="form-select" id="specializationSelect" name="specialization">
+                            <option value="">All Specializations</option>
+                            {% for specialization in specializations %}
+                            <option value="{{ specialization }}" {% if selected_specialization == specialization %}selected{% endif %}>{{ specialization }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="sangeethCheck" checked>
-                        <label class="form-check-label" for="sangeethCheck">
-                            Sangeeth
-                        </label>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Service Category</div>
+                        <select class="form-select" id="serviceCategorySelect" name="service_category">
+                            <option value="">All Categories</option>
+                            {% for category in service_categories %}
+                            <option value="{{ category }}" {% if selected_service_category == category %}selected{% endif %}>{{ category }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="receptionCheck" checked>
-                        <label class="form-check-label" for="receptionCheck">
-                            Reception
-                        </label>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Price Range</div>
+                        <select class="form-select" id="priceRangeSelect" name="price_range">
+                            <option value="">All Price Ranges</option>
+                            {% for price in price_ranges %}
+                            <option value="{{ price }}" {% if selected_price_range == price %}selected{% endif %}>{{ price }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
+                    
+                    <button class="btn btn-primary w-100 mt-3" type="submit">Apply Filters</button>
+                    <a href="{{ url_for('event_managers') }}" class="btn btn-outline-secondary w-100 mt-2">Reset Filters</a>
                 </div>
-                
-                <div class="filter-group">
-                    <div class="filter-label">Budget Range</div>
-                    <div class="range-filter">
-                        <input type="range" class="form-range" min="10000" max="500000" step="5000" id="budgetRange" value="100000">
-                        <div class="range-values">
-                            <span>₹10,000</span>
-                            <span id="budgetValue">₹100,000</span>
-                            <span>₹500,000</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="filter-group">
-                    <div class="filter-label">Rating</div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="rating5" checked>
-                        <label class="form-check-label" for="rating5">
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                        </label>
-                    </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="rating4" checked>
-                        <label class="form-check-label" for="rating4">
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="far fa-star text-warning"></i> & Up
-                        </label>
-                    </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="rating3" checked>
-                        <label class="form-check-label" for="rating3">
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="far fa-star text-warning"></i>
-                            <i class="far fa-star text-warning"></i> & Up
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="filter-group">
-                    <div class="filter-label">Location</div>
-                    <select class="form-select" id="locationSelect" name="location">
-                        <option value="">All Locations</option>
-                        {% for location in locations %}
-                        <option value="{{ location }}" {% if selected_location == location %}selected{% endif %}>{{ location }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <div class="filter-label">Specialization</div>
-                    <select class="form-select" id="specializationSelect" name="specialization">
-                        <option value="">All Specializations</option>
-                        {% for specialization in specializations %}
-                        <option value="{{ specialization }}" {% if selected_specialization == specialization %}selected{% endif %}>{{ specialization }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <div class="filter-label">Service Category</div>
-                    <select class="form-select" id="serviceCategorySelect" name="service_category">
-                        <option value="">All Categories</option>
-                        {% for category in service_categories %}
-                        <option value="{{ category }}" {% if selected_service_category == category %}selected{% endif %}>{{ category }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <div class="filter-label">Price Range</div>
-                    <select class="form-select" id="priceRangeSelect" name="price_range">
-                        <option value="">All Price Ranges</option>
-                        {% for price in price_ranges %}
-                        <option value="{{ price }}" {% if selected_price_range == price %}selected{% endif %}>{{ price }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <button class="btn btn-primary w-100 mt-3" type="submit">Apply Filters</button>
-                <a href="{{ url_for('event_managers') }}" class="btn btn-outline-secondary w-100 mt-2">Reset Filters</a>
-            </div>
+            </form>
         </div>
         
         <!-- Main Content -->
@@ -503,409 +435,188 @@
                         </div>
                     </div>
                 {% endif %}
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <span class="ms-1 text-light">(5.0)</span>
-                            </div>
-                            <div class="manager-card-price">₹1,00,000 - ₹3,00,000</div>
-                            <div class="manager-card-location">
-                                <i class="fas fa-map-marker-alt me-2"></i>
-                                <span>Delhi NCR</span>
-                            </div>
-                            <div class="manager-card-categories">
-                                <span class="category-badge">Wedding</span>
-                                <span class="category-badge">Haldi</span>
-                                <span class="category-badge">Sangeeth</span>
-                                <span class="category-badge">Reception</span>
-                            </div>
-                            <div class="manager-card-action">
-                                <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#managerModal2">View Profile</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Manager Card 3 -->
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="manager-card">
-                        <img src="/static/images/managers/manager3.jpg" class="card-img-top" alt="Event Manager" onerror="this.src='https://via.placeholder.com/300x200?text=Event+Manager'">
-                        <div class="manager-card-body">
-                            <h4 class="manager-card-title">Ananya Patel</h4>
-                            <div class="manager-card-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                                <span class="ms-1 text-light">(4.0)</span>
-                            </div>
-                            <div class="manager-card-price">₹50,000 - ₹1,50,000</div>
-                            <div class="manager-card-location">
-                                <i class="fas fa-map-marker-alt me-2"></i>
-                                <span>Bengaluru, Karnataka</span>
-                            </div>
-                            <div class="manager-card-categories">
-                                <span class="category-badge">Wedding</span>
-                                <span class="category-badge">Mehendi</span>
-                                <span class="category-badge">Reception</span>
-                            </div>
-                            <div class="manager-card-action">
-                                <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#managerModal3">View Profile</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Manager Card 4 -->
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="manager-card">
-                        <img src="/static/images/managers/manager4.jpg" class="card-img-top" alt="Event Manager" onerror="this.src='https://via.placeholder.com/300x200?text=Event+Manager'">
-                        <div class="manager-card-body">
-                            <h4 class="manager-card-title">Vikram Singh</h4>
-                            <div class="manager-card-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                                <i class="far fa-star"></i>
-                                <span class="ms-1 text-light">(3.5)</span>
-                            </div>
-                            <div class="manager-card-price">₹40,000 - ₹1,20,000</div>
-                            <div class="manager-card-location">
-                                <i class="fas fa-map-marker-alt me-2"></i>
-                                <span>Jaipur, Rajasthan</span>
-                            </div>
-                            <div class="manager-card-categories">
-                                <span class="category-badge">Wedding</span>
-                                <span class="category-badge">Haldi</span>
-                                <span class="category-badge">Sangeeth</span>
-                            </div>
-                            <div class="manager-card-action">
-                                <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#managerModal4">View Profile</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Manager Card 5 -->
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="manager-card">
-                        <img src="/static/images/managers/manager5.jpg" class="card-img-top" alt="Event Manager" onerror="this.src='https://via.placeholder.com/300x200?text=Event+Manager'">
-                        <div class="manager-card-body">
-                            <h4 class="manager-card-title">Meera Joshi</h4>
-                            <div class="manager-card-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <span class="ms-1 text-light">(5.0)</span>
-                            </div>
-                            <div class="manager-card-price">₹90,000 - ₹2,80,000</div>
-                            <div class="manager-card-location">
-                                <i class="fas fa-map-marker-alt me-2"></i>
-                                <span>Hyderabad, Telangana</span>
-                            </div>
-                            <div class="manager-card-categories">
-                                <span class="category-badge">Wedding</span>
-                                <span class="category-badge">Mehendi</span>
-                                <span class="category-badge">Haldi</span>
-                                <span class="category-badge">Reception</span>
-                            </div>
-                            <div class="manager-card-action">
-                                <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#managerModal5">View Profile</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Manager Card 6 -->
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="manager-card">
-                        <img src="/static/images/managers/manager6.jpg" class="card-img-top" alt="Event Manager" onerror="this.src='https://via.placeholder.com/300x200?text=Event+Manager'">
-                        <div class="manager-card-body">
-                            <h4 class="manager-card-title">Akash Kapoor</h4>
-                            <div class="manager-card-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                                <span class="ms-1 text-light">(4.0)</span>
-                            </div>
-                            <div class="manager-card-price">₹60,000 - ₹1,80,000</div>
-                            <div class="manager-card-location">
-                                <i class="fas fa-map-marker-alt me-2"></i>
-                                <span>Chennai, Tamil Nadu</span>
-                            </div>
-                            <div class="manager-card-categories">
-                                <span class="category-badge">Wedding</span>
-                                <span class="category-badge">Sangeeth</span>
-                                <span class="category-badge">Reception</span>
-                            </div>
-                            <div class="manager-card-action">
-                                <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#managerModal6">View Profile</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
             
             <!-- List View (Hidden by Default) -->
-            <div id="listView" style="display: none;">
-                <!-- Manager List Item 1 -->
-                <div class="manager-list-item">
-                    <div class="list-img-container">
-                        <img src="/static/images/managers/manager1.jpg" alt="Event Manager" onerror="this.src='https://via.placeholder.com/180x180?text=Event+Manager'">
-                    </div>
-                    <div class="list-content">
-                        <div class="list-header">
-                            <div class="list-title-area">
-                                <h4>Priya Sharma</h4>
-                                <div class="manager-card-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                    <span class="ms-1 text-light">(4.5)</span>
-                                </div>
-                            </div>
-                            <div class="list-price-area">
-                                <div class="manager-card-price">₹75,000 - ₹2,50,000</div>
-                            </div>
+            <div id="listView" class="d-none">
+                {% if event_managers %}
+                    {% for manager in event_managers %}
+                    <div class="manager-list-item">
+                        <div class="list-img-container">
+                            <img src="{{ manager.profile_photo }}" alt="{{ manager.name }}" onerror="this.src='https://via.placeholder.com/300x200?text=Event+Manager'">
                         </div>
-                        <div class="list-body">
-                            <div class="list-details">
-                                <div class="manager-card-location mb-2">
-                                    <i class="fas fa-map-marker-alt me-2"></i>
-                                    <span>Mumbai, Maharashtra</span>
+                        <div class="list-content">
+                            <div class="list-header">
+                                <div class="list-title-area">
+                                    <h4>{{ manager.name }}</h4>
+                                    <div class="manager-card-rating">
+                                        {% set full_stars = manager.rating|int %}
+                                        {% set half_star = (manager.rating - full_stars) >= 0.5 %}
+                                        
+                                        {% for i in range(full_stars) %}
+                                            <i class="fas fa-star"></i>
+                                        {% endfor %}
+                                        
+                                        {% if half_star %}
+                                            <i class="fas fa-star-half-alt"></i>
+                                        {% endif %}
+                                        
+                                        {% for i in range(5 - full_stars - (1 if half_star else 0)) %}
+                                            <i class="far fa-star"></i>
+                                        {% endfor %}
+                                        
+                                        <span class="ms-1 text-light">({{ manager.rating }})</span>
+                                    </div>
                                 </div>
-                                <div class="manager-card-categories mb-2">
-                                    <span class="category-badge">Wedding</span>
-                                    <span class="category-badge">Reception</span>
-                                    <span class="category-badge">Mehendi</span>
-                                </div>
-                                <p class="small text-light">Experienced event manager specializing in luxury weddings with 8+ years of experience and over 200 successful events.</p>
-                            </div>
-                            <div class="list-action">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#managerModal1">View Profile</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Manager List Item 2 -->
-                <div class="manager-list-item">
-                    <div class="list-img-container">
-                        <img src="/static/images/managers/manager2.jpg" alt="Event Manager" onerror="this.src='https://via.placeholder.com/180x180?text=Event+Manager'">
-                    </div>
-                    <div class="list-content">
-                        <div class="list-header">
-                            <div class="list-title-area">
-                                <h4>Rahul Verma</h4>
-                                <div class="manager-card-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <span class="ms-1 text-light">(5.0)</span>
+                                <div class="list-price-area">
+                                    <div class="manager-card-price">{{ manager.price_range }}</div>
                                 </div>
                             </div>
-                            <div class="list-price-area">
-                                <div class="manager-card-price">₹1,00,000 - ₹3,00,000</div>
-                            </div>
-                        </div>
-                        <div class="list-body">
-                            <div class="list-details">
-                                <div class="manager-card-location mb-2">
-                                    <i class="fas fa-map-marker-alt me-2"></i>
-                                    <span>Delhi NCR</span>
+                            <div class="list-body">
+                                <div class="list-details">
+                                    <div class="manager-card-location mb-2">
+                                        <i class="fas fa-map-marker-alt me-2"></i>
+                                        <span>{{ manager.location }}</span>
+                                    </div>
+                                    <div class="manager-card-categories mb-2">
+                                        {% if manager.service_categories %}
+                                            {% set categories = manager.service_categories.split(',') %}
+                                            {% for category in categories[:5] %}
+                                                <span class="category-badge">{{ category }}</span>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-muted small">
+                                        <span>Experience: {{ manager.experience_years }} years</span>
+                                        {% if manager.specialization %}
+                                        <span class="ms-3">Specialization: {{ manager.specialization }}</span>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                <div class="manager-card-categories mb-2">
-                                    <span class="category-badge">Wedding</span>
-                                    <span class="category-badge">Haldi</span>
-                                    <span class="category-badge">Sangeeth</span>
-                                    <span class="category-badge">Reception</span>
+                                <div class="list-action">
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#managerModal{{ manager.id }}">View Profile</button>
                                 </div>
-                                <p class="small text-light">Premier wedding planner with a team of 15 professionals handling all aspects of wedding planning and execution.</p>
-                            </div>
-                            <div class="list-action">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#managerModal2">View Profile</button>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Manager List Item 3 -->
-                <div class="manager-list-item">
-                    <div class="list-img-container">
-                        <img src="/static/images/managers/manager3.jpg" alt="Event Manager" onerror="this.src='https://via.placeholder.com/180x180?text=Event+Manager'">
-                    </div>
-                    <div class="list-content">
-                        <div class="list-header">
-                            <div class="list-title-area">
-                                <h4>Ananya Patel</h4>
-                                <div class="manager-card-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                    <span class="ms-1 text-light">(4.0)</span>
-                                </div>
-                            </div>
-                            <div class="list-price-area">
-                                <div class="manager-card-price">₹50,000 - ₹1,50,000</div>
-                            </div>
-                        </div>
-                        <div class="list-body">
-                            <div class="list-details">
-                                <div class="manager-card-location mb-2">
-                                    <i class="fas fa-map-marker-alt me-2"></i>
-                                    <span>Bengaluru, Karnataka</span>
-                                </div>
-                                <div class="manager-card-categories mb-2">
-                                    <span class="category-badge">Wedding</span>
-                                    <span class="category-badge">Mehendi</span>
-                                    <span class="category-badge">Reception</span>
-                                </div>
-                                <p class="small text-light">Specializes in tech-integrated wedding experiences with unique themes and personalized guest experiences.</p>
-                            </div>
-                            <div class="list-action">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#managerModal3">View Profile</button>
-                            </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="alert alert-info">
+                            <h4 class="alert-heading">No Event Managers Found</h4>
+                            <p>We couldn't find any event managers matching your criteria. Please try adjusting your filters.</p>
                         </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
-            
-            <!-- Pagination -->
-            <nav aria-label="Event manager pagination" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next</a>
-                    </li>
-                </ul>
-            </nav>
         </div>
     </div>
 </div>
 
-<!-- Manager Modal 1 -->
-<div class="modal fade manager-modal" id="managerModal1" tabindex="-1" aria-labelledby="managerModalLabel1" aria-hidden="true">
+<!-- Manager Modals -->
+{% for manager in event_managers %}
+<div class="modal fade manager-modal" id="managerModal{{ manager.id }}" tabindex="-1" aria-labelledby="managerModalLabel{{ manager.id }}" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="managerModalLabel1">Priya Sharma</h5>
+                <h5 class="modal-title" id="managerModalLabel{{ manager.id }}">{{ manager.name }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div id="managerCarousel1" class="carousel slide mb-4" data-bs-ride="carousel">
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img src="/static/images/managers/portfolio/manager1_1.jpg" class="d-block w-100" alt="Portfolio" onerror="this.src='https://via.placeholder.com/800x300?text=Portfolio+Image'">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <img src="{{ manager.profile_photo }}" class="img-fluid rounded" alt="{{ manager.name }}" style="width: 100%;" onerror="this.src='https://via.placeholder.com/300x300?text=Event+Manager'">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="manager-card-rating">
+                                {% set full_stars = manager.rating|int %}
+                                {% set half_star = (manager.rating - full_stars) >= 0.5 %}
+                                
+                                {% for i in range(full_stars) %}
+                                    <i class="fas fa-star"></i>
+                                {% endfor %}
+                                
+                                {% if half_star %}
+                                    <i class="fas fa-star-half-alt"></i>
+                                {% endif %}
+                                
+                                {% for i in range(5 - full_stars - (1 if half_star else 0)) %}
+                                    <i class="far fa-star"></i>
+                                {% endfor %}
+                                
+                                <span class="ms-1 text-light">({{ manager.rating }})</span>
+                            </div>
+                            <div class="manager-card-price">{{ manager.price_range }}</div>
                         </div>
-                        <div class="carousel-item">
-                            <img src="/static/images/managers/portfolio/manager1_2.jpg" class="d-block w-100" alt="Portfolio" onerror="this.src='https://via.placeholder.com/800x300?text=Portfolio+Image'">
+                        <div class="manager-card-location mb-3">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            <span>{{ manager.location }}</span>
                         </div>
-                        <div class="carousel-item">
-                            <img src="/static/images/managers/portfolio/manager1_3.jpg" class="d-block w-100" alt="Portfolio" onerror="this.src='https://via.placeholder.com/800x300?text=Portfolio+Image'">
+                        <div class="mb-3">
+                            <strong>Experience:</strong> {{ manager.experience_years }} years
+                        </div>
+                        <div class="mb-3">
+                            <strong>Specialization:</strong> {{ manager.specialization }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Languages:</strong> {{ manager.languages }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Services:</strong>
+                            <div class="manager-card-categories mt-2">
+                                {% if manager.service_categories %}
+                                    {% set categories = manager.service_categories.split(',') %}
+                                    {% for category in categories %}
+                                        <span class="category-badge">{{ category }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Contact:</strong>
+                            <div>Email: {{ manager.email }}</div>
+                            <div>Phone: {{ manager.phone }}</div>
+                            <div>Website: <a href="https://{{ manager.website }}" target="_blank" class="text-info">{{ manager.website }}</a></div>
                         </div>
                     </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#managerCarousel1" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#managerCarousel1" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
                 </div>
                 
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h5>About</h5>
-                        <p>Priya Sharma is a luxury wedding planner with 8+ years of experience in planning and executing high-end Indian weddings. Her team specializes in creating personalized wedding experiences with meticulous attention to detail.</p>
-                    </div>
-                    <div class="col-md-6">
-                        <h5>Details</h5>
-                        <ul class="list-unstyled">
-                            <li><strong>Experience:</strong> 8+ years</li>
-                            <li><strong>Events Completed:</strong> 200+</li>
-                            <li><strong>Team Size:</strong> 12 members</li>
-                            <li><strong>Service Area:</strong> Mumbai, Goa, Rajasthan</li>
-                            <li><strong>Languages:</strong> English, Hindi, Marathi</li>
-                        </ul>
-                    </div>
+                <div class="mt-4">
+                    <h5>About {{ manager.name }}</h5>
+                    <p>{{ manager.bio }}</p>
                 </div>
-                
-                <h5>Testimonial Videos</h5>
-                <div class="testimonial-container">
-                    <div class="testimonial-item">
-                        <img src="/static/images/managers/testimonials/test1_1.jpg" alt="Testimonial" onerror="this.src='https://via.placeholder.com/150x100?text=Testimonial'">
-                        <div class="testimonial-play">
-                            <i class="fas fa-play-circle"></i>
+
+                <div class="mt-4">
+                    <h5>Portfolio</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <img src="https://via.placeholder.com/300x200?text=Wedding+Portfolio" class="img-fluid rounded" alt="Portfolio">
                         </div>
-                        <div class="testimonial-title">Sharma Wedding</div>
-                    </div>
-                    <div class="testimonial-item">
-                        <img src="/static/images/managers/testimonials/test1_2.jpg" alt="Testimonial" onerror="this.src='https://via.placeholder.com/150x100?text=Testimonial'">
-                        <div class="testimonial-play">
-                            <i class="fas fa-play-circle"></i>
+                        <div class="col-md-4 mb-3">
+                            <img src="https://via.placeholder.com/300x200?text=Wedding+Portfolio" class="img-fluid rounded" alt="Portfolio">
                         </div>
-                        <div class="testimonial-title">Mehta Reception</div>
-                    </div>
-                    <div class="testimonial-item">
-                        <img src="/static/images/managers/testimonials/test1_3.jpg" alt="Testimonial" onerror="this.src='https://via.placeholder.com/150x100?text=Testimonial'">
-                        <div class="testimonial-play">
-                            <i class="fas fa-play-circle"></i>
+                        <div class="col-md-4 mb-3">
+                            <img src="https://via.placeholder.com/300x200?text=Wedding+Portfolio" class="img-fluid rounded" alt="Portfolio">
                         </div>
-                        <div class="testimonial-title">Desai Sangeet</div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Contact Now</button>
+                <button type="button" class="btn btn-primary">Contact {{ manager.name.split()[0] }}</button>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Other Manager Modals (2-6) would be similar structure -->
+{% endfor %}
 
 {% endblock %}
 
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Budget range slider
-        const budgetRange = document.getElementById('budgetRange');
-        const budgetValue = document.getElementById('budgetValue');
-        
-        if (budgetRange && budgetValue) {
-            budgetRange.addEventListener('input', function() {
-                const value = parseInt(this.value).toLocaleString('en-IN', {
-                    style: 'currency',
-                    currency: 'INR',
-                    maximumFractionDigits: 0
-                });
-                budgetValue.textContent = value;
-            });
-        }
-        
-        // View toggle (grid/list)
+        // View toggle functionality
         const gridViewBtn = document.getElementById('gridViewBtn');
         const listViewBtn = document.getElementById('listViewBtn');
         const gridView = document.getElementById('gridView');
@@ -913,28 +624,29 @@
         
         if (gridViewBtn && listViewBtn && gridView && listView) {
             gridViewBtn.addEventListener('click', function() {
-                gridView.style.display = 'flex';
-                listView.style.display = 'none';
                 gridViewBtn.classList.add('active');
                 listViewBtn.classList.remove('active');
+                gridView.classList.remove('d-none');
+                listView.classList.add('d-none');
             });
             
             listViewBtn.addEventListener('click', function() {
-                gridView.style.display = 'none';
-                listView.style.display = 'block';
                 listViewBtn.classList.add('active');
                 gridViewBtn.classList.remove('active');
+                listView.classList.remove('d-none');
+                gridView.classList.add('d-none');
             });
         }
         
-        // Simulate testimonial video click (would normally open video player)
-        const testimonialItems = document.querySelectorAll('.testimonial-item');
+        // Budget range slider
+        const budgetRange = document.getElementById('budgetRange');
+        const budgetValue = document.getElementById('budgetValue');
         
-        testimonialItems.forEach(item => {
-            item.addEventListener('click', function() {
-                alert('Video testimonial would play here');
+        if (budgetRange && budgetValue) {
+            budgetRange.addEventListener('input', function() {
+                budgetValue.textContent = '₹' + parseInt(budgetRange.value).toLocaleString();
             });
-        });
+        }
     });
 </script>
 {% endblock %}

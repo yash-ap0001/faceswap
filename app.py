@@ -12,15 +12,134 @@ import zipfile
 import io
 import traceback
 import logging
+from flask_login import LoginManager
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# Create the Flask app
 app = Flask(__name__)
+app.secret_key = os.environ.get("SESSION_SECRET", "development_secret_key")
+
+# Initialize the database
+from db import db
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+db.init_app(app)
+
+# Initialize login manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+# Import user model for login functionality
+from models import User, EventManager
+
+# Create all tables and add sample managers if needed
+with app.app_context():
+    db.create_all()
+    
+    # Create directories for event manager images if they don't exist
+    os.makedirs('static/images/event_managers', exist_ok=True)
+    
+    # Check if we have event managers already
+    if EventManager.query.count() == 0:
+        print("Creating sample event managers...")
+        # Create sample event managers
+        managers = [
+            {
+                'name': 'Priya Sharma',
+                'profile_photo': '/static/images/event_managers/priya_sharma.jpg',
+                'email': 'priya@weddingplanners.com',
+                'phone': '+91 98765-43210',
+                'website': 'www.priyasharmaevents.com',
+                'bio': 'With over 10 years of experience in planning luxury Indian weddings, Priya specializes in creating unforgettable ceremonies that blend tradition with modern elegance.',
+                'rating': 4.8,
+                'price_range': '₹75,000 - ₹2,50,000',
+                'service_categories': 'Full Planning,Day-of Coordination,Destination Weddings',
+                'location': 'Mumbai, Delhi',
+                'experience_years': 10,
+                'specialization': 'Luxury Weddings',
+                'languages': 'Hindi, English, Punjabi'
+            },
+            {
+                'name': 'Raj Kumar',
+                'profile_photo': '/static/images/event_managers/raj_kumar.jpg',
+                'email': 'raj@weddingdreams.com',
+                'phone': '+91 87654-32109',
+                'website': 'www.rajkumarevents.com',
+                'bio': 'Raj brings creativity and precision to every wedding, focusing on personalized experiences that tell your unique love story.',
+                'rating': 4.5,
+                'price_range': '₹50,000 - ₹1,50,000',
+                'service_categories': 'Wedding Design,Cultural Ceremonies,Theme Weddings',
+                'location': 'Bangalore, Chennai',
+                'experience_years': 8,
+                'specialization': 'Themed Weddings',
+                'languages': 'Tamil, English, Hindi'
+            },
+            {
+                'name': 'Anjali Desai',
+                'profile_photo': '/static/images/event_managers/anjali_desai.jpg',
+                'email': 'anjali@intimateweddings.com',
+                'phone': '+91 76543-21098',
+                'website': 'www.anjalidesaiweddings.com',
+                'bio': 'Anjali focuses on creating intimate, personalized wedding experiences that tell each couple\'s unique story.',
+                'rating': 4.3,
+                'price_range': '₹30,000 - ₹80,000',
+                'service_categories': 'Intimate Weddings,Budget Planning,DIY Coordination',
+                'location': 'Pune, Ahmedabad',
+                'experience_years': 5,
+                'specialization': 'Intimate Ceremonies',
+                'languages': 'Gujarati, Hindi, English'
+            }
+        ]
+        
+        # Add the event managers to the database
+        for manager_data in managers:
+            # Create placeholder image if it doesn't exist
+            photo_path = manager_data['profile_photo'].lstrip('/')
+            if not os.path.exists(photo_path):
+                # Create a placeholder image with manager's initials
+                img = np.zeros((400, 400, 3), dtype=np.uint8)
+                
+                # Generate a color based on the name (for consistent colors)
+                name_hash = sum(ord(c) for c in manager_data['name'])
+                color = (name_hash % 180 + 50, 150, 250)  # Ensure good hue, saturation, value
+                
+                # Fill the background
+                img[:] = color
+                
+                # Get initials
+                name_parts = manager_data['name'].split()
+                initials = ''.join([name[0] for name in name_parts])
+                
+                # Add text
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                text_size = cv2.getTextSize(initials, font, 2, 3)[0]
+                text_x = (img.shape[1] - text_size[0]) // 2
+                text_y = (img.shape[0] + text_size[1]) // 2
+                
+                # White text
+                cv2.putText(img, initials, (text_x, text_y), font, 2, (255, 255, 255), 3)
+                
+                # Save the image
+                os.makedirs(os.path.dirname(photo_path), exist_ok=True)
+                cv2.imwrite(photo_path, img)
+            
+            manager = EventManager(**manager_data)
+            db.session.add(manager)
+        
+        db.session.commit()
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-app.secret_key = os.environ.get("SESSION_SECRET", "default_secret_key")
 
 # Create uploads directory if it doesn't exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
