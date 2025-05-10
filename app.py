@@ -436,9 +436,19 @@ def bridal_gallery():
             else:
                 # Use a placeholder if no template is available
                 templates[ceremony][template_type] = None
+                
+            # Check if AI variations exist
+            if template_type == 'ai':
+                templates[ceremony]['ai_variations'] = []
+                for i in range(1, 6):
+                    variation_path = os.path.join(template_dir, 'ai', f"{ceremony}_{i}.jpg")
+                    if os.path.exists(variation_path):
+                        templates[ceremony]['ai_variations'].append(
+                            f"/uploads/templates/ai/{ceremony}_{i}.jpg"
+                        )
     
     return render_template(
-        'bridal_gallery_organized.html',
+        'bridal_gallery_enhanced.html',
         templates=templates,
         ceremony_types=ceremony_types,
         template_types=template_types
