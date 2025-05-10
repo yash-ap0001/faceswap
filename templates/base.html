@@ -32,6 +32,12 @@
             overflow-x: hidden;
             position: relative;
             min-height: 100vh;
+            padding-left: 350px; /* Initial padding for sidebar */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        body.sidebar-closed {
+            padding-left: 0;
         }
         
         .navbar {
@@ -186,7 +192,7 @@
         /* Transparent Sidebar */
         .sidebar {
             position: fixed;
-            left: -350px;
+            left: 0;
             top: 0;
             width: 350px;
             height: 100vh;
@@ -201,8 +207,8 @@
             overflow-y: auto;
         }
         
-        .sidebar.active {
-            left: 0;
+        .sidebar.closed {
+            left: -350px;
         }
         
         .sidebar-header {
@@ -686,12 +692,20 @@
             
             const themeSwitch = document.getElementById('themeSwitch');
             
+            // Initialize sidebar in open state by default
+            if (sidebar) {
+                console.log("Initializing sidebar in open state");
+                sidebar.classList.remove('closed');
+                document.body.classList.remove('sidebar-closed');
+            }
+            
             // Function to toggle sidebar
             function toggleSidebar() {
                 console.log("Toggle sidebar called");
                 if (sidebar) {
                     console.log("Toggling sidebar class");
-                    sidebar.classList.toggle('active');
+                    sidebar.classList.toggle('closed');
+                    document.body.classList.toggle('sidebar-closed');
                 } else {
                     console.error("Sidebar element not found");
                 }
@@ -724,7 +738,8 @@
                     console.log("Close button clicked");
                     e.preventDefault();
                     if (sidebar) {
-                        sidebar.classList.remove('active');
+                        sidebar.classList.add('closed');
+                        document.body.classList.add('sidebar-closed');
                     }
                 });
             }
@@ -737,8 +752,9 @@
                         (sidebarToggle && sidebarToggle.contains(event.target)) ||
                         (navSidebarToggle && navSidebarToggle.contains(event.target));
                     
-                    if (!isClickInside && sidebar.classList.contains('active')) {
-                        sidebar.classList.remove('active');
+                    if (!isClickInside && !sidebar.classList.contains('closed')) {
+                        sidebar.classList.add('closed');
+                        document.body.classList.add('sidebar-closed');
                     }
                 }
             });
