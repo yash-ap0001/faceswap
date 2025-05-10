@@ -353,12 +353,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Refresh the templates for this ceremony type
                 refreshTemplatesAfterUpload(ceremonyType);
                 
-                // Store flag in localStorage to trigger refresh on bridal_swap page
-                localStorage.setItem('refreshTemplates', 'true');
-                localStorage.setItem('lastUpdatedCeremony', ceremonyType);
+                // Enhanced refresh mechanism to trigger updates on other pages
                 const timestamp = Date.now().toString();
-                localStorage.setItem('updateTimestamp', timestamp);
                 console.log(`Templates updated for ${ceremonyType} at ${timestamp}`);
+                
+                // 1. Set the refresh flag for any page listening
+                localStorage.setItem('refreshTemplates', 'true');
+                
+                // 2. Store which ceremony was updated
+                localStorage.setItem('lastUpdatedCeremony', ceremonyType);
+                
+                // 3. Store the update timestamp to avoid duplicate refreshes
+                localStorage.setItem('updateTimestamp', timestamp);
+                
+                // 4. Add debugging information
+                console.log({
+                    message: 'Template update notification saved to localStorage',
+                    ceremony: ceremonyType,
+                    timestamp: timestamp,
+                    currentLastProcessed: localStorage.getItem('lastProcessedTimestamp') || 'none'
+                });
             } else {
                 statusMessage.textContent = 'Error: ' + (data.error || 'Unknown error occurred');
                 statusMessage.className = 'alert alert-danger';

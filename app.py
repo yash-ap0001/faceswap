@@ -831,13 +831,33 @@ def get_templates():
     # Validate ceremony name
     valid_ceremonies = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
     if ceremony_type not in valid_ceremonies:
+        app.logger.warning(f"Invalid ceremony type requested: {ceremony_type}")
         return jsonify({'error': f'Invalid ceremony type: {ceremony_type}'}), 400
     
     # Get templates directory
     template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
     
+    # Check if template directory exists
+    if not os.path.exists(template_dir):
+        app.logger.warning(f"Template directory does not exist: {template_dir}")
+        os.makedirs(template_dir, exist_ok=True)
+        app.logger.info(f"Created template directory: {template_dir}")
+    
+    app.logger.info(f"Scanning template directory: {template_dir}")
+    
     # Define template types to search for
     template_types = ['real', 'natural', 'ai', 'pinterest']
+    
+    # Log all subdirectories in templates for debugging
+    try:
+        subdirs = [d for d in os.listdir(template_dir) if os.path.isdir(os.path.join(template_dir, d))]
+        app.logger.info(f"Template subdirectories: {subdirs}")
+        
+        # Also log files in the template root
+        files = [f for f in os.listdir(template_dir) if os.path.isfile(os.path.join(template_dir, f))]
+        app.logger.info(f"Files in template root: {files}")
+    except Exception as e:
+        app.logger.error(f"Error scanning template directory: {e}")
     
     # Ensure fresh list by explicitly creating a new array
     templates = []

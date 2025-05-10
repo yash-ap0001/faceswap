@@ -637,11 +637,19 @@ function initializePage() {
     function checkForTemplateUpdates() {
         const shouldRefresh = localStorage.getItem('refreshTemplates') === 'true';
         const updateTimestamp = localStorage.getItem('updateTimestamp');
-        const lastProcessedTimestamp = localStorage.getItem('lastProcessedTimestamp');
+        const lastProcessedTimestamp = localStorage.getItem('lastProcessedTimestamp') || '0';
+        
+        console.log('Checking for template updates', {
+            shouldRefresh,
+            updateTimestamp,
+            lastProcessedTimestamp,
+            timestampDiffers: updateTimestamp !== lastProcessedTimestamp,
+            lastUpdatedCeremony: localStorage.getItem('lastUpdatedCeremony')
+        });
         
         // Check if either the refresh flag is set or there's a new timestamp
         if (shouldRefresh || (updateTimestamp && updateTimestamp !== lastProcessedTimestamp)) {
-            console.log('Template update detected from bulk upload page');
+            console.log('✓ Template update detected from bulk upload page');
             console.log('Update timestamp:', updateTimestamp);
             console.log('Last processed timestamp:', lastProcessedTimestamp);
             
@@ -656,18 +664,26 @@ function initializePage() {
             // Add debugging information to the console
             console.log('Refreshing templates after upload detected');
             
-            // Refresh all templates
-            loadAllTemplates();
-            
-            // If we know which ceremony was updated, switch to that tab
             if (updatedCeremony) {
+                console.log(`Specific ceremony updated: ${updatedCeremony}`);
+                // First, refresh the specific ceremony that was updated
+                loadTemplates(updatedCeremony);
+                
+                // Then switch to that tab
                 const tab = document.getElementById(`${updatedCeremony}-tab`);
                 if (tab) {
+                    console.log(`Showing tab for updated ceremony: ${updatedCeremony}`);
                     setTimeout(() => {
                         new bootstrap.Tab(tab).show();
                     }, 500); // Short delay to ensure templates are loaded
                 }
+            } else {
+                // If no specific ceremony was marked, refresh all templates
+                console.log('No specific ceremony marked as updated, refreshing all');
+                loadAllTemplates();
             }
+        } else {
+            console.log('No template updates detected');
         }
     }
     
