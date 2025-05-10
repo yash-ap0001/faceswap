@@ -920,7 +920,7 @@ def upload_file():
             os.remove(target_path)
         return jsonify({'error': str(e)}), 500
 
-@app.route('/uploads/<filename>')
+@app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
