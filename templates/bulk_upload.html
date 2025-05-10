@@ -117,7 +117,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 fileName.className = 'card-text small text-truncate';
                 fileName.textContent = file.name;
                 
+                // Add category selection for each image
+                const categoryLabel = document.createElement('label');
+                categoryLabel.className = 'form-label mt-2 mb-1';
+                categoryLabel.textContent = 'Ceremony Type:';
+                
+                const categorySelect = document.createElement('select');
+                categorySelect.className = 'form-select form-select-sm individual-category';
+                categorySelect.dataset.fileName = file.name;
+                
+                // Add options
+                const categories = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'];
+                const mainCategory = document.getElementById('ceremonyType').value;
+                
+                // Create a default option
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = 'Select ceremony';
+                categorySelect.appendChild(defaultOption);
+                
+                // Add ceremony type options
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                    // Pre-select the main category if it's set
+                    if (category === mainCategory) {
+                        option.selected = true;
+                    }
+                    categorySelect.appendChild(option);
+                });
+                
                 cardBody.appendChild(fileName);
+                cardBody.appendChild(categoryLabel);
+                cardBody.appendChild(categorySelect);
                 card.appendChild(img);
                 card.appendChild(cardBody);
                 col.appendChild(card);
@@ -132,17 +165,38 @@ document.addEventListener('DOMContentLoaded', function() {
     uploadForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const formData = new FormData(this);
-        const ceremonyType = document.getElementById('ceremonyType').value;
+        // Get all image categories from the preview section
+        const individualCategorySelects = document.querySelectorAll('.individual-category');
+        const defaultCeremonyType = document.getElementById('ceremonyType').value;
         
-        if (!ceremonyType) {
-            alert('Please select a ceremony type');
+        if (!defaultCeremonyType) {
+            alert('Please select a default ceremony type');
             return;
         }
         
         if (imageInput.files.length === 0) {
             alert('Please select at least one image');
             return;
+        }
+        
+        // Create a map of file name to ceremony type
+        const imageCategories = {};
+        individualCategorySelects.forEach(select => {
+            const fileName = select.dataset.fileName;
+            const category = select.value || defaultCeremonyType; // Fallback to default if not set
+            imageCategories[fileName] = category;
+        });
+        
+        // Create customized FormData with category information
+        const formData = new FormData();
+        formData.append('ceremony_type', defaultCeremonyType);
+        
+        // Add each file with its category
+        for (let i = 0; i < imageInput.files.length; i++) {
+            const file = imageInput.files[i];
+            const category = imageCategories[file.name] || defaultCeremonyType;
+            formData.append('files', file);
+            formData.append('file_categories', category);
         }
         
         // Show upload status
@@ -152,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
         statusMessage.textContent = 'Uploading images...';
         statusMessage.className = 'alert alert-info';
         
-        // Create a fake progress animation
+        // Create a progress animation
         let progress = 0;
         const progressInterval = setInterval(() => {
             progress += 5;
@@ -179,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Show success message
                 uploadResult.style.display = 'block';
                 successMessage.innerHTML = `
-                    <strong>Success!</strong> Uploaded ${data.uploaded_count} images for ${data.ceremony_type} ceremony.
+                    <strong>Success!</strong> Uploaded ${data.uploaded_count} images across different ceremony types.
                     ${data.main_template_updated ? '<p>The main template has been updated.</p>' : ''}
                 `;
                 
