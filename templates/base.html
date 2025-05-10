@@ -669,32 +669,60 @@
     <script>
         // Sidebar functionality
         document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM content loaded");
+            
+            // Try to get sidebar elements
             const sidebar = document.getElementById('sidebar');
+            console.log("Sidebar element:", sidebar);
+            
             const sidebarToggle = document.getElementById('sidebarToggle');
+            console.log("Sidebar toggle button:", sidebarToggle);
+            
             const navSidebarToggle = document.getElementById('navSidebarToggle');
+            console.log("Nav sidebar toggle button:", navSidebarToggle);
+            
             const closeBtn = document.querySelector('.close-sidebar');
+            console.log("Close button:", closeBtn);
+            
             const themeSwitch = document.getElementById('themeSwitch');
             
             // Function to toggle sidebar
             function toggleSidebar() {
+                console.log("Toggle sidebar called");
                 if (sidebar) {
+                    console.log("Toggling sidebar class");
                     sidebar.classList.toggle('active');
+                } else {
+                    console.error("Sidebar element not found");
                 }
             }
             
             // Toggle sidebar from floating button
             if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', toggleSidebar);
+                console.log("Adding event listener to sidebar toggle button");
+                sidebarToggle.addEventListener('click', function(e) {
+                    console.log("Sidebar toggle button clicked");
+                    e.preventDefault();
+                    toggleSidebar();
+                });
             }
             
             // Toggle sidebar from navbar button
             if (navSidebarToggle) {
-                navSidebarToggle.addEventListener('click', toggleSidebar);
+                console.log("Adding event listener to nav sidebar toggle button");
+                navSidebarToggle.addEventListener('click', function(e) {
+                    console.log("Nav sidebar toggle button clicked");
+                    e.preventDefault();
+                    toggleSidebar();
+                });
             }
             
             // Close sidebar
             if (closeBtn) {
-                closeBtn.addEventListener('click', function() {
+                console.log("Adding event listener to close button");
+                closeBtn.addEventListener('click', function(e) {
+                    console.log("Close button clicked");
+                    e.preventDefault();
                     if (sidebar) {
                         sidebar.classList.remove('active');
                     }
