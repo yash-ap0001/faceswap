@@ -290,6 +290,10 @@ def allowed_file(filename):
 def index():
     return render_template('index.html')
 
+@app.route('/bridal-gallery')
+def bridal_gallery():
+    return render_template('bridal_gallery.html')
+
 @app.route('/bridal-swap', methods=['GET', 'POST'])
 def bridal_swap():
     if request.method == 'GET':
@@ -373,16 +377,42 @@ def get_bridal_template(style, template_type='natural'):
     
     Args:
         style (str): The bridal style ('haldi', 'mehendi', 'wedding', or 'reception')
-        template_type (str): The template type ('natural' or 'ai')
+        template_type (str): The template type ('real', 'natural' or 'ai')
         
     Returns:
         tuple: (template_img, template_path)
     """
     # Create directory for template images if it doesn't exist
     template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
+    real_dir = os.path.join(template_dir, 'real')
     os.makedirs(template_dir, exist_ok=True)
+    os.makedirs(real_dir, exist_ok=True)
     
     # Define paths for template images based on style and type
+    if template_type == 'real':
+        # Real photo templates
+        # Map the style to specific real image files
+        if style == 'haldi':
+            real_files = ['weeding saree.jpg']
+        elif style == 'mehendi':
+            real_files = ['halfhand.jpg']
+        elif style == 'wedding':
+            real_files = ['voni dress.jpg', 'full dress.jpg']
+        elif style == 'reception':
+            real_files = ['jewellary.jpg']
+        else:
+            real_files = []
+            
+        # Use the first available file for the style
+        if real_files:
+            template_path = os.path.join(real_dir, real_files[0])
+            if os.path.exists(template_path):
+                return cv2.imread(template_path), template_path
+        
+        # Fallback to natural if real image not found
+        logger.warning(f"Real template for {style} not found, falling back to natural template.")
+        template_type = 'natural'
+    
     if template_type == 'natural':
         # Natural image templates
         template_paths = {

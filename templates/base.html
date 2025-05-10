@@ -3,20 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face Swap App - InsightFace</title>
+    <title>Indian Bridal Face Swap - Wedding Magic</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        :root {
+            --primary-purple: #6a1b9a;
+            --secondary-purple: #9c27b0;
+            --dark-purple: #4a148c;
+            --light-purple: #ce93d8;
+            --accent-gold: #ffd700;
+        }
+        
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        
+        .navbar {
+            background-color: var(--dark-purple) !important;
+        }
+        
+        .card {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+        }
+        
+        .card-header {
+            background-color: #222;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-purple);
+            border-color: var(--primary-purple);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-purple);
+            border-color: var(--secondary-purple);
+        }
+        
+        .brand-gradient {
+            background: linear-gradient(45deg, var(--dark-purple), var(--secondary-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: bold;
+        }
+        
+        .gold-accent {
+            color: var(--accent-gold);
+        }
+        
+        footer {
+            background-color: var(--dark-purple) !important;
+        }
+    </style>
+    {% block style %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-exchange-alt me-2"></i>
-                Face Swap App
+                <i class="fas fa-ring gold-accent me-2"></i>
+                <span class="brand-gradient">Wedding Magic</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -30,7 +84,12 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/bridal-swap" title="Indian Bridal Swap">
-                            <i class="fas fa-female me-1"></i> Indian Bridal Swap
+                            <i class="fas fa-female me-1"></i> Simple Bridal Swap
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/bridal-gallery" title="Bridal Gallery">
+                            <i class="fas fa-images me-1"></i> Bridal Gallery
                         </a>
                     </li>
                 </ul>
@@ -38,16 +97,17 @@
         </div>
     </nav>
 
-    <main class="container my-4">
+    <main class="my-4">
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-dark py-3 mt-5">
+    <footer class="py-3 mt-5">
         <div class="container text-center">
-            <p class="text-muted mb-0">
-                Face Swap Application using InsightFace 0.7.3 | 
-                <a href="https://github.com/deepinsight/insightface" target="_blank" rel="noopener" class="text-muted">
-                    <i class="fab fa-github me-1"></i>InsightFace
+            <p class="text-light mb-0">
+                <span class="gold-accent">Wedding Magic</span> - Indian Bridal Face Swap App | 
+                <span class="text-light">Powered by </span>
+                <a href="https://github.com/deepinsight/insightface" target="_blank" rel="noopener" class="text-light">
+                    <i class="fab fa-github me-1"></i>InsightFace 0.7.3
                 </a>
             </p>
         </div>
@@ -57,5 +117,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,722 @@
+{% extends "base.html" %}
+
+{% block style %}
+<style>
+    :root {
+        --primary-purple: #6a1b9a;
+        --secondary-purple: #9c27b0;
+        --dark-purple: #4a148c;
+        --light-purple: #ce93d8;
+        --accent-gold: #ffd700;
+    }
+    
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+    
+    .navbar {
+        background-color: var(--dark-purple) !important;
+    }
+    
+    .card {
+        background-color: #1e1e1e;
+        border: 1px solid var(--primary-purple);
+    }
+    
+    .card-header {
+        background-color: var(--primary-purple);
+        color: white;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-purple);
+        border-color: var(--primary-purple);
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--secondary-purple);
+        border-color: var(--secondary-purple);
+    }
+    
+    .btn-outline-primary {
+        color: var(--light-purple);
+        border-color: var(--light-purple);
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: var(--primary-purple);
+        border-color: var(--primary-purple);
+    }
+    
+    .bridal-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 3px solid transparent;
+    }
+    
+    .bridal-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    
+    .bridal-card.selected {
+        border-color: var(--accent-gold);
+    }
+    
+    .image-preview-container {
+        min-height: 300px;
+        border: 2px dashed var(--light-purple);
+        border-radius: 5px;
+    }
+    
+    .result-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+    
+    .result-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .result-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    
+    .result-image {
+        width: 100%;
+        height: 350px;
+        object-fit: cover;
+    }
+    
+    .result-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(74, 20, 140, 0.7);
+        padding: 10px;
+        color: white;
+    }
+    
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(206, 147, 216, 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 15px rgba(206, 147, 216, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(206, 147, 216, 0);
+        }
+    }
+    
+    .placeholder-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #757575;
+    }
+    
+    .category-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: var(--accent-gold);
+        color: black;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: bold;
+        z-index: 10;
+    }
+    
+    .btn-floating {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        z-index: 10;
+    }
+    
+    .btn-download {
+        bottom: 60px;
+        right: 10px;
+        background-color: var(--accent-gold);
+        color: black;
+    }
+    
+    .btn-remove {
+        top: 10px;
+        left: 10px;
+        background-color: #f44336;
+        color: white;
+    }
+    
+    .feature-icon {
+        font-size: 2rem;
+        color: var(--accent-gold);
+        margin-bottom: 15px;
+    }
+    
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        flex-direction: column;
+    }
+    
+    .spinner {
+        width: 70px;
+        height: 70px;
+        border: 8px solid var(--light-purple);
+        border-top: 8px solid var(--accent-gold);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card mb-4 shadow">
+                <div class="card-header bg-dark">
+                    <h4 class="mb-0"><i class="fas fa-user me-2"></i>Your Photo</h4>
+                </div>
+                <div class="card-body">
+                    <div class="image-preview-container mb-3 d-flex align-items-center justify-content-center">
+                        <img id="source-preview" class="img-fluid d-none" alt="Your photo preview">
+                        <div id="source-placeholder" class="placeholder-container">
+                            <i class="fas fa-user-circle fa-4x mb-3"></i>
+                            <p class="text-center">Upload your photo to begin</p>
+                        </div>
+                    </div>
+                    <form id="upload-form" enctype="multipart/form-data">
+                        <div class="input-group mb-3">
+                            <input type="file" class="form-control" id="source-input" name="source" accept=".jpg,.jpeg,.png" required>
+                            <button class="btn btn-outline-secondary" type="button" id="source-clear-btn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mb-4 shadow">
+                <div class="card-header bg-dark">
+                    <h4 class="mb-0"><i class="fas fa-cog me-2"></i>Settings</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Template Type</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="templateType" id="real" value="real" checked>
+                            <label class="form-check-label" for="real">
+                                <strong>Real Photos</strong> - Actual bridal portraits
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="templateType" id="natural" value="natural">
+                            <label class="form-check-label" for="natural">
+                                <strong>Natural Style</strong> - Simulated natural templates
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="templateType" id="ai" value="ai">
+                            <label class="form-check-label" for="ai">
+                                <strong>AI-Generated</strong> - Computer-generated templates
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Categories</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="cat-haldi" value="haldi" checked>
+                            <label class="form-check-label" for="cat-haldi">Haldi Ceremony</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="cat-mehendi" value="mehendi" checked>
+                            <label class="form-check-label" for="cat-mehendi">Mehendi Function</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="cat-wedding" value="wedding" checked>
+                            <label class="form-check-label" for="cat-wedding">Wedding Ceremony</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="cat-reception" value="reception" checked>
+                            <label class="form-check-label" for="cat-reception">Reception</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm d-none" id="model-status-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="spinner-border text-warning me-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div>
+                            <h5 class="mb-1" id="model-status-title">Checking Models</h5>
+                            <p class="mb-0 small" id="model-status-message">Please wait while we check model status...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button type="button" id="generate-btn" class="btn btn-primary btn-lg">
+                    <i class="fas fa-magic me-2"></i>Generate All Previews
+                </button>
+            </div>
+        </div>
+        
+        <div class="col-lg-9">
+            <div class="card mb-4 shadow">
+                <div class="card-header bg-dark">
+                    <h4 class="mb-0"><i class="fas fa-images me-2"></i>Bridal Templates</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="p-3">
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Select templates for face swap. Click on any template to generate a preview.
+                        </div>
+                    </div>
+                    
+                    <div class="container-fluid">
+                        <div class="row" id="templates-container">
+                            <!-- Template cards will be loaded here -->
+                            <div class="col-md-4 mb-4">
+                                <div class="card shadow-sm bridal-card" data-style="haldi">
+                                    <div class="category-badge">Haldi</div>
+                                    <img src="/uploads/templates/real/weeding saree.jpg" class="card-img-top" alt="Haldi Template" style="height: 300px; object-fit: cover;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Haldi Ceremony</h5>
+                                        <p class="card-text small">Yellow saree with traditional gold jewelry</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-4">
+                                <div class="card shadow-sm bridal-card" data-style="mehendi">
+                                    <div class="category-badge">Mehendi</div>
+                                    <img src="/uploads/templates/real/halfhand.jpg" class="card-img-top" alt="Mehendi Template" style="height: 300px; object-fit: cover;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Mehendi Function</h5>
+                                        <p class="card-text small">Beautiful henna designs with red bridal outfit</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-4">
+                                <div class="card shadow-sm bridal-card" data-style="wedding">
+                                    <div class="category-badge">Wedding</div>
+                                    <img src="/uploads/templates/real/voni dress.jpg" class="card-img-top" alt="Wedding Template" style="height: 300px; object-fit: cover;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Wedding Ceremony</h5>
+                                        <p class="card-text small">Elegant red outfit with traditional namaste pose</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-4">
+                                <div class="card shadow-sm bridal-card" data-style="reception">
+                                    <div class="category-badge">Reception</div>
+                                    <img src="/uploads/templates/real/jewellary.jpg" class="card-img-top" alt="Reception Template" style="height: 300px; object-fit: cover;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Jewelry Showcase</h5>
+                                        <p class="card-text small">Traditional gold jewelry with elegant saree</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-4">
+                                <div class="card shadow-sm bridal-card" data-style="reception">
+                                    <div class="category-badge">Reception</div>
+                                    <img src="/uploads/templates/real/full dress.jpg" class="card-img-top" alt="Full Dress Template" style="height: 300px; object-fit: cover;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Full Bridal Attire</h5>
+                                        <p class="card-text small">Complete bridal look with embroidered lehenga</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4" id="results-card">
+                <div class="card-header bg-dark">
+                    <h4 class="mb-0"><i class="fas fa-star me-2"></i>Your Bridal Looks</h4>
+                </div>
+                <div class="card-body">
+                    <div id="empty-results" class="text-center py-5">
+                        <i class="fas fa-images fa-4x mb-3 text-muted"></i>
+                        <h5>No previews generated yet</h5>
+                        <p class="text-muted">Upload your photo and click on any bridal template<br>or use the "Generate All Previews" button</p>
+                    </div>
+                    
+                    <div id="result-gallery" class="result-gallery d-none">
+                        <!-- Result cards will be generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-dark shadow">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="feature-icon">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <h5>Multiple Styles</h5>
+                            <p class="small">Explore various traditional bridal styles</p>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="feature-icon">
+                                <i class="fas fa-magic"></i>
+                            </div>
+                            <h5>AI Technology</h5>
+                            <p class="small">Advanced face swapping algorithms</p>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="feature-icon">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <h5>Easy Download</h5>
+                            <p class="small">Save all your favorite looks</p>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="feature-icon">
+                                <i class="fas fa-share-alt"></i>
+                            </div>
+                            <h5>Share Options</h5>
+                            <p class="small">Share with friends and family</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay d-none" id="loading-overlay">
+    <div class="spinner mb-3"></div>
+    <h4 class="text-white mb-2">Creating Your Bridal Look</h4>
+    <p class="text-light" id="loading-message">Processing template...</p>
+</div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Error</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="error-message">
+                An error occurred while processing your request.
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const sourceInput = document.getElementById('source-input');
+    const sourcePreview = document.getElementById('source-preview');
+    const sourcePlaceholder = document.getElementById('source-placeholder');
+    const sourceClearBtn = document.getElementById('source-clear-btn');
+    const generateBtn = document.getElementById('generate-btn');
+    const templateCards = document.querySelectorAll('.bridal-card');
+    const emptyResults = document.getElementById('empty-results');
+    const resultGallery = document.getElementById('result-gallery');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingMessage = document.getElementById('loading-message');
+    const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+    const errorMessage = document.getElementById('error-message');
+    const modelStatusCard = document.getElementById('model-status-card');
+    
+    // Check model status
+    checkModels();
+    
+    // Handle file input change
+    sourceInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                sourcePreview.src = e.target.result;
+                sourcePreview.classList.remove('d-none');
+                sourcePlaceholder.classList.add('d-none');
+            };
+            
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+    
+    // Clear source image
+    sourceClearBtn.addEventListener('click', function() {
+        sourceInput.value = '';
+        sourcePreview.classList.add('d-none');
+        sourcePlaceholder.classList.remove('d-none');
+    });
+    
+    // Generate all previews
+    generateBtn.addEventListener('click', function() {
+        if (!sourceInput.files.length) {
+            showError('Please upload your photo first');
+            return;
+        }
+        
+        // Get selected template type
+        const templateType = document.querySelector('input[name="templateType"]:checked').value;
+        
+        // Get selected categories
+        const selectedCategories = [];
+        document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+            selectedCategories.push(checkbox.value);
+        });
+        
+        if (selectedCategories.length === 0) {
+            showError('Please select at least one category');
+            return;
+        }
+        
+        // Show loading overlay
+        loadingOverlay.classList.remove('d-none');
+        loadingMessage.textContent = 'Preparing to generate previews...';
+        
+        // Clear previous results
+        resultGallery.innerHTML = '';
+        
+        // Count for tracking progress
+        let processedCount = 0;
+        let totalTemplates = templateCards.length;
+        
+        // Process each template
+        templateCards.forEach((card, index) => {
+            const style = card.dataset.style;
+            const category = card.querySelector('.category-badge').textContent;
+            
+            // Skip if category not selected
+            if (!selectedCategories.includes(style)) {
+                processedCount++;
+                updateProgressMessage(processedCount, totalTemplates);
+                return;
+            }
+            
+            setTimeout(() => {
+                loadingMessage.textContent = `Processing ${category} template...`;
+                
+                processTemplate(card, templateType, style)
+                    .then(() => {
+                        processedCount++;
+                        updateProgressMessage(processedCount, totalTemplates);
+                        
+                        if (processedCount >= totalTemplates) {
+                            // All templates processed
+                            emptyResults.classList.add('d-none');
+                            resultGallery.classList.remove('d-none');
+                            loadingOverlay.classList.add('d-none');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error processing template:', error);
+                        processedCount++;
+                        updateProgressMessage(processedCount, totalTemplates);
+                    });
+            }, index * 200); // Stagger the requests
+        });
+    });
+    
+    // Click on individual template
+    templateCards.forEach(card => {
+        card.addEventListener('click', function() {
+            if (!sourceInput.files.length) {
+                showError('Please upload your photo first');
+                return;
+            }
+            
+            // Get selected template type
+            const templateType = document.querySelector('input[name="templateType"]:checked').value;
+            const style = this.dataset.style;
+            
+            // Show loading overlay
+            loadingOverlay.classList.remove('d-none');
+            loadingMessage.textContent = `Processing ${style} template...`;
+            
+            processTemplate(this, templateType, style)
+                .then(() => {
+                    emptyResults.classList.add('d-none');
+                    resultGallery.classList.remove('d-none');
+                    loadingOverlay.classList.add('d-none');
+                })
+                .catch(error => {
+                    console.error('Error processing template:', error);
+                    loadingOverlay.classList.add('d-none');
+                    showError('Failed to process template: ' + error.message);
+                });
+        });
+    });
+    
+    // Process a template and add result to gallery
+    function processTemplate(templateCard, templateType, style) {
+        return new Promise((resolve, reject) => {
+            const imgSrc = templateCard.querySelector('img').src;
+            const title = templateCard.querySelector('.card-title').textContent;
+            const category = templateCard.querySelector('.category-badge').textContent;
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('source', sourceInput.files[0]);
+            formData.append('style', style);
+            formData.append('template_type', templateType);
+            
+            // Send AJAX request
+            fetch('/bridal-swap', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Create result card
+                    addResultCard(data.result_image, title, category, style);
+                    resolve();
+                } else {
+                    showError(data.error || 'Failed to process image');
+                    reject(new Error(data.error || 'Failed to process image'));
+                }
+            })
+            .catch(error => {
+                showError('Network error: ' + error.message);
+                reject(error);
+            });
+        });
+    }
+    
+    // Add a result card to the gallery
+    function addResultCard(imagePath, title, category, style) {
+        const existingCard = document.querySelector(`.result-card[data-style="${style}"]`);
+        if (existingCard) {
+            existingCard.remove();
+        }
+        
+        const cardHtml = `
+            <div class="result-card" data-style="${style}">
+                <div class="category-badge">${category}</div>
+                <a href="/uploads/${imagePath}" target="_blank">
+                    <img src="/uploads/${imagePath}" class="result-image" alt="${title}">
+                </a>
+                <div class="result-overlay">
+                    <h5 class="mb-0">${title}</h5>
+                </div>
+                <a href="/uploads/${imagePath}" download="${title.replace(/\s+/g, '_')}.jpg" class="btn-floating btn-download">
+                    <i class="fas fa-download"></i>
+                </a>
+                <button class="btn-floating btn-remove" onclick="removeResult('${style}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        
+        resultGallery.insertAdjacentHTML('beforeend', cardHtml);
+    }
+    
+    // Check model status
+    function checkModels() {
+        fetch('/check-models')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.face_detection || !data.face_swap) {
+                    modelStatusCard.classList.remove('d-none');
+                    let statusMessage = 'Some models are not loaded properly.';
+                    
+                    if (!data.face_detection) {
+                        statusMessage = 'Face detection model is not loaded.';
+                    } else if (!data.face_swap) {
+                        statusMessage = 'Face swap model is not loaded.';
+                    }
+                    
+                    document.getElementById('model-status-message').textContent = statusMessage;
+                }
+            })
+            .catch(error => {
+                console.error('Error checking model status:', error);
+                modelStatusCard.classList.remove('d-none');
+                document.getElementById('model-status-message').textContent = 'Could not check model status.';
+            });
+    }
+    
+    // Update progress message
+    function updateProgressMessage(processed, total) {
+        const percent = Math.round((processed / total) * 100);
+        loadingMessage.textContent = `Processing templates... ${percent}%`;
+    }
+    
+    // Show error message
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorModal.show();
+    }
+    
+    // Expose removeResult to global scope
+    window.removeResult = function(style) {
+        const card = document.querySelector(`.result-card[data-style="${style}"]`);
+        if (card) {
+            card.remove();
+            
+            // Check if any results left
+            if (resultGallery.children.length === 0) {
+                resultGallery.classList.add('d-none');
+                emptyResults.classList.remove('d-none');
+            }
+        }
+    };
+});
+</script>
+{% endblock %}
