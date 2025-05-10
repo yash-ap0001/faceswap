@@ -82,6 +82,72 @@
             </div>
         </div>
     </div>
+    
+    <!-- Current Templates Section -->
+    <div class="card bg-dark text-light mt-4">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Current Templates</h3>
+            <button id="refreshTemplates" class="btn btn-outline-light btn-sm">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-tabs" id="templateTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="haldi-tab" data-bs-toggle="tab" data-bs-target="#haldi" type="button" role="tab">Haldi</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="mehendi-tab" data-bs-toggle="tab" data-bs-target="#mehendi" type="button" role="tab">Mehendi</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="sangeeth-tab" data-bs-toggle="tab" data-bs-target="#sangeeth" type="button" role="tab">Sangeeth</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="wedding-tab" data-bs-toggle="tab" data-bs-target="#wedding" type="button" role="tab">Wedding</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reception-tab" data-bs-toggle="tab" data-bs-target="#reception" type="button" role="tab">Reception</button>
+                </li>
+            </ul>
+            <div class="tab-content pt-4" id="templateTabContent">
+                <div class="tab-pane fade show active" id="haldi" role="tabpanel">
+                    <div id="haldi-templates" class="row g-3">
+                        <div class="col-12 text-center text-muted loading-placeholder">
+                            <p>Loading haldi templates...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="mehendi" role="tabpanel">
+                    <div id="mehendi-templates" class="row g-3">
+                        <div class="col-12 text-center text-muted loading-placeholder">
+                            <p>Loading mehendi templates...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="sangeeth" role="tabpanel">
+                    <div id="sangeeth-templates" class="row g-3">
+                        <div class="col-12 text-center text-muted loading-placeholder">
+                            <p>Loading sangeeth templates...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="wedding" role="tabpanel">
+                    <div id="wedding-templates" class="row g-3">
+                        <div class="col-12 text-center text-muted loading-placeholder">
+                            <p>Loading wedding templates...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="reception" role="tabpanel">
+                    <div id="reception-templates" class="row g-3">
+                        <div class="col-12 text-center text-muted loading-placeholder">
+                            <p>Loading reception templates...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -283,6 +349,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <strong>Success!</strong> Uploaded ${data.uploaded_count} images to ${ceremonyType}.
                     ${data.main_template_updated ? '<p>Main templates have been updated.</p>' : ''}
                 `;
+                
+                // Refresh the templates for this ceremony type
+                refreshTemplatesAfterUpload(ceremonyType);
             } else {
                 statusMessage.textContent = 'Error: ' + (data.error || 'Unknown error occurred');
                 statusMessage.className = 'alert alert-danger';
@@ -304,6 +373,97 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         uploadCheckedImages();
     });
+    
+    // Function to load templates for a specific ceremony type
+    function loadTemplates(ceremonyType) {
+        const templateContainer = document.getElementById(`${ceremonyType}-templates`);
+        
+        // Display loading state
+        templateContainer.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        
+        // Fetch templates for this ceremony type
+        fetch(`/get-templates?ceremony_type=${ceremonyType}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.templates && data.templates.length > 0) {
+                    // Clear loading state
+                    templateContainer.innerHTML = '';
+                    
+                    // Add each template
+                    data.templates.forEach(template => {
+                        const col = document.createElement('div');
+                        col.className = 'col-md-3 col-sm-6 mb-4';
+                        
+                        const card = document.createElement('div');
+                        card.className = 'card h-100 bg-secondary';
+                        
+                        const img = document.createElement('img');
+                        img.src = template.url;
+                        img.className = 'card-img-top';
+                        img.alt = 'Template';
+                        img.style.height = '180px';
+                        img.style.objectFit = 'cover';
+                        
+                        const cardBody = document.createElement('div');
+                        cardBody.className = 'card-body p-2';
+                        
+                        const typeLabel = document.createElement('p');
+                        typeLabel.className = 'card-text small mb-0';
+                        typeLabel.textContent = template.template_type || 'pinterest';
+                        
+                        const dateAdded = document.createElement('small');
+                        dateAdded.className = 'text-muted';
+                        dateAdded.textContent = 'Recently Added';
+                        
+                        cardBody.appendChild(typeLabel);
+                        cardBody.appendChild(dateAdded);
+                        card.appendChild(img);
+                        card.appendChild(cardBody);
+                        col.appendChild(card);
+                        
+                        templateContainer.appendChild(col);
+                    });
+                } else {
+                    // No templates found
+                    templateContainer.innerHTML = `<div class="col-12 text-center text-muted"><p>No ${ceremonyType} templates found</p></div>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading templates:', error);
+                templateContainer.innerHTML = `<div class="col-12 text-center text-danger"><p>Error loading templates: ${error.message}</p></div>`;
+            });
+    }
+    
+    // Load all ceremony type templates initially
+    function loadAllTemplates() {
+        const ceremonyTypes = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'];
+        ceremonyTypes.forEach(type => loadTemplates(type));
+    }
+    
+    // Refresh button functionality
+    const refreshButton = document.getElementById('refreshTemplates');
+    refreshButton.addEventListener('click', loadAllTemplates);
+    
+    // Auto-refresh templates after successful upload
+    function refreshTemplatesAfterUpload(ceremonyType) {
+        // Small delay to ensure server has processed the images
+        setTimeout(() => {
+            loadTemplates(ceremonyType);
+            
+            // Activate the tab for the ceremony type that was just updated
+            const tabToActivate = document.getElementById(`${ceremonyType}-tab`);
+            if (tabToActivate) {
+                const tab = new bootstrap.Tab(tabToActivate);
+                tab.show();
+            }
+        }, 1000);
+    }
+    
+    // Update the success handler to refresh templates
+    const originalFetchHandler = fetch;
+    
+    // Load templates when the page loads
+    document.addEventListener('DOMContentLoaded', loadAllTemplates);
 });
 </script>
 {% endblock %}
