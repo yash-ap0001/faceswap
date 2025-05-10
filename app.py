@@ -821,8 +821,12 @@ def get_templates():
     """
     API endpoint to get available templates for a specific ceremony type.
     Returns templates for the requested ceremony with URLs for display.
+    Always performs a fresh scan of the filesystem to avoid caching issues.
     """
     ceremony_type = request.args.get('ceremony_type', request.args.get('ceremony', 'wedding'))
+    # Add cache-busting parameter in logs (not used but helps in debugging)
+    cache_buster = request.args.get('_t', 'none')
+    app.logger.info(f"Fetching templates for ceremony: {ceremony_type}, cache-buster: {cache_buster}")
     
     # Validate ceremony name
     valid_ceremonies = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
@@ -833,9 +837,9 @@ def get_templates():
     template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
     
     # Define template types to search for
-    template_types = ['real', 'natural', 'ai']
+    template_types = ['real', 'natural', 'ai', 'pinterest']
     
-    # Find available templates
+    # Ensure fresh list by explicitly creating a new array
     templates = []
     template_id = 1
     
@@ -891,6 +895,9 @@ def get_templates():
             'url': f"/uploads/templates/{ceremony_type}_pinterest.jpg"
         })
         template_id += 1
+    
+    # Add template count to the logging
+    app.logger.info(f"Found {len(templates)} templates for {ceremony_type}")
     
     # If no templates found, create dummy templates for testing
     if not templates:
