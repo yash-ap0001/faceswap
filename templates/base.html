@@ -632,10 +632,10 @@
                          aria-labelledby="headingBride" data-bs-parent="#sidebarAccordion">
                         <div class="accordion-body p-0 pt-2">
                             <ul class="sidebar-menu">
-                                <li><a href="/bridal-gallery"><i class="fas fa-angle-right me-2"></i>Bridal Face Swap</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Bridal Outfits</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Jewelry Collections</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Makeup Styles</a></li>
+                                <li><a href="{{ url_for('bridal_gallery') }}"><i class="fas fa-angle-right me-2"></i>Bridal Face Swap</a></li>
+                                <li><a href="{{ url_for('bridal_outfits') }}"><i class="fas fa-angle-right me-2"></i>Bridal Outfits</a></li>
+                                <li><a href="{{ url_for('jewelry_collections') }}"><i class="fas fa-angle-right me-2"></i>Jewelry Collections</a></li>
+                                <li><a href="{{ url_for('makeup_styles') }}"><i class="fas fa-angle-right me-2"></i>Makeup Styles</a></li>
                             </ul>
                         </div>
                     </div>
@@ -655,10 +655,10 @@
                          aria-labelledby="headingGroom" data-bs-parent="#sidebarAccordion">
                         <div class="accordion-body p-0 pt-2">
                             <ul class="sidebar-menu">
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Groom Face Swap</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Traditional Wear</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Modern Suits</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Accessories</a></li>
+                                <li><a href="{{ url_for('groom_face_swap') }}"><i class="fas fa-angle-right me-2"></i>Groom Face Swap</a></li>
+                                <li><a href="{{ url_for('traditional_wear') }}"><i class="fas fa-angle-right me-2"></i>Traditional Wear</a></li>
+                                <li><a href="{{ url_for('modern_suits') }}"><i class="fas fa-angle-right me-2"></i>Modern Suits</a></li>
+                                <li><a href="{{ url_for('groom_accessories') }}"><i class="fas fa-angle-right me-2"></i>Accessories</a></li>
                             </ul>
                         </div>
                     </div>
@@ -678,10 +678,10 @@
                          aria-labelledby="headingEventManager" data-bs-parent="#sidebarAccordion">
                         <div class="accordion-body p-0 pt-2">
                             <ul class="sidebar-menu">
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Event Planner</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Guest Management</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Timeline Creator</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Budget Calculator</a></li>
+                                <li><a href="#" onclick="alert('Event Planner - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Event Planner</a></li>
+                                <li><a href="#" onclick="alert('Guest Management - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Guest Management</a></li>
+                                <li><a href="#" onclick="alert('Timeline Creator - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Timeline Creator</a></li>
+                                <li><a href="#" onclick="alert('Budget Calculator - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Budget Calculator</a></li>
                             </ul>
                         </div>
                     </div>
@@ -701,10 +701,10 @@
                          aria-labelledby="headingConventionHalls" data-bs-parent="#sidebarAccordion">
                         <div class="accordion-body p-0 pt-2">
                             <ul class="sidebar-menu">
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Venue Search</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Hall Comparison</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Virtual Tours</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right me-2"></i>Booking Management</a></li>
+                                <li><a href="{{ url_for('venue_search') }}"><i class="fas fa-angle-right me-2"></i>Venue Search</a></li>
+                                <li><a href="{{ url_for('hall_comparison') }}"><i class="fas fa-angle-right me-2"></i>Hall Comparison</a></li>
+                                <li><a href="{{ url_for('virtual_tours') }}"><i class="fas fa-angle-right me-2"></i>Virtual Tours</a></li>
+                                <li><a href="{{ url_for('booking_management') }}"><i class="fas fa-angle-right me-2"></i>Booking Management</a></li>
                             </ul>
                         </div>
                     </div>

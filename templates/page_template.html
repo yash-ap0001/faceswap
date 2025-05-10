@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block style %}
+<style>
+    .page-header {
+        background-color: rgba(0, 0, 0, 0.3);
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .feature-card {
+        background-color: var(--card-surface);
+        border-radius: 10px;
+        padding: 20px;
+        height: 100%;
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        border-color: var(--primary-purple);
+    }
+    
+    .feature-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        margin-bottom: 20px;
+        background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        color: white;
+        font-size: 1.8rem;
+    }
+    
+    .image-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .image-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .image-card img {
+        width: 100%;
+        height: auto;
+        transition: all 0.5s ease;
+    }
+    
+    .image-card:hover img {
+        transform: scale(1.05);
+    }
+    
+    .image-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+        padding: 20px;
+        color: white;
+    }
+    
+    .image-overlay h5 {
+        margin-bottom: 5px;
+    }
+    
+    .image-overlay p {
+        margin-bottom: 0;
+        font-size: 14px;
+        opacity: 0.8;
+    }
+    
+    .coming-soon {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 300px;
+        text-align: center;
+        padding: 30px;
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        border: 2px dashed var(--border-color);
+    }
+    
+    .coming-soon i {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        color: var(--light-purple);
+    }
+    
+    .coming-soon h3 {
+        margin-bottom: 15px;
+        color: var(--light-purple);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="mb-3">{{ page_title }}</h1>
+                <p class="mb-0">{{ page_description }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        {% for feature in features %}
+        <div class="col-md-4 mb-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="{{ feature.icon }}"></i>
+                </div>
+                <h4>{{ feature.title }}</h4>
+                <p>{{ feature.description }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h2 class="mb-4">{{ secondary_title }}</h2>
+        </div>
+        
+        {% if items %}
+            {% for item in items %}
+            <div class="col-md-4 mb-4">
+                <div class="image-card">
+                    <img src="{{ item.image }}" alt="{{ item.title }}">
+                    <div class="image-overlay">
+                        <h5>{{ item.title }}</h5>
+                        <p>{{ item.description }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="coming-soon">
+                    <i class="fas fa-tools"></i>
+                    <h3>Coming Soon</h3>
+                    <p>We're working hard to bring you this feature. Check back later!</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

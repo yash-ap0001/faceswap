@@ -1,0 +1,59 @@
+{% extends "page_template.html" %}
+
+{% set page_title = "Bridal Outfits" %}
+{% set page_description = "Explore traditional and modern bridal outfits for different Indian wedding ceremonies. Find the perfect wedding outfit for your special day." %}
+{% set secondary_title = "Popular Bridal Outfit Collections" %}
+
+{% set features = [
+    {
+        "icon": "fas fa-paint-brush",
+        "title": "Customizable Designs",
+        "description": "Personalize every detail from colors to embroidery patterns to create your dream bridal outfit."
+    },
+    {
+        "icon": "fas fa-history",
+        "title": "Traditional & Modern Styles",
+        "description": "Browse both traditional and contemporary designs that blend cultural heritage with modern fashion trends."
+    },
+    {
+        "icon": "fas fa-calendar-day",
+        "title": "Ceremony-Specific Collections",
+        "description": "Find outfits specially designed for each wedding ceremony from Haldi to Reception."
+    }
+] %}
+
+{% set items = [
+    {
+        "image": "/static/images/bridal_outfits/lehenga1.jpg",
+        "title": "Royal Red Wedding Lehenga",
+        "description": "Traditional bridal lehenga with intricate gold embroidery and mirror work"
+    },
+    {
+        "image": "/static/images/bridal_outfits/saree1.jpg",
+        "title": "Designer Wedding Saree",
+        "description": "Elegant silk saree with handcrafted zari border and contemporary design"
+    },
+    {
+        "image": "/static/images/bridal_outfits/mehndi1.jpg",
+        "title": "Vibrant Mehendi Outfit",
+        "description": "Bright yellow and green ensemble perfect for the mehendi ceremony"
+    },
+    {
+        "image": "/static/images/bridal_outfits/reception1.jpg",
+        "title": "Modern Reception Gown",
+        "description": "Contemporary fusion gown combining traditional elements with modern styling"
+    },
+    {
+        "image": "/static/images/bridal_outfits/haldi1.jpg",
+        "title": "Haldi Ceremony Outfit",
+        "description": "Comfortable yet stylish yellow outfit designed for the Haldi ceremony"
+    },
+    {
+        "image": "/static/images/bridal_outfits/sangeet1.jpg",
+        "title": "Glamorous Sangeet Lehenga",
+        "description": "Dance-friendly designer lehenga with intricate embroidery for the sangeet night"
+    }
+] %}
+
+{# Empty items list for coming soon display #}
+{% set items = [] %}

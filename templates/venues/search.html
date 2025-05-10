@@ -1,0 +1,26 @@
+{% extends "page_template.html" %}
+
+{% set page_title = "Venue Search" %}
+{% set page_description = "Find the perfect wedding venue for your special day. Browse through our curated selection of popular wedding venues across India." %}
+{% set secondary_title = "Featured Wedding Venues" %}
+
+{% set features = [
+    {
+        "icon": "fas fa-search-location",
+        "title": "Advanced Search",
+        "description": "Filter venues by location, capacity, price range, and amenities to find your perfect match."
+    },
+    {
+        "icon": "fas fa-calendar-check",
+        "title": "Availability Checker",
+        "description": "Instantly check venue availability for your preferred wedding dates without making phone calls."
+    },
+    {
+        "icon": "fas fa-star-half-alt",
+        "title": "Verified Reviews",
+        "description": "Read authentic reviews from couples who have hosted their wedding at these venues."
+    }
+] %}
+
+{# Empty items list for coming soon display #}
+{% set items = [] %}

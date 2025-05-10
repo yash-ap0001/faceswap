@@ -294,6 +294,53 @@ def index():
 def bridal_gallery():
     return render_template('bridal_gallery_new.html')
 
+# Bride section routes
+@app.route('/bridal-outfits')
+def bridal_outfits():
+    return render_template('bride/outfits.html')
+
+@app.route('/jewelry-collections')
+def jewelry_collections():
+    return render_template('bride/jewelry.html')
+
+@app.route('/makeup-styles')
+def makeup_styles():
+    return render_template('bride/makeup.html')
+
+# Groom section routes
+@app.route('/groom-face-swap')
+def groom_face_swap():
+    return render_template('groom/face_swap.html')
+
+@app.route('/traditional-wear')
+def traditional_wear():
+    return render_template('groom/traditional_wear.html')
+
+@app.route('/modern-suits')
+def modern_suits():
+    return render_template('groom/modern_suits.html')
+
+@app.route('/groom-accessories')
+def groom_accessories():
+    return render_template('groom/accessories.html')
+
+# Convention halls section routes
+@app.route('/venue-search')
+def venue_search():
+    return render_template('venues/search.html')
+
+@app.route('/hall-comparison')
+def hall_comparison():
+    return render_template('venues/comparison.html')
+
+@app.route('/virtual-tours')
+def virtual_tours():
+    return render_template('venues/tours.html')
+
+@app.route('/booking-management')
+def booking_management():
+    return render_template('venues/booking.html')
+
 @app.route('/bridal-swap', methods=['GET', 'POST'])
 def bridal_swap():
     if request.method == 'GET':

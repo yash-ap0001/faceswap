@@ -1,0 +1,26 @@
+{% extends "page_template.html" %}
+
+{% set page_title = "Jewelry Collections" %}
+{% set page_description = "Discover exquisite bridal jewelry collections for your wedding day. From traditional gold pieces to contemporary diamond sets, find the perfect accessories to complement your bridal look." %}
+{% set secondary_title = "Featured Jewelry Collections" %}
+
+{% set features = [
+    {
+        "icon": "fas fa-gem",
+        "title": "Traditional Sets",
+        "description": "Explore heritage gold jewelry with intricate designs that celebrate Indian craftsmanship and wedding traditions."
+    },
+    {
+        "icon": "fas fa-star",
+        "title": "Diamond & Precious Stones",
+        "description": "Browse modern jewelry featuring diamonds, rubies, emeralds and other precious stones set in elegant designs."
+    },
+    {
+        "icon": "fas fa-palette",
+        "title": "Custom Designs",
+        "description": "Create bespoke jewelry pieces that match your wedding outfit and personal style preferences."
+    }
+] %}
+
+{# Empty items list for coming soon display #}
+{% set items = [] %}
