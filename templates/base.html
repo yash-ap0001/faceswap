@@ -186,23 +186,23 @@
         /* Transparent Sidebar */
         .sidebar {
             position: fixed;
-            left: -350px;
+            right: -350px;
             top: 0;
             width: 350px;
             height: 100vh;
             background-color: rgba(30, 30, 30, 0.92);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border-right: 2px solid var(--primary-purple);
+            border-left: 2px solid var(--primary-purple);
             z-index: 1050;
             padding: 20px;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
             overflow-y: auto;
         }
         
         .sidebar.active {
-            left: 0;
+            right: 0;
         }
         
         .sidebar-header {
@@ -368,7 +368,7 @@
         
         .sidebar-toggle {
             position: fixed;
-            left: 20px;
+            right: 20px;
             top: 100px;
             z-index: 999;
         }
@@ -434,7 +434,7 @@
         .sidebar-notification {
             position: fixed;
             bottom: 30px;
-            left: 30px;
+            right: 30px;
             background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
             color: white;
             padding: 15px 20px;
@@ -520,10 +520,6 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <button type="button" class="btn me-3 wedding-categories-btn" id="navSidebarToggle">
-                <i class="fas fa-th-large me-2"></i>Wedding Categories
-            </button>
-            
             <a class="navbar-brand" href="/">
                 <span class="brand-gradient">Bridal Vision</span>
             </a>
@@ -548,6 +544,10 @@
                         </a>
                     </li>
                 </ul>
+                
+                <button type="button" class="btn me-2 wedding-categories-btn" id="navSidebarToggle">
+                    <i class="fas fa-th-large me-2"></i>Wedding Categories
+                </button>
             </div>
         </div>
     </nav>
