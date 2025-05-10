@@ -16,25 +16,39 @@
 
             <form id="uploadForm" enctype="multipart/form-data">
                 <div class="mb-3">
-                    <label for="ceremonyType" class="form-label">Ceremony Type</label>
-                    <select class="form-select" id="ceremonyType" name="ceremony_type" required>
-                        <option value="" disabled selected>Select ceremony type</option>
-                        <option value="haldi">Haldi</option>
-                        <option value="mehendi">Mehendi</option>
-                        <option value="sangeeth">Sangeeth</option>
-                        <option value="wedding">Wedding</option>
-                        <option value="reception">Reception</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
                     <label for="images" class="form-label">Select Images</label>
                     <input type="file" class="form-control" id="images" name="files" multiple accept="image/*" required>
                     <div class="form-text text-light">You can select multiple images at once. Supported formats: JPG, PNG</div>
                 </div>
 
-                <div class="mb-3">
-                    <button type="submit" class="btn btn-primary">Upload Templates</button>
+                <div class="card bg-dark mb-4 border border-secondary">
+                    <div class="card-header bg-dark">
+                        <h5 class="mb-0">Batch Processing Controls</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-end">
+                            <div class="col-md-6">
+                                <div class="form-group mb-md-0 mb-3">
+                                    <label for="ceremonyType" class="form-label">Ceremony Type</label>
+                                    <select class="form-select" id="ceremonyType" name="ceremony_type" required>
+                                        <option value="" disabled selected>Select ceremony type</option>
+                                        <option value="haldi">Haldi</option>
+                                        <option value="mehendi">Mehendi</option>
+                                        <option value="sangeeth">Sangeeth</option>
+                                        <option value="wedding">Wedding</option>
+                                        <option value="reception">Reception</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <button type="button" id="selectAll" class="btn btn-outline-light me-2">Select All</button>
+                                    <button type="button" id="deselectAll" class="btn btn-outline-secondary me-2">Deselect All</button>
+                                    <button type="button" id="uploadSelected" class="btn btn-primary">Upload Selected</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form>
 
@@ -103,6 +117,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 const card = document.createElement('div');
                 card.className = 'card h-100 bg-secondary';
                 
+                // Add checkbox for selection
+                const checkboxWrapper = document.createElement('div');
+                checkboxWrapper.className = 'form-check position-absolute top-0 start-0 m-2';
+                checkboxWrapper.style.zIndex = '10';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'form-check-input image-checkbox';
+                checkbox.id = 'checkbox-' + file.name.replace(/[^a-zA-Z0-9]/g, '-');
+                checkbox.dataset.fileName = file.name;
+                
+                checkboxWrapper.appendChild(checkbox);
+                
                 const img = document.createElement('img');
                 img.src = e.target.result;
                 img.className = 'card-img-top';
@@ -117,40 +144,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 fileName.className = 'card-text small text-truncate';
                 fileName.textContent = file.name;
                 
-                // Add category selection for each image
-                const categoryLabel = document.createElement('label');
-                categoryLabel.className = 'form-label mt-2 mb-1';
-                categoryLabel.textContent = 'Ceremony Type:';
+                // Save the file object reference for later use
+                cardBody.dataset.fileName = file.name;
                 
-                const categorySelect = document.createElement('select');
-                categorySelect.className = 'form-select form-select-sm individual-category';
-                categorySelect.dataset.fileName = file.name;
-                
-                // Add options
-                const categories = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'];
-                const mainCategory = document.getElementById('ceremonyType').value;
-                
-                // Create a default option
-                const defaultOption = document.createElement('option');
-                defaultOption.value = '';
-                defaultOption.textContent = 'Select ceremony';
-                categorySelect.appendChild(defaultOption);
-                
-                // Add ceremony type options
-                categories.forEach(category => {
-                    const option = document.createElement('option');
-                    option.value = category;
-                    option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
-                    // Pre-select the main category if it's set
-                    if (category === mainCategory) {
-                        option.selected = true;
-                    }
-                    categorySelect.appendChild(option);
-                });
+                // Add ceremony type label that will be updated when images are processed
+                const categoryLabel = document.createElement('p');
+                categoryLabel.className = 'card-text small mb-0 category-label';
+                categoryLabel.innerHTML = '<span class="text-muted">Not assigned</span>';
+                categoryLabel.dataset.fileName = file.name;
                 
                 cardBody.appendChild(fileName);
                 cardBody.appendChild(categoryLabel);
-                cardBody.appendChild(categorySelect);
+                card.appendChild(checkboxWrapper);
                 card.appendChild(img);
                 card.appendChild(cardBody);
                 col.appendChild(card);
@@ -161,49 +166,71 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle form submission
-    uploadForm.addEventListener('submit', function(e) {
-        e.preventDefault();
+    // Event listeners for select/deselect buttons
+    const selectAllButton = document.getElementById('selectAll');
+    const deselectAllButton = document.getElementById('deselectAll');
+    const uploadSelectedButton = document.getElementById('uploadSelected');
+    
+    // Select all images
+    selectAllButton.addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('.image-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = true;
+        });
+    });
+    
+    // Deselect all images
+    deselectAllButton.addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('.image-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+    });
+    
+    // Function to handle uploading checked images
+    function uploadCheckedImages() {
+        // Get selected ceremony type
+        const ceremonyType = document.getElementById('ceremonyType').value;
         
-        // Get all image categories from the preview section
-        const individualCategorySelects = document.querySelectorAll('.individual-category');
-        const defaultCeremonyType = document.getElementById('ceremonyType').value;
-        
-        if (!defaultCeremonyType) {
-            alert('Please select a default ceremony type');
+        if (!ceremonyType) {
+            alert('Please select a ceremony type');
             return;
         }
         
-        if (imageInput.files.length === 0) {
+        // Get all checked images
+        const checkedBoxes = document.querySelectorAll('.image-checkbox:checked');
+        
+        if (checkedBoxes.length === 0) {
             alert('Please select at least one image');
             return;
         }
         
-        // Create a map of file name to ceremony type
-        const imageCategories = {};
-        individualCategorySelects.forEach(select => {
-            const fileName = select.dataset.fileName;
-            const category = select.value || defaultCeremonyType; // Fallback to default if not set
-            imageCategories[fileName] = category;
-        });
-        
-        // Create customized FormData with category information
+        // Create FormData for upload
         const formData = new FormData();
-        formData.append('ceremony_type', defaultCeremonyType);
+        formData.append('ceremony_type', ceremonyType);
         
-        // Add each file with its category
-        for (let i = 0; i < imageInput.files.length; i++) {
-            const file = imageInput.files[i];
-            const category = imageCategories[file.name] || defaultCeremonyType;
-            formData.append('files', file);
-            formData.append('file_categories', category);
-        }
+        // Keep track of which files are being uploaded
+        const uploadingFileNames = [];
+        
+        // Find the corresponding files from the input
+        Array.from(imageInput.files).forEach(file => {
+            // Check if this file is selected
+            const isSelected = Array.from(checkedBoxes).some(
+                checkbox => checkbox.dataset.fileName === file.name
+            );
+            
+            if (isSelected) {
+                formData.append('files', file);
+                formData.append('file_categories', ceremonyType);
+                uploadingFileNames.push(file.name);
+            }
+        });
         
         // Show upload status
         uploadStatus.style.display = 'block';
         uploadResult.style.display = 'none';
         uploadProgress.style.width = '0%';
-        statusMessage.textContent = 'Uploading images...';
+        statusMessage.textContent = 'Uploading selected images...';
         statusMessage.className = 'alert alert-info';
         
         // Create a progress animation
@@ -230,17 +257,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusMessage.textContent = 'Upload complete!';
                 statusMessage.className = 'alert alert-success';
                 
+                // Update labels for uploaded images
+                uploadingFileNames.forEach(fileName => {
+                    // Find checkboxes and labels for this file
+                    const checkbox = document.querySelector(`.image-checkbox[data-file-name="${fileName}"]`);
+                    const label = document.querySelector(`.category-label[data-file-name="${fileName}"]`);
+                    
+                    if (checkbox && label) {
+                        // Mark as uploaded and update label
+                        checkbox.disabled = true;
+                        checkbox.checked = false;
+                        label.innerHTML = `<span class="text-success">Uploaded to ${ceremonyType}</span>`;
+                        
+                        // Optionally: add a visual effect to show it's been processed
+                        const card = checkbox.closest('.card');
+                        if (card) {
+                            card.classList.add('opacity-50');
+                        }
+                    }
+                });
+                
                 // Show success message
                 uploadResult.style.display = 'block';
                 successMessage.innerHTML = `
-                    <strong>Success!</strong> Uploaded ${data.uploaded_count} images across ${data.categories_updated.length} 
-                    ceremony types: ${data.categories_updated.join(', ')}.
+                    <strong>Success!</strong> Uploaded ${data.uploaded_count} images to ${ceremonyType}.
                     ${data.main_template_updated ? '<p>Main templates have been updated.</p>' : ''}
                 `;
-                
-                // Reset form
-                uploadForm.reset();
-                imagePreview.innerHTML = '<div class="col-12 text-center text-muted"><p>Selected images will appear here</p></div>';
             } else {
                 statusMessage.textContent = 'Error: ' + (data.error || 'Unknown error occurred');
                 statusMessage.className = 'alert alert-danger';
@@ -252,6 +294,15 @@ document.addEventListener('DOMContentLoaded', function() {
             statusMessage.textContent = 'Error: ' + error.message;
             statusMessage.className = 'alert alert-danger';
         });
+    }
+    
+    // Upload selected images button
+    uploadSelectedButton.addEventListener('click', uploadCheckedImages);
+    
+    // Original form submission (now just delegated to the upload function)
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        uploadCheckedImages();
     });
 });
 </script>
