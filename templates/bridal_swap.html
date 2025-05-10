@@ -580,7 +580,7 @@ function initializePage() {
                         // Add error handling for image loading
                         img.onerror = function() {
                             console.error(`Failed to load image for template ${template.id} from URL: ${template.url}`);
-                            img.src = '/static/img/placeholder.jpg';
+                            img.src = '/static/img/placeholder.svg';
                             img.alt = 'Image load failed';
                         };
                         
@@ -831,7 +831,7 @@ function initializePage() {
                 alert('Error deleting templates. See console for details.');
             });
         });
-    });
+    }
 });
 </script>
 {% endblock %}
