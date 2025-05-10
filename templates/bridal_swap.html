@@ -325,6 +325,32 @@ function initializePage() {
     const errorMessage = document.getElementById('error-message');
     const modelStatusAlert = document.getElementById('model-status-alert');
     const modelStatusMessage = document.getElementById('model-status-message');
+    
+    // Initialize template features
+    const refreshTemplatesBtn = document.getElementById('refreshTemplatesBtn');
+    if (refreshTemplatesBtn) {
+        console.log('Adding click listener to refresh templates button');
+        refreshTemplatesBtn.addEventListener('click', loadAllTemplates);
+    } else {
+        console.error('Refresh templates button not found');
+    }
+    
+    // Set up bridal style radio buttons
+    document.querySelectorAll('input[name="bridalStyle"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const selectedStyle = this.value;
+            // Show the corresponding tab
+            const tab = document.getElementById(`${selectedStyle}-tab`);
+            if (tab) {
+                console.log(`Showing tab for ${selectedStyle}`);
+                new bootstrap.Tab(tab).show();
+            }
+        });
+    });
+    
+    // Load templates on page initialization
+    console.log('Initial template loading');
+    loadAllTemplates();
 
     // Check if models are loaded
     checkModels();
@@ -645,28 +671,7 @@ function initializePage() {
         }
     }
     
-    // Initialize template loading on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get refresh button after DOM is loaded
-        const refreshTemplatesBtn = document.getElementById('refreshTemplatesBtn');
-        if (refreshTemplatesBtn) {
-            refreshTemplatesBtn.addEventListener('click', loadAllTemplates);
-        }
-        
-        // Load templates when page loads
-        loadAllTemplates();
-        
-        // Also update template display when radio buttons change
-        document.querySelectorAll('input[name="bridalStyle"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                const selectedStyle = this.value;
-                // Show the corresponding tab
-                const tab = document.getElementById(`${selectedStyle}-tab`);
-                if (tab) {
-                    new bootstrap.Tab(tab).show();
-                }
-            });
-        });
+    // This is now handled in the initializePage function
         
         // Set up periodic check for template updates (every 3 seconds)
         const updateInterval = setInterval(checkForTemplateUpdates, 3000);
