@@ -207,3 +207,24 @@ class CategoryBudget(db.Model):
     
     def __repr__(self):
         return f'<CategoryBudget ${self.allocated_amount} for {self.category} in Event #{self.event_id}>'
+
+# Event Manager model for specialized wedding planners
+class EventManager(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False)
+    profile_photo = db.Column(db.String(512))  # Path to profile photo
+    email = db.Column(db.String(120), unique=True)
+    phone = db.Column(db.String(20))
+    website = db.Column(db.String(256))
+    bio = db.Column(db.Text)
+    rating = db.Column(db.Float, default=0)  # Rating out of 5
+    price_range = db.Column(db.String(20))  # e.g., '$', '$$', '$$$'
+    service_categories = db.Column(db.String(256))  # Comma-separated categories
+    location = db.Column(db.String(128))
+    experience_years = db.Column(db.Integer, default=0)
+    specialization = db.Column(db.String(128))  # Primary specialization
+    languages = db.Column(db.String(256))  # Languages spoken
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<EventManager {self.name}>'
