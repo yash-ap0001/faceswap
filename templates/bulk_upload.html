@@ -233,8 +233,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Show success message
                 uploadResult.style.display = 'block';
                 successMessage.innerHTML = `
-                    <strong>Success!</strong> Uploaded ${data.uploaded_count} images across different ceremony types.
-                    ${data.main_template_updated ? '<p>The main template has been updated.</p>' : ''}
+                    <strong>Success!</strong> Uploaded ${data.uploaded_count} images across ${data.categories_updated.length} 
+                    ceremony types: ${data.categories_updated.join(', ')}.
+                    ${data.main_template_updated ? '<p>Main templates have been updated.</p>' : ''}
                 `;
                 
                 // Reset form
