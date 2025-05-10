@@ -204,7 +204,9 @@
             padding: 20px;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
-            overflow-y: auto;
+            overflow-y: hidden;
+            display: flex;
+            flex-direction: column;
         }
         
         .sidebar.closed {
@@ -258,13 +260,16 @@
         
         .category-title {
             font-size: 1.1rem;
-            margin-bottom: 15px;
+            margin-bottom: 0;
             color: var(--light-purple);
             font-weight: 600;
             display: flex;
             align-items: center;
-            padding-left: 10px;
+            justify-content: space-between;
+            padding: 10px 10px 10px 10px;
             position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         
         .category-title::before {
@@ -276,6 +281,30 @@
             width: 3px;
             background: linear-gradient(to bottom, var(--primary-purple), var(--secondary-purple));
             border-radius: 3px;
+        }
+        
+        .category-title:hover {
+            color: var(--primary-purple);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .category-title .chevron-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .category-title.collapsed .chevron-icon {
+            transform: rotate(-90deg);
+        }
+        
+        .category-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .category-content.expanded {
+            max-height: 300px;
+            padding-top: 10px;
         }
         
         .sidebar-menu {
@@ -575,15 +604,20 @@
         </div>
         <div class="sidebar-content">
             <div class="sidebar-section">
-                <h6 class="category-title">
-                    <i class="fas fa-female me-2"></i>Bride
+                <h6 class="category-title" data-target="bride-content">
+                    <div>
+                        <i class="fas fa-female me-2"></i>Bride
+                    </div>
+                    <i class="fas fa-chevron-down chevron-icon"></i>
                 </h6>
-                <ul class="sidebar-menu">
-                    <li><a href="/bridal-gallery"><i class="fas fa-angle-right me-2"></i>Bridal Face Swap</a></li>
-                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Bridal Outfits</a></li>
-                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Jewelry Collections</a></li>
-                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Makeup Styles</a></li>
-                </ul>
+                <div class="category-content expanded" id="bride-content">
+                    <ul class="sidebar-menu">
+                        <li><a href="/bridal-gallery"><i class="fas fa-angle-right me-2"></i>Bridal Face Swap</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Bridal Outfits</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Jewelry Collections</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right me-2"></i>Makeup Styles</a></li>
+                    </ul>
+                </div>
             </div>
             
             <div class="sidebar-section">
