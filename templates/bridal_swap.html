@@ -52,29 +52,48 @@
                                 </div>
                                 <div class="card-body">
                                     <p class="text-muted small">Select a traditional Indian bridal style</p>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="radio" name="bridalStyle" id="haldi" value="haldi" checked>
-                                        <label class="form-check-label" for="haldi">
-                                            <strong>Haldi Ceremony</strong> - Yellow saree with marigold decorations
-                                        </label>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Event Type</label>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="haldi" value="haldi" checked>
+                                            <label class="form-check-label" for="haldi">
+                                                <strong>Haldi Ceremony</strong> - Yellow saree with marigold decorations
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="mehendi" value="mehendi">
+                                            <label class="form-check-label" for="mehendi">
+                                                <strong>Mehendi Function</strong> - Green lehenga with henna designs
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="wedding" value="wedding">
+                                            <label class="form-check-label" for="wedding">
+                                                <strong>Wedding Ceremony</strong> - Traditional red bridal lehenga
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="reception" value="reception">
+                                            <label class="form-check-label" for="reception">
+                                                <strong>Reception</strong> - Stylish maroon designer gown/lehenga
+                                            </label>
+                                        </div>
                                     </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="radio" name="bridalStyle" id="mehendi" value="mehendi">
-                                        <label class="form-check-label" for="mehendi">
-                                            <strong>Mehendi Function</strong> - Green lehenga with henna designs
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="radio" name="bridalStyle" id="wedding" value="wedding">
-                                        <label class="form-check-label" for="wedding">
-                                            <strong>Wedding Ceremony</strong> - Traditional red bridal lehenga
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="bridalStyle" id="reception" value="reception">
-                                        <label class="form-check-label" for="reception">
-                                            <strong>Reception</strong> - Stylish maroon designer gown/lehenga
-                                        </label>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Template Type</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="templateType" id="natural" value="natural" checked>
+                                            <label class="form-check-label" for="natural">
+                                                <strong>Natural Images</strong> - Real-life bridal photographs
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="templateType" id="ai" value="ai">
+                                            <label class="form-check-label" for="ai">
+                                                <strong>AI-Generated</strong> - Computer-generated bridal templates
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -214,8 +233,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Get selected bridal style
+        // Get selected bridal style and template type
         const selectedStyle = document.querySelector('input[name="bridalStyle"]:checked').value;
+        const selectedTemplateType = document.querySelector('input[name="templateType"]:checked').value;
 
         // Check file sizes
         const maxSize = 16 * 1024 * 1024; // 16MB
@@ -241,6 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData();
         formData.append('source', sourceInput.files[0]);
         formData.append('style', selectedStyle);
+        formData.append('template_type', selectedTemplateType);
 
         // Send AJAX request
         fetch('/bridal-swap', {

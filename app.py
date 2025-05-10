@@ -303,6 +303,7 @@ def bridal_swap():
     
     source_file = request.files['source']
     selected_style = request.form.get('style', 'haldi')
+    template_type = request.form.get('template_type', 'natural')
     
     if source_file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
@@ -327,8 +328,8 @@ def bridal_swap():
         if not source_faces:
             return jsonify({'error': 'No face detected in your photo. Please upload a clear photo with your face visible.'}), 400
         
-        # Get the template image for the selected bridal style
-        target_img, target_path = get_bridal_template(selected_style)
+        # Get the template image for the selected bridal style and template type
+        target_img, target_path = get_bridal_template(selected_style, template_type)
         
         if target_img is None:
             return jsonify({'error': 'Failed to load bridal template image'}), 500
@@ -340,11 +341,11 @@ def bridal_swap():
             return jsonify({'error': 'No face detected in template image. Please try a different style.'}), 400
         
         # Perform face swap
-        logger.info(f"Performing face swap with style: {selected_style}")
+        logger.info(f"Performing face swap with style: {selected_style}, template type: {template_type}")
         result_img = swapper.get(target_img, target_faces[0], source_faces[0])
         
         # Save result
-        output_filename = f'bridal_{selected_style}_{secure_filename(source_file.filename)}'
+        output_filename = f'bridal_{selected_style}_{template_type}_{secure_filename(source_file.filename)}'
         output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
         cv2.imwrite(output_path, result_img)
         
@@ -354,7 +355,8 @@ def bridal_swap():
         return jsonify({
             'success': True,
             'result_image': output_filename,
-            'style': selected_style
+            'style': selected_style,
+            'template_type': template_type
         })
         
     except Exception as e:
@@ -365,22 +367,38 @@ def bridal_swap():
             os.remove(source_path)
         return jsonify({'error': str(e)}), 500
 
-def get_bridal_template(style):
+def get_bridal_template(style, template_type='natural'):
     """
-    Get the template image for the selected bridal style.
-    Returns the image and path.
+    Get the template image for the selected bridal style and template type.
+    
+    Args:
+        style (str): The bridal style ('haldi', 'mehendi', 'wedding', or 'reception')
+        template_type (str): The template type ('natural' or 'ai')
+        
+    Returns:
+        tuple: (template_img, template_path)
     """
     # Create directory for template images if it doesn't exist
     template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
     os.makedirs(template_dir, exist_ok=True)
     
-    # Define paths for template images
-    template_paths = {
-        'haldi': os.path.join(template_dir, 'haldi_template.jpg'),
-        'mehendi': os.path.join(template_dir, 'mehendi_template.jpg'),
-        'wedding': os.path.join(template_dir, 'wedding_template.jpg'),
-        'reception': os.path.join(template_dir, 'reception_template.jpg')
-    }
+    # Define paths for template images based on style and type
+    if template_type == 'natural':
+        # Natural image templates
+        template_paths = {
+            'haldi': os.path.join(template_dir, 'haldi_natural.jpg'),
+            'mehendi': os.path.join(template_dir, 'mehendi_natural.jpg'),
+            'wedding': os.path.join(template_dir, 'wedding_natural.jpg'),
+            'reception': os.path.join(template_dir, 'reception_natural.jpg')
+        }
+    else:
+        # AI-generated templates
+        template_paths = {
+            'haldi': os.path.join(template_dir, 'haldi_ai.jpg'),
+            'mehendi': os.path.join(template_dir, 'mehendi_ai.jpg'),
+            'wedding': os.path.join(template_dir, 'wedding_ai.jpg'),
+            'reception': os.path.join(template_dir, 'reception_ai.jpg')
+        }
     
     # Check if template image exists, if not, create a placeholder
     if not os.path.exists(template_paths[style]):
@@ -402,9 +420,12 @@ def get_bridal_template(style):
             # Maroon for Reception
             template_img[:] = (0, 0, 128)  # BGR for maroon
         
+        # Add a label indicating which template type this is
+        template_type_label = "Natural" if template_type == "natural" else "AI-Generated"
+        
         # Add text
         font = cv2.FONT_HERSHEY_SIMPLEX
-        text = f"{style.capitalize()} Template"
+        text = f"{style.capitalize()} {template_type_label} Template"
         text_size = cv2.getTextSize(text, font, 1, 2)[0]
         text_x = (img_width - text_size[0]) // 2
         text_y = (img_height + text_size[1]) // 2
@@ -413,33 +434,41 @@ def get_bridal_template(style):
         # Save the template
         cv2.imwrite(template_paths[style], template_img)
         
-        logger.warning(f"Created placeholder template for {style}")
+        logger.warning(f"Created placeholder template for {style} ({template_type})")
         
-        # Add a face to the template for testing
-        # Draw a simple face outline
-        face_center_x, face_center_y = img_width // 2, img_height // 3
-        face_radius = min(img_width, img_height) // 6
-        
-        # Draw face circle
-        cv2.circle(template_img, (face_center_x, face_center_y), face_radius, (255, 255, 255), 2)
-        
-        # Draw eyes
-        eye_radius = face_radius // 5
-        left_eye_x = face_center_x - face_radius // 3
-        right_eye_x = face_center_x + face_radius // 3
-        eyes_y = face_center_y - face_radius // 4
-        
-        cv2.circle(template_img, (left_eye_x, eyes_y), eye_radius, (255, 255, 255), 2)
-        cv2.circle(template_img, (right_eye_x, eyes_y), eye_radius, (255, 255, 255), 2)
-        
-        # Draw mouth
-        mouth_y = face_center_y + face_radius // 3
-        cv2.ellipse(template_img, (face_center_x, mouth_y), 
-                   (face_radius // 3, face_radius // 6), 
-                   0, 0, 180, (255, 255, 255), 2)
-        
-        # Save the template with face
-        cv2.imwrite(template_paths[style], template_img)
+        # If this is an initial setup and we created placeholder images, 
+        # use our nice templates instead if they exist
+        template_placeholder = os.path.join(template_dir, f'{style}_template.jpg')
+        if os.path.exists(template_placeholder):
+            logger.info(f"Found existing template for {style}, using it instead of placeholder")
+            template_img = cv2.imread(template_placeholder)
+            cv2.imwrite(template_paths[style], template_img)
+        else:
+            # Add a face to the template for testing
+            # Draw a simple face outline
+            face_center_x, face_center_y = img_width // 2, img_height // 3
+            face_radius = min(img_width, img_height) // 6
+            
+            # Draw face circle
+            cv2.circle(template_img, (face_center_x, face_center_y), face_radius, (255, 255, 255), 2)
+            
+            # Draw eyes
+            eye_radius = face_radius // 5
+            left_eye_x = face_center_x - face_radius // 3
+            right_eye_x = face_center_x + face_radius // 3
+            eyes_y = face_center_y - face_radius // 4
+            
+            cv2.circle(template_img, (left_eye_x, eyes_y), eye_radius, (255, 255, 255), 2)
+            cv2.circle(template_img, (right_eye_x, eyes_y), eye_radius, (255, 255, 255), 2)
+            
+            # Draw mouth
+            mouth_y = face_center_y + face_radius // 3
+            cv2.ellipse(template_img, (face_center_x, mouth_y), 
+                       (face_radius // 3, face_radius // 6), 
+                       0, 0, 180, (255, 255, 255), 2)
+            
+            # Save the template with face
+            cv2.imwrite(template_paths[style], template_img)
     
     # Load and return the template image
     template_img = cv2.imread(template_paths[style])
