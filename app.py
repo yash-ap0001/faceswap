@@ -76,7 +76,7 @@ def create_demo_result(source_img, target_img, source_face, target_face):
 
 def download_face_swap_model():
     """
-    Download the face swap model from various sources.
+    Download the face swap model from the provided Hugging Face repository.
     """
     try:
         model_path = os.path.join('models', 'inswapper_128.onnx')
@@ -98,34 +98,66 @@ def download_face_swap_model():
             logger.info("Attempting to download face swap model...")
             success = False
             
-            # List of URLs to try
-            urls = [
-                # Try various mirrors
-                "https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128.onnx"
-            ]
+            # Get Hugging Face token from environment variables
+            hf_token = os.environ.get("HUGGINGFACE_TOKEN")
+            if not hf_token:
+                logger.warning("HUGGINGFACE_TOKEN environment variable not set")
             
+            # Use the provided Hugging Face repository
+            url = "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/resolve/main/inswapper_128.onnx"
+            
+            # Set up headers
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             }
             
-            for url in urls:
-                try:
-                    logger.info(f"Trying to download model from {url}")
-                    response = requests.get(url, headers=headers, stream=True)
-                    
-                    if response.status_code == 200:
-                        logger.info("Model download successful, saving file...")
-                        with open(model_path, 'wb') as f:
-                            for chunk in response.iter_content(chunk_size=8192):
-                                if chunk:
-                                    f.write(chunk)
-                        logger.info("Face swap model downloaded and saved successfully")
-                        success = True
-                        break
-                    else:
-                        logger.warning(f"Failed to download from {url}, status code: {response.status_code}")
-                except Exception as e:
-                    logger.warning(f"Error downloading from {url}: {str(e)}")
+            # Add authorization if token is available
+            if hf_token:
+                headers['Authorization'] = f'Bearer {hf_token}'
+            
+            logger.info(f"Trying to download model from {url}")
+            try:
+                response = requests.get(url, headers=headers, stream=True)
+                
+                if response.status_code == 200:
+                    logger.info("Model download successful, saving file...")
+                    with open(model_path, 'wb') as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            if chunk:
+                                f.write(chunk)
+                    logger.info("Face swap model downloaded and saved successfully")
+                    success = True
+                else:
+                    logger.warning(f"Failed to download from provided repository, status code: {response.status_code}")
+                    logger.warning(f"Response: {response.text}")
+            except Exception as e:
+                logger.warning(f"Error downloading from provided repository: {str(e)}")
+            
+            # If Hugging Face download failed, try fallback URLs
+            if not success:
+                fallback_urls = [
+                    "https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128.onnx",
+                    "https://github.com/deepinsight/insightface/releases/download/v0.7/inswapper_128.onnx"
+                ]
+                
+                for url in fallback_urls:
+                    try:
+                        logger.info(f"Trying fallback URL: {url}")
+                        response = requests.get(url, headers=headers, stream=True)
+                        
+                        if response.status_code == 200:
+                            logger.info("Model download successful, saving file...")
+                            with open(model_path, 'wb') as f:
+                                for chunk in response.iter_content(chunk_size=8192):
+                                    if chunk:
+                                        f.write(chunk)
+                            logger.info("Face swap model downloaded and saved successfully")
+                            success = True
+                            break
+                        else:
+                            logger.warning(f"Failed to download from {url}, status code: {response.status_code}")
+                    except Exception as e:
+                        logger.warning(f"Error downloading from {url}: {str(e)}")
             
             if not success:
                 logger.error("Failed to download model from all sources")
