@@ -671,13 +671,16 @@ function initializePage() {
         }
     }
     
-    // This is now handled in the initializePage function
+    // Initialize the page when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM fully loaded, initializing page');
+        initializePage();
         
         // Set up periodic check for template updates (every 3 seconds)
         const updateInterval = setInterval(checkForTemplateUpdates, 3000);
         console.log('Template update checker interval started');
         
-        // Also check for updates immediately
+        // Also check for updates immediately when the page loads
         setTimeout(checkForTemplateUpdates, 500);
         
         // Also check for updates every time the page becomes visible again
@@ -692,6 +695,7 @@ function initializePage() {
         window.addEventListener('beforeunload', function() {
             clearInterval(updateInterval);
         });
+    });
         
         // Template selection mode toggle
         const toggleSelectModeBtn = document.getElementById('toggleSelectModeBtn');
