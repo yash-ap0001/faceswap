@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark">
+                <h1 class="h3 mb-0 text-center">
+                    <i class="fas fa-user-bride me-2"></i>Indian Bridal Face Swap
+                </h1>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Upload your photo to see yourself in traditional Indian bridal attire for different ceremonies.
+                </div>
+                
+                <div id="model-status-alert" class="alert alert-warning d-none" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="model-status-message">Checking model status...</span>
+                </div>
+
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="card h-100">
+                                <div class="card-header bg-dark">
+                                    <h5 class="mb-0">Your Photo</h5>
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <p class="text-muted small">Upload a clear photo of your face looking directly at the camera</p>
+                                    <div class="image-preview-container mb-3 flex-grow-1 d-flex align-items-center justify-content-center">
+                                        <img id="source-preview" class="img-preview d-none" alt="Your photo preview">
+                                        <div id="source-placeholder" class="placeholder-container">
+                                            <i class="fas fa-user fa-4x text-muted"></i>
+                                            <p class="text-muted mt-2">Your photo will appear here</p>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <input type="file" class="form-control" id="source-input" name="source" accept=".jpg,.jpeg,.png" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="source-clear-btn">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header bg-dark">
+                                    <h5 class="mb-0">Choose Bridal Style</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted small">Select a traditional Indian bridal style</p>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="bridalStyle" id="haldi" value="haldi" checked>
+                                        <label class="form-check-label" for="haldi">
+                                            <strong>Haldi Ceremony</strong> - Yellow saree with marigold decorations
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="bridalStyle" id="mehendi" value="mehendi">
+                                        <label class="form-check-label" for="mehendi">
+                                            <strong>Mehendi Function</strong> - Green lehenga with henna designs
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="bridalStyle" id="wedding" value="wedding">
+                                        <label class="form-check-label" for="wedding">
+                                            <strong>Wedding Ceremony</strong> - Traditional red bridal lehenga
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="bridalStyle" id="reception" value="reception">
+                                        <label class="form-check-label" for="reception">
+                                            <strong>Reception</strong> - Stylish maroon designer gown/lehenga
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" id="swap-btn" class="btn btn-primary">
+                            <i class="fas fa-magic me-2"></i>Create Bridal Look
+                        </button>
+                    </div>
+                </form>
+
+                <div id="result-container" class="mt-4 d-none">
+                    <h4 class="text-center mb-3">Your Bridal Look</h4>
+                    <div class="text-center mb-3">
+                        <img id="result-image" class="img-fluid result-image" alt="Bridal face swap result">
+                    </div>
+                    <div class="text-center">
+                        <a id="download-btn" class="btn btn-success me-2" download>
+                            <i class="fas fa-download me-2"></i>Download
+                        </a>
+                        <button id="try-again-btn" class="btn btn-secondary">
+                            <i class="fas fa-redo me-2"></i>Try Another Style
+                        </button>
+                    </div>
+                </div>
+
+                <div id="loading-container" class="text-center my-4 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Creating your bridal look... Please wait.</p>
+                </div>
+
+                <div id="error-container" class="alert alert-danger mt-4 d-none" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="error-message"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark">
+                <h2 class="h4 mb-0">About Indian Bridal Styles</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <div class="text-center">
+                            <div class="p-3 rounded-circle bg-warning d-inline-block mb-3">
+                                <i class="fas fa-sun fa-2x text-white"></i>
+                            </div>
+                            <h5>Haldi Ceremony</h5>
+                            <p class="text-muted small">Yellow attire with turmeric paste applied to bring a natural glow to the skin.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <div class="text-center">
+                            <div class="p-3 rounded-circle bg-success d-inline-block mb-3">
+                                <i class="fas fa-leaf fa-2x text-white"></i>
+                            </div>
+                            <h5>Mehendi Function</h5>
+                            <p class="text-muted small">Green attire with intricate henna designs applied to the hands.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <div class="text-center">
+                            <div class="p-3 rounded-circle bg-danger d-inline-block mb-3">
+                                <i class="fas fa-heart fa-2x text-white"></i>
+                            </div>
+                            <h5>Wedding Ceremony</h5>
+                            <p class="text-muted small">Traditional red lehenga with elaborate gold jewelry and ceremonial decor.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <div class="p-3 rounded-circle bg-dark d-inline-block mb-3">
+                                <i class="fas fa-glass-cheers fa-2x text-white"></i>
+                            </div>
+                            <h5>Reception</h5>
+                            <p class="text-muted small">Modern designer outfit in maroon with elegant diamond jewelry for celebrations.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const uploadForm = document.getElementById('upload-form');
+    const sourceInput = document.getElementById('source-input');
+    const sourcePreview = document.getElementById('source-preview');
+    const sourcePlaceholder = document.getElementById('source-placeholder');
+    const sourceClearBtn = document.getElementById('source-clear-btn');
+    const swapBtn = document.getElementById('swap-btn');
+    const resultContainer = document.getElementById('result-container');
+    const resultImage = document.getElementById('result-image');
+    const downloadBtn = document.getElementById('download-btn');
+    const tryAgainBtn = document.getElementById('try-again-btn');
+    const loadingContainer = document.getElementById('loading-container');
+    const errorContainer = document.getElementById('error-container');
+    const errorMessage = document.getElementById('error-message');
+    const modelStatusAlert = document.getElementById('model-status-alert');
+    const modelStatusMessage = document.getElementById('model-status-message');
+
+    // Check if models are loaded
+    checkModels();
+
+    // File input change handlers
+    sourceInput.addEventListener('change', function() {
+        handleFileInputChange(this, sourcePreview, sourcePlaceholder);
+    });
+
+    // Clear button handlers
+    sourceClearBtn.addEventListener('click', function() {
+        clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
+    });
+
+    // Try again button handler
+    tryAgainBtn.addEventListener('click', function() {
+        resultContainer.classList.add('d-none');
+        errorContainer.classList.add('d-none');
+    });
+
+    // Form submission
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!sourceInput.files.length) {
+            showError('Please select your photo.');
+            return;
+        }
+
+        // Get selected bridal style
+        const selectedStyle = document.querySelector('input[name="bridalStyle"]:checked').value;
+
+        // Check file sizes
+        const maxSize = 16 * 1024 * 1024; // 16MB
+        if (sourceInput.files[0].size > maxSize) {
+            showError('File size exceeds the maximum limit of 16MB.');
+            return;
+        }
+
+        // Check file types
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (!allowedTypes.includes(sourceInput.files[0].type)) {
+            showError('Only JPG, JPEG and PNG files are allowed.');
+            return;
+        }
+
+        // Show loading
+        loadingContainer.classList.remove('d-none');
+        errorContainer.classList.add('d-none');
+        resultContainer.classList.add('d-none');
+        swapBtn.disabled = true;
+
+        // Create form data
+        const formData = new FormData();
+        formData.append('source', sourceInput.files[0]);
+        formData.append('style', selectedStyle);
+
+        // Send AJAX request
+        fetch('/bridal-swap', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingContainer.classList.add('d-none');
+            swapBtn.disabled = false;
+
+            if (data.success) {
+                resultImage.src = `/uploads/${data.result_image}`;
+                downloadBtn.href = `/uploads/${data.result_image}`;
+                downloadBtn.download = data.result_image;
+                resultContainer.classList.remove('d-none');
+                window.scrollTo({
+                    top: resultContainer.offsetTop,
+                    behavior: 'smooth'
+                });
+            } else {
+                showError(data.error || 'An unknown error occurred.');
+            }
+        })
+        .catch(error => {
+            loadingContainer.classList.add('d-none');
+            swapBtn.disabled = false;
+            showError('Network error: ' + error.message);
+        });
+    });
+
+    // Helper functions
+    function handleFileInputChange(input, preview, placeholder) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+                placeholder.classList.add('d-none');
+            };
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function clearFileInput(input, preview, placeholder) {
+        input.value = '';
+        preview.classList.add('d-none');
+        placeholder.classList.remove('d-none');
+    }
+
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorContainer.classList.remove('d-none');
+        window.scrollTo({
+            top: errorContainer.offsetTop,
+            behavior: 'smooth'
+        });
+    }
+
+    function checkModels() {
+        fetch('/check-models')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.face_detection || !data.face_swap) {
+                    modelStatusAlert.classList.remove('d-none');
+                    modelStatusMessage.textContent = 'Some models are not loaded properly. The application may not work correctly.';
+                    
+                    if (!data.face_detection) {
+                        modelStatusMessage.textContent = 'Face detection model is not loaded. Please check server logs.';
+                    } else if (!data.face_swap) {
+                        modelStatusMessage.textContent = 'Face swap model is not loaded. Please check server logs.';
+                    }
+                } else {
+                    modelStatusAlert.classList.add('d-none');
+                }
+            })
+            .catch(error => {
+                modelStatusAlert.classList.remove('d-none');
+                modelStatusMessage.textContent = 'Could not check model status. There might be connection issues.';
+            });
+    }
+});
+</script>
+{% endblock %}

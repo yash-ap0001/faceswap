@@ -290,6 +290,161 @@ def allowed_file(filename):
 def index():
     return render_template('index.html')
 
+@app.route('/bridal-swap', methods=['GET', 'POST'])
+def bridal_swap():
+    if request.method == 'GET':
+        return render_template('bridal_swap.html')
+    
+    if faceapp is None or swapper is None:
+        return jsonify({'error': 'Models not loaded. Please check server logs.'}), 500
+
+    if 'source' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    
+    source_file = request.files['source']
+    selected_style = request.form.get('style', 'haldi')
+    
+    if source_file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    
+    if not allowed_file(source_file.filename):
+        return jsonify({'error': 'Invalid file type. Only PNG, JPG, and JPEG files are allowed.'}), 400
+    
+    try:
+        # Save the source file
+        source_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(source_file.filename))
+        source_file.save(source_path)
+        
+        # Read the source image for face detection
+        source_img = cv2.imread(source_path)
+        
+        if source_img is None:
+            return jsonify({'error': 'Failed to read source image'}), 400
+        
+        # Detect face in source image
+        source_faces = faceapp.get(source_img)
+        
+        if not source_faces:
+            return jsonify({'error': 'No face detected in your photo. Please upload a clear photo with your face visible.'}), 400
+        
+        # Get the template image for the selected bridal style
+        target_img, target_path = get_bridal_template(selected_style)
+        
+        if target_img is None:
+            return jsonify({'error': 'Failed to load bridal template image'}), 500
+        
+        # Detect face in the template image
+        target_faces = faceapp.get(target_img)
+        
+        if not target_faces:
+            return jsonify({'error': 'No face detected in template image. Please try a different style.'}), 400
+        
+        # Perform face swap
+        logger.info(f"Performing face swap with style: {selected_style}")
+        result_img = swapper.get(target_img, target_faces[0], source_faces[0])
+        
+        # Save result
+        output_filename = f'bridal_{selected_style}_{secure_filename(source_file.filename)}'
+        output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
+        cv2.imwrite(output_path, result_img)
+        
+        # Clean up the source file
+        os.remove(source_path)
+        
+        return jsonify({
+            'success': True,
+            'result_image': output_filename,
+            'style': selected_style
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in bridal_swap: {str(e)}")
+        logger.error(traceback.format_exc())
+        # Clean up files in case of error
+        if 'source_path' in locals() and os.path.exists(source_path):
+            os.remove(source_path)
+        return jsonify({'error': str(e)}), 500
+
+def get_bridal_template(style):
+    """
+    Get the template image for the selected bridal style.
+    Returns the image and path.
+    """
+    # Create directory for template images if it doesn't exist
+    template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
+    os.makedirs(template_dir, exist_ok=True)
+    
+    # Define paths for template images
+    template_paths = {
+        'haldi': os.path.join(template_dir, 'haldi_template.jpg'),
+        'mehendi': os.path.join(template_dir, 'mehendi_template.jpg'),
+        'wedding': os.path.join(template_dir, 'wedding_template.jpg'),
+        'reception': os.path.join(template_dir, 'reception_template.jpg')
+    }
+    
+    # Check if template image exists, if not, create a placeholder
+    if not os.path.exists(template_paths[style]):
+        # Create a placeholder image with text
+        img_height, img_width = 1024, 768
+        template_img = np.zeros((img_height, img_width, 3), dtype=np.uint8)
+        
+        # Set background color based on style
+        if style == 'haldi':
+            # Yellow for Haldi
+            template_img[:] = (0, 215, 255)  # BGR for yellow
+        elif style == 'mehendi':
+            # Green for Mehendi
+            template_img[:] = (0, 128, 0)  # BGR for green
+        elif style == 'wedding':
+            # Red for Wedding
+            template_img[:] = (0, 0, 255)  # BGR for red
+        elif style == 'reception':
+            # Maroon for Reception
+            template_img[:] = (0, 0, 128)  # BGR for maroon
+        
+        # Add text
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        text = f"{style.capitalize()} Template"
+        text_size = cv2.getTextSize(text, font, 1, 2)[0]
+        text_x = (img_width - text_size[0]) // 2
+        text_y = (img_height + text_size[1]) // 2
+        cv2.putText(template_img, text, (text_x, text_y), font, 1, (255, 255, 255), 2)
+        
+        # Save the template
+        cv2.imwrite(template_paths[style], template_img)
+        
+        logger.warning(f"Created placeholder template for {style}")
+        
+        # Add a face to the template for testing
+        # Draw a simple face outline
+        face_center_x, face_center_y = img_width // 2, img_height // 3
+        face_radius = min(img_width, img_height) // 6
+        
+        # Draw face circle
+        cv2.circle(template_img, (face_center_x, face_center_y), face_radius, (255, 255, 255), 2)
+        
+        # Draw eyes
+        eye_radius = face_radius // 5
+        left_eye_x = face_center_x - face_radius // 3
+        right_eye_x = face_center_x + face_radius // 3
+        eyes_y = face_center_y - face_radius // 4
+        
+        cv2.circle(template_img, (left_eye_x, eyes_y), eye_radius, (255, 255, 255), 2)
+        cv2.circle(template_img, (right_eye_x, eyes_y), eye_radius, (255, 255, 255), 2)
+        
+        # Draw mouth
+        mouth_y = face_center_y + face_radius // 3
+        cv2.ellipse(template_img, (face_center_x, mouth_y), 
+                   (face_radius // 3, face_radius // 6), 
+                   0, 0, 180, (255, 255, 255), 2)
+        
+        # Save the template with face
+        cv2.imwrite(template_paths[style], template_img)
+    
+    # Load and return the template image
+    template_img = cv2.imread(template_paths[style])
+    return template_img, template_paths[style]
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if faceapp is None:
