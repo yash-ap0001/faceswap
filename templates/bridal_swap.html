@@ -723,13 +723,15 @@ function initializePage() {
         window.addEventListener('beforeunload', function() {
             clearInterval(updateInterval);
         });
-    });
         
         // Template selection mode toggle
         const toggleSelectModeBtn = document.getElementById('toggleSelectModeBtn');
         const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+        console.log('Selection buttons:', toggleSelectModeBtn, deleteSelectedBtn);
         
-        toggleSelectModeBtn.addEventListener('click', function() {
+        if (toggleSelectModeBtn) {
+            console.log('Adding click event to toggle selection mode button');
+            toggleSelectModeBtn.addEventListener('click', function() {
             const isSelectionMode = document.body.classList.toggle('template-selection-mode');
             
             // Show/hide checkboxes
