@@ -12,16 +12,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <style>
         :root {
-            --primary-purple: #5e35b1;
-            --secondary-purple: #7e57c2;
-            --dark-purple: #4527a0;
-            --light-purple: #b39ddb;
-            --dark-surface: #1a1a1a;
-            --card-surface: #212121;
+            --primary-purple: #4a148c;
+            --secondary-purple: #6a1b9a;
+            --dark-purple: #38006b;
+            --light-purple: #9c4dcc;
+            --dark-surface: #121212;
+            --card-surface: #1e1e1e;
             --border-color: #333333;
             --text-primary: #f5f5f5;
             --text-secondary: #bdbdbd;
-            --glass-bg: rgba(30, 30, 30, 0.8);
+            --glass-bg: rgba(18, 18, 18, 0.9);
             --glass-border: rgba(255, 255, 255, 0.1);
         }
         
@@ -35,7 +35,7 @@
         }
         
         .navbar {
-            background-color: rgba(69, 39, 160, 0.95) !important;
+            background-color: rgba(56, 0, 107, 0.95) !important;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             box-shadow: 0 2px 15px rgba(0,0,0,0.3);
@@ -186,18 +186,18 @@
         /* Transparent Sidebar */
         .sidebar {
             position: fixed;
-            right: -300px;
+            right: -350px;
             top: 0;
-            width: 300px;
+            width: 350px;
             height: 100vh;
-            background-color: var(--glass-bg);
+            background-color: rgba(30, 30, 30, 0.85);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border-left: 1px solid var(--glass-border);
             z-index: 1000;
             padding: 20px;
-            transition: all 0.3s ease;
-            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
             overflow-y: auto;
         }
         
@@ -217,6 +217,12 @@
         .sidebar-header h5 {
             margin: 0;
             color: var(--text-primary);
+            font-size: 1.4rem;
+            font-weight: 600;
+            background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
         
         .close-sidebar {
@@ -233,9 +239,9 @@
         }
         
         .sidebar-section {
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .sidebar-section:last-child {
@@ -244,10 +250,63 @@
             padding-bottom: 0;
         }
         
-        .sidebar-section h6 {
+        .category-title {
+            font-size: 1.1rem;
             margin-bottom: 15px;
-            color: var(--text-accent);
+            color: var(--light-purple);
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            position: relative;
+        }
+        
+        .category-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary-purple), var(--secondary-purple));
+            border-radius: 3px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 0 10px;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-menu li:hover {
+            transform: translateX(5px);
+        }
+        
+        .sidebar-menu a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: block;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+        
+        .sidebar-menu a:hover {
+            color: var(--text-primary);
+            background-color: rgba(126, 87, 194, 0.15);
+        }
+        
+        .setting-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
         }
         
         .theme-switcher {
@@ -310,29 +369,65 @@
         .sidebar-toggle {
             position: fixed;
             right: 20px;
-            top: 80px;
+            top: 100px;
             z-index: 999;
         }
         
         .toggle-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
             border: none;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             color: white;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .toggle-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .toggle-btn:hover::before {
+            left: 100%;
         }
         
         .toggle-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .toggle-btn::after {
+            content: "Menu";
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: var(--light-purple);
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease, bottom 0.3s ease;
+        }
+        
+        .toggle-btn:hover::after {
+            opacity: 1;
+            bottom: -30px;
         }
     </style>
     {% block style %}{% endblock %}
@@ -371,44 +466,92 @@
     <!-- Stylish Sidebar Toggle -->
     <div class="sidebar-toggle" id="sidebarToggle">
         <button class="toggle-btn">
-            <i class="fas fa-sliders-h"></i>
+            <i class="fas fa-th-large"></i>
         </button>
     </div>
     
     <!-- Transparent Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h5>Settings</h5>
+            <h5>Wedding Categories</h5>
             <button class="close-sidebar">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         <div class="sidebar-content">
             <div class="sidebar-section">
-                <h6>Theme</h6>
-                <div class="theme-switcher">
-                    <span>Dark Purple</span>
-                    <label class="switch">
-                        <input type="checkbox" id="themeSwitch">
-                        <span class="slider round"></span>
-                    </label>
-                    <span>Deep Purple</span>
-                </div>
+                <h6 class="category-title">
+                    <i class="fas fa-female me-2"></i>Bride
+                </h6>
+                <ul class="sidebar-menu">
+                    <li><a href="/bridal-gallery"><i class="fas fa-angle-right me-2"></i>Bridal Face Swap</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Bridal Outfits</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Jewelry Collections</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Makeup Styles</a></li>
+                </ul>
             </div>
+            
             <div class="sidebar-section">
-                <h6>Layout</h6>
-                <div class="btn-group w-100">
-                    <button class="btn btn-sm btn-outline-light active" data-layout="grid">Grid</button>
-                    <button class="btn btn-sm btn-outline-light" data-layout="list">List</button>
-                </div>
+                <h6 class="category-title">
+                    <i class="fas fa-male me-2"></i>Groom
+                </h6>
+                <ul class="sidebar-menu">
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Groom Face Swap</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Traditional Wear</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Modern Suits</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Accessories</a></li>
+                </ul>
             </div>
+            
             <div class="sidebar-section">
-                <h6>Image Quality</h6>
-                <select class="form-select form-select-sm">
-                    <option>High</option>
-                    <option>Medium</option>
-                    <option>Low</option>
-                </select>
+                <h6 class="category-title">
+                    <i class="fas fa-user-tie me-2"></i>Event Manager
+                </h6>
+                <ul class="sidebar-menu">
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Event Planner</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Guest Management</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Timeline Creator</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Budget Calculator</a></li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h6 class="category-title">
+                    <i class="fas fa-building me-2"></i>Convention Halls
+                </h6>
+                <ul class="sidebar-menu">
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Venue Search</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Hall Comparison</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Virtual Tours</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right me-2"></i>Booking Management</a></li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h6 class="category-title">
+                    <i class="fas fa-cog me-2"></i>Settings
+                </h6>
+                <div class="setting-item mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Theme</span>
+                        <label class="switch">
+                            <input type="checkbox" id="themeSwitch">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <small class="text-secondary">Light Purple</small>
+                        <small class="text-secondary">Deep Purple</small>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="mb-2">Layout Style</div>
+                    <div class="btn-group w-100">
+                        <button class="btn btn-sm btn-outline-light active" data-layout="grid">Grid</button>
+                        <button class="btn btn-sm btn-outline-light" data-layout="list">List</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -458,9 +601,12 @@
             
             // Close sidebar when clicking outside
             document.addEventListener('click', function(event) {
-                const isClickInside = sidebar.contains(event.target) || toggleBtn.contains(event.target);
-                if (!isClickInside && sidebar.classList.contains('active')) {
-                    sidebar.classList.remove('active');
+                // Only process if both elements exist
+                if (sidebar && toggleBtn) {
+                    const isClickInside = sidebar.contains(event.target) || toggleBtn.contains(event.target);
+                    if (!isClickInside && sidebar.classList.contains('active')) {
+                        sidebar.classList.remove('active');
+                    }
                 }
             });
             
