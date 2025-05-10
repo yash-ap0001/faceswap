@@ -1,7 +1,8 @@
 import os
 import cv2
 import numpy as np
-from flask import Flask, request, jsonify, render_template, send_from_directory
+import time
+from flask import Flask, request, jsonify, render_template, send_from_directory, redirect, url_for
 import insightface
 from insightface.app import FaceAnalysis
 from insightface.model_zoo import get_model
@@ -573,14 +574,20 @@ def event_managers():
         selected_service_category=service_category
     )
 
+@app.route('/bridal-multi-swap', methods=['GET'])
+def bridal_multi_swap():
+    """Show the multi-template swap page."""
+    ceremony = request.args.get('ceremony', 'wedding')
+    return render_template('bridal_multi_swap.html', selected_ceremony=ceremony)
+
 @app.route('/bridal-swap', methods=['GET', 'POST'])
 def bridal_swap():
     if request.method == 'GET':
         # Check for template parameters
         style = request.args.get('style', None)
         if style:
-            # Show the multi-template page when a specific style is provided
-            return render_template('bridal_multi_swap.html')
+            # Redirect to the multi-template page when a specific style is provided
+            return redirect(url_for('bridal_multi_swap', ceremony=style))
         return render_template('bridal_swap.html')
     
     if faceapp is None or swapper is None:
