@@ -388,8 +388,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Display loading state
         templateContainer.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div></div>';
         
-        // Fetch templates for this ceremony type
-        fetch(`/api/templates?ceremony_type=${ceremonyType}`)
+        // Fetch templates for this ceremony type with cache busting
+        const timestamp = Date.now();
+        fetch(`/api/templates?ceremony_type=${ceremonyType}&_t=${timestamp}`)
             .then(response => response.json())
             .then(data => {
                 if (data.templates && data.templates.length > 0) {
