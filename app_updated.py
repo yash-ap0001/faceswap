@@ -576,7 +576,8 @@ def create_event():
 @app.route('/events/<int:event_id>', methods=['GET'])
 @login_required
 def view_event(event_id):
-    from models import WeddingEvent, Guest, Task, BudgetItem
+    from models import WeddingEvent, Guest, Task, BudgetItem, EventBudget
+    from datetime import datetime
     
     event = WeddingEvent.query.get_or_404(event_id)
     
@@ -590,12 +591,22 @@ def view_event(event_id):
     tasks = Task.query.filter_by(event_id=event_id).all()
     budget_items = BudgetItem.query.filter_by(event_id=event_id).all()
     
+    # Get budget information
+    budget = EventBudget.query.filter_by(event_id=event_id).first()
+    
+    # Calculate total spent
+    budget_spent = sum(item.actual_cost if item.actual_cost else item.estimated_cost 
+                     for item in budget_items)
+    
     return render_template(
         'events/view.html',
         event=event,
         guests=guests,
         tasks=tasks,
-        budget_items=budget_items
+        budget_items=budget_items,
+        budget=budget,
+        budget_spent=budget_spent,
+        now=datetime.now()
     )
 
 @app.route('/events/<int:event_id>/edit', methods=['GET', 'POST'])
