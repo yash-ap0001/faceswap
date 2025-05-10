@@ -880,7 +880,7 @@ def get_templates():
             })
             template_id += 1
             
-        # Check in type subdirectory
+        # Check in type subdirectory for standard file
         subdir_path = os.path.join(template_dir, template_type, f"{ceremony_type}.jpg")
         if os.path.exists(subdir_path):
             app.logger.info(f"Found subdir template: {subdir_path}")
@@ -894,26 +894,50 @@ def get_templates():
                 'url': f"{url_path}?t={int(time.time())}"
             })
             template_id += 1
+            
+        # Check for additional images in the type subdirectory
+        type_dir = os.path.join(template_dir, template_type, ceremony_type)
+        if os.path.exists(type_dir) and os.path.isdir(type_dir):
+            app.logger.info(f"Scanning additional templates in: {type_dir}")
+            for file in sorted(os.listdir(type_dir)):
+                if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                    file_path = os.path.join(type_dir, file)
+                    if os.path.isfile(file_path):
+                        template_id_str = f"{ceremony_type}_{template_type}_{template_id}"
+                        app.logger.info(f"Found additional {template_type} template: {file_path}")
+                        
+                        # Calculate the URL relative to the uploads directory
+                        url_path = file_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
+                        templates.append({
+                            'id': template_id_str,
+                            'template_type': template_type,
+                            'ceremony': ceremony_type,
+                            'path': file_path,
+                            'url': f"{url_path}?t={int(time.time())}"
+                        })
+                        template_id += 1
     
     # Check for Pinterest templates
     pinterest_dir = os.path.join(template_dir, 'pinterest', ceremony_type)
     if os.path.exists(pinterest_dir):
-        for file in os.listdir(pinterest_dir):
+        # Get all image files in the Pinterest directory
+        for file in sorted(os.listdir(pinterest_dir)):
             if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
                 file_path = os.path.join(pinterest_dir, file)
-                template_id_str = f"{ceremony_type}_pinterest_{template_id}"
-                app.logger.info(f"Found Pinterest template: {file_path}")
-                
-                # Calculate the URL relative to the uploads directory
-                url_path = file_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
-                templates.append({
-                    'id': template_id_str,
-                    'template_type': 'pinterest',
-                    'ceremony': ceremony_type,
-                    'path': file_path,
-                    'url': f"{url_path}?t={int(time.time())}"
-                })
-                template_id += 1
+                if os.path.isfile(file_path):  # Make sure it's a file not a directory
+                    template_id_str = f"{ceremony_type}_pinterest_{template_id}"
+                    app.logger.info(f"Found Pinterest template: {file_path}")
+                    
+                    # Calculate the URL relative to the uploads directory
+                    url_path = file_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
+                    templates.append({
+                        'id': template_id_str,
+                        'template_type': 'pinterest',
+                        'ceremony': ceremony_type,
+                        'path': file_path,
+                        'url': f"{url_path}?t={int(time.time())}"
+                    })
+                    template_id += 1
     
     # Also check for main Pinterest template
     main_pinterest_path = os.path.join(template_dir, f"{ceremony_type}_pinterest.jpg")
