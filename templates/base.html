@@ -725,6 +725,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/accordion.js') }}"></script>
     
     <script>
         // Sidebar functionality
@@ -833,80 +834,7 @@
                     }
                 });
             }
-            
-            // Category accordion functionality - direct execution
-            console.log("Setting up accordion");
-            
-            // Get all category titles
-            const accordionCategoryTitles = document.querySelectorAll('.category-title');
-            console.log("Found category titles:", accordionCategoryTitles.length);
-            
-            // Close all sections initially except Bride
-            const accordionAllContents = document.querySelectorAll('.category-content');
-            accordionAllContents.forEach(content => {
-                if (content.id !== 'bride-content') {
-                    content.classList.remove('expanded');
-                    
-                    // Find and collapse the corresponding title
-                    const matchingTitle = document.querySelector(`[data-target="${content.id}"]`);
-                    if (matchingTitle) {
-                        matchingTitle.classList.add('collapsed');
-                    }
-                }
-            });
-            
-            // Make sure Bride section is open
-            const brideSectionContent = document.getElementById('bride-content');
-            if (brideSectionContent) {
-                brideSectionContent.classList.add('expanded');
-                const brideTitle = document.querySelector('[data-target="bride-content"]');
-                if (brideTitle) {
-                    brideTitle.classList.remove('collapsed');
-                }
-            }
-            
-            // Manual click handler setup
-            accordionCategoryTitles.forEach(title => {
-                title.onclick = function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    console.log("Category title clicked");
-                    const targetId = this.getAttribute('data-target');
-                    
-                    if (!targetId) {
-                        console.warn("Missing data-target on clicked title");
-                        return;
-                    }
-                    
-                    const contentToToggle = document.getElementById(targetId);
-                    if (!contentToToggle) {
-                        console.warn("Missing content element for ID:", targetId);
-                        return;
-                    }
-                    
-                    const isCurrentlyExpanded = contentToToggle.classList.contains('expanded');
-                    console.log("Current state of", targetId, "is expanded:", isCurrentlyExpanded);
-                    
-                    // Close all categories
-                    accordionAllContents.forEach(content => {
-                        content.classList.remove('expanded');
-                    });
-                    accordionCategoryTitles.forEach(t => {
-                        t.classList.add('collapsed');
-                    });
-                    
-                    // Toggle current category
-                    if (!isCurrentlyExpanded) {
-                        contentToToggle.classList.add('expanded');
-                        this.classList.remove('collapsed');
-                    }
-                    
-                    return false;
-                };
-            });
-            
-            console.log("Accordion setup completed");
+            // Accordion functionality moved to separate accordion.js file
             
             // Layout buttons
             const layoutBtns = document.querySelectorAll('[data-layout]');
