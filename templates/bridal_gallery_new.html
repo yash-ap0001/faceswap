@@ -688,7 +688,6 @@
         const loadingOverlay = document.getElementById('loading-overlay');
         const resultsSection = document.getElementById('results-section');
         const resultsContainer = document.getElementById('results-container');
-        const templatesContainer = document.getElementById('templates-container');
         
         // File preview handling
         sourceInput.addEventListener('change', function() {
@@ -733,11 +732,65 @@
             const selectedCategories = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
                 .map(cb => cb.value);
             
-            document.querySelectorAll('.bridal-card').forEach(card => {
-                const style = card.dataset.style;
-                const visible = selectedCategories.includes(style);
-                card.closest('.col-md-3').style.display = visible ? 'block' : 'none';
-            });
+            // Filter Haldi templates
+            if (document.getElementById('haldi-templates-container')) {
+                const haldiCards = document.querySelectorAll('#haldi-templates-container .bridal-card');
+                haldiCards.forEach(card => {
+                    const parentCol = card.closest('.col-md-3');
+                    parentCol.style.display = selectedCategories.includes('haldi') ? 'block' : 'none';
+                });
+                
+                const haldiSection = document.getElementById('haldi-templates-container').closest('.mb-4');
+                haldiSection.style.display = selectedCategories.includes('haldi') ? 'block' : 'none';
+            }
+            
+            // Filter Mehendi templates
+            if (document.getElementById('mehendi-templates-container')) {
+                const mehendiCards = document.querySelectorAll('#mehendi-templates-container .bridal-card');
+                mehendiCards.forEach(card => {
+                    const parentCol = card.closest('.col-md-3');
+                    parentCol.style.display = selectedCategories.includes('mehendi') ? 'block' : 'none';
+                });
+                
+                const mehendiSection = document.getElementById('mehendi-templates-container').closest('.mb-4');
+                mehendiSection.style.display = selectedCategories.includes('mehendi') ? 'block' : 'none';
+            }
+            
+            // Filter Sangeeth templates
+            if (document.getElementById('sangeeth-templates-container')) {
+                const sangeethCards = document.querySelectorAll('#sangeeth-templates-container .bridal-card');
+                sangeethCards.forEach(card => {
+                    const parentCol = card.closest('.col-md-3');
+                    parentCol.style.display = selectedCategories.includes('sangeeth') ? 'block' : 'none';
+                });
+                
+                const sangeethSection = document.getElementById('sangeeth-templates-container').closest('.mb-4');
+                sangeethSection.style.display = selectedCategories.includes('sangeeth') ? 'block' : 'none';
+            }
+            
+            // Filter Wedding templates
+            if (document.getElementById('wedding-templates-container')) {
+                const weddingCards = document.querySelectorAll('#wedding-templates-container .bridal-card');
+                weddingCards.forEach(card => {
+                    const parentCol = card.closest('.col-md-3');
+                    parentCol.style.display = selectedCategories.includes('wedding') ? 'block' : 'none';
+                });
+                
+                const weddingSection = document.getElementById('wedding-templates-container').closest('.mb-4');
+                weddingSection.style.display = selectedCategories.includes('wedding') ? 'block' : 'none';
+            }
+            
+            // Filter Reception templates
+            if (document.getElementById('reception-templates-container')) {
+                const receptionCards = document.querySelectorAll('#reception-templates-container .bridal-card');
+                receptionCards.forEach(card => {
+                    const parentCol = card.closest('.col-md-3');
+                    parentCol.style.display = selectedCategories.includes('reception') ? 'block' : 'none';
+                });
+                
+                const receptionSection = document.getElementById('reception-templates-container').closest('.mb-4');
+                receptionSection.style.display = selectedCategories.includes('reception') ? 'block' : 'none';
+            }
         }
         
         // Template selection
@@ -753,30 +806,34 @@
         });
         
         // Generate button
-        generateBtn.addEventListener('click', function() {
-            if (!sourceInput.files || !sourceInput.files[0]) {
-                alert('Please upload your photo first.');
-                return;
-            }
-            
-            const selectedTemplate = document.querySelector('.bridal-card.selected');
-            if (!selectedTemplate) {
-                alert('Please select at least one template.');
-                return;
-            }
-            
-            // Show loading overlay
-            loadingOverlay.classList.remove('d-none');
-            
-            // Simulate processing (replace with actual API call)
-            setTimeout(function() {
-                loadingOverlay.classList.add('d-none');
-                resultsSection.classList.remove('d-none');
+        if (generateBtn) {
+            generateBtn.addEventListener('click', function() {
+                if (!sourceInput.files || !sourceInput.files[0]) {
+                    alert('Please upload your photo first.');
+                    return;
+                }
                 
-                // Scroll to results
-                resultsSection.scrollIntoView({ behavior: 'smooth' });
-            }, 2000);
-        });
+                const selectedTemplate = document.querySelector('.bridal-card.selected');
+                if (!selectedTemplate) {
+                    alert('Please select at least one template.');
+                    return;
+                }
+                
+                // Show loading overlay
+                loadingOverlay.classList.remove('d-none');
+                
+                // Simulate processing (replace with actual API call)
+                setTimeout(function() {
+                    loadingOverlay.classList.add('d-none');
+                    resultsSection.classList.remove('d-none');
+                    
+                    // Scroll to results
+                    resultsSection.scrollIntoView({ behavior: 'smooth' });
+                }, 2000);
+            });
+        }
     });
 </script>
+<!-- Add category-specific features script -->
+<script src="/static/js/category_features.js"></script>
 {% endblock %}
