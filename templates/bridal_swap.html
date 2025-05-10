@@ -492,12 +492,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Clear loading state
                     templateContainer.innerHTML = '';
                     
-                    // Display template count
+                    // Display template count with timestamp information
                     const templateCount = document.createElement('div');
                     templateCount.className = 'col-12 mb-3';
                     templateCount.innerHTML = `
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle me-2"></i>
+                            <span class="template-update-info" data-ceremony="${ceremonyType}">
+                            </span>
                             Found ${data.templates.length} templates for ${ceremonyType} ceremony.
                             <span class="small text-muted ms-2">Last updated: ${new Date().toLocaleTimeString()}</span>
                         </div>
@@ -670,6 +672,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 checkForTemplateUpdates();
             }
         });
+        
+        // Set up periodic checks for template updates from other pages (every 5 seconds)
+        setInterval(checkForTemplateUpdates, 5000);
         
         // Template selection mode toggle
         const toggleSelectModeBtn = document.getElementById('toggleSelectModeBtn');
