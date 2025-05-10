@@ -341,6 +341,11 @@ def virtual_tours():
 def booking_management():
     return render_template('venues/booking.html')
 
+# Event Manager section routes
+@app.route('/event-managers')
+def event_managers():
+    return render_template('event_manager/managers.html')
+
 @app.route('/bridal-swap', methods=['GET', 'POST'])
 def bridal_swap():
     if request.method == 'GET':
