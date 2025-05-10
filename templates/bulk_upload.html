@@ -356,7 +356,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Store flag in localStorage to trigger refresh on bridal_swap page
                 localStorage.setItem('refreshTemplates', 'true');
                 localStorage.setItem('lastUpdatedCeremony', ceremonyType);
-                localStorage.setItem('lastUpdatedTime', new Date().getTime());
+                const timestamp = Date.now().toString();
+                localStorage.setItem('updateTimestamp', timestamp);
+                console.log(`Templates updated for ${ceremonyType} at ${timestamp}`);
             } else {
                 statusMessage.textContent = 'Error: ' + (data.error || 'Unknown error occurred');
                 statusMessage.className = 'alert alert-danger';

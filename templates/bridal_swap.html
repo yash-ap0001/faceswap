@@ -1,5 +1,38 @@
 {% extends "base.html" %}
 
+{% block head %}
+{{ super() }}
+<style>
+    .template-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+    }
+    .template-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .tab-content {
+        min-height: 300px;
+    }
+    .template-checkbox-wrapper {
+        z-index: 5;
+    }
+    .template-checkbox {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    .template-card.selected {
+        border: 2px solid #8e44ad !important;
+    }
+    /* Nice large hover effect for checkbox */
+    .template-checkbox:hover {
+        transform: scale(1.2);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row">
     <div class="col-lg-10 mx-auto">
@@ -446,9 +479,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Display loading state
         templateContainer.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div></div>';
         
-        // Fetch templates for this ceremony type
-        fetch(`/api/templates?ceremony_type=${ceremonyType}`)
-            .then(response => response.json())
+        // Add a timestamp to prevent caching
+        const timestamp = Date.now();
+        // Fetch templates for this ceremony type with cache busting
+        fetch(`/api/templates?ceremony_type=${ceremonyType}&_t=${timestamp}`)
+            .then(response => {
+                console.log(`Templates fetched for ${ceremonyType} at ${timestamp}`);
+                return response.json();
+            })
             .then(data => {
                 if (data.templates && data.templates.length > 0) {
                     // Clear loading state
@@ -547,12 +585,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to check localStorage for updates from the bulk upload page
     function checkForTemplateUpdates() {
         const shouldRefresh = localStorage.getItem('refreshTemplates') === 'true';
-        if (shouldRefresh) {
+        const updateTimestamp = localStorage.getItem('updateTimestamp');
+        const lastProcessedTimestamp = localStorage.getItem('lastProcessedTimestamp');
+        
+        // Check if either the refresh flag is set or there's a new timestamp
+        if (shouldRefresh || (updateTimestamp && updateTimestamp !== lastProcessedTimestamp)) {
             console.log('Template update detected from bulk upload page');
+            console.log('Update timestamp:', updateTimestamp);
+            console.log('Last processed timestamp:', lastProcessedTimestamp);
+            
             const updatedCeremony = localStorage.getItem('lastUpdatedCeremony');
+            
+            // Update the processed timestamp to avoid redundant refreshes
+            localStorage.setItem('lastProcessedTimestamp', updateTimestamp || Date.now().toString());
             
             // Clear the flag immediately to avoid repeated refreshes
             localStorage.removeItem('refreshTemplates');
+            
+            // Add debugging information to the console
+            console.log('Refreshing templates after upload detected');
             
             // Refresh all templates
             loadAllTemplates();
