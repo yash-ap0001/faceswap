@@ -170,9 +170,11 @@ def create_ai_bridal_templates(output_dir):
     # Add embellishment lines on lehenga
     for i in range(5):
         y_pos = body_top_y + face_radius*2 + i * (img_height - body_top_y - face_radius*2)//5
+        start_x = int(face_center_x - face_radius*1.5 - i*face_radius*0.3)
+        end_x = int(face_center_x + face_radius*1.5 + i*face_radius*0.3)
         cv2.line(mehendi_img, 
-                (face_center_x - face_radius*1.5 - i*face_radius*0.3, y_pos),
-                (face_center_x + face_radius*1.5 + i*face_radius*0.3, y_pos),
+                (start_x, y_pos),
+                (end_x, y_pos),
                 (0, 200, 50), 2)
     
     # Add text
@@ -249,7 +251,7 @@ def create_ai_bridal_templates(output_dir):
         [face_center_x + face_radius, body_top_y],
         [face_center_x + face_radius*1.5, body_top_y + face_radius*2],
         [face_center_x - face_radius*1.5, body_top_y + face_radius*2]
-    ])
+    ], dtype=np.int32)
     cv2.fillPoly(wedding_img, [upper_body_points], (30, 30, 200))
     
     # Lehenga (skirt)
@@ -258,15 +260,17 @@ def create_ai_bridal_templates(output_dir):
         [face_center_x + face_radius*1.5, body_top_y + face_radius*2],
         [face_center_x + face_radius*3, img_height],
         [face_center_x - face_radius*3, img_height]
-    ])
+    ], dtype=np.int32)
     cv2.fillPoly(wedding_img, [lehenga_points], (30, 30, 180))
     
     # Gold embellishments on lehenga
     for i in range(8):
         y_pos = body_top_y + face_radius*2 + i * (img_height - body_top_y - face_radius*2)//8
+        start_x = int(face_center_x - face_radius*1.5 - i*face_radius*0.25)
+        end_x = int(face_center_x + face_radius*1.5 + i*face_radius*0.25)
         cv2.line(wedding_img, 
-                (face_center_x - face_radius*1.5 - i*face_radius*0.25, y_pos),
-                (face_center_x + face_radius*1.5 + i*face_radius*0.25, y_pos),
+                (start_x, y_pos),
+                (end_x, y_pos),
                 (0, 180, 240), 3)  # Gold color
     
     # Add jewelry (necklace)
@@ -349,7 +353,7 @@ def create_ai_bridal_templates(output_dir):
         [face_center_x + face_radius, body_top_y],
         [face_center_x + face_radius*1.2, body_top_y + face_radius*2],
         [face_center_x - face_radius*1.2, body_top_y + face_radius*2]
-    ])
+    ], dtype=np.int32)
     cv2.fillPoly(reception_img, [upper_body_points], (150, 0, 150))
     
     # Gown skirt (A-line)
@@ -358,7 +362,7 @@ def create_ai_bridal_templates(output_dir):
         [face_center_x + face_radius*1.2, body_top_y + face_radius*2],
         [face_center_x + face_radius*2.5, img_height],
         [face_center_x - face_radius*2.5, img_height]
-    ])
+    ], dtype=np.int32)
     cv2.fillPoly(reception_img, [gown_points], (130, 0, 130))
     
     # Add sparkle/sequin effects on dress
