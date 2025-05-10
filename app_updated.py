@@ -767,6 +767,237 @@ def upload_image():
     
     return render_template('gallery/upload.html')
 
+# Budget planner routes
+@app.route('/events/<int:event_id>/budget', methods=['GET'])
+@login_required
+def budget_planner(event_id):
+    from models import WeddingEvent, BudgetItem, Vendor, EventBudget, CategoryBudget
+    from datetime import datetime
+    
+    event = WeddingEvent.query.get_or_404(event_id)
+    
+    # Ensure user owns this event
+    if event.user_id != current_user.id:
+        flash('You do not have permission to view this event.')
+        return redirect(url_for('list_events'))
+    
+    # Get budget items
+    budget_items = BudgetItem.query.filter_by(event_id=event_id).all()
+    
+    # Get vendors
+    vendors = Vendor.query.all()
+    
+    # Get event budget
+    event_budget = EventBudget.query.filter_by(event_id=event_id).first()
+    total_budget = event_budget.total_amount if event_budget else 0
+    
+    # Calculate totals
+    total_spent = sum(item.actual_cost if item.actual_cost else item.estimated_cost for item in budget_items)
+    total_paid = sum(item.actual_cost if item.actual_cost and item.payment_status == 'paid' else 0 for item in budget_items)
+    total_unpaid = total_spent - total_paid
+    remaining = total_budget - total_spent
+    
+    # Get expense categories
+    categories = ['venue', 'catering', 'decor', 'attire', 'photography', 'entertainment', 'transportation', 'gifts', 'beauty', 'accommodation', 'stationery', 'other']
+    
+    # Calculate category totals
+    category_totals = {category: 0 for category in categories}
+    
+    for item in budget_items:
+        if item.category in category_totals:
+            category_totals[item.category] += item.actual_cost if item.actual_cost else item.estimated_cost
+    
+    # Get category budgets
+    category_budgets = {category: 0 for category in categories}
+    category_budget_objs = CategoryBudget.query.filter_by(event_id=event_id).all()
+    
+    for cat_budget in category_budget_objs:
+        if cat_budget.category in category_budgets:
+            category_budgets[cat_budget.category] = cat_budget.allocated_amount
+    
+    # Category colors for charts
+    category_colors = {
+        'venue': '126, 87, 194',
+        'catering': '40, 167, 69',
+        'decor': '220, 53, 69',
+        'attire': '255, 193, 7',
+        'photography': '23, 162, 184',
+        'entertainment': '111, 66, 193',
+        'transportation': '13, 110, 253',
+        'gifts': '253, 126, 20',
+        'beauty': '241, 66, 132',
+        'accommodation': '108, 117, 125',
+        'stationery': '32, 201, 151',
+        'other': '173, 181, 189'
+    }
+    
+    return render_template(
+        'budgets/index.html',
+        event=event,
+        budget_items=budget_items,
+        vendors=vendors,
+        total_budget=total_budget,
+        total_spent=total_spent,
+        total_paid=total_paid,
+        total_unpaid=total_unpaid,
+        remaining=remaining,
+        categories=categories,
+        category_totals=category_totals,
+        category_budgets=category_budgets,
+        category_colors=category_colors,
+        now=datetime.now()
+    )
+
+@app.route('/events/<int:event_id>/budget/set', methods=['POST'])
+@login_required
+def set_budget(event_id):
+    from models import WeddingEvent, EventBudget, CategoryBudget
+    
+    event = WeddingEvent.query.get_or_404(event_id)
+    
+    # Ensure user owns this event
+    if event.user_id != current_user.id:
+        flash('You do not have permission to modify this event.')
+        return redirect(url_for('list_events'))
+    
+    total_budget = float(request.form.get('total_budget', 0))
+    
+    # Get or create the event budget
+    event_budget = EventBudget.query.filter_by(event_id=event_id).first()
+    if not event_budget:
+        event_budget = EventBudget(event_id=event_id, total_amount=total_budget)
+        db.session.add(event_budget)
+    else:
+        event_budget.total_amount = total_budget
+    
+    # Update category budgets
+    for key, value in request.form.items():
+        if key.startswith('budget_') and value:
+            category = key.replace('budget_', '')
+            amount = float(value)
+            
+            # Get or create the category budget
+            category_budget = CategoryBudget.query.filter_by(
+                event_id=event_id, 
+                category=category
+            ).first()
+            
+            if not category_budget:
+                category_budget = CategoryBudget(
+                    event_id=event_id,
+                    category=category,
+                    allocated_amount=amount
+                )
+                db.session.add(category_budget)
+            else:
+                category_budget.allocated_amount = amount
+    
+    db.session.commit()
+    
+    flash('Budget updated successfully!')
+    return redirect(url_for('budget_planner', event_id=event_id))
+
+@app.route('/events/<int:event_id>/budget/add', methods=['POST'])
+@login_required
+def add_budget_item(event_id):
+    from models import WeddingEvent, BudgetItem
+    from datetime import datetime
+    
+    event = WeddingEvent.query.get_or_404(event_id)
+    
+    # Ensure user owns this event
+    if event.user_id != current_user.id:
+        flash('You do not have permission to modify this event.')
+        return redirect(url_for('list_events'))
+    
+    category = request.form.get('category')
+    description = request.form.get('description')
+    estimated_cost = float(request.form.get('estimated_cost', 0))
+    actual_cost = float(request.form.get('actual_cost', 0)) if request.form.get('actual_cost') else None
+    payment_status = request.form.get('payment_status', 'unpaid')
+    payment_date = datetime.strptime(request.form.get('payment_date'), '%Y-%m-%d') if request.form.get('payment_date') else None
+    vendor_id = int(request.form.get('vendor_id')) if request.form.get('vendor_id') else None
+    
+    # Create new budget item
+    budget_item = BudgetItem(
+        category=category,
+        description=description,
+        estimated_cost=estimated_cost,
+        actual_cost=actual_cost,
+        payment_status=payment_status,
+        payment_date=payment_date,
+        event_id=event_id,
+        vendor_id=vendor_id
+    )
+    
+    db.session.add(budget_item)
+    db.session.commit()
+    
+    flash('Expense added successfully!')
+    return redirect(url_for('budget_planner', event_id=event_id))
+
+@app.route('/events/<int:event_id>/budget/<int:item_id>/edit', methods=['POST'])
+@login_required
+def edit_budget_item(event_id, item_id):
+    from models import WeddingEvent, BudgetItem
+    from datetime import datetime
+    
+    event = WeddingEvent.query.get_or_404(event_id)
+    
+    # Ensure user owns this event
+    if event.user_id != current_user.id:
+        flash('You do not have permission to modify this event.')
+        return redirect(url_for('list_events'))
+    
+    # Get the budget item
+    budget_item = BudgetItem.query.get_or_404(item_id)
+    
+    # Ensure item belongs to the event
+    if budget_item.event_id != event_id:
+        flash('This expense does not belong to the selected event.')
+        return redirect(url_for('budget_planner', event_id=event_id))
+    
+    # Update item fields
+    budget_item.category = request.form.get('category')
+    budget_item.description = request.form.get('description')
+    budget_item.estimated_cost = float(request.form.get('estimated_cost', 0))
+    budget_item.actual_cost = float(request.form.get('actual_cost', 0)) if request.form.get('actual_cost') else None
+    budget_item.payment_status = request.form.get('payment_status', 'unpaid')
+    budget_item.payment_date = datetime.strptime(request.form.get('payment_date'), '%Y-%m-%d') if request.form.get('payment_date') else None
+    budget_item.vendor_id = int(request.form.get('vendor_id')) if request.form.get('vendor_id') else None
+    
+    db.session.commit()
+    
+    flash('Expense updated successfully!')
+    return redirect(url_for('budget_planner', event_id=event_id))
+
+@app.route('/events/<int:event_id>/budget/<int:item_id>/delete', methods=['POST'])
+@login_required
+def delete_budget_item(event_id, item_id):
+    from models import WeddingEvent, BudgetItem
+    
+    event = WeddingEvent.query.get_or_404(event_id)
+    
+    # Ensure user owns this event
+    if event.user_id != current_user.id:
+        flash('You do not have permission to modify this event.')
+        return redirect(url_for('list_events'))
+    
+    # Get the budget item
+    budget_item = BudgetItem.query.get_or_404(item_id)
+    
+    # Ensure item belongs to the event
+    if budget_item.event_id != event_id:
+        flash('This expense does not belong to the selected event.')
+        return redirect(url_for('budget_planner', event_id=event_id))
+    
+    # Delete the item
+    db.session.delete(budget_item)
+    db.session.commit()
+    
+    flash('Expense deleted successfully!')
+    return redirect(url_for('budget_planner', event_id=event_id))
+
 # Initialize models
 with app.app_context():
     # Create all database tables

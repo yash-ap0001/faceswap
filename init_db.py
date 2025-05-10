@@ -188,6 +188,162 @@ def init_db():
             
             db.session.commit()
             
+            # Create sample budget
+            print("Creating sample budget data...")
+            wedding_event = WeddingEvent.query.filter_by(
+                user_id=demo_user.id, 
+                ceremony_type='wedding'
+            ).first()
+            
+            # Set total budget
+            from models import EventBudget, CategoryBudget, BudgetItem
+            event_budget = EventBudget(
+                event_id=wedding_event.id,
+                total_amount=50000.00,
+                notes="Budget for main wedding ceremony"
+            )
+            db.session.add(event_budget)
+            
+            # Set category budgets
+            category_budgets = [
+                {'category': 'venue', 'allocated_amount': 15000.00},
+                {'category': 'catering', 'allocated_amount': 10000.00},
+                {'category': 'decor', 'allocated_amount': 5000.00},
+                {'category': 'attire', 'allocated_amount': 8000.00},
+                {'category': 'photography', 'allocated_amount': 4000.00},
+                {'category': 'entertainment', 'allocated_amount': 3000.00},
+                {'category': 'transportation', 'allocated_amount': 2000.00},
+                {'category': 'gifts', 'allocated_amount': 1000.00},
+                {'category': 'beauty', 'allocated_amount': 1500.00},
+                {'category': 'accommodation', 'allocated_amount': 0.00},
+                {'category': 'stationery', 'allocated_amount': 500.00}
+            ]
+            
+            for budget_data in category_budgets:
+                category_budget = CategoryBudget(
+                    event_id=wedding_event.id,
+                    **budget_data
+                )
+                db.session.add(category_budget)
+            
+            # Add sample budget items
+            budget_items = [
+                {
+                    'category': 'venue',
+                    'description': 'Sacred Temple Booking',
+                    'estimated_cost': 12000.00,
+                    'actual_cost': 12500.00,
+                    'payment_status': 'paid',
+                    'payment_date': wedding_date - timedelta(days=60),
+                    'event_id': wedding_event.id
+                },
+                {
+                    'category': 'venue',
+                    'description': 'Decoration Setup Fee',
+                    'estimated_cost': 2000.00,
+                    'actual_cost': 2000.00,
+                    'payment_status': 'paid',
+                    'payment_date': wedding_date - timedelta(days=30),
+                    'event_id': wedding_event.id
+                },
+                {
+                    'category': 'catering',
+                    'description': 'Catering Services (200 guests)',
+                    'estimated_cost': 8000.00,
+                    'actual_cost': 8500.00,
+                    'payment_status': 'partially_paid',
+                    'payment_date': wedding_date - timedelta(days=45),
+                    'event_id': wedding_event.id
+                },
+                {
+                    'category': 'catering',
+                    'description': 'Wedding Cake',
+                    'estimated_cost': 1200.00,
+                    'actual_cost': None,
+                    'payment_status': 'unpaid',
+                    'payment_date': None,
+                    'event_id': wedding_event.id
+                },
+                {
+                    'category': 'decor',
+                    'description': 'Floral Arrangements',
+                    'estimated_cost': 3000.00,
+                    'actual_cost': 3200.00,
+                    'payment_status': 'paid',
+                    'payment_date': wedding_date - timedelta(days=15),
+                    'event_id': wedding_event.id
+                },
+                {
+                    'category': 'decor',
+                    'description': 'Lighting Setup',
+                    'estimated_cost': 1500.00,
+                    'actual_cost': None,
+                    'payment_status': 'unpaid',
+                    'payment_date': None,
+                    'event_id': wedding_event.id
+                },
+                {
+                    'category': 'attire',
+                    'description': 'Bridal Lehenga',
+                    'estimated_cost': 5000.00,
+                    'actual_cost': 4800.00,
+                    'payment_status': 'paid',
+                    'payment_date': wedding_date - timedelta(days=90),
+                    'event_id': wedding_event.id
+                },
+                {
+                    'category': 'attire',
+                    'description': 'Groom\'s Sherwani',
+                    'estimated_cost': 2500.00,
+                    'actual_cost': 2700.00,
+                    'payment_status': 'paid',
+                    'payment_date': wedding_date - timedelta(days=90),
+                    'event_id': wedding_event.id
+                },
+                {
+                    'category': 'photography',
+                    'description': 'Photography Package',
+                    'estimated_cost': 3500.00,
+                    'actual_cost': 3500.00,
+                    'payment_status': 'paid',
+                    'payment_date': wedding_date - timedelta(days=120),
+                    'event_id': wedding_event.id
+                },
+                {
+                    'category': 'entertainment',
+                    'description': 'DJ Services',
+                    'estimated_cost': 1500.00,
+                    'actual_cost': None,
+                    'payment_status': 'unpaid',
+                    'payment_date': None,
+                    'event_id': wedding_event.id
+                },
+                {
+                    'category': 'transportation',
+                    'description': 'Luxury Car Rental',
+                    'estimated_cost': 1200.00,
+                    'actual_cost': None,
+                    'payment_status': 'unpaid',
+                    'payment_date': None,
+                    'event_id': wedding_event.id
+                },
+                {
+                    'category': 'gifts',
+                    'description': 'Guest Favors',
+                    'estimated_cost': 800.00,
+                    'actual_cost': None,
+                    'payment_status': 'unpaid',
+                    'payment_date': None,
+                    'event_id': wedding_event.id
+                }
+            ]
+            
+            for item_data in budget_items:
+                budget_item = BudgetItem(**item_data)
+                db.session.add(budget_item)
+            
+            db.session.commit()
+            
             # Create sample tasks
             print("Creating sample tasks...")
             wedding_event = WeddingEvent.query.filter_by(

@@ -174,3 +174,36 @@ class BudgetItem(db.Model):
     
     def __repr__(self):
         return f'<BudgetItem {self.category} - {self.description}>'
+
+# Overall budget for a wedding event
+class EventBudget(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('wedding_event.id'), nullable=False, unique=True)
+    total_amount = db.Column(db.Float, default=0)
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    event = db.relationship('WeddingEvent', backref=db.backref('budget', uselist=False))
+    
+    def __repr__(self):
+        return f'<EventBudget ${self.total_amount} for Event #{self.event_id}>'
+
+# Budget allocation for specific categories
+class CategoryBudget(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('wedding_event.id'), nullable=False)
+    category = db.Column(db.String(64), nullable=False)
+    allocated_amount = db.Column(db.Float, default=0)
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    event = db.relationship('WeddingEvent', backref='category_budgets')
+    
+    __table_args__ = (
+        db.UniqueConstraint('event_id', 'category', name='_event_category_uc'),
+    )
+    
+    def __repr__(self):
+        return f'<CategoryBudget ${self.allocated_amount} for {self.category} in Event #{self.event_id}>'
