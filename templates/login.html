@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block style %}
+<style>
+    .login-container {
+        max-width: 500px;
+        margin: 80px auto;
+        background-color: var(--card-surface);
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        padding: 30px;
+    }
+    
+    .form-title {
+        text-align: center;
+        margin-bottom: 30px;
+        color: var(--light-purple);
+    }
+    
+    .login-form .form-control {
+        background-color: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 12px 15px;
+    }
+    
+    .login-form .form-control:focus {
+        background-color: rgba(0, 0, 0, 0.3);
+        border-color: var(--light-purple);
+        box-shadow: 0 0 0 0.25rem rgba(126, 87, 194, 0.25);
+    }
+    
+    .login-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: var(--primary-purple);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .login-btn:hover {
+        background-color: var(--secondary-purple);
+        transform: translateY(-2px);
+    }
+    
+    .login-footer {
+        margin-top: 25px;
+        text-align: center;
+        color: var(--text-secondary);
+    }
+    
+    .login-footer a {
+        color: var(--light-purple);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .login-footer a:hover {
+        color: var(--secondary-purple);
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="login-container">
+        <h2 class="form-title">Log In to Bridal Vision</h2>
+        
+        <form class="login-form" method="POST" action="{{ url_for('login') }}">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" required autofocus>
+            </div>
+            
+            <div class="mb-4">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            
+            <div class="mb-4 form-check">
+                <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                <label class="form-check-label" for="remember">Remember me</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary login-btn">
+                <i class="fas fa-sign-in-alt me-2"></i>Log In
+            </button>
+        </form>
+        
+        <div class="login-footer">
+            <p>Don't have an account? <a href="{{ url_for('register') }}">Sign Up</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
