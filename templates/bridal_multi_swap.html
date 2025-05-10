@@ -338,6 +338,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize template sections based on selected ceremonies
     updateTemplateSections();
     
+    // Check for template updates from bulk upload page
+    checkForTemplateUpdates();
+    
+    // Set up periodic checking for template updates (every 5 seconds)
+    setInterval(checkForTemplateUpdates, 5000);
+    
+    // Also check for updates every time the page becomes visible again
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            checkForTemplateUpdates();
+        }
+    });
+    
     // File input change handler
     sourceInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
