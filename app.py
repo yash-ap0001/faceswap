@@ -158,7 +158,7 @@ def download_face_swap_model():
             headers['Authorization'] = f'Bearer {hf_token}'
             
             # Try to query the repository info to see its structure
-            repo_info_url = "https://huggingface.co/api/models/Olek03282255/faceswap_inswapper128_MVP"
+            repo_info_url = "https://huggingface.co/api/models/foduucom/Headshot_Generator-FaceSwap"
             logger.info(f"Checking repository info: {repo_info_url}")
             try:
                 repo_info_response = requests.get(repo_info_url, headers=headers)
@@ -175,12 +175,16 @@ def download_face_swap_model():
         
         # Try different possible paths and filenames for the Hugging Face model
         possible_urls = [
+            # New repository
+            "https://huggingface.co/foduucom/Headshot_Generator-FaceSwap/resolve/main/inswapper_128.onnx",
+            "https://huggingface.co/foduucom/Headshot_Generator-FaceSwap/blob/main/inswapper_128.onnx",
+            "https://huggingface.co/foduucom/Headshot_Generator-FaceSwap/resolve/main/models/inswapper_128.onnx",
+            "https://huggingface.co/foduucom/Headshot_Generator-FaceSwap/resolve/main/assets/inswapper_128.onnx",
+            "https://huggingface.co/foduucom/Headshot_Generator-FaceSwap/resolve/main/onnx/inswapper_128.onnx",
+            # Original repository
             "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/resolve/main/inswapper_128.onnx",
-            "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/resolve/main/insightface/inswapper_128.onnx", 
-            "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/resolve/main/models/inswapper_128.onnx",
-            "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/resolve/main/inswapper_128.onnx.bin",
-            "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/resolve/main/inswapper.onnx",
-            "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/blob/main/inswapper_128.onnx"
+            "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/resolve/main/insightface/inswapper_128.onnx",
+            "https://huggingface.co/Olek03282255/faceswap_inswapper128_MVP/resolve/main/models/inswapper_128.onnx"
         ]
         
         # Try each possible URL
