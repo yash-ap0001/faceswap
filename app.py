@@ -47,6 +47,16 @@ with app.app_context():
     # Create directories for event manager images if they don't exist
     os.makedirs('static/images/event_managers', exist_ok=True)
     
+    # Create directories for template uploads
+    os.makedirs('uploads/templates', exist_ok=True)
+    ceremony_types = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
+    template_types = ['real', 'natural', 'ai', 'pinterest']
+    
+    for template_type in template_types:
+        os.makedirs(f'uploads/templates/{template_type}', exist_ok=True)
+        for ceremony in ceremony_types:
+            os.makedirs(f'uploads/templates/{template_type}/{ceremony}', exist_ok=True)
+    
     # Check if we have event managers already
     if EventManager.query.count() == 0:
         print("Creating sample event managers...")

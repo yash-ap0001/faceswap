@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Template Upload</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <style>
+        body {
+            padding-top: 20px;
+            padding-bottom: 40px;
+        }
+        .ceremony-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        .ceremony-title {
+            margin-bottom: 15px;
+            color: var(--bs-info);
+            border-bottom: 1px solid var(--bs-primary);
+            padding-bottom: 10px;
+        }
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .image-preview {
+            width: 150px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid var(--bs-primary);
+        }
+        .progress {
+            margin-top: 10px;
+            display: none;
+        }
+        .upload-status {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .upload-count {
+            color: var(--bs-info);
+            font-size: 0.9rem;
+        }
+        .actions {
+            position: sticky;
+            bottom: 0;
+            background-color: var(--bs-dark);
+            padding: 15px;
+            margin-top: 20px;
+            z-index: 100;
+            border-top: 1px solid var(--bs-primary);
+        }
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+            border-radius: 10px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'header.html' %}
+
+    <div class="container">
+        <h1 class="text-center mb-4">Bulk Template Upload</h1>
+        <p class="text-center mb-4">Upload multiple template images for each ceremony type</p>
+        
+        <div class="alert alert-info">
+            <h4>Instructions:</h4>
+            <ol>
+                <li>Select ceremony type for each section</li>
+                <li>Choose multiple images for each ceremony</li>
+                <li>Images will be automatically processed and saved with proper naming</li>
+                <li>Click "Upload All Images" when ready to process all selected files</li>
+            </ol>
+        </div>
+        
+        <form id="bulkUploadForm" enctype="multipart/form-data">
+            <div class="ceremony-sections">
+                <!-- Haldi Ceremony Section -->
+                <div class="ceremony-section" data-ceremony="haldi">
+                    <h3 class="ceremony-title">
+                        Haldi Ceremony
+                        <span class="upload-count">(0 images selected)</span>
+                        <span class="status-badge badge bg-secondary">Ready</span>
+                    </h3>
+                    <div class="mb-3">
+                        <label for="haldiFiles" class="form-label">Haldi Images (Yellow themed)</label>
+                        <input class="form-control" type="file" id="haldiFiles" name="haldiFiles" multiple accept="image/*" 
+                               data-ceremony="haldi">
+                    </div>
+                    <div class="image-preview-container" id="haldiPreview"></div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" 
+                             style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="upload-status"></div>
+                </div>
+                
+                <!-- Mehendi Ceremony Section -->
+                <div class="ceremony-section" data-ceremony="mehendi">
+                    <h3 class="ceremony-title">
+                        Mehendi Ceremony
+                        <span class="upload-count">(0 images selected)</span>
+                        <span class="status-badge badge bg-secondary">Ready</span>
+                    </h3>
+                    <div class="mb-3">
+                        <label for="mehendiFiles" class="form-label">Mehendi Images (Green themed)</label>
+                        <input class="form-control" type="file" id="mehendiFiles" name="mehendiFiles" multiple accept="image/*"
+                               data-ceremony="mehendi">
+                    </div>
+                    <div class="image-preview-container" id="mehendiPreview"></div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" 
+                             style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="upload-status"></div>
+                </div>
+                
+                <!-- Sangeeth Ceremony Section -->
+                <div class="ceremony-section" data-ceremony="sangeeth">
+                    <h3 class="ceremony-title">
+                        Sangeeth Ceremony
+                        <span class="upload-count">(0 images selected)</span>
+                        <span class="status-badge badge bg-secondary">Ready</span>
+                    </h3>
+                    <div class="mb-3">
+                        <label for="sangeethFiles" class="form-label">Sangeeth Images (Blue/Purple themed)</label>
+                        <input class="form-control" type="file" id="sangeethFiles" name="sangeethFiles" multiple accept="image/*"
+                               data-ceremony="sangeeth">
+                    </div>
+                    <div class="image-preview-container" id="sangeethPreview"></div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" 
+                             style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="upload-status"></div>
+                </div>
+                
+                <!-- Wedding Ceremony Section -->
+                <div class="ceremony-section" data-ceremony="wedding">
+                    <h3 class="ceremony-title">
+                        Wedding Ceremony
+                        <span class="upload-count">(0 images selected)</span>
+                        <span class="status-badge badge bg-secondary">Ready</span>
+                    </h3>
+                    <div class="mb-3">
+                        <label for="weddingFiles" class="form-label">Wedding Images (Red themed)</label>
+                        <input class="form-control" type="file" id="weddingFiles" name="weddingFiles" multiple accept="image/*"
+                               data-ceremony="wedding">
+                    </div>
+                    <div class="image-preview-container" id="weddingPreview"></div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" 
+                             style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="upload-status"></div>
+                </div>
+                
+                <!-- Reception Ceremony Section -->
+                <div class="ceremony-section" data-ceremony="reception">
+                    <h3 class="ceremony-title">
+                        Reception Ceremony
+                        <span class="upload-count">(0 images selected)</span>
+                        <span class="status-badge badge bg-secondary">Ready</span>
+                    </h3>
+                    <div class="mb-3">
+                        <label for="receptionFiles" class="form-label">Reception Images (Elegant themed)</label>
+                        <input class="form-control" type="file" id="receptionFiles" name="receptionFiles" multiple accept="image/*"
+                               data-ceremony="reception">
+                    </div>
+                    <div class="image-preview-container" id="receptionPreview"></div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-purple" role="progressbar" 
+                             style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="upload-status"></div>
+                </div>
+            </div>
+            
+            <div class="actions text-center">
+                <button type="button" id="uploadAllBtn" class="btn btn-primary btn-lg">Upload All Images</button>
+                <button type="button" id="clearAllBtn" class="btn btn-outline-secondary">Clear All</button>
+                <span id="globalStatus" class="ms-3"></span>
+            </div>
+        </form>
+    </div>
+    
+    {% include 'footer.html' %}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle file selection and previews
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+            
+            fileInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    const ceremonyType = this.dataset.ceremony;
+                    const previewContainer = document.getElementById(`${ceremonyType}Preview`);
+                    const countDisplay = this.closest('.ceremony-section').querySelector('.upload-count');
+                    const statusBadge = this.closest('.ceremony-section').querySelector('.status-badge');
+                    
+                    // Clear previous previews
+                    previewContainer.innerHTML = '';
+                    
+                    // Update count
+                    countDisplay.textContent = `(${this.files.length} images selected)`;
+                    
+                    // Update status badge
+                    statusBadge.textContent = 'Ready';
+                    statusBadge.className = 'status-badge badge bg-secondary';
+                    
+                    // Generate previews
+                    if (this.files.length > 0) {
+                        for (const file of this.files) {
+                            if (file.type.startsWith('image/')) {
+                                const reader = new FileReader();
+                                
+                                reader.onload = function(e) {
+                                    const img = document.createElement('img');
+                                    img.src = e.target.result;
+                                    img.className = 'image-preview';
+                                    img.title = file.name;
+                                    previewContainer.appendChild(img);
+                                }
+                                
+                                reader.readAsDataURL(file);
+                            }
+                        }
+                    }
+                });
+            });
+            
+            // Handle upload
+            document.getElementById('uploadAllBtn').addEventListener('click', function() {
+                const allInputs = document.querySelectorAll('input[type="file"]');
+                let totalFiles = 0;
+                let hasFiles = false;
+                
+                // Count total files
+                allInputs.forEach(input => {
+                    totalFiles += input.files.length;
+                    if (input.files.length > 0) {
+                        hasFiles = true;
+                    }
+                });
+                
+                if (!hasFiles) {
+                    alert('Please select at least one image to upload.');
+                    return;
+                }
+                
+                // Disable button during upload
+                this.disabled = true;
+                document.getElementById('clearAllBtn').disabled = true;
+                document.getElementById('globalStatus').textContent = 'Uploading...';
+                
+                // Process each ceremony section
+                allInputs.forEach(input => {
+                    const ceremonyType = input.dataset.ceremony;
+                    const files = input.files;
+                    const statusBadge = input.closest('.ceremony-section').querySelector('.status-badge');
+                    const progressBar = input.closest('.ceremony-section').querySelector('.progress');
+                    const progressBarInner = progressBar.querySelector('.progress-bar');
+                    const statusText = input.closest('.ceremony-section').querySelector('.upload-status');
+                    
+                    if (files.length === 0) {
+                        return; // Skip if no files
+                    }
+                    
+                    // Show progress
+                    progressBar.style.display = 'block';
+                    statusBadge.textContent = 'Uploading...';
+                    statusBadge.className = 'status-badge badge bg-primary';
+                    
+                    // Create FormData
+                    const formData = new FormData();
+                    formData.append('ceremony_type', ceremonyType);
+                    
+                    // Add all files
+                    for (let i = 0; i < files.length; i++) {
+                        formData.append('files', files[i]);
+                    }
+                    
+                    // Upload files
+                    fetch('/upload-bulk-templates', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Update progress to 100%
+                        progressBarInner.style.width = '100%';
+                        progressBarInner.setAttribute('aria-valuenow', 100);
+                        
+                        // Update status
+                        statusBadge.textContent = 'Completed';
+                        statusBadge.className = 'status-badge badge bg-success';
+                        statusText.textContent = `Successfully uploaded ${data.uploaded_count} images for ${ceremonyType} ceremony.`;
+                        
+                        // Check if all ceremonies are done
+                        checkAllUploadsComplete();
+                    })
+                    .catch(error => {
+                        console.error('Error uploading files:', error);
+                        statusBadge.textContent = 'Failed';
+                        statusBadge.className = 'status-badge badge bg-danger';
+                        statusText.textContent = `Error: ${error.message}`;
+                        
+                        // Check if all ceremonies are done despite error
+                        checkAllUploadsComplete();
+                    });
+                    
+                    // Simulate progress (in a real app, you'd get this from server)
+                    let progress = 0;
+                    const progressInterval = setInterval(() => {
+                        progress += 5;
+                        if (progress >= 90) {
+                            clearInterval(progressInterval);
+                        }
+                        progressBarInner.style.width = `${progress}%`;
+                        progressBarInner.setAttribute('aria-valuenow', progress);
+                    }, 300);
+                });
+            });
+            
+            // Check if all uploads are complete
+            function checkAllUploadsComplete() {
+                const allSections = document.querySelectorAll('.ceremony-section');
+                let allComplete = true;
+                let hasUploads = false;
+                
+                allSections.forEach(section => {
+                    const input = section.querySelector('input[type="file"]');
+                    if (input.files.length > 0) {
+                        hasUploads = true;
+                        const badge = section.querySelector('.status-badge');
+                        if (badge.textContent !== 'Completed' && badge.textContent !== 'Failed') {
+                            allComplete = false;
+                        }
+                    }
+                });
+                
+                if (hasUploads && allComplete) {
+                    document.getElementById('uploadAllBtn').disabled = false;
+                    document.getElementById('clearAllBtn').disabled = false;
+                    document.getElementById('globalStatus').textContent = 'All uploads completed!';
+                }
+            }
+            
+            // Clear all button
+            document.getElementById('clearAllBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all selected images?')) {
+                    const allInputs = document.querySelectorAll('input[type="file"]');
+                    
+                    allInputs.forEach(input => {
+                        input.value = '';
+                        const ceremonyType = input.dataset.ceremony;
+                        const previewContainer = document.getElementById(`${ceremonyType}Preview`);
+                        const countDisplay = input.closest('.ceremony-section').querySelector('.upload-count');
+                        const statusBadge = input.closest('.ceremony-section').querySelector('.status-badge');
+                        const progressBar = input.closest('.ceremony-section').querySelector('.progress');
+                        const statusText = input.closest('.ceremony-section').querySelector('.upload-status');
+                        
+                        // Clear everything
+                        previewContainer.innerHTML = '';
+                        countDisplay.textContent = '(0 images selected)';
+                        statusBadge.textContent = 'Ready';
+                        statusBadge.className = 'status-badge badge bg-secondary';
+                        progressBar.style.display = 'none';
+                        statusText.textContent = '';
+                    });
+                    
+                    document.getElementById('globalStatus').textContent = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
