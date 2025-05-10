@@ -306,7 +306,9 @@
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+// Main initialization function for the entire page
+function initializePage() {
+    console.log('Initializing bridal swap page');
     // DOM Elements
     const uploadForm = document.getElementById('upload-form');
     const sourceInput = document.getElementById('source-input');
@@ -469,22 +471,29 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to load templates for a specific ceremony type
     function loadTemplates(ceremonyType) {
+        console.log(`Loading templates for ${ceremonyType}`);
         const templateContainer = document.querySelector(`#${ceremonyType}-templates .template-container`);
         
         if (!templateContainer) {
             console.error(`Template container for ${ceremonyType} not found`);
+            console.log('Available containers:', document.querySelectorAll('.template-container'));
             return;
         }
+        
+        console.log(`Template container for ${ceremonyType} found:`, templateContainer);
         
         // Display loading state
         templateContainer.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div></div>';
         
         // Add a timestamp to prevent caching
         const timestamp = Date.now();
+        const apiUrl = `/api/templates?ceremony_type=${ceremonyType}&_t=${timestamp}`;
+        console.log(`Fetching templates from: ${apiUrl}`);
+        
         // Fetch templates for this ceremony type with cache busting
-        fetch(`/api/templates?ceremony_type=${ceremonyType}&_t=${timestamp}`)
+        fetch(apiUrl)
             .then(response => {
-                console.log(`Templates fetched for ${ceremonyType} at ${timestamp}`);
+                console.log(`Templates fetched for ${ceremonyType} at ${timestamp}, status: ${response.status}`);
                 return response.json();
             })
             .then(data => {
@@ -592,7 +601,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load all ceremony type templates
     function loadAllTemplates() {
+        console.log('loadAllTemplates called');
         const ceremonyTypes = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'];
+        console.log('Loading templates for ceremony types:', ceremonyTypes);
         ceremonyTypes.forEach(type => loadTemplates(type));
     }
     
