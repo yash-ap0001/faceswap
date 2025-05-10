@@ -292,7 +292,7 @@ def index():
 
 @app.route('/bridal-gallery')
 def bridal_gallery():
-    return render_template('bridal_gallery.html')
+    return render_template('bridal_gallery_new.html')
 
 @app.route('/bridal-swap', methods=['GET', 'POST'])
 def bridal_swap():

@@ -1,90 +1,70 @@
-// Accordion functionality for sidebar
-window.onload = function() {
-    console.log("Window loaded, initializing accordion");
-    initAccordion();
-};
+// Bootstrap sidebar functionality
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM content loaded");
+    initSidebar();
+});
 
-function initAccordion() {
+function initSidebar() {
     try {
-        // Get all category titles and contents
-        const categoryTitles = document.querySelectorAll('.category-title');
-        const categoryContents = document.querySelectorAll('.category-content');
+        // Get elements
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggleBtn = document.querySelector('.sidebar-toggle');
+        const navSidebarToggleBtn = document.querySelector('.nav-sidebar-toggle');
+        const closeBtn = document.querySelector('.close-sidebar');
         
-        console.log(`Found ${categoryTitles.length} category titles and ${categoryContents.length} content sections`);
+        console.log("Sidebar element:", sidebar);
+        console.log("Sidebar toggle button:", sidebarToggleBtn);
+        console.log("Nav sidebar toggle button:", navSidebarToggleBtn);
+        console.log("Close button:", closeBtn);
         
-        if (categoryTitles.length === 0) {
-            console.error("No category titles found with class .category-title");
-            return;
+        // Initialize sidebar state
+        console.log("Initializing sidebar in open state");
+        
+        // Add event listener to sidebar toggle button
+        if (sidebarToggleBtn) {
+            console.log("Adding event listener to sidebar toggle button");
+            sidebarToggleBtn.addEventListener('click', function() {
+                console.log("Sidebar toggle button clicked");
+                toggleSidebar();
+            });
         }
         
-        // First, close all sections
-        categoryContents.forEach(content => {
-            content.classList.remove('expanded');
-        });
-        
-        categoryTitles.forEach(title => {
-            title.classList.add('collapsed');
-        });
-        
-        // Then open the Bride section by default
-        const brideContent = document.getElementById('bride-content');
-        const brideTitle = document.querySelector('[data-target="bride-content"]');
-        
-        if (brideContent && brideTitle) {
-            brideContent.classList.add('expanded');
-            brideTitle.classList.remove('collapsed');
-            console.log("Bride section opened by default");
-        } else {
-            console.warn("Could not find bride section to open by default");
+        // Add event listener to nav sidebar toggle button
+        if (navSidebarToggleBtn) {
+            console.log("Adding event listener to nav sidebar toggle button");
+            navSidebarToggleBtn.addEventListener('click', function() {
+                console.log("Nav sidebar toggle button clicked");
+                toggleSidebar();
+            });
         }
         
-        // Add click event listeners to all category titles
-        categoryTitles.forEach(title => {
-            title.addEventListener('click', function(event) {
-                event.preventDefault();
-                event.stopPropagation();
-                
-                const targetId = this.getAttribute('data-target');
-                console.log(`Clicked on category title with target: ${targetId}`);
-                
-                if (!targetId) {
-                    console.warn("Category title missing data-target attribute");
-                    return;
-                }
-                
-                const content = document.getElementById(targetId);
-                if (!content) {
-                    console.warn(`Could not find content with ID: ${targetId}`);
-                    return;
-                }
-                
-                const isExpanded = content.classList.contains('expanded');
-                console.log(`Category ${targetId} is currently ${isExpanded ? 'expanded' : 'collapsed'}`);
-                
-                // First, close all sections
-                categoryContents.forEach(c => {
-                    c.classList.remove('expanded');
-                });
-                
-                categoryTitles.forEach(t => {
-                    t.classList.add('collapsed');
-                });
-                
-                // If the section wasn't already expanded, open it
-                if (!isExpanded) {
-                    content.classList.add('expanded');
-                    this.classList.remove('collapsed');
-                    console.log(`Opened category ${targetId}`);
-                } else {
-                    console.log(`Closed category ${targetId}`);
+        // Add event listener to close button
+        if (closeBtn) {
+            console.log("Adding event listener to close button");
+            closeBtn.addEventListener('click', function() {
+                console.log("Close button clicked");
+                if (sidebar) {
+                    document.body.classList.add('sidebar-closed');
+                    sidebar.classList.add('closed');
                 }
             });
-            
-            console.log(`Added click listener to category title: ${title.textContent.trim()}`);
-        });
+        }
         
-        console.log("Accordion initialization completed successfully");
+        // Bootstrap 5 accordion is handled automatically via data attributes
+        // No need for manual JavaScript for the accordion functionality
+        
     } catch (error) {
-        console.error("Error initializing accordion:", error);
+        console.error("Error initializing sidebar:", error);
+    }
+}
+
+function toggleSidebar() {
+    console.log("Toggle sidebar called");
+    try {
+        console.log("Toggling sidebar class");
+        document.body.classList.toggle('sidebar-closed');
+        document.querySelector('.sidebar').classList.toggle('closed');
+    } catch (error) {
+        console.error("Error toggling sidebar:", error);
     }
 }
