@@ -1,0 +1,718 @@
+{% extends "base.html" %}
+
+{% block style %}
+<style>
+    :root {
+        --primary-purple: #5e35b1;
+        --secondary-purple: #7e57c2;
+        --dark-purple: #4527a0;
+        --light-purple: #b39ddb;
+        --dark-surface: #1a1a1a;
+        --card-surface: #212121;
+        --border-color: #333333;
+        --text-primary: #f5f5f5;
+        --text-secondary: #bdbdbd;
+        --accent-color: var(--light-purple);
+    }
+    
+    body {
+        background-color: var(--dark-surface);
+        color: var(--text-primary);
+        font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+    
+    .navbar {
+        background-color: var(--dark-purple) !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .card {
+        background-color: var(--card-surface);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .card-header {
+        background-color: rgba(0,0,0,0.2);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-purple);
+        border-color: var(--primary-purple);
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--secondary-purple);
+        border-color: var(--secondary-purple);
+    }
+    
+    .btn-outline-primary {
+        color: var(--accent-color);
+        border-color: var(--accent-color);
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: var(--primary-purple);
+        border-color: var(--primary-purple);
+        color: white;
+    }
+    
+    .bridal-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    
+    .bridal-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    
+    .bridal-card.selected {
+        border-color: var(--accent-color);
+    }
+    
+    .image-preview-container {
+        min-height: 200px;
+        border: 2px dashed var(--light-purple);
+        border-radius: 5px;
+    }
+    
+    .result-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+    
+    .result-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .result-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    
+    .result-image {
+        width: 100%;
+        height: 350px;
+        object-fit: cover;
+    }
+    
+    .result-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(74, 20, 140, 0.7);
+        padding: 10px;
+        color: white;
+    }
+    
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(206, 147, 216, 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 15px rgba(206, 147, 216, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(206, 147, 216, 0);
+        }
+    }
+    
+    .placeholder-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #757575;
+    }
+    
+    .category-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: var(--primary-purple);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: bold;
+        z-index: 10;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .btn-floating {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        z-index: 10;
+    }
+    
+    .btn-download {
+        bottom: 60px;
+        right: 10px;
+        background-color: var(--secondary-purple);
+        color: white;
+    }
+    
+    .btn-remove {
+        top: 10px;
+        left: 10px;
+        background-color: #f44336;
+        color: white;
+    }
+    
+    .feature-icon {
+        font-size: 2rem;
+        color: var(--accent-color);
+        margin-bottom: 15px;
+        opacity: 0.8;
+    }
+    
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        flex-direction: column;
+    }
+    
+    .spinner {
+        width: 70px;
+        height: 70px;
+        border: 8px solid rgba(179, 157, 219, 0.3);
+        border-top: 8px solid var(--primary-purple);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Upload button and modal styles */
+    .upload-btn-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: var(--primary-purple);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-btn-circle:hover {
+        transform: scale(1.1);
+        background-color: var(--secondary-purple);
+    }
+    
+    .modal-content {
+        background-color: var(--card-surface);
+        border: 1px solid var(--border-color);
+    }
+    
+    .modal-header, .modal-footer {
+        border-color: var(--border-color);
+    }
+    
+    .btn-show-more {
+        transition: all 0.3s ease;
+    }
+    
+    .btn-show-more:hover {
+        background-color: var(--dark-purple);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Upload Photo Button (top-right) -->
+<div class="position-fixed top-0 end-0 p-4" style="z-index: 1050; margin-top: 60px; margin-right: 20px;">
+    <button type="button" class="btn btn-primary rounded-circle shadow-lg" data-bs-toggle="modal" data-bs-target="#uploadPhotoModal" style="width: 60px; height: 60px;">
+        <i class="fas fa-upload"></i>
+    </button>
+</div>
+
+<!-- Upload Photo Modal Dialog -->
+<div class="modal fade" id="uploadPhotoModal" tabindex="-1" aria-labelledby="uploadPhotoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-0">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title" id="uploadPhotoModalLabel">Upload Your Photo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="image-preview-container mb-4 d-flex align-items-center justify-content-center mx-auto" style="width: 200px; height: 200px;">
+                    <img id="source-preview" class="img-fluid d-none rounded-circle shadow" style="width: 180px; height: 180px; object-fit: cover;" alt="Your photo preview">
+                    <div id="source-placeholder" class="placeholder-container">
+                        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-3">
+                            <path opacity="0.4" d="M12 22.01C17.5228 22.01 22 17.5329 22 12.01C22 6.48716 17.5228 2.01001 12 2.01001C6.47715 2.01001 2 6.48716 2 12.01C2 17.5329 6.47715 22.01 12 22.01Z" fill="rgba(126, 87, 194, 0.3)"/>
+                            <path d="M12 6.94001C9.93 6.94001 8.25 8.62001 8.25 10.69C8.25 12.72 9.84 14.37 11.95 14.43C11.98 14.43 12.02 14.43 12.04 14.43C12.06 14.43 12.09 14.43 12.11 14.43C12.12 14.43 12.13 14.43 12.13 14.43C14.15 14.36 15.74 12.72 15.75 10.69C15.75 8.62001 14.07 6.94001 12 6.94001Z" fill="rgba(126, 87, 194, 0.7)"/>
+                            <path d="M18.7802 19.36C17.0002 21 14.6202 22.01 12.0002 22.01C9.38022 22.01 7.00021 21 5.22021 19.36C5.46021 18.45 6.11022 17.62 7.06021 16.98C9.79022 15.16 14.2302 15.16 16.9402 16.98C17.9002 17.62 18.5402 18.45 18.7802 19.36Z" fill="rgba(126, 87, 194, 0.7)"/>
+                        </svg>
+                        <p class="text-center text-secondary">No photo selected yet</p>
+                    </div>
+                </div>
+                
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="upload-input">
+                        <input type="file" id="source-input" name="source" accept=".jpg,.jpeg,.png" required>
+                        <div class="upload-btn btn btn-outline-light w-100">
+                            <i class="fas fa-cloud-upload-alt me-2"></i> Choose Photo
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-secondary mt-3 d-none" type="button" id="source-clear-btn">
+                        <i class="fas fa-times me-1"></i> Remove Photo
+                    </button>
+                </form>
+                
+                <div class="alert alert-info mt-3">
+                    <small><i class="fas fa-info-circle me-1"></i> Select a clear frontal photo of your face for best results</small>
+                </div>
+            </div>
+            <div class="modal-footer border-top border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="confirmUpload">
+                    <i class="fas fa-check me-1"></i> Confirm Photo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid py-4">
+    <!-- Settings Bar -->
+    <div class="card mb-4 shadow">
+        <div class="card-body p-2">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="d-flex gap-3 align-items-center">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="templateType" id="real" value="real" checked autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="real">Real Photos</label>
+                            
+                            <input type="radio" class="btn-check" name="templateType" id="natural" value="natural" autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="natural">Natural Style</label>
+                            
+                            <input type="radio" class="btn-check" name="templateType" id="ai" value="ai" autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="ai">AI Generated</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex gap-2 justify-content-md-end mt-3 mt-md-0">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="cat-haldi" value="haldi" checked>
+                            <label class="form-check-label" for="cat-haldi">Haldi</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="cat-mehendi" value="mehendi" checked>
+                            <label class="form-check-label" for="cat-mehendi">Mehendi</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="cat-wedding" value="wedding" checked>
+                            <label class="form-check-label" for="cat-wedding">Wedding</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="cat-reception" value="reception" checked>
+                            <label class="form-check-label" for="cat-reception">Reception</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Haldi Section -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="mb-0"><i class="fas fa-sun me-2 text-warning"></i>Haldi Ceremony</h3>
+            <a href="#" class="text-decoration-none">More <i class="fas fa-chevron-right ms-1"></i></a>
+        </div>
+        <div class="row" id="haldi-templates-container">
+            <!-- Template cards - First row -->
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="haldi">
+                    <div class="category-badge">Haldi</div>
+                    <img src="/uploads/templates/real/weeding saree.jpg" class="card-img-top" alt="Haldi Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Haldi Ceremony</h6>
+                        <p class="card-text small">Yellow saree with traditional gold jewelry</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="haldi">
+                    <div class="category-badge">Haldi</div>
+                    <img src="/uploads/templates/real/halfhand.jpg" class="card-img-top" alt="Haldi Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Vibrant Haldi</h6>
+                        <p class="card-text small">Traditional yellow outfit with flower decorations</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="haldi">
+                    <div class="category-badge">Haldi</div>
+                    <img src="/uploads/templates/real/voni dress.jpg" class="card-img-top" alt="Haldi Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Elegant Haldi</h6>
+                        <p class="card-text small">Decorated with yellow flowers and turmeric</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="haldi">
+                    <div class="category-badge">Haldi</div>
+                    <img src="/uploads/templates/real/full dress.jpg" class="card-img-top" alt="Haldi Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Modern Haldi</h6>
+                        <p class="card-text small">Contemporary yellow outfit with minimal design</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mb-5">
+            <button class="btn btn-outline-secondary">
+                <i class="fas fa-angle-down me-2"></i>Show More Haldi Templates
+            </button>
+        </div>
+    </div>
+    
+    <!-- Mehendi Section -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="mb-0"><i class="fas fa-hands me-2 text-danger"></i>Mehendi Function</h3>
+            <a href="#" class="text-decoration-none">More <i class="fas fa-chevron-right ms-1"></i></a>
+        </div>
+        <div class="row" id="mehendi-templates-container">
+            <!-- Template cards - First row -->
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="mehendi">
+                    <div class="category-badge">Mehendi</div>
+                    <img src="/uploads/templates/real/jewellary.jpg" class="card-img-top" alt="Mehendi Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Mehendi Celebration</h6>
+                        <p class="card-text small">Beautiful henna designs with green outfit</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="mehendi">
+                    <div class="category-badge">Mehendi</div>
+                    <img src="/uploads/templates/real/halfhand.jpg" class="card-img-top" alt="Mehendi Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Artistic Mehendi</h6>
+                        <p class="card-text small">Intricate henna patterns on hands</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="mehendi">
+                    <div class="category-badge">Mehendi</div>
+                    <img src="/uploads/templates/real/weeding saree.jpg" class="card-img-top" alt="Mehendi Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Traditional Mehendi</h6>
+                        <p class="card-text small">Classic red and green outfit combination</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="mehendi">
+                    <div class="category-badge">Mehendi</div>
+                    <img src="/uploads/templates/real/voni dress.jpg" class="card-img-top" alt="Mehendi Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Glamorous Mehendi</h6>
+                        <p class="card-text small">Designer outfit with modern henna patterns</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mb-5">
+            <button class="btn btn-outline-secondary">
+                <i class="fas fa-angle-down me-2"></i>Show More Mehendi Templates
+            </button>
+        </div>
+    </div>
+    
+    <!-- Wedding Section -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="mb-0"><i class="fas fa-heart me-2 text-danger"></i>Wedding Ceremony</h3>
+            <a href="#" class="text-decoration-none">More <i class="fas fa-chevron-right ms-1"></i></a>
+        </div>
+        <div class="row" id="wedding-templates-container">
+            <!-- Template cards - First row -->
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="wedding">
+                    <div class="category-badge">Wedding</div>
+                    <img src="/uploads/templates/real/voni dress.jpg" class="card-img-top" alt="Wedding Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Wedding Ceremony</h6>
+                        <p class="card-text small">Elegant red outfit with traditional namaste pose</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="wedding">
+                    <div class="category-badge">Wedding</div>
+                    <img src="/uploads/templates/real/full dress.jpg" class="card-img-top" alt="Wedding Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Wedding Day</h6>
+                        <p class="card-text small">Traditional wedding attire with bridal flowers</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="wedding">
+                    <div class="category-badge">Wedding</div>
+                    <img src="/uploads/templates/real/weeding saree.jpg" class="card-img-top" alt="Wedding Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Royal Wedding</h6>
+                        <p class="card-text small">Red and gold saree with heavy jewelry</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="wedding">
+                    <div class="category-badge">Wedding</div>
+                    <img src="/uploads/templates/real/jewellary.jpg" class="card-img-top" alt="Wedding Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Modern Wedding</h6>
+                        <p class="card-text small">Contemporary bridal look with designer jewelry</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mb-5">
+            <button class="btn btn-outline-secondary">
+                <i class="fas fa-angle-down me-2"></i>Show More Wedding Templates
+            </button>
+        </div>
+    </div>
+    
+    <!-- Reception Section -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="mb-0"><i class="fas fa-glass-cheers me-2 text-info"></i>Reception</h3>
+            <a href="#" class="text-decoration-none">More <i class="fas fa-chevron-right ms-1"></i></a>
+        </div>
+        <div class="row" id="reception-templates-container">
+            <!-- Template cards - First row -->
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="reception">
+                    <div class="category-badge">Reception</div>
+                    <img src="/uploads/templates/real/jewellary.jpg" class="card-img-top" alt="Reception Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Reception Gala</h6>
+                        <p class="card-text small">Glamorous reception look with designer jewelry</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="reception">
+                    <div class="category-badge">Reception</div>
+                    <img src="/uploads/templates/real/voni dress.jpg" class="card-img-top" alt="Reception Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Evening Reception</h6>
+                        <p class="card-text small">Sophisticated evening attire with subtle elegance</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="reception">
+                    <div class="category-badge">Reception</div>
+                    <img src="/uploads/templates/real/full dress.jpg" class="card-img-top" alt="Reception Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Chic Reception</h6>
+                        <p class="card-text small">Modern fusion outfit for the reception party</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm bridal-card" data-style="reception">
+                    <div class="category-badge">Reception</div>
+                    <img src="/uploads/templates/real/halfhand.jpg" class="card-img-top" alt="Reception Template" style="height: 250px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Grand Reception</h6>
+                        <p class="card-text small">Luxurious heavy work outfit with statement jewelry</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mb-5">
+            <button class="btn btn-outline-secondary">
+                <i class="fas fa-angle-down me-2"></i>Show More Reception Templates
+            </button>
+        </div>
+    </div>
+    
+    <!-- Results Section -->
+    <div id="results-section" class="d-none mt-5">
+        <h3 class="mb-4 text-center"><i class="fas fa-magic me-2"></i>Your Bridal Previews</h3>
+        
+        <div class="result-gallery" id="results-container">
+            <!-- Result images will be displayed here -->
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay d-none" id="loading-overlay">
+    <div class="spinner mb-4"></div>
+    <h4 class="text-white mb-2">Processing Your Image</h4>
+    <p class="text-light">This may take a few moments...</p>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // File input handling
+        const sourceInput = document.getElementById('source-input');
+        const sourcePreview = document.getElementById('source-preview');
+        const sourcePlaceholder = document.getElementById('source-placeholder');
+        const sourceClearBtn = document.getElementById('source-clear-btn');
+        const uploadBtn = document.querySelector('.upload-btn');
+        const generateBtn = document.getElementById('generate-btn');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const resultsSection = document.getElementById('results-section');
+        const resultsContainer = document.getElementById('results-container');
+        const templatesContainer = document.getElementById('templates-container');
+        
+        // File preview handling
+        sourceInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    sourcePreview.src = e.target.result;
+                    sourcePreview.classList.remove('d-none');
+                    sourcePlaceholder.classList.add('d-none');
+                    sourceClearBtn.classList.remove('d-none');
+                };
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+        
+        // Clear photo button
+        sourceClearBtn.addEventListener('click', function() {
+            sourceInput.value = '';
+            sourcePreview.classList.add('d-none');
+            sourcePlaceholder.classList.remove('d-none');
+            sourceClearBtn.classList.add('d-none');
+        });
+        
+        // Trigger file input click when custom button is clicked
+        uploadBtn.addEventListener('click', function() {
+            sourceInput.click();
+        });
+        
+        // Category filter handling
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', filterTemplates);
+        });
+        
+        document.querySelectorAll('input[name="templateType"]').forEach(radio => {
+            radio.addEventListener('change', filterTemplates);
+        });
+        
+        function filterTemplates() {
+            const selectedType = document.querySelector('input[name="templateType"]:checked').value;
+            const selectedCategories = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+            
+            document.querySelectorAll('.bridal-card').forEach(card => {
+                const style = card.dataset.style;
+                const visible = selectedCategories.includes(style);
+                card.closest('.col-md-3').style.display = visible ? 'block' : 'none';
+            });
+        }
+        
+        // Template selection
+        document.addEventListener('click', function(e) {
+            const bridalCard = e.target.closest('.bridal-card');
+            if (bridalCard) {
+                // Toggle selection
+                document.querySelectorAll('.bridal-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                bridalCard.classList.add('selected');
+            }
+        });
+        
+        // Generate button
+        generateBtn.addEventListener('click', function() {
+            if (!sourceInput.files || !sourceInput.files[0]) {
+                alert('Please upload your photo first.');
+                return;
+            }
+            
+            const selectedTemplate = document.querySelector('.bridal-card.selected');
+            if (!selectedTemplate) {
+                alert('Please select at least one template.');
+                return;
+            }
+            
+            // Show loading overlay
+            loadingOverlay.classList.remove('d-none');
+            
+            // Simulate processing (replace with actual API call)
+            setTimeout(function() {
+                loadingOverlay.classList.add('d-none');
+                resultsSection.classList.remove('d-none');
+                
+                // Scroll to results
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }, 2000);
+        });
+    });
+</script>
+{% endblock %}
