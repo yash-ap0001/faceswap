@@ -779,12 +779,12 @@ def get_templates():
     API endpoint to get available templates for a specific ceremony type.
     Returns templates for the requested ceremony with URLs for display.
     """
-    ceremony = request.args.get('ceremony', 'wedding')
+    ceremony_type = request.args.get('ceremony_type', request.args.get('ceremony', 'wedding'))
     
     # Validate ceremony name
     valid_ceremonies = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
-    if ceremony not in valid_ceremonies:
-        return jsonify({'error': f'Invalid ceremony type: {ceremony}'}), 400
+    if ceremony_type not in valid_ceremonies:
+        return jsonify({'error': f'Invalid ceremony type: {ceremony_type}'}), 400
     
     # Get templates directory
     template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
@@ -796,39 +796,67 @@ def get_templates():
     templates = []
     template_id = 1
     
+    # First check for standard template formats
     for template_type in template_types:
         # Check in main directory
-        main_path = os.path.join(template_dir, f"{ceremony}_{template_type}.jpg")
+        main_path = os.path.join(template_dir, f"{ceremony_type}_{template_type}.jpg")
         if os.path.exists(main_path):
             templates.append({
-                'id': f"{ceremony}_{template_type}_{template_id}",
-                'type': template_type,
-                'ceremony': ceremony,
+                'id': f"{ceremony_type}_{template_type}_{template_id}",
+                'template_type': template_type,
+                'ceremony': ceremony_type,
                 'path': main_path,
-                'url': f"/uploads/templates/{ceremony}_{template_type}.jpg"
+                'url': f"/uploads/templates/{ceremony_type}_{template_type}.jpg"
             })
             template_id += 1
             
         # Check in type subdirectory
-        subdir_path = os.path.join(template_dir, template_type, f"{ceremony}.jpg")
+        subdir_path = os.path.join(template_dir, template_type, f"{ceremony_type}.jpg")
         if os.path.exists(subdir_path):
             templates.append({
-                'id': f"{ceremony}_{template_type}_{template_id}",
-                'type': template_type,
-                'ceremony': ceremony,
+                'id': f"{ceremony_type}_{template_type}_{template_id}",
+                'template_type': template_type,
+                'ceremony': ceremony_type,
                 'path': subdir_path,
-                'url': f"/uploads/templates/{template_type}/{ceremony}.jpg"
+                'url': f"/uploads/templates/{template_type}/{ceremony_type}.jpg"
             })
             template_id += 1
+    
+    # Check for Pinterest templates
+    pinterest_dir = os.path.join(template_dir, 'pinterest', ceremony_type)
+    if os.path.exists(pinterest_dir):
+        for file in os.listdir(pinterest_dir):
+            if file.lower().endswith(('.jpg', '.jpeg', '.png')):
+                file_path = os.path.join(pinterest_dir, file)
+                templates.append({
+                    'id': f"{ceremony_type}_pinterest_{template_id}",
+                    'template_type': 'pinterest',
+                    'ceremony': ceremony_type,
+                    'path': file_path,
+                    'url': f"/uploads/templates/pinterest/{ceremony_type}/{file}"
+                })
+                template_id += 1
+    
+    # Also check for main Pinterest template
+    main_pinterest_path = os.path.join(template_dir, f"{ceremony_type}_pinterest.jpg")
+    if os.path.exists(main_pinterest_path):
+        templates.append({
+            'id': f"{ceremony_type}_pinterest_{template_id}",
+            'template_type': 'pinterest',
+            'ceremony': ceremony_type,
+            'path': main_pinterest_path,
+            'url': f"/uploads/templates/{ceremony_type}_pinterest.jpg"
+        })
+        template_id += 1
     
     # If no templates found, create dummy templates for testing
     if not templates:
         # For each template type, create a dummy entry
         for template_type in template_types:
             templates.append({
-                'id': f"{ceremony}_{template_type}_{template_id}",
-                'type': template_type,
-                'ceremony': ceremony,
+                'id': f"{ceremony_type}_{template_type}_{template_id}",
+                'template_type': template_type,
+                'ceremony': ceremony_type,
                 'path': "",  # No actual file
                 'url': f"/static/placeholder_{template_type}.jpg"  # This would be a placeholder image
             })
@@ -836,7 +864,7 @@ def get_templates():
     
     return jsonify({
         'success': True,
-        'ceremony': ceremony,
+        'ceremony': ceremony_type,
         'templates': templates
     })
 

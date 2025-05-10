@@ -425,7 +425,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Template preview functionality
-    const refreshTemplatesBtn = document.getElementById('refreshTemplatesBtn');
     
     // Function to load templates for a specific ceremony type
     function loadTemplates(ceremonyType) {
@@ -440,7 +439,7 @@ document.addEventListener('DOMContentLoaded', function() {
         templateContainer.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div></div>';
         
         // Fetch templates for this ceremony type
-        fetch(`/get-templates?ceremony_type=${ceremonyType}`)
+        fetch(`/api/templates?ceremony_type=${ceremonyType}`)
             .then(response => response.json())
             .then(data => {
                 if (data.templates && data.templates.length > 0) {
@@ -476,10 +475,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         selectBtn.textContent = 'Select';
                         selectBtn.onclick = function() {
                             // Auto-select the corresponding ceremony type and template type in the form
-                            document.getElementById(ceremonyType).checked = true;
+                            const bridalStyleRadio = document.getElementById(ceremonyType);
+                            if (bridalStyleRadio) {
+                                bridalStyleRadio.checked = true;
+                            }
+                            
                             const templateType = template.template_type || 'natural';
-                            if (document.getElementById(templateType)) {
-                                document.getElementById(templateType).checked = true;
+                            const templateTypeRadio = document.getElementById(templateType);
+                            if (templateTypeRadio) {
+                                templateTypeRadio.checked = true;
                             }
                             
                             // Visual indication of selection
@@ -516,21 +520,27 @@ document.addEventListener('DOMContentLoaded', function() {
         ceremonyTypes.forEach(type => loadTemplates(type));
     }
     
-    // Refresh button functionality
-    refreshTemplatesBtn.addEventListener('click', loadAllTemplates);
-    
-    // Load templates when page loads
-    loadAllTemplates();
-    
-    // Also update template display when radio buttons change
-    document.querySelectorAll('input[name="bridalStyle"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            const selectedStyle = this.value;
-            // Show the corresponding tab
-            const tab = document.getElementById(`${selectedStyle}-tab`);
-            if (tab) {
-                new bootstrap.Tab(tab).show();
-            }
+    // Initialize template loading on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get refresh button after DOM is loaded
+        const refreshTemplatesBtn = document.getElementById('refreshTemplatesBtn');
+        if (refreshTemplatesBtn) {
+            refreshTemplatesBtn.addEventListener('click', loadAllTemplates);
+        }
+        
+        // Load templates when page loads
+        loadAllTemplates();
+        
+        // Also update template display when radio buttons change
+        document.querySelectorAll('input[name="bridalStyle"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const selectedStyle = this.value;
+                // Show the corresponding tab
+                const tab = document.getElementById(`${selectedStyle}-tab`);
+                if (tab) {
+                    new bootstrap.Tab(tab).show();
+                }
+            });
         });
     });
 });

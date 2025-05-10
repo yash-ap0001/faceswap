@@ -352,6 +352,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Refresh the templates for this ceremony type
                 refreshTemplatesAfterUpload(ceremonyType);
+                
+                // Store flag in localStorage to trigger refresh on bridal_swap page
+                localStorage.setItem('refreshTemplates', 'true');
+                localStorage.setItem('lastUpdatedCeremony', ceremonyType);
+                localStorage.setItem('lastUpdatedTime', new Date().getTime());
             } else {
                 statusMessage.textContent = 'Error: ' + (data.error || 'Unknown error occurred');
                 statusMessage.className = 'alert alert-danger';
