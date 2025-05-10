@@ -576,6 +576,11 @@ def event_managers():
 @app.route('/bridal-swap', methods=['GET', 'POST'])
 def bridal_swap():
     if request.method == 'GET':
+        # Check for template parameters
+        style = request.args.get('style', None)
+        if style:
+            # Show the multi-template page when a specific style is provided
+            return render_template('bridal_multi_swap.html')
         return render_template('bridal_swap.html')
     
     if faceapp is None or swapper is None:
@@ -628,7 +633,8 @@ def bridal_swap():
         result_img = swapper.get(target_img, target_faces[0], source_faces[0])
         
         # Save result
-        output_filename = f'bridal_{selected_style}_{template_type}_{secure_filename(source_file.filename)}'
+        timestamp = int(time.time())
+        output_filename = f'bridal_{selected_style}_{template_type}_{timestamp}_{secure_filename(source_file.filename)}'
         output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
         cv2.imwrite(output_path, result_img)
         
@@ -649,6 +655,73 @@ def bridal_swap():
         if 'source_path' in locals() and os.path.exists(source_path):
             os.remove(source_path)
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/templates', methods=['GET'])
+def get_templates():
+    """
+    API endpoint to get available templates for a specific ceremony type.
+    Returns templates for the requested ceremony with URLs for display.
+    """
+    ceremony = request.args.get('ceremony', 'wedding')
+    
+    # Validate ceremony name
+    valid_ceremonies = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
+    if ceremony not in valid_ceremonies:
+        return jsonify({'error': f'Invalid ceremony type: {ceremony}'}), 400
+    
+    # Get templates directory
+    template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
+    
+    # Define template types to search for
+    template_types = ['real', 'natural', 'ai']
+    
+    # Find available templates
+    templates = []
+    template_id = 1
+    
+    for template_type in template_types:
+        # Check in main directory
+        main_path = os.path.join(template_dir, f"{ceremony}_{template_type}.jpg")
+        if os.path.exists(main_path):
+            templates.append({
+                'id': f"{ceremony}_{template_type}_{template_id}",
+                'type': template_type,
+                'ceremony': ceremony,
+                'path': main_path,
+                'url': f"/uploads/templates/{ceremony}_{template_type}.jpg"
+            })
+            template_id += 1
+            
+        # Check in type subdirectory
+        subdir_path = os.path.join(template_dir, template_type, f"{ceremony}.jpg")
+        if os.path.exists(subdir_path):
+            templates.append({
+                'id': f"{ceremony}_{template_type}_{template_id}",
+                'type': template_type,
+                'ceremony': ceremony,
+                'path': subdir_path,
+                'url': f"/uploads/templates/{template_type}/{ceremony}.jpg"
+            })
+            template_id += 1
+    
+    # If no templates found, create dummy templates for testing
+    if not templates:
+        # For each template type, create a dummy entry
+        for template_type in template_types:
+            templates.append({
+                'id': f"{ceremony}_{template_type}_{template_id}",
+                'type': template_type,
+                'ceremony': ceremony,
+                'path': "",  # No actual file
+                'url': f"/static/placeholder_{template_type}.jpg"  # This would be a placeholder image
+            })
+            template_id += 1
+    
+    return jsonify({
+        'success': True,
+        'ceremony': ceremony,
+        'templates': templates
+    })
 
 def get_bridal_template(style, template_type='natural'):
     """
