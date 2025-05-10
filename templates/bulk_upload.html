@@ -453,16 +453,38 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Auto-refresh templates after successful upload
     function refreshTemplatesAfterUpload(ceremonyType) {
+        // Set a unique timestamp for this update
+        const updateTime = Date.now().toString();
+        localStorage.setItem('updateTimestamp', updateTime);
+        
+        // Set flags for cross-page communication
+        localStorage.setItem('refreshTemplates', 'true');
+        localStorage.setItem('lastUpdatedCeremony', ceremonyType);
+        
+        console.log(`Setting refresh flag for ${ceremonyType} templates with timestamp ${updateTime}`);
+        
         // Small delay to ensure server has processed the images
         setTimeout(() => {
-            loadTemplates(ceremonyType);
-            
-            // Activate the tab for the ceremony type that was just updated
-            const tabToActivate = document.getElementById(`${ceremonyType}-tab`);
-            if (tabToActivate) {
-                const tab = new bootstrap.Tab(tabToActivate);
-                tab.show();
-            }
+            // Use cache-busting for template refresh
+            const timestamp = Date.now();
+            fetch(`/api/templates?ceremony_type=${ceremonyType}&_t=${timestamp}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.templates) {
+                        console.log(`Refreshed ${ceremonyType} templates, found ${data.templates.length} templates`);
+                        loadTemplates(ceremonyType);
+                        
+                        // Activate the tab for the ceremony type that was just updated
+                        const tabToActivate = document.getElementById(`${ceremonyType}-tab`);
+                        if (tabToActivate) {
+                            const tab = new bootstrap.Tab(tabToActivate);
+                            tab.show();
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error refreshing templates:', error);
+                });
         }, 1000);
     }
     

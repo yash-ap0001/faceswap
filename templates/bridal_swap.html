@@ -492,6 +492,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Clear loading state
                     templateContainer.innerHTML = '';
                     
+                    // Display template count
+                    const templateCount = document.createElement('div');
+                    templateCount.className = 'col-12 mb-3';
+                    templateCount.innerHTML = `
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Found ${data.templates.length} templates for ${ceremonyType} ceremony.
+                            <span class="small text-muted ms-2">Last updated: ${new Date().toLocaleTimeString()}</span>
+                        </div>
+                    `;
+                    templateContainer.appendChild(templateCount);
+                    
                     // Add each template
                     data.templates.forEach(template => {
                         const col = document.createElement('div');
@@ -630,6 +642,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Load templates when page loads
         loadAllTemplates();
+        
+        // Set up periodic check for template updates (every 5 seconds)
+        setInterval(checkForTemplateUpdates, 5000);
+        
+        // Do an immediate check for any pending template updates
+        checkForTemplateUpdates();
         
         // Also update template display when radio buttons change
         document.querySelectorAll('input[name="bridalStyle"]').forEach(radio => {
