@@ -1093,18 +1093,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Also update the new process button in the selected templates preview
-        if (processSelectedTemplatesBtn) {
+        // Update the Create Bride Look button based on selection
+        if (swapBtn) {
             const hasSourceImage = sourceInput && sourceInput.files.length > 0;
+            const hasSomeTemplates = count > 0 && count <= 5;
             
-            processSelectedTemplatesBtn.disabled = (count === 0 || count > 5 || !hasSourceImage);
-            
-            if (count > 5) {
-                processSelectedTemplatesBtn.title = 'Please select a maximum of 5 templates';
-            } else if (!hasSourceImage) {
-                processSelectedTemplatesBtn.title = 'Please upload your photo first';
+            // If we have selected templates, the Create Bride Look button will use those
+            // otherwise, it will use the single template method
+            if (hasSomeTemplates && hasSourceImage) {
+                swapBtn.innerHTML = `<i class="fas fa-magic me-1"></i> Create Bride Look (${count} templates)`;
+                // Ensure the button is enabled when we have both source image and selected templates
+                swapBtn.disabled = false;
             } else {
-                processSelectedTemplatesBtn.title = '';
+                swapBtn.innerHTML = `<i class="fas fa-magic me-1"></i> Create Bride Look`;
+                // Button will be enabled/disabled based on single template selection in the original flow
+            }
+            
+            // Set a title on the button to explain limitations
+            if (count > 5) {
+                swapBtn.title = 'Please select a maximum of 5 templates';
+            } else if (!hasSourceImage) {
+                swapBtn.title = 'Please upload your photo first';
+            } else {
+                swapBtn.title = '';
             }
         }
         
