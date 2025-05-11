@@ -830,10 +830,13 @@ def multi_face_swap():
         session['source_path'] = source_path
         session['template_paths'] = template_paths
         
+        # Create a unique session ID for tracking this process
+        session_id = str(uuid.uuid4())
+        
         # Redirect to results page
         return jsonify({
             'success': True, 
-            'redirect_url': '/bridal_results',
+            'session_id': session_id,
             'message': f'Processing {len(template_paths)} templates'
         })
         
