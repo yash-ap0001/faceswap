@@ -263,21 +263,29 @@
         width: 100%;
     }
     
-    .template-select-btn {
-        opacity: 0.7;
+    .template-actions {
+        opacity: 0.8;
         transition: all 0.3s ease;
         z-index: 20;
-        height: 32px;
+    }
+    
+    .template-card:hover .template-actions {
+        opacity: 1;
+    }
+    
+    .single-swap-btn, .template-select-btn {
         width: 32px;
+        height: 32px;
         padding: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         border-radius: 50%;
+        transition: all 0.2s ease;
     }
     
-    .template-card:hover .template-select-btn {
-        opacity: 1;
+    .single-swap-btn:hover, .template-select-btn:hover {
+        transform: scale(1.1);
     }
     
     /* Icon buttons */
@@ -604,12 +612,22 @@
                                     </span>
                                 </div>
                                 
-                                <!-- Multi-selection button (always visible for quick selection) -->
-                                <button class="btn btn-sm btn-primary position-absolute top-0 end-0 m-2 template-select-btn"
-                                        data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" title="Add to selection"
-                                        onclick="toggleTemplateSelection(event, '{{ template.url }}', '{{ ceremony }}')">
-                                    <i class="fas fa-plus"></i>
-                                </button>
+                                <!-- Controls overlay with action buttons -->
+                                <div class="position-absolute top-0 end-0 p-2 template-actions d-flex gap-2">
+                                    <!-- Single swap button -->
+                                    <button class="btn btn-sm btn-icon btn-primary single-swap-btn"
+                                            data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" title="Single swap"
+                                            onclick="prepareSingleSwap(event, '{{ template.url }}', '{{ ceremony }}')">
+                                        <i class="fas fa-user"></i>
+                                    </button>
+
+                                    <!-- Multi-selection button -->
+                                    <button class="btn btn-sm btn-icon btn-outline-primary template-select-btn"
+                                            data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" title="Add to multi-selection"
+                                            onclick="toggleTemplateSelection(event, '{{ template.url }}', '{{ ceremony }}')">
+                                        <i class="fas fa-users"></i>
+                                    </button>
+                                </div>
                                 
                                 <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" style="cursor: pointer;" onclick="showFullsizePreview('{{ template.url }}', '{{ ceremony }}')">
                                 
@@ -1004,16 +1022,16 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('DOMContentLoaded', function() {
         initializeCarouselsCollapsed();
         
-        // Initialize multi-selection variables
+        // Initialize global variables for multi-selection
         window.selectedTemplates = [];
-        const multiSelectionInterface = document.getElementById('multiSelectionInterface');
-        const selectedCount = document.getElementById('selectedCount');
-        const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
-        const processMultipleBtn = document.getElementById('processMultipleBtn');
-        const clearSelectionBtn = document.getElementById('clearSelectionBtn');
-        const multiSourceInput = document.getElementById('multiSourceInput');
-        const multiSourcePreview = document.getElementById('multiSourcePreview');
-        const multiSourcePlaceholder = document.getElementById('multiSourcePlaceholder');
+        window.multiSelectionInterface = document.getElementById('multiSelectionInterface');
+        window.selectedCount = document.getElementById('selectedCount');
+        window.selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
+        window.processMultipleBtn = document.getElementById('processMultipleBtn');
+        window.clearSelectionBtn = document.getElementById('clearSelectionBtn');
+        window.multiSourceInput = document.getElementById('multiSourceInput');
+        window.multiSourcePreview = document.getElementById('multiSourcePreview');
+        window.multiSourcePlaceholder = document.getElementById('multiSourcePlaceholder');
         
         // Clear selection button
         if (clearSelectionBtn) {
@@ -1660,10 +1678,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 previewCol.innerHTML = `
                     <div class="position-relative">
                         <img src="${template.path}" class="img-thumbnail" alt="Selected template ${index+1}" style="height: 100px; object-fit: cover;">
-                        <button class="btn btn-sm btn-danger position-absolute top-0 end-0 remove-template-btn" 
+                        <button class="btn btn-sm btn-icon btn-danger position-absolute top-0 end-0 m-1 remove-template-btn" 
                                 data-index="${index}">
                             <i class="fas fa-times"></i>
                         </button>
+                        <div class="text-center small mt-1">${template.ceremony.charAt(0).toUpperCase() + template.ceremony.slice(1)}</div>
                     </div>
                 `;
                 selectedTemplatesPreview.appendChild(previewCol);
@@ -1673,12 +1692,18 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.remove-template-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const index = parseInt(this.getAttribute('data-index'));
-                    removeTemplateByIndex(index);
+                    if (index >= 0 && index < selectedTemplates.length) {
+                        removeTemplateFromSelection(selectedTemplates[index].path);
+                    }
                 });
             });
             
             // Enable/disable process button based on source image
-            processMultipleBtn.disabled = !multiSourceFile;
+            if (multiSourceInput && multiSourceInput.files && multiSourceInput.files[0]) {
+                processMultipleBtn.disabled = false;
+            } else {
+                processMultipleBtn.disabled = true;
+            }
         } else {
             multiSelectionInterface.classList.add('d-none');
         }
@@ -1845,6 +1870,167 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update the interface
         updateSelectionInterface();
+    }
+    
+    // Handle single template face swap
+    function prepareSingleSwap(event, templatePath, ceremonyType) {
+        // Prevent the click from triggering the parent's click event (image preview)
+        event.stopPropagation();
+        
+        // Create the single swap modal if it doesn't exist
+        if (!document.getElementById('singleSwapModal')) {
+            createSingleSwapModal();
+        }
+        
+        // Set the template information
+        document.getElementById('single-swap-template-preview').src = templatePath;
+        document.getElementById('single-swap-ceremony-type').textContent = ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1);
+        document.getElementById('single-swap-template-path').value = templatePath;
+        document.getElementById('single-swap-ceremony').value = ceremonyType;
+        
+        // Clear previous source image
+        document.getElementById('singleSourcePreview').classList.add('d-none');
+        document.getElementById('singleSourcePlaceholder').classList.remove('d-none');
+        document.getElementById('singleSourceInput').value = '';
+        
+        // Show the modal
+        const singleSwapModal = new bootstrap.Modal(document.getElementById('singleSwapModal'));
+        singleSwapModal.show();
+    }
+    
+    // Create the single swap modal dynamically
+    function createSingleSwapModal() {
+        const modalHtml = `
+        <div class="modal fade" id="singleSwapModal" tabindex="-1" aria-labelledby="singleSwapModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content bg-dark">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="singleSwapModalLabel">Single Face Swap</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <div class="card bg-secondary">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Your Photo</h6>
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <div class="mb-3">
+                                            <input type="file" class="form-control" id="singleSourceInput" accept=".jpg,.jpeg,.png">
+                                        </div>
+                                        <div class="image-preview-container" style="height: 200px; overflow: hidden;">
+                                            <img id="singleSourcePreview" class="img-fluid d-none" alt="Your photo preview" style="max-height: 200px;">
+                                            <div id="singleSourcePlaceholder" class="text-center p-4">
+                                                <i class="fas fa-user-circle" style="font-size: 4rem; opacity: 0.5;"></i>
+                                                <p class="text-muted">Upload your photo</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-secondary">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Template: <span id="single-swap-ceremony-type"></span></h6>
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <img id="single-swap-template-preview" class="img-fluid" style="max-height: 240px;" alt="Template preview">
+                                        <input type="hidden" id="single-swap-template-path">
+                                        <input type="hidden" id="single-swap-ceremony">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="processSingleBtn" disabled>
+                            <i class="fas fa-magic me-2"></i> Create Face Swap
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+        
+        // Append modal to body
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Setup event listeners
+        const singleSourceInput = document.getElementById('singleSourceInput');
+        const singleSourcePreview = document.getElementById('singleSourcePreview');
+        const singleSourcePlaceholder = document.getElementById('singleSourcePlaceholder');
+        const processSingleBtn = document.getElementById('processSingleBtn');
+        
+        // Source image preview for single swap
+        singleSourceInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    singleSourcePreview.src = e.target.result;
+                    singleSourcePreview.classList.remove('d-none');
+                    singleSourcePlaceholder.classList.add('d-none');
+                    processSingleBtn.disabled = false;
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+        
+        // Process single template
+        processSingleBtn.addEventListener('click', function() {
+            if (!singleSourceInput.files || !singleSourceInput.files[0]) {
+                showError('Please upload your source image first.');
+                return;
+            }
+            
+            processSingleTemplate();
+        });
+    }
+    
+    // Process a single template with the source face
+    function processSingleTemplate() {
+        // Get elements
+        const processSingleBtn = document.getElementById('processSingleBtn');
+        const singleSourceInput = document.getElementById('singleSourceInput');
+        const templatePath = document.getElementById('single-swap-template-path').value;
+        const ceremony = document.getElementById('single-swap-ceremony').value;
+        
+        // Show loading spinner
+        const originalText = processSingleBtn.innerHTML;
+        processSingleBtn.disabled = true;
+        processSingleBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('source', singleSourceInput.files[0]);
+        formData.append('style', ceremony);
+        formData.append('template_path', templatePath);
+        
+        // Send AJAX request
+        fetch('/bridal-swap', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            processSingleBtn.innerHTML = originalText;
+            processSingleBtn.disabled = false;
+            
+            if (data.success) {
+                // Hide the modal
+                bootstrap.Modal.getInstance(document.getElementById('singleSwapModal')).hide();
+                
+                // Show the result in a new window or redirect to result page
+                window.open(data.result_image, '_blank');
+            } else {
+                showError(data.error || 'Failed to process image');
+            }
+        })
+        .catch(error => {
+            processSingleBtn.innerHTML = originalText;
+            processSingleBtn.disabled = false;
+            showError('An error occurred: ' + error.message);
+        });
     }
     
     // Process multiple templates with the same source face
