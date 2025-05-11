@@ -792,19 +792,37 @@ document.addEventListener('DOMContentLoaded', function() {
             // Find the associated ceremony
             const ceremony = carouselId.replace('-carousel', '');
             
-            // Find the associated "Show All" button and trigger it if it's not expanded
+            // Get the scroll container for this ceremony
+            const cardsContainer = document.getElementById(`${ceremony}-cards`);
+            
+            if (!cardsContainer) {
+                console.error(`Could not find cards container for ${ceremony}`);
+                return;
+            }
+            
+            // First make sure the row is expanded
             const toggleButton = document.querySelector(`button.toggle-row-btn[data-target="${ceremony}-row"]`);
             
-            if (toggleButton) {
-                // Only toggle if not already expanded
-                if (!toggleButton.classList.contains('expanded')) {
-                    console.log(`Expanding section for ${ceremony}`);
-                    toggleButton.click();
-                } else {
-                    console.log(`Section for ${ceremony} is already expanded`);
-                }
+            if (toggleButton && !toggleButton.classList.contains('expanded')) {
+                toggleButton.click();
+            }
+            
+            // Calculate scroll amount (approximately 1 card width)
+            const cardWidth = 280; // Approximate width of a card plus margin
+            
+            // Get the scrollable parent
+            const scrollableParent = cardsContainer.closest('.template-row');
+            
+            if (!scrollableParent) {
+                console.error('Could not find scrollable parent');
+                return;
+            }
+            
+            // Determine scroll direction
+            if (this.classList.contains('prev-btn')) {
+                scrollableParent.scrollBy({ left: -cardWidth * 2, behavior: 'smooth' });
             } else {
-                console.error(`Could not find toggle button for ${ceremony}`);
+                scrollableParent.scrollBy({ left: cardWidth * 2, behavior: 'smooth' });
             }
         });
     });
