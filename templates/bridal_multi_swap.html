@@ -504,21 +504,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     const templateCard = document.createElement('div');
                     templateCard.className = 'template-card';
                     templateCard.dataset.ceremony = ceremony;
-                    templateCard.dataset.type = template.type;
+                    // No longer tracking template type since we only use Pinterest templates
                     templateCard.dataset.path = template.path;
                     
                     templateCard.innerHTML = `
                         <div class="template-img-container">
-                            <img src="${template.url}" class="template-img" alt="${capitalize(ceremony)} ${capitalize(template.type)} Template">
-                            <div class="template-badge">${capitalize(template.type)}</div>
+                            <img src="${template.url}" class="template-img" alt="${capitalize(ceremony)} Template">
+                            <!-- Template badge removed - no need to show template type -->
                         </div>
                         <div class="template-info">
                             <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0">${capitalize(ceremony)} ${capitalize(template.type)}</h6>
+                                <h6 class="mb-0">${capitalize(ceremony)} Template</h6>
                                 <div class="form-check">
                                     <input class="form-check-input template-checkbox" type="checkbox" 
                                            value="${template.id}" id="template-${template.id}"
-                                           data-ceremony="${ceremony}" data-type="${template.type}">
+                                           data-ceremony="${ceremony}">
                                 </div>
                             </div>
                         </div>
