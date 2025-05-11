@@ -1765,32 +1765,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Toggle template selection
     // Template selection function removed as requested
     
-    // Clear all selected templates
-    function clearTemplateSelection() {
-        // Remove selected class from all cards
-        document.querySelectorAll('.bridal-card.selected').forEach(card => {
-            card.classList.remove('selected');
-            
-            // Hide selection badge
-            const badge = card.querySelector('.select-badge');
-            if (badge) badge.classList.add('d-none');
-            
-            // Reset selection button if it exists
-            const selectBtn = card.querySelector('.template-select-btn');
-            if (selectBtn) {
-                selectBtn.classList.remove('btn-success');
-                selectBtn.classList.add('btn-primary');
-                selectBtn.innerHTML = '<i class="fas fa-plus"></i>';
-                selectBtn.title = "Add to selection";
-            }
-        });
-        
-        // Clear the array
-        selectedTemplates.length = 0;
-        
-        // Update the interface
-        updateSelectionInterface();
-    }
+    // Template selection clearing function removed as requested
     
     // Process multiple templates with the same source face
     function processMultipleTemplates() {
