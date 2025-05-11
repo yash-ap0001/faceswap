@@ -1271,6 +1271,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 console.log(`Added template ${index}: path=${template.path}, ceremony=${ceremonyType}`);
             });
+        } catch (error) {
+            console.error('Error while processing template data:', error);
+            showError('An error occurred while processing template data. Please try again.');
+            if (loadingContainer) loadingContainer.classList.add('d-none');
+            return;
+        }
         
         // Send AJAX request - use the Create Bride Look endpoint with multi=true flag
         formData.append('multi', 'true'); // Add flag to tell the endpoint this is a multi-template request
