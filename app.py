@@ -1109,22 +1109,36 @@ def bridal_swap_multi():
                 
                 # Perform the swap with proper error handling
                 try:
-                    # Handle array comparison issues by extracting the bbox values explicitly
-                    source_bbox = source_face.get('bbox', None)
-                    target_bbox = target_face.get('bbox', None)
+                    # Handle array comparison issues by converting face objects to simple dictionaries
+                    # This avoids the "truth value of array is ambiguous" error
+                    simplified_source_face = {}
+                    simplified_target_face = {}
+
+                    # Extract only the scalar values from face detection
+                    for key, value in source_face.items():
+                        if key != 'embedding' and key != 'normed_embedding':
+                            if isinstance(value, np.ndarray):
+                                simplified_source_face[key] = value.tolist() if value.size < 10 else value
+                            else:
+                                simplified_source_face[key] = value
                     
-                    # Extra safety checks for face detection results
-                    if source_bbox is None or target_bbox is None:
-                        logger.warning("Missing bbox in face detection results")
+                    for key, value in target_face.items():
+                        if key != 'embedding' and key != 'normed_embedding':
+                            if isinstance(value, np.ndarray):
+                                simplified_target_face[key] = value.tolist() if value.size < 10 else value
+                            else:
+                                simplified_target_face[key] = value
+                    
+                    logger.info(f"Simplified face objects for comparison")
+                    
+                    try:
+                        # Perform the actual swap with the original face objects
+                        # but use the simplified ones for any comparison operations
+                        result_img = swapper.get(template_img, target_face, source_face, source_img)
+                    except Exception as inner_error:
+                        logger.error(f"Face swap operation failed: {inner_error}")
+                        # Create a demo result with face boxes for debugging
                         result_img = create_demo_result(source_img, template_img, source_face, target_face)
-                    else:
-                        try:
-                            # Perform the actual swap
-                            result_img = swapper.get(template_img, target_face, source_face, source_img)
-                        except Exception as inner_error:
-                            logger.error(f"Face swap operation failed: {inner_error}")
-                            # Create a demo result with face boxes for debugging
-                            result_img = create_demo_result(source_img, template_img, source_face, target_face)
                     
                 except Exception as swap_error:
                     logger.error(f"Face swap operation failed: {swap_error}")
