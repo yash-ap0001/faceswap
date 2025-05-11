@@ -169,7 +169,9 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         transition: all 0.2s ease;
         flex: 0 0 auto;
-        width: 350px;
+        width: 250px;
+        min-width: 250px;
+        max-width: 250px;
     }
     
     .selected-template-card:hover {
@@ -179,7 +181,9 @@
     }
     
     .selected-template-img {
-        height: 350px;
+        height: 300px;
+        min-height: 300px;
+        max-height: 300px;
         object-fit: cover;
         width: 100%;
     }
@@ -502,7 +506,7 @@
                         </div>
                         <div class="card-body bg-dark p-3">
                             <div class="templates-scroll-container">
-                                <div class="d-flex flex-nowrap gap-3" id="selectedTemplatesThumbnails">
+                                <div class="d-flex flex-nowrap overflow-auto" id="selectedTemplatesThumbnails" style="gap: 15px;">
                                     <!-- Selected template thumbnails will be added here dynamically -->
                                 </div>
                             </div>
@@ -970,6 +974,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (count > 0) {
             selectedTemplatesPreview.classList.remove('d-none');
             
+            // Empty the entire container and rebuild it
+            thumbnailsContainer.innerHTML = '';
+            
             // Create thumbnails for each selected template
             selectedCheckboxes.forEach((checkbox, index) => {
                 const card = checkbox.closest('.template-card');
@@ -981,12 +988,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const img = card.querySelector('img');
                 const imageUrl = img ? img.src : '';
                 
-                // Check if this template is already in the preview
-                const existingCard = Array.from(thumbnailsContainer.children)
-                    .find(el => el.querySelector('img')?.src === imageUrl);
-                if (existingCard) return; // Skip if already shown
-                
-                // Create template card directly (no column needed)
+                // Create template card
                 const cardDiv = document.createElement('div');
                 cardDiv.className = 'selected-template-card animate__animated animate__fadeIn';
                 
@@ -1009,12 +1011,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     checkbox.checked = false;
                     card.classList.remove('selected');
                     
-                    // Update preview with animation
-                    cardDiv.classList.remove('animate__fadeIn');
-                    cardDiv.classList.add('animate__fadeOut');
-                    setTimeout(() => {
-                        updateSelectedCount();
-                    }, 300);
+                    // Remove the card entirely
+                    cardDiv.remove();
+                    
+                    // Update the count
+                    updateSelectedCount();
                 });
                 
                 // Add the card to the container
