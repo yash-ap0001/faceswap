@@ -431,6 +431,14 @@
                             <i class="fas fa-magic me-2"></i>Create Bridal Look
                         </button>
                     </div>
+                    
+                    <!-- Selected templates preview row with fixed height -->
+                    <div id="selected-templates-row" class="mt-4 mb-3 d-none">
+                        <h5 class="mb-3 text-center">Selected Templates</h5>
+                        <div class="d-flex overflow-auto position-relative" style="height: 200px; gap: 15px;">
+                            <!-- Selected templates will be shown here -->
+                        </div>
+                    </div>
                 </form>
 
                 <!-- Single Template Result -->
@@ -492,9 +500,9 @@
                     <button id="toggleSelectionModeBtn" class="btn btn-outline-light btn-sm me-2">
                         <i class="fas fa-check-square"></i> Multi-Select
                     </button>
-                    <button id="processSelectedBtn" class="btn btn-primary btn-sm me-2 d-none">
-                        <i class="fas fa-magic"></i> Process Selected (<span id="selectedCount">0</span>)
-                    </button>
+                    <span id="selectionCountBadge" class="badge bg-primary me-2 d-none">
+                        <span id="selectedCount">0</span> selected
+                    </span>
                     <button id="refreshTemplatesBtn" class="btn btn-outline-light btn-sm">
                         <i class="fas fa-sync-alt"></i> Refresh
                     </button>
@@ -518,12 +526,9 @@
                                 </div>
                             </div>
                             
-                            <!-- Process Button -->
+                            <!-- Template count message -->
                             <div class="mt-3 text-center">
-                                <button id="processSelectedTemplatesBtn" class="btn btn-primary btn-lg" disabled>
-                                    <i class="fas fa-wand-magic-sparkles me-2"></i> Process Selected Templates
-                                </button>
-                                <div class="text-muted mt-2 small">Select at least 1 template and upload your photo to process</div>
+                                <div class="text-muted mt-2 small">Select up to 5 templates and use the "Create Bridal Look" button above</div>
                             </div>
                         </div>
                     </div>
@@ -890,8 +895,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Multi-template selection functionality
     const toggleSelectionModeBtn = document.getElementById('toggleSelectionModeBtn');
-    const processSelectedBtn = document.getElementById('processSelectedBtn');
+    const selectionCountBadge = document.getElementById('selectionCountBadge');
     const selectedCount = document.getElementById('selectedCount');
+    const selectedTemplatesRow = document.getElementById('selected-templates-row');
     let isSelectionMode = false;
     
     if (toggleSelectionModeBtn) {
@@ -899,16 +905,13 @@ document.addEventListener('DOMContentLoaded', function() {
             isSelectionMode = !isSelectionMode;
             document.body.classList.toggle('template-selection-mode', isSelectionMode);
             
-            const selectionCountWrapper = document.getElementById('selectionCountWrapper');
-            
             if (isSelectionMode) {
                 // Entering selection mode
                 console.log('Entering template selection mode');
                 toggleSelectionModeBtn.innerHTML = '<i class="fas fa-times"></i> Cancel Selection';
                 toggleSelectionModeBtn.classList.remove('btn-outline-light');
                 toggleSelectionModeBtn.classList.add('btn-outline-danger');
-                processSelectedBtn.classList.remove('d-none');
-                if (selectionCountWrapper) selectionCountWrapper.classList.remove('d-none');
+                selectionCountBadge.classList.remove('d-none');
                 
                 // Start with no templates selected by default when entering selection mode
                 document.querySelectorAll('.template-checkbox').forEach(checkbox => {
@@ -921,15 +924,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateSelectedCount();
                 
                 // Show a message to guide the user
-                showMessage('Select up to 5 templates from any ceremony and click "Process Selected Templates"');
+                showMessage('Select up to 5 templates and use the "Create Bridal Look" button');
             } else {
                 // Exiting selection mode
                 console.log('Exiting template selection mode');
                 toggleSelectionModeBtn.innerHTML = '<i class="fas fa-check-square"></i> Multi-Select';
                 toggleSelectionModeBtn.classList.add('btn-outline-light');
                 toggleSelectionModeBtn.classList.remove('btn-outline-danger');
-                processSelectedBtn.classList.add('d-none');
-                if (selectionCountWrapper) selectionCountWrapper.classList.add('d-none');
+                selectionCountBadge.classList.add('d-none');
+                
+                // Hide the selected templates row
+                if (selectedTemplatesRow) {
+                    selectedTemplatesRow.classList.add('d-none');
+                }
                 
                 // Hide the thumbnails preview when exiting selection mode
                 const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
