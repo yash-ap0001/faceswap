@@ -867,12 +867,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showError(message) {
-        errorMessage.textContent = message;
-        errorContainer.classList.remove('d-none');
-        window.scrollTo({
-            top: errorContainer.offsetTop,
-            behavior: 'smooth'
-        });
+        console.error('Error:', message);
+        
+        // Get error elements
+        const errorContainer = document.getElementById('error-container');
+        const errorMessage = document.getElementById('error-message');
+        
+        // Update error message if element exists
+        if (errorMessage) errorMessage.textContent = message;
+        
+        // Show error container if it exists
+        if (errorContainer) errorContainer.classList.remove('d-none');
+        
+        // Scroll to error container if it exists
+        if (errorContainer) {
+            window.scrollTo({
+                top: errorContainer.offsetTop,
+                behavior: 'smooth'
+            });
+        }
     }
     
     // Multi-template selection functionality
@@ -1238,13 +1251,27 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to display multiple results
     function displayMultiResults(results, selectedTemplates) {
-        const multiResultsContainer = document.getElementById('multi-results-container');
-        const multiResultsGrid = multiResultsContainer.querySelector('.multi-results-container');
+        console.log('Display multi results called with:', results?.length || 0, 'results');
         
-        if (!multiResultsContainer || !multiResultsGrid) {
+        const multiResultsContainer = document.getElementById('multi-results-container');
+        
+        // Make sure the container exists
+        if (!multiResultsContainer) {
             console.error('Multi-results container not found');
+            showError('Unable to display results - container not found');
             return;
         }
+        
+        // Find the grid within the container
+        const multiResultsGrid = multiResultsContainer.querySelector('.multi-results-container');
+        
+        if (!multiResultsGrid) {
+            console.error('Multi-results grid not found');
+            showError('Unable to display results - grid not found');
+            return;
+        }
+        
+        console.log('Found multi-results containers, processing results...');
         
         // Add new results to our global array
         results.forEach((result, index) => {
