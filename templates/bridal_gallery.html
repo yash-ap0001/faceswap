@@ -329,10 +329,11 @@
     .template-select-overlay {
         position: absolute;
         top: 0;
-        right: 0;
-        width: auto;
-        height: auto;
-        z-index: 10;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 5;
         display: flex;
         align-items: flex-start;
         justify-content: flex-end;
@@ -347,13 +348,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    }
-    
-    .form-check-input:checked {
-        background-color: var(--primary-purple);
-        border-color: var(--primary-purple);
     }
     
     .template-checkbox {
@@ -477,43 +471,13 @@
         </div>
     </div>
 
-    <!-- Selection Mode Card -->
+    <!-- Settings Bar -->
     <div class="card mb-4 shadow">
-        <div class="card-header bg-dark">
-            <h5 class="mb-0">Selection Mode</h5>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <!-- Mode Selection -->
-                    <div class="btn-group w-100 mb-3" role="group" aria-label="Selection mode">
-                        <input type="radio" class="btn-check" name="selection-mode" id="single-mode" autocomplete="off" checked>
-                        <label class="btn btn-outline-primary" for="single-mode">
-                            <i class="fas fa-user me-2"></i>Single Template Mode
-                        </label>
-                        
-                        <input type="radio" class="btn-check" name="selection-mode" id="multi-mode" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="multi-mode">
-                            <i class="fas fa-users me-2"></i>Multi-Template Mode
-                        </label>
-                    </div>
-                    
-                    <!-- Mode description -->
-                    <div id="mode-description" class="alert alert-info">
-                        <div id="single-mode-desc">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>Single Template Mode:</strong> Click on any template to create a face swap with just that one image.
-                        </div>
-                        <div id="multi-mode-desc" class="d-none">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>Multi-Template Mode:</strong> Click to select up to 5 templates across different ceremonies, then process them all at once.
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <!-- Ceremony filters -->
-                    <h6 class="mb-2">Show Ceremonies:</h6>
-                    <div class="d-flex flex-wrap gap-2">
+        <div class="card-body p-2">
+            <div class="row align-items-center">
+                <!-- Template type filters removed - Using only Pinterest photos now -->
+                <div class="col-12">
+                    <div class="d-flex gap-2 justify-content-md-end mt-3 mt-md-0">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" id="cat-haldi" value="haldi" checked>
                             <label class="form-check-label" for="cat-haldi">Haldi</label>
@@ -638,19 +602,12 @@
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4" id="{{ ceremony }}-cards">
                 {% if all_templates[ceremony]|length > 0 %}
                     {% for template in all_templates[ceremony] %}
-                        <div class="col template-card mb-4 {% if loop.index0 >= 4 %}extra-card{% endif %}" data-index="{{ loop.index0 }}">
-                            <div class="card shadow-sm bridal-card position-relative" 
-                                data-template-path="{{ template.url }}"
-                                data-ceremony="{{ ceremony }}"
-                                data-style="{{ ceremony }}">
-                                <!-- Selection checkbox -->
-                                <div class="template-select-overlay">
+                        <div class="col template-card mb-4 {% if loop.index0 >= 4 %}extra-card{% endif %}" data-index="{{ loop.index0 }}" data-template-path="{{ template.url }}">
+                            <div class="card shadow-sm bridal-card position-relative" data-style="{{ ceremony }}">
+                                <!-- Selection checkbox (hidden by default) -->
+                                <div class="template-select-overlay d-none">
                                     <div class="form-check">
-                                        <input class="form-check-input template-checkbox" type="checkbox" 
-                                               value="{{ template.url }}" 
-                                               id="check-{{ ceremony }}-{{ loop.index }}"
-                                               data-template-path="{{ template.url }}"
-                                               data-ceremony="{{ ceremony }}">
+                                        <input class="form-check-input template-checkbox" type="checkbox" value="{{ template.url }}" id="check-{{ ceremony }}-{{ loop.index }}">
                                         <label class="form-check-label" for="check-{{ ceremony }}-{{ loop.index }}"></label>
                                     </div>
                                 </div>
@@ -662,16 +619,30 @@
                                     </span>
                                 </div>
                                 
-                                <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" 
-                                    loading="lazy" 
-                                    data-template-path="{{ template.url }}" 
-                                    data-ceremony="{{ ceremony }}" 
-                                    style="cursor: pointer;">
+                                <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" style="cursor: pointer;" onclick="showFullsizePreview('{{ template.url }}', '{{ ceremony }}')">
                                 
-                                <!-- Preview hint on hover -->
-                                <div class="position-absolute bottom-0 left-0 right-0 p-2 text-center preview-hint" 
-                                     style="background: rgba(0,0,0,0.7); opacity: 0;">
-                                    <small class="text-white">Click to select</small>
+                                <!-- Action buttons overlay on hover -->
+                                <div class="position-absolute bottom-0 left-0 right-0 p-2 d-flex justify-content-center template-actions gap-2" style="background: rgba(0,0,0,0.7);">
+                                    <!-- Single swap button -->
+                                    <button class="btn btn-sm btn-primary single-swap-btn"
+                                            data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}"
+                                            onclick="prepareSingleSwap(event, '{{ template.url }}', '{{ ceremony }}')">
+                                        Single Swap
+                                    </button>
+
+                                    <!-- Multi-selection button -->
+                                    <button class="btn btn-sm btn-secondary template-select-btn"
+                                            data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}"
+                                            onclick="toggleTemplateSelection(event, '{{ template.url }}', '{{ ceremony }}')">
+                                        Add to Multi
+                                    </button>
+                                </div>
+                                
+                                <!-- Selected indicator (Hidden by default) -->
+                                <div class="position-absolute top-0 end-0 p-2 d-none select-badge">
+                                    <span class="badge bg-success rounded-pill">
+                                        Selected for Multi-Swap
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -1050,11 +1021,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Call initialization when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
-        console.log("DOM content loaded - initializing template interactions");
         initializeCarouselsCollapsed();
         
-        // Initialize global variables for selection
-        window.currentMode = 'single'; // Default to single template mode
+        // Initialize global variables for multi-selection
         window.selectedTemplates = [];
         window.multiSelectionInterface = document.getElementById('multiSelectionInterface');
         window.selectedCount = document.getElementById('selectedCount');
@@ -1064,91 +1033,6 @@ document.addEventListener('DOMContentLoaded', function() {
         window.multiSourceInput = document.getElementById('multiSourceInput');
         window.multiSourcePreview = document.getElementById('multiSourcePreview');
         window.multiSourcePlaceholder = document.getElementById('multiSourcePlaceholder');
-        
-        // Initialize preview hint for all template cards
-        const previewHints = document.querySelectorAll('.preview-hint');
-        previewHints.forEach(hint => {
-            const card = hint.closest('.card');
-            if (card) {
-                card.addEventListener('mouseenter', () => {
-                    hint.style.opacity = '1';
-                });
-                card.addEventListener('mouseleave', () => {
-                    hint.style.opacity = '0';
-                });
-            }
-        });
-        
-        // Initialize selection modes
-        initializeSelectionModes();
-        
-        // Set up event handlers for checkboxes
-        document.querySelectorAll('.template-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const templatePath = this.getAttribute('data-template-path');
-                const ceremonyType = this.getAttribute('data-ceremony');
-                const card = this.closest('.bridal-card');
-                
-                console.log("Checkbox changed: ", templatePath, ceremonyType, this.checked);
-                
-                if (this.checked) {
-                    // Add to selection
-                    if (window.currentMode === 'multi') {
-                        // Add to multi-selection
-                        const template = {
-                            path: templatePath,
-                            ceremony: ceremonyType
-                        };
-                        addTemplateToSelection(template);
-                        
-                        // Mark the card as selected
-                        if (card) {
-                            card.classList.add('selected');
-                            const badge = card.querySelector('.select-badge');
-                            if (badge) badge.classList.remove('d-none');
-                        }
-                    } else {
-                        // Single template mode - uncheck all other checkboxes
-                        document.querySelectorAll('.template-checkbox').forEach(cb => {
-                            if (cb !== this) {
-                                cb.checked = false;
-                                const otherCard = cb.closest('.bridal-card');
-                                if (otherCard) {
-                                    otherCard.classList.remove('selected');
-                                    const badge = otherCard.querySelector('.select-badge');
-                                    if (badge) badge.classList.add('d-none');
-                                }
-                            }
-                        });
-                        
-                        // Mark this card as selected
-                        if (card) {
-                            card.classList.add('selected');
-                            const badge = card.querySelector('.select-badge');
-                            if (badge) badge.classList.remove('d-none');
-                        }
-                        
-                        // Open the single swap dialog
-                        prepareSingleSwap(event, templatePath, ceremonyType);
-                    }
-                } else {
-                    // Remove from selection
-                    removeTemplateFromSelection(templatePath);
-                    
-                    // Mark the card as not selected
-                    if (card) {
-                        card.classList.remove('selected');
-                        const badge = card.querySelector('.select-badge');
-                        if (badge) badge.classList.add('d-none');
-                    }
-                }
-            });
-        });
-        
-        // Remove all inline onclick handlers from template images
-        document.querySelectorAll('.preview-image').forEach(img => {
-            img.removeAttribute('onclick');
-        });
         
         // Clear selection button
         if (clearSelectionBtn) {
@@ -1707,11 +1591,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function addTemplateToSelection(template) {
         if (selectedTemplates.length >= 5) {
             showError('You can only select up to 5 templates.');
-            
-            // Uncheck the checkbox that was just checked
-            const checkbox = document.querySelector(`.template-checkbox[data-template-path="${template.path}"]`);
-            if (checkbox) checkbox.checked = false;
-            
             return false;
         }
         
@@ -1722,22 +1601,13 @@ document.addEventListener('DOMContentLoaded', function() {
             updateSelectionInterface();
             
             // Find the card and mark it as selected
-            const card = document.querySelector(`.bridal-card[data-template-path="${template.path}"]`);
+            const card = document.querySelector(`.preview-image[data-template-path="${template.path}"]`).closest('.bridal-card');
             if (card) {
                 card.classList.add('selected');
                 
                 // Show selection badge
                 const badge = card.querySelector('.select-badge');
                 if (badge) badge.classList.remove('d-none');
-                
-                // Make sure the checkbox is checked
-                const checkbox = card.querySelector('.template-checkbox');
-                if (checkbox) checkbox.checked = true;
-                
-                // Enable process button if we have a source image
-                if (window.multiSourceInput && window.multiSourceInput.files && window.multiSourceInput.files[0] && window.processMultipleBtn) {
-                    window.processMultipleBtn.disabled = false;
-                }
                 
                 // Update selection button if it exists
                 const selectBtn = card.querySelector('.template-select-btn');
@@ -1766,22 +1636,13 @@ document.addEventListener('DOMContentLoaded', function() {
             updateSelectionInterface();
             
             // Find the card and unmark it
-            const card = document.querySelector(`.bridal-card[data-template-path="${templatePath}"]`);
+            const card = document.querySelector(`.preview-image[data-template-path="${removed.path}"]`).closest('.bridal-card');
             if (card) {
                 card.classList.remove('selected');
                 
                 // Hide selection badge
                 const badge = card.querySelector('.select-badge');
                 if (badge) badge.classList.add('d-none');
-                
-                // Make sure the checkbox is unchecked
-                const checkbox = card.querySelector('.template-checkbox');
-                if (checkbox) checkbox.checked = false;
-                
-                // Disable process button if no templates are selected
-                if (selectedTemplates.length === 0 && window.processMultipleBtn) {
-                    window.processMultipleBtn.disabled = true;
-                }
                 
                 // Update selection button if it exists
                 const selectBtn = card.querySelector('.template-select-btn');
@@ -1995,10 +1856,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const badge = card.querySelector('.select-badge');
             if (badge) badge.classList.add('d-none');
             
-            // Uncheck all checkboxes
-            const checkbox = card.querySelector('.template-checkbox');
-            if (checkbox) checkbox.checked = false;
-            
             // Reset selection button if it exists
             const selectBtn = card.querySelector('.template-select-btn');
             if (selectBtn) {
@@ -2014,58 +1871,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update the interface
         updateSelectionInterface();
-    }
-    
-    // Initialize the selection modes (single/multi)
-    function initializeSelectionModes() {
-        const singleModeRadio = document.getElementById('single-mode');
-        const multiModeRadio = document.getElementById('multi-mode');
-        const singleModeDesc = document.getElementById('single-mode-desc');
-        const multiModeDesc = document.getElementById('multi-mode-desc');
-        
-        if (singleModeRadio && multiModeRadio) {
-            // Single mode selection
-            singleModeRadio.addEventListener('change', function() {
-                if (this.checked) {
-                    window.currentMode = 'single';
-                    if (window.multiSelectionInterface) {
-                        window.multiSelectionInterface.classList.add('d-none');
-                    }
-                    if (singleModeDesc) singleModeDesc.classList.remove('d-none');
-                    if (multiModeDesc) multiModeDesc.classList.add('d-none');
-                    
-                    // Update preview hints
-                    document.querySelectorAll('.preview-hint small').forEach(hint => {
-                        hint.textContent = 'Click to use this template';
-                    });
-                    
-                    // Clear any selections
-                    clearTemplateSelection();
-                }
-            });
-            
-            // Multi mode selection
-            multiModeRadio.addEventListener('change', function() {
-                if (this.checked) {
-                    window.currentMode = 'multi';
-                    if (singleModeDesc) singleModeDesc.classList.add('d-none');
-                    if (multiModeDesc) multiModeDesc.classList.remove('d-none');
-                    
-                    // Update preview hints
-                    document.querySelectorAll('.preview-hint small').forEach(hint => {
-                        hint.textContent = 'Click to select for multi-swap';
-                    });
-                    
-                    // Show multi-selection interface if it exists
-                    if (window.multiSelectionInterface) {
-                        window.multiSelectionInterface.classList.remove('d-none');
-                    }
-                    
-                    // Clear any selections
-                    clearTemplateSelection();
-                }
-            });
-        }
     }
     
     // Handle single template face swap
@@ -2246,8 +2051,8 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('templates[]', template.path);
         });
         
-        // Send AJAX request to multi_face_swap endpoint
-        fetch('/multi_face_swap', {
+        // Send AJAX request to multi-face-swap endpoint
+        fetch('/multi-face-swap', {
             method: 'POST',
             body: formData
         })
@@ -2258,8 +2063,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (data.success) {
                 // Redirect to results page
-                console.log("Processing successful, redirecting to results page");
-                window.location.href = '/bridal_results';
+                window.location.href = '/bridal-results?session=' + data.session_id;
             } else {
                 showError(data.error || 'Failed to process images');
             }
