@@ -1129,33 +1129,73 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedCount.textContent = count;
         }
         
-        // Enable/disable the process buttons based on selection count
-        if (processSelectedBtn) {
-            processSelectedBtn.disabled = (count === 0 || count > 5);
-            
-            if (count > 5) {
-                processSelectedBtn.title = 'Please select a maximum of 5 templates';
+        // Check source image status
+        const hasSourceImage = sourceInput && sourceInput.files && sourceInput.files.length > 0;
+        console.log('Source image status:', hasSourceImage ? 'Image uploaded' : 'No image uploaded');
+        
+        // Process button in main form
+        if (swapBtn) {
+            // Main "Create Bridal Look" button should be enabled when checkboxes are selected
+            // The original logic already handles the template input field for standard mode
+            if (selectedCheckboxes.length > 0) {
+                console.log('Templates selected: Enabling main swap button');
+                swapBtn.classList.add('btn-success');
+                swapBtn.disabled = !hasSourceImage;
             } else {
-                processSelectedBtn.title = '';
+                swapBtn.classList.remove('btn-success');
             }
         }
         
-        // Also update the new process button in the selected templates preview
-        if (processSelectedTemplatesBtn) {
-            const hasSourceImage = sourceInput && sourceInput.files.length > 0;
-            
-            console.log('Updating process button state:', {
+        // Button in template selection card
+        if (processSelectedBtn) {
+            console.log('Updating processSelectedBtn state:', {
                 count: count,
-                hasSourceImage: hasSourceImage,
-                sourceInput: sourceInput ? sourceInput.id : 'not found',
-                files: sourceInput && sourceInput.files ? sourceInput.files.length : 0
+                hasSourceImage: hasSourceImage
             });
             
-            // Make sure the button is enabled when conditions are met
-            processSelectedTemplatesBtn.disabled = (count === 0 || count > 5 || !hasSourceImage);
+            // This button should be enabled only when both conditions are met
+            const shouldEnable = (count > 0 && count <= 5 && hasSourceImage);
+            processSelectedBtn.disabled = !shouldEnable;
             
-            // Add a visual indicator when the button is enabled
-            if (count > 0 && count <= 5 && hasSourceImage) {
+            if (count > 5) {
+                processSelectedBtn.title = 'Please select a maximum of 5 templates';
+            } else if (!hasSourceImage) {
+                processSelectedBtn.title = 'Please upload your photo';
+            } else if (count === 0) {
+                processSelectedBtn.title = 'Please select at least one template';
+            } else {
+                processSelectedBtn.title = 'Click to process selected templates';
+            }
+            
+            // Add visual style when enabled
+            if (shouldEnable) {
+                processSelectedBtn.classList.add('btn-success');
+                processSelectedBtn.classList.remove('btn-primary');
+                
+                // Add a flash animation to draw attention
+                processSelectedBtn.classList.add('btn-flash');
+                setTimeout(() => {
+                    processSelectedBtn.classList.remove('btn-flash');
+                }, 1000);
+            } else {
+                processSelectedBtn.classList.remove('btn-success');
+                processSelectedBtn.classList.add('btn-primary');
+            }
+        }
+        
+        // Button in selected templates preview
+        if (processSelectedTemplatesBtn) {
+            console.log('Updating processSelectedTemplatesBtn state:', {
+                count: count,
+                hasSourceImage: hasSourceImage
+            });
+            
+            // This should mirror the behavior of processSelectedBtn
+            const shouldEnable = (count > 0 && count <= 5 && hasSourceImage);
+            processSelectedTemplatesBtn.disabled = !shouldEnable;
+            
+            // Add visual style when enabled
+            if (shouldEnable) {
                 processSelectedTemplatesBtn.classList.add('btn-success');
                 processSelectedTemplatesBtn.classList.remove('btn-primary');
                 // Add a flash animation to draw attention
