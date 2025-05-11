@@ -812,7 +812,7 @@ def bridal_swap():
     
     source_file = request.files['source']
     selected_style = request.form.get('style', 'haldi')
-    template_type = request.form.get('template_type', 'pinterest')
+    # We'll use Pinterest templates directly instead of other template types
     
     if source_file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
@@ -837,8 +837,8 @@ def bridal_swap():
         if not source_faces:
             return jsonify({'error': 'No face detected in your photo. Please upload a clear photo with your face visible.'}), 400
         
-        # Get the template image for the selected bridal style and template type
-        target_img, target_path = get_bridal_template(selected_style, template_type)
+        # Get the template image directly from Pinterest based on ceremony type
+        target_img, target_path = get_pinterest_template_for_ceremony(selected_style)
         
         if target_img is None:
             return jsonify({'error': 'Failed to load bridal template image'}), 500
@@ -850,12 +850,12 @@ def bridal_swap():
             return jsonify({'error': 'No face detected in template image. Please try a different style.'}), 400
         
         # Perform face swap
-        logger.info(f"Performing face swap with style: {selected_style}, template type: {template_type}")
+        logger.info(f"Performing face swap with style: {selected_style}, using Pinterest template")
         result_img = swapper.get(target_img, target_faces[0], source_faces[0])
         
         # Save result
         timestamp = int(time.time())
-        output_filename = f'bridal_{selected_style}_{template_type}_{timestamp}_{secure_filename(source_file.filename)}'
+        output_filename = f'bridal_{selected_style}_{timestamp}_{secure_filename(source_file.filename)}'
         output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
         cv2.imwrite(output_path, result_img)
         
@@ -865,8 +865,7 @@ def bridal_swap():
         return jsonify({
             'success': True,
             'result_image': output_filename,
-            'style': selected_style,
-            'template_type': template_type
+            'style': selected_style
         })
         
     except Exception as e:
