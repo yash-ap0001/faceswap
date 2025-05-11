@@ -255,15 +255,12 @@
     .template-card img {
         height: 350px;
         object-fit: cover;
+        width: 100%;
     }
     
-    /* Hide cards beyond the first row by default */
-    .expanded-content {
+    /* Template rows after the first one */
+    .template-card.hidden-card {
         display: none;
-    }
-    
-    .ceremony-section.expanded .expanded-content {
-        display: block;
     }
     
     /* Template management styles */
@@ -512,7 +509,7 @@
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4" id="{{ ceremony }}-cards">
                 {% if all_templates[ceremony]|length > 0 %}
                     {% for template in all_templates[ceremony] %}
-                        <div class="col template-card mb-4 {% if loop.index0 >= 4 %}expanded-card{% endif %}" data-index="{{ loop.index0 }}" data-template-path="{{ template.url }}">
+                        <div class="col template-card mb-4 {% if loop.index0 >= 4 %}hidden-card{% endif %}" data-index="{{ loop.index0 }}" data-template-path="{{ template.url }}">
                             <div class="card shadow-sm bridal-card position-relative" data-style="{{ ceremony }}">
                                 <!-- Selection checkbox (hidden by default) -->
                                 <div class="template-select-overlay d-none">
@@ -850,26 +847,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Expand All button functionality
+    // Expand All button functionality with simplified approach
     document.querySelectorAll('.toggle-row-btn').forEach(button => {
         button.addEventListener('click', function() {
             const targetId = this.getAttribute('data-target');
             const ceremony = targetId.replace('-row', '');
             const carousel = document.getElementById(`${ceremony}-carousel`);
-            const expandedCards = carousel.querySelectorAll('.template-card.expanded-card');
+            const hiddenCards = carousel.querySelectorAll('.template-card.hidden-card');
             const icon = this.querySelector('i');
             
             console.log(`Toggle row button clicked for ${ceremony}`);
-            console.log(`Found ${expandedCards.length} expanded cards`);
+            console.log(`Found ${hiddenCards.length} hidden cards`);
             
             // Check current state (expanded or collapsed)
             const isExpanded = this.classList.contains('expanded');
             console.log(`Current state: ${isExpanded ? 'expanded' : 'collapsed'}`);
             
             if (isExpanded) {
-                // Collapse - hide expanded cards
+                // Collapse - hide extra cards
                 console.log('Collapsing to show only first row');
-                expandedCards.forEach(card => {
+                hiddenCards.forEach(card => {
                     card.style.display = 'none';
                 });
                 
@@ -881,9 +878,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon.classList.add('fa-chevron-down');
                 this.setAttribute('title', 'Expand All');
             } else {
-                // Expand - show all expanded cards
+                // Expand - show all cards
                 console.log('Expanding to show all cards');
-                expandedCards.forEach(card => {
+                hiddenCards.forEach(card => {
                     card.style.display = 'block';
                 });
                 
@@ -902,11 +899,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function initializeCarouselsCollapsed() {
         console.log('Initializing all carousels in collapsed state');
         document.querySelectorAll('.template-carousel').forEach(carousel => {
-            // Hide all expanded cards
-            const expandedCards = carousel.querySelectorAll('.template-card.expanded-card');
-            console.log(`Setting initial state for ${carousel.id} with ${expandedCards.length} expanded cards`);
+            // Hide all cards with the hidden-card class
+            const hiddenCards = carousel.querySelectorAll('.template-card.hidden-card');
+            console.log(`Setting initial state for ${carousel.id} with ${hiddenCards.length} hidden cards`);
             
-            expandedCards.forEach(card => {
+            hiddenCards.forEach(card => {
                 card.style.display = 'none';
             });
         });
