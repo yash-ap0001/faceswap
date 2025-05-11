@@ -2,7 +2,7 @@ import os
 import cv2
 import numpy as np
 import time
-from flask import Flask, request, jsonify, render_template, send_from_directory, redirect, url_for
+from flask import Flask, request, jsonify, render_template, send_from_directory, redirect, url_for, session
 import insightface
 from insightface.app import FaceAnalysis
 from insightface.model_zoo import get_model
@@ -791,6 +791,131 @@ def bridal_multi_swap():
     """Show the multi-template swap page."""
     ceremony = request.args.get('ceremony', 'wedding')
     return render_template('bridal_multi_swap.html', selected_ceremony=ceremony)
+
+@app.route('/multi_face_swap', methods=['POST'])
+def multi_face_swap():
+    """
+    Process multiple templates with the same source face.
+    Expects:
+    - source: uploaded image file
+    - templates[]: array of template paths
+    Returns:
+    - JSON with results or error message
+    """
+    if faceapp is None or swapper is None:
+        return jsonify({'success': False, 'error': 'Models not loaded. Please check server logs.'}), 500
+        
+    if 'source' not in request.files:
+        return jsonify({'success': False, 'error': 'No source image provided'})
+    
+    source_file = request.files['source']
+    if source_file.filename == '':
+        return jsonify({'success': False, 'error': 'No source image selected'})
+    
+    if not allowed_file(source_file.filename):
+        return jsonify({'success': False, 'error': 'Invalid file format'})
+    
+    # Get template paths from the form
+    template_paths = request.form.getlist('templates[]')
+    if not template_paths:
+        return jsonify({'success': False, 'error': 'No templates selected'})
+    
+    try:
+        # Save the source image
+        source_filename = secure_filename(source_file.filename)
+        source_path = os.path.join(app.config['UPLOAD_FOLDER'], source_filename)
+        source_file.save(source_path)
+        
+        # Store paths in session for the results page
+        session['source_path'] = source_path
+        session['template_paths'] = template_paths
+        
+        # Redirect to results page
+        return jsonify({
+            'success': True, 
+            'redirect_url': '/bridal_results',
+            'message': f'Processing {len(template_paths)} templates'
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error in multi-face swap: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/bridal_results')
+def bridal_results():
+    """Show results from multi-template processing"""
+    source_path = session.get('source_path')
+    template_paths = session.get('template_paths', [])
+    
+    if not source_path or not template_paths:
+        return redirect(url_for('bridal_gallery'))
+    
+    # Process will happen on this page with JavaScript
+    return render_template('bridal_results.html', 
+                          source_path=source_path,
+                          template_paths=template_paths)
+
+@app.route('/process_template', methods=['POST'])
+def process_template():
+    """
+    Process a single template with the source face (for AJAX requests)
+    Expects:
+    - source_path: path to the source image
+    - template_path: path to the template image
+    Returns:
+    - JSON with result path or error
+    """
+    if faceapp is None or swapper is None:
+        return jsonify({'success': False, 'error': 'Models not loaded'})
+        
+    data = request.get_json()
+    source_path = data.get('source_path')
+    template_path = data.get('template_path')
+    
+    if not source_path or not template_path:
+        return jsonify({'success': False, 'error': 'Missing source or template path'})
+    
+    try:
+        # Read source and template images
+        source_img = cv2.imread(source_path)
+        template_img = cv2.imread(template_path)
+        
+        if source_img is None or template_img is None:
+            return jsonify({'success': False, 'error': 'Failed to read images'})
+            
+        # Detect faces
+        source_faces = faceapp.get(source_img)
+        target_faces = faceapp.get(template_img)
+        
+        if not source_faces:
+            return jsonify({'success': False, 'error': 'No face detected in source image'})
+            
+        if not target_faces:
+            return jsonify({'success': False, 'error': 'No face detected in template image'})
+            
+        # Perform face swap
+        result_img = swapper.get(template_img, target_faces[0], source_faces[0], source_img)
+        
+        # Save result
+        timestamp = int(time.time())
+        result_filename = f"result_{timestamp}_{os.path.basename(template_path)}"
+        result_path = os.path.join(app.config['UPLOAD_FOLDER'], 'results', result_filename)
+        
+        # Create results directory if it doesn't exist
+        os.makedirs(os.path.dirname(result_path), exist_ok=True)
+        
+        # Save the result
+        cv2.imwrite(result_path, result_img)
+        
+        # Return the result path for display
+        return jsonify({
+            'success': True,
+            'result_path': f"/uploads/results/{result_filename}"
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error processing template: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/bridal-swap', methods=['GET', 'POST'])
 def bridal_swap():
