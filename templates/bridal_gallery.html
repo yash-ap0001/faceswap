@@ -526,6 +526,13 @@
                                     </div>
                                 </div>
                                 
+                                <!-- Selection badge (initially hidden) -->
+                                <div class="position-absolute top-0 end-0 mt-2 me-2 select-badge d-none">
+                                    <span class="badge bg-primary rounded-pill">
+                                        <i class="fas fa-check"></i> Selected
+                                    </span>
+                                </div>
+                                
                                 <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}">
                                 
                                 <!-- Template Selection Overlay (Hidden by default) -->

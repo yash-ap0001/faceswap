@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+
+{% block title %}Multi-Template Results{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between">
+                <h1 class="mb-0">Face Swap Results</h1>
+                <a href="{{ url_for('bridal_gallery') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Gallery
+                </a>
+            </div>
+            <p class="text-muted">Processing your face on multiple templates</p>
+        </div>
+    </div>
+
+    <!-- Source Image -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Your Source Image</h5>
+                </div>
+                <div class="card-body d-flex align-items-center justify-content-center">
+                    <img src="{{ url_for('uploaded_file', filename=source_path.split('/')[-1]) }}" 
+                         class="img-fluid rounded" 
+                         alt="Source Image"
+                         style="max-height: 300px; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Results</h5>
+                </div>
+                <div class="card-body">
+                    <div class="progress mb-3" id="overall-progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                             role="progressbar" 
+                             style="width: 0%" 
+                             aria-valuenow="0" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">0%</div>
+                    </div>
+                    <p id="status-message">Processing templates... Please wait.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Grid -->
+    <div class="row mb-4" id="results-container">
+        <!-- Results will be added here dynamically -->
+    </div>
+</div>
+
+<!-- Image preview modal -->
+<div class="modal fade" id="resultPreviewModal" tabindex="-1" aria-labelledby="resultPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resultPreviewModalLabel">Face Swap Result</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="resultPreviewModalImage" src="" class="img-fluid" alt="Result Preview">
+            </div>
+            <div class="modal-footer">
+                <a id="downloadResultBtn" href="#" class="btn btn-primary" download>
+                    <i class="fas fa-download me-2"></i> Download
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="errorModalLabel">Error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="error-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize variables
+    const sourcePath = "{{ source_path }}";
+    const templatePaths = {{ template_paths|tojson }};
+    const resultsContainer = document.getElementById('results-container');
+    const overallProgress = document.querySelector('#overall-progress .progress-bar');
+    const statusMessage = document.getElementById('status-message');
+    const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+    const errorMessage = document.getElementById('error-message');
+    const resultPreviewModal = new bootstrap.Modal(document.getElementById('resultPreviewModal'));
+    const resultPreviewModalImage = document.getElementById('resultPreviewModalImage');
+    const downloadResultBtn = document.getElementById('downloadResultBtn');
+    
+    // Process all templates sequentially
+    async function processAllTemplates() {
+        const results = [];
+        let processedCount = 0;
+        
+        // Create template cards first
+        templatePaths.forEach((path, index) => {
+            const templateName = path.split('/').pop();
+            const ceremony = path.split('/').slice(-2)[0]; // Get ceremony from path
+            
+            const colDiv = document.createElement('div');
+            colDiv.className = 'col-md-4 mb-4';
+            colDiv.innerHTML = `
+                <div class="card h-100 template-result-card" id="result-card-${index}">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">${ceremony.charAt(0).toUpperCase() + ceremony.slice(1)}</h5>
+                        <span class="badge bg-secondary processing-badge">Processing...</span>
+                    </div>
+                    <div class="card-body p-0 position-relative">
+                        <div class="d-flex">
+                            <div class="w-50 p-2">
+                                <p class="small text-muted mb-1">Template</p>
+                                <img src="${path}" class="img-fluid rounded" alt="Template" style="height: 200px; width: 100%; object-fit: cover;">
+                            </div>
+                            <div class="w-50 p-2 result-container" id="result-container-${index}">
+                                <p class="small text-muted mb-1">Result</p>
+                                <div class="result-placeholder d-flex align-items-center justify-content-center" style="height: 200px; background-color: #f8f9fa; border-radius: 0.25rem;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            resultsContainer.appendChild(colDiv);
+        });
+        
+        // Process each template
+        for (let i = 0; i < templatePaths.length; i++) {
+            const template = templatePaths[i];
+            const resultContainer = document.getElementById(`result-container-${i}`);
+            const resultCard = document.getElementById(`result-card-${i}`);
+            const processingBadge = resultCard.querySelector('.processing-badge');
+            
+            try {
+                statusMessage.textContent = `Processing template ${i+1} of ${templatePaths.length}...`;
+                
+                // Make API call to process this template
+                const response = await fetch('/process_template', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        source_path: sourcePath,
+                        template_path: template
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update the result container with the processed image
+                    resultContainer.innerHTML = `
+                        <p class="small text-muted mb-1">Result</p>
+                        <img src="${data.result_path}" class="img-fluid rounded result-image" 
+                             alt="Result" style="height: 200px; width: 100%; object-fit: cover;"
+                             data-full-path="${data.result_path}">
+                    `;
+                    
+                    // Add click handler for the result image
+                    const resultImage = resultContainer.querySelector('.result-image');
+                    resultImage.addEventListener('click', function() {
+                        resultPreviewModalImage.src = this.getAttribute('data-full-path');
+                        downloadResultBtn.href = this.getAttribute('data-full-path');
+                        downloadResultBtn.download = this.getAttribute('data-full-path').split('/').pop();
+                        resultPreviewModal.show();
+                    });
+                    
+                    // Update badge to show success
+                    processingBadge.className = 'badge bg-success';
+                    processingBadge.textContent = 'Completed';
+                    
+                    results.push({
+                        template: template,
+                        result: data.result_path
+                    });
+                } else {
+                    throw new Error(data.error || 'Failed to process template');
+                }
+            } catch (error) {
+                console.error(`Error processing template ${i+1}:`, error);
+                
+                // Update result container to show error
+                resultContainer.innerHTML = `
+                    <p class="small text-muted mb-1">Result</p>
+                    <div class="alert alert-danger h-100 d-flex align-items-center justify-content-center" style="min-height: 200px;">
+                        <div>
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Processing failed
+                        </div>
+                    </div>
+                `;
+                
+                // Update badge to show error
+                processingBadge.className = 'badge bg-danger';
+                processingBadge.textContent = 'Failed';
+            }
+            
+            // Update progress
+            processedCount++;
+            const percentComplete = Math.round((processedCount / templatePaths.length) * 100);
+            overallProgress.style.width = `${percentComplete}%`;
+            overallProgress.setAttribute('aria-valuenow', percentComplete);
+            overallProgress.textContent = `${percentComplete}%`;
+        }
+        
+        // All templates processed
+        statusMessage.textContent = `All ${processedCount} templates processed. ${results.length} successful, ${processedCount - results.length} failed.`;
+    }
+    
+    // Show error in modal
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorModal.show();
+    }
+    
+    // Initialize processing
+    document.addEventListener('DOMContentLoaded', function() {
+        if (templatePaths.length > 0) {
+            processAllTemplates().catch(error => {
+                console.error('Error in template processing:', error);
+                showError('An error occurred during processing. Please try again.');
+            });
+        } else {
+            showError('No templates selected for processing.');
+        }
+    });
+</script>
+{% endblock %}
