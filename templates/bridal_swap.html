@@ -1146,15 +1146,35 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedCards = Array.from(document.querySelectorAll('.template-card.selected, .template-card:has(.template-checkbox:checked)'));
         console.log('Found selected cards:', selectedCards.length);
         
+        // Debug card data attributes
+        selectedCards.forEach((card, i) => {
+            console.log(`Card ${i+1} dataset:`, {
+                path: card.dataset.templatePath || card.dataset.path,
+                ceremony: card.dataset.ceremony,
+                url: card.dataset.templateUrl || card.dataset.url,
+                allAttributes: Object.keys(card.dataset)
+            });
+            
+            // Check if we have the necessary attributes
+            if (!card.dataset.templatePath && !card.dataset.path) {
+                console.warn(`Card ${i+1} is missing path attribute`);
+            }
+            if (!card.dataset.ceremony) {
+                console.warn(`Card ${i+1} is missing ceremony attribute`);
+            }
+        });
+        
         // Remove duplicates (in case a card has both .selected class and checked checkbox)
         const uniqueCards = [];
         const uniquePaths = new Set();
         
         selectedCards.forEach(card => {
             const path = card.dataset.templatePath || card.dataset.path;
-            if (!uniquePaths.has(path)) {
+            if (path && !uniquePaths.has(path)) {
                 uniquePaths.add(path);
                 uniqueCards.push(card);
+            } else if (!path) {
+                console.error('Card is missing path attribute:', card);
             }
         });
         
