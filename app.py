@@ -907,7 +907,7 @@ def get_templates():
     app.logger.info(f"Scanning template directory: {template_dir}")
     
     # Define template types to search for
-    template_types = ['real', 'natural', 'ai', 'pinterest']
+    template_types = ['real', 'natural', 'ai', 'pinterest', 'pintrest']
     
     # Log all subdirectories in templates for debugging
     try:
