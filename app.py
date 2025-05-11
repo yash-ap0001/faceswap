@@ -597,15 +597,75 @@ def event_managers():
 @app.route('/delete-templates', methods=['POST'])
 def delete_templates():
     """
-    Delete selected templates.
-    Expected JSON payload: { template_paths: [path1, path2, ...] }
+    Delete selected templates or all templates for a ceremony.
+    Expected JSON payload: 
+    - For specific templates: { template_paths: [path1, path2, ...] }
+    - For clearing all ceremony templates: { ceremony_type: "haldi", clear_all: true }
     """
     if not request.is_json:
         return jsonify({"success": False, "message": "Expected JSON payload"}), 400
     
     data = request.get_json()
     template_paths = data.get('template_paths', [])
+    ceremony_type = data.get('ceremony_type')
+    clear_all = data.get('clear_all', False)
     
+    # Handle clearing all templates for a ceremony
+    if clear_all and ceremony_type:
+        if ceremony_type not in ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']:
+            return jsonify({"success": False, "message": "Invalid ceremony type"}), 400
+        
+        deleted_count = 0
+        errors = []
+        template_types = ['ai', 'natural', 'real', 'pinterest']
+        template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
+        
+        try:
+            # Clear all temple files for the ceremony in the main directory
+            for template_type in template_types:
+                main_path = os.path.join(template_dir, f"{ceremony_type}_{template_type}.jpg")
+                if os.path.exists(main_path):
+                    os.remove(main_path)
+                    deleted_count += 1
+                    app.logger.info(f"Deleted main template: {main_path}")
+            
+            # Clear all templates in subdirectories
+            for template_type in template_types:
+                type_dir = os.path.join(template_dir, template_type)
+                
+                # Delete the standard template file
+                standard_path = os.path.join(type_dir, f"{ceremony_type}.jpg")
+                if os.path.exists(standard_path):
+                    os.remove(standard_path)
+                    deleted_count += 1
+                    app.logger.info(f"Deleted standard template: {standard_path}")
+                
+                # Check for ceremony-specific directory
+                ceremony_dir = os.path.join(type_dir, ceremony_type)
+                if os.path.exists(ceremony_dir) and os.path.isdir(ceremony_dir):
+                    for file in os.listdir(ceremony_dir):
+                        if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                            file_path = os.path.join(ceremony_dir, file)
+                            if os.path.isfile(file_path):
+                                os.remove(file_path)
+                                deleted_count += 1
+                                app.logger.info(f"Deleted template: {file_path}")
+            
+            return jsonify({
+                "success": True,
+                "deleted_count": deleted_count,
+                "ceremony_type": ceremony_type,
+                "message": f"Cleared all templates for {ceremony_type} ceremony"
+            })
+            
+        except Exception as e:
+            app.logger.error(f"Error clearing templates: {str(e)}")
+            return jsonify({
+                "success": False,
+                "message": f"Error clearing templates: {str(e)}"
+            }), 500
+    
+    # Handle deleting specific template paths
     if not template_paths:
         return jsonify({"success": False, "message": "No template paths provided"}), 400
     
@@ -614,8 +674,8 @@ def delete_templates():
     
     for path in template_paths:
         try:
-            # Validate the path - ensure it starts with static/templates
-            if not path or not path.startswith('static/templates/'):
+            # Validate the path - ensure it starts with uploads/templates
+            if not path or not path.startswith('uploads/templates/'):
                 errors.append(f"Invalid path: {path}")
                 continue
                 
@@ -627,6 +687,7 @@ def delete_templates():
             # Delete the file
             os.remove(path)
             deleted_count += 1
+            app.logger.info(f"Deleted template: {path}")
             
         except Exception as e:
             errors.append(f"Error deleting {path}: {str(e)}")
