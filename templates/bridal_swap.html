@@ -1573,8 +1573,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     resultCard.innerHTML = `
-                        <div class="card bg-dark border-0 shadow position-relative" style="height: 280px;">
-                            <div class="card-img-top position-relative overflow-hidden" style="height: 230px;">
+                        <div class="card bg-dark border-0 shadow position-relative" style="height: 280px; max-height: 280px; min-height: 280px;">
+                            <div class="card-img-top position-relative overflow-hidden" style="height: 230px; max-height: 230px; min-height: 230px;">
                                 <img src="${resultFullPath}" class="multi-result-img" alt="Result for ${displayCeremony}" 
                                     style="width: 100%; height: 100%; object-fit: cover;">
                                 <div class="position-absolute top-0 end-0 m-2">
@@ -1582,8 +1582,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </div>
                                 ${newBadge}
                             </div>
-                            <div class="card-footer d-flex justify-content-between align-items-center bg-dark text-light">
-                                <span class="ceremony-badge"><i class="fas fa-check-circle text-success me-1"></i> ${displayCeremony}</span>
+                            <div class="card-footer d-flex justify-content-between align-items-center bg-dark text-light p-1" style="height: 50px; max-height: 50px; min-height: 50px;">
+                                <span class="ceremony-badge small"><i class="fas fa-check-circle text-success me-1"></i> ${displayCeremony}</span>
                                 <div class="btn-group">
                                     <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
                                         <i class="fas fa-trash"></i>
