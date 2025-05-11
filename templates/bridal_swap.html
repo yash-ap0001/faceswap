@@ -20,18 +20,64 @@
     }
     
     .template-checkbox-wrapper {
-        z-index: 5;
+        z-index: 10;
         display: none;
     }
     
+    .template-selection-mode .template-checkbox-wrapper {
+        display: block;
+    }
+    
     .template-checkbox {
-        width: 20px;
-        height: 20px;
+        width: 24px;
+        height: 24px;
         cursor: pointer;
     }
     
     .template-card.selected {
-        border: 2px solid #8e44ad !important;
+        border: 3px solid #8e44ad !important;
+        box-shadow: 0 0 10px rgba(142, 68, 173, 0.7);
+    }
+    
+    /* Multi-result styles */
+    .multi-results-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1rem;
+    }
+    
+    .multi-results-container .result-card {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        background-color: #202124;
+    }
+    
+    .multi-results-container .result-card img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .multi-results-container .result-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    /* Selection count badge */
+    #selectionCountWrapper {
+        position: relative;
+        margin-left: 1rem;
+    }
+    
+    #selectedCount {
+        font-weight: bold;
+        color: white;
+    }
+    
+    /* Message styling */
+    .template-message {
+        margin-bottom: 1rem;
     }
     
     /* Selected template styling */
@@ -617,6 +663,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const selectionCountWrapper = document.getElementById('selectionCountWrapper');
             
             if (isSelectionMode) {
+                // Entering selection mode
+                console.log('Entering template selection mode');
                 toggleSelectionModeBtn.innerHTML = '<i class="fas fa-times"></i> Cancel Selection';
                 toggleSelectionModeBtn.classList.remove('btn-outline-light');
                 toggleSelectionModeBtn.classList.add('btn-outline-danger');
@@ -631,7 +679,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     card.classList.remove('selected');
                 });
                 updateSelectedCount();
+                
+                // Show a message to guide the user
+                showMessage('Select up to 5 templates from any ceremony and click "Process Selected Templates"');
             } else {
+                // Exiting selection mode
+                console.log('Exiting template selection mode');
                 toggleSelectionModeBtn.innerHTML = '<i class="fas fa-check-square"></i> Multi-Select';
                 toggleSelectionModeBtn.classList.add('btn-outline-light');
                 toggleSelectionModeBtn.classList.remove('btn-outline-danger');
@@ -639,6 +692,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (selectionCountWrapper) selectionCountWrapper.classList.add('d-none');
             }
         });
+    }
+    
+    // Helper function to show a temporary message
+    function showMessage(message) {
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'alert alert-info alert-dismissible fade show template-message';
+        messageContainer.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        // Insert the message at the top of the template content
+        const templateContent = document.getElementById('templateTabContent');
+        if (templateContent) {
+            templateContent.parentNode.insertBefore(messageContainer, templateContent);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                messageContainer.classList.remove('show');
+                setTimeout(() => messageContainer.remove(), 500);
+            }, 5000);
+        }
     }
     
     // Function to update selected count
@@ -664,12 +739,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Add event listener to all checkboxes (for future checkboxes as well)
-    document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('template-checkbox')) {
+    // We now have direct event listeners on each checkbox, but keep this for any dynamically added checkboxes
+    document.addEventListener('click', function(e) {
+        if (isSelectionMode && e.target.closest('.template-card') && !e.target.classList.contains('template-checkbox') && !e.target.closest('.select-template-btn')) {
+            // When in selection mode, clicking on the card toggles the checkbox
             const card = e.target.closest('.template-card');
-            if (card) {
-                card.classList.toggle('selected', e.target.checked);
+            const checkbox = card.querySelector('.template-checkbox');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                card.classList.toggle('selected', checkbox.checked);
                 updateSelectedCount();
             }
         }
@@ -935,7 +1013,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     col.appendChild(card);
                     
                     // Add click event to the card
-                    card.addEventListener('click', function() {
+                    // Add click events based on mode
+                    card.addEventListener('click', function(e) {
+                        // Don't trigger if clicking on a checkbox or the select button
+                        if (e.target.classList.contains('template-checkbox') || 
+                            e.target.closest('.select-template-btn') ||
+                            isSelectionMode) {
+                            return;
+                        }
                         useTemplate(this);
                     });
                     
@@ -944,7 +1029,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (selectBtn) {
                         selectBtn.addEventListener('click', function(e) {
                             e.stopPropagation(); // Prevent the card click event
-                            useTemplate(this.closest('.template-card'));
+                            if (!isSelectionMode) {
+                                useTemplate(this.closest('.template-card'));
+                            }
+                        });
+                    }
+                    
+                    // Add click event to the checkbox
+                    const checkbox = card.querySelector('.template-checkbox');
+                    if (checkbox) {
+                        checkbox.addEventListener('change', function(e) {
+                            e.stopPropagation(); // Prevent the card click event
+                            const card = this.closest('.template-card');
+                            if (card) {
+                                card.classList.toggle('selected', this.checked);
+                                updateSelectedCount();
+                            }
                         });
                     }
                 });
