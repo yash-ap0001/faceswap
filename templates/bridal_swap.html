@@ -665,12 +665,23 @@ function initializePage() {
                     
                     // Group templates by type
                     const templatesByType = {};
-                    data.templates.forEach(template => {
+                    console.log(`Grouping ${data.templates.length} templates by type for ${ceremonyType}`);
+                    
+                    // Debug log individual templates by type
+                    data.templates.forEach((template, index) => {
                         const type = template.template_type || 'other';
+                        console.log(`Template ${index+1}/${data.templates.length}: ${type} - ${template.url}`);
+                        
                         if (!templatesByType[type]) {
+                            console.log(`Creating new template group: ${type}`);
                             templatesByType[type] = [];
                         }
                         templatesByType[type].push(template);
+                    });
+                    
+                    // Log summary of template counts by type
+                    Object.keys(templatesByType).forEach(type => {
+                        console.log(`Found ${templatesByType[type].length} templates of type: ${type}`);
                     });
                     
                     // Create headers for each template type
