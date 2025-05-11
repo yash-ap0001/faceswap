@@ -488,6 +488,46 @@
         </div>
     </div>
     
+    <!-- Multi-Template Selection Interface -->
+    <div class="card mb-4 shadow d-none" id="multiSelectionInterface">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-tasks me-2"></i> Selected Templates (<span id="selectedCount">0</span>/5)</h5>
+                <button type="button" class="btn btn-sm btn-light" id="clearSelectionBtn">
+                    <i class="fas fa-times"></i> Clear Selection
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="multiSourceInput" class="form-label">Upload Your Photo</label>
+                        <input type="file" class="form-control" id="multiSourceInput" accept=".jpg,.jpeg,.png">
+                    </div>
+                    <div class="image-preview-container mb-3" style="height: 180px; overflow: hidden;">
+                        <img id="multiSourcePreview" class="img-fluid d-none" alt="Your photo preview" style="max-height: 180px;">
+                        <div id="multiSourcePlaceholder" class="text-center p-4">
+                            <i class="fas fa-user-circle mb-2" style="font-size: 3rem; opacity: 0.5;"></i>
+                            <p class="text-muted">No photo selected yet<br>Please upload a clear frontal photo</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <h6 class="mb-3">Selected Templates</h6>
+                    <div class="row row-cols-2 row-cols-lg-5 g-2" id="selectedTemplatesPreview">
+                        <!-- Selected templates will appear here -->
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <button class="btn btn-primary btn-lg" id="processMultipleBtn" disabled>
+                    <i class="fas fa-magic me-2"></i> Create Face Swaps
+                </button>
+            </div>
+        </div>
+    </div>
+
     {% for ceremony in ceremony_types %}
 <div class="mb-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -566,7 +606,8 @@
                                 
                                 <!-- Multi-selection button (always visible for quick selection) -->
                                 <button class="btn btn-sm btn-primary position-absolute top-0 end-0 m-2 template-select-btn"
-                                        data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" title="Add to selection">
+                                        data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" title="Add to selection"
+                                        onclick="toggleTemplateSelection(event, '{{ template.url }}', '{{ ceremony }}')">
                                     <i class="fas fa-plus"></i>
                                 </button>
                                 
@@ -962,6 +1003,61 @@ document.addEventListener('DOMContentLoaded', function() {
     // Call initialization when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
         initializeCarouselsCollapsed();
+        
+        // Initialize multi-selection variables
+        window.selectedTemplates = [];
+        const multiSelectionInterface = document.getElementById('multiSelectionInterface');
+        const selectedCount = document.getElementById('selectedCount');
+        const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
+        const processMultipleBtn = document.getElementById('processMultipleBtn');
+        const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+        const multiSourceInput = document.getElementById('multiSourceInput');
+        const multiSourcePreview = document.getElementById('multiSourcePreview');
+        const multiSourcePlaceholder = document.getElementById('multiSourcePlaceholder');
+        
+        // Clear selection button
+        if (clearSelectionBtn) {
+            clearSelectionBtn.addEventListener('click', function() {
+                clearTemplateSelection();
+            });
+        }
+        
+        // Source image preview for multi-selection
+        if (multiSourceInput) {
+            multiSourceInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        multiSourcePreview.src = e.target.result;
+                        multiSourcePreview.classList.remove('d-none');
+                        multiSourcePlaceholder.classList.add('d-none');
+                        
+                        // Enable process button if we have templates selected
+                        if (selectedTemplates.length > 0) {
+                            processMultipleBtn.disabled = false;
+                        }
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+        
+        // Process multiple templates button
+        if (processMultipleBtn) {
+            processMultipleBtn.addEventListener('click', function() {
+                if (!multiSourceInput.files || !multiSourceInput.files[0]) {
+                    showError('Please upload your source image first.');
+                    return;
+                }
+                
+                if (selectedTemplates.length === 0) {
+                    showError('Please select at least one template.');
+                    return;
+                }
+                
+                processMultipleTemplates();
+            });
+        }
     });
     
     // Toggle select mode for bulk deletion
@@ -1703,6 +1799,93 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show the modal
         const previewModal = new bootstrap.Modal(document.getElementById('fullsizePreviewModal'));
         previewModal.show();
+    }
+    
+    // Toggle template selection
+    function toggleTemplateSelection(event, templatePath, ceremonyType) {
+        // Prevent the click from triggering the parent's click event (image preview)
+        event.stopPropagation();
+        
+        const template = {
+            path: templatePath,
+            ceremony: ceremonyType
+        };
+        
+        if (isTemplateSelected(templatePath)) {
+            // Already selected, remove it
+            removeTemplateFromSelection(templatePath);
+        } else {
+            // Not selected, add it
+            addTemplateToSelection(template);
+        }
+    }
+    
+    // Clear all selected templates
+    function clearTemplateSelection() {
+        // Remove selected class from all cards
+        document.querySelectorAll('.bridal-card.selected').forEach(card => {
+            card.classList.remove('selected');
+            
+            // Hide selection badge
+            const badge = card.querySelector('.select-badge');
+            if (badge) badge.classList.add('d-none');
+            
+            // Reset selection button if it exists
+            const selectBtn = card.querySelector('.template-select-btn');
+            if (selectBtn) {
+                selectBtn.classList.remove('btn-success');
+                selectBtn.classList.add('btn-primary');
+                selectBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                selectBtn.title = "Add to selection";
+            }
+        });
+        
+        // Clear the array
+        selectedTemplates.length = 0;
+        
+        // Update the interface
+        updateSelectionInterface();
+    }
+    
+    // Process multiple templates with the same source face
+    function processMultipleTemplates() {
+        // Show loading spinner
+        const processBtn = document.getElementById('processMultipleBtn');
+        const originalText = processBtn.innerHTML;
+        processBtn.disabled = true;
+        processBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
+        
+        // Create FormData with the source image and template paths
+        const formData = new FormData();
+        formData.append('source', document.getElementById('multiSourceInput').files[0]);
+        
+        // Add all selected templates
+        selectedTemplates.forEach((template, index) => {
+            formData.append('templates[]', template.path);
+        });
+        
+        // Send AJAX request to multi-face-swap endpoint
+        fetch('/multi-face-swap', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            processBtn.innerHTML = originalText;
+            processBtn.disabled = false;
+            
+            if (data.success) {
+                // Redirect to results page
+                window.location.href = '/bridal-results?session=' + data.session_id;
+            } else {
+                showError(data.error || 'Failed to process images');
+            }
+        })
+        .catch(error => {
+            processBtn.innerHTML = originalText;
+            processBtn.disabled = false;
+            showError('An error occurred: ' + error.message);
+        });
     }
 });
 </script>
