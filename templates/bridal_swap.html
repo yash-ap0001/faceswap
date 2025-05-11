@@ -997,7 +997,29 @@ document.addEventListener('DOMContentLoaded', function() {
         if (processSelectedTemplatesBtn) {
             const hasSourceImage = sourceInput && sourceInput.files.length > 0;
             
+            console.log('Updating process button state:', {
+                count: count,
+                hasSourceImage: hasSourceImage,
+                sourceInput: sourceInput ? sourceInput.id : 'not found',
+                files: sourceInput && sourceInput.files ? sourceInput.files.length : 0
+            });
+            
+            // Make sure the button is enabled when conditions are met
             processSelectedTemplatesBtn.disabled = (count === 0 || count > 5 || !hasSourceImage);
+            
+            // Add a visual indicator when the button is enabled
+            if (count > 0 && count <= 5 && hasSourceImage) {
+                processSelectedTemplatesBtn.classList.add('btn-success');
+                processSelectedTemplatesBtn.classList.remove('btn-primary');
+                // Add a flash animation to draw attention
+                processSelectedTemplatesBtn.classList.add('btn-flash');
+                setTimeout(() => {
+                    processSelectedTemplatesBtn.classList.remove('btn-flash');
+                }, 1500);
+            } else {
+                processSelectedTemplatesBtn.classList.add('btn-primary');
+                processSelectedTemplatesBtn.classList.remove('btn-success');
+            }
             
             if (count > 5) {
                 processSelectedTemplatesBtn.title = 'Please select a maximum of 5 templates';
