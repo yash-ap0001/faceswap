@@ -531,7 +531,7 @@
                                     </span>
                                 </div>
                                 
-                                <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}">
+                                <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" style="cursor: pointer;" onclick="showFullSizePreview(this)">
                                 
                                 <!-- Template Selection Overlay (Hidden by default) -->
                                 <div class="position-absolute top-0 start-0 p-2 d-none select-badge">
@@ -1472,6 +1472,55 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize the image preview and multi-selection handlers
     setupImagePreviewHandlers();
+    
+    // Function to show full-size image preview
+    window.showFullSizePreview = function(imageElement) {
+        // Don't trigger preview if in selection mode
+        if (document.querySelector('.template-select-mode')) {
+            return;
+        }
+        
+        const templatePath = imageElement.getAttribute('data-template-path');
+        const ceremony = imageElement.getAttribute('data-ceremony');
+        
+        // Set the modal image source
+        const previewImage = document.getElementById('previewModalImage');
+        previewImage.src = templatePath;
+        
+        // Update modal title with ceremony name
+        document.querySelector('#imagePreviewModal .modal-title').textContent = 
+            `${ceremony.charAt(0).toUpperCase() + ceremony.slice(1)} Template Preview`;
+        
+        // Update select button with data
+        const selectBtn = document.getElementById('selectTemplateBtn');
+        selectBtn.dataset.templatePath = templatePath;
+        selectBtn.dataset.ceremony = ceremony;
+        
+        // Show the modal
+        const previewModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+        previewModal.show();
+    };
+    
+    // Add click event to the select template button
+    document.getElementById('selectTemplateBtn').addEventListener('click', function() {
+        const templatePath = this.dataset.templatePath;
+        const ceremony = this.dataset.ceremony;
+        
+        // Find the template card
+        const templateCard = document.querySelector(`.template-card[data-template-path="${templatePath}"]`);
+        if (templateCard) {
+            // Add to selected templates (if using multi-selection)
+            if (selectedTemplates.length < 5) {
+                addTemplateToSelection({
+                    path: templatePath,
+                    ceremony: ceremony
+                });
+            }
+            
+            // Close the modal
+            bootstrap.Modal.getInstance(document.getElementById('imagePreviewModal')).hide();
+        }
+    });
     
     // Expose removeResult to global scope
     window.removeResult = function(style) {
