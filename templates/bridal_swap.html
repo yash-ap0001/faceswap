@@ -633,7 +633,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const templatePreview = document.getElementById('template-preview');
     const templateUrlInput = document.getElementById('template-url');
     // Additional elements for multi-template processing
-    const processSelectedTemplatesBtn = document.getElementById('processSelectedTemplatesBtn');
+    // No longer need a separate process button as we've integrated with the main "Create Bride Look" button
     
     // Function to use a template (called when a template is selected)
     function useTemplate(templateCard) {
@@ -1232,11 +1232,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Add event listener to the new process selected templates button in the preview section
-    if (processSelectedTemplatesBtn) {
-        processSelectedTemplatesBtn.addEventListener('click', function() {
-            processSelectedTemplates();
-        });
-    }
+    // We've now integrated the multi-template functionality into the main form submission
     
     // Function to process selected templates
     function processSelectedTemplates() {
