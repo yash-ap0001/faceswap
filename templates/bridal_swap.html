@@ -278,10 +278,28 @@
     .template-checkbox-wrapper {
         display: none;
         z-index: 10;
+        position: absolute;
+        top: 8px;
+        left: 8px;
     }
     
     body.template-selection-mode .template-checkbox-wrapper {
         display: block;
+    }
+    
+    /* Selected templates preview styles */
+    #selectedTemplatesThumbnails {
+        min-height: 240px;
+    }
+    
+    #selectedTemplatesThumbnails .card {
+        transition: all 0.3s ease;
+        border: 2px solid var(--bs-dark);
+    }
+    
+    #selectedTemplatesThumbnails .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
     }
     
     .template-card.selected {
@@ -428,7 +446,7 @@
 
                     <div class="text-center">
                         <button type="submit" id="swap-btn" class="btn btn-primary">
-                            <i class="fas fa-magic me-2"></i>Create Bridal Look
+                            <i class="fas fa-magic me-2"></i>Create Bride Look
                         </button>
                     </div>
                     
@@ -820,6 +838,10 @@ document.addEventListener('DOMContentLoaded', function() {
             resultContainer.classList.add('d-none');
             swapBtn.disabled = true;
             
+            // Change form action to multi-template processing endpoint
+            uploadForm.action = "{{ url_for('bridal_swap_multi') }}";
+            uploadForm.method = "post";
+            
             // Add template count and template info
             formData.append('template_count', selectedCheckboxes.length);
             
@@ -835,7 +857,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             // Use the multi-template endpoint
-            fetch('/bridal-swap-multi', {
+            fetch("{{ url_for('bridal_swap_multi') }}", {
                 method: 'POST',
                 body: formData
             })
