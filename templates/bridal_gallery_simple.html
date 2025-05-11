@@ -189,9 +189,9 @@
                     {% for template in all_templates[ceremony] %}
                     <div class="col-md-3 col-sm-6 template-card {% if loop.index > 4 %}hidden-template {{ ceremony }}-hidden{% endif %}">
                         <div class="template-container position-relative" data-path="{{ template.url }}">
-                            <img src="{{ url_for('uploaded_file', filename=template.url) }}" 
+                            <img src="/uploads/{{ template.url }}" 
                                 alt="{{ ceremony }} template" class="template-img"
-                                onclick="previewTemplate('{{ url_for('uploaded_file', filename=template.url) }}', '{{ template.url }}')">
+                                onclick="previewTemplate('/uploads/{{ template.url }}', '{{ template.url }}')">
                             
                             <!-- Selection indicator -->
                             <div class="selected-indicator">
@@ -201,7 +201,7 @@
                             <!-- Template actions -->
                             <div class="template-actions">
                                 <button class="btn btn-sm btn-primary preview-btn" 
-                                        onclick="event.stopPropagation(); previewTemplate('{{ url_for('uploaded_file', filename=template.url) }}', '{{ template.url }}')">
+                                        onclick="event.stopPropagation(); previewTemplate('/uploads/{{ template.url }}', '{{ template.url }}')">
                                     <i class="fas fa-eye"></i>
                                 </button>
                                 <button class="btn btn-sm btn-danger delete-btn" 
