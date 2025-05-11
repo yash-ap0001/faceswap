@@ -855,27 +855,43 @@ def bridal_results():
                           source_path=source_path,
                           template_paths=template_paths)
 
-@app.route('/process_template', methods=['POST'])
+@app.route('/process-template', methods=['POST'])
 def process_template():
     """
     Process a single template with the source face (for AJAX requests)
     Expects:
-    - source_path: path to the source image
+    - source: uploaded image file
     - template_path: path to the template image
     Returns:
     - JSON with result path or error
     """
     if faceapp is None or swapper is None:
         return jsonify({'success': False, 'error': 'Models not loaded'})
-        
-    data = request.get_json()
-    source_path = data.get('source_path')
-    template_path = data.get('template_path')
     
-    if not source_path or not template_path:
-        return jsonify({'success': False, 'error': 'Missing source or template path'})
+    # Check if template path is provided
+    template_path = request.form.get('template_path')
+    if not template_path:
+        return jsonify({'success': False, 'error': 'Missing template path'})
+    
+    # Check if source file is uploaded
+    if 'source' not in request.files:
+        return jsonify({'success': False, 'error': 'No source image uploaded'})
+    
+    source_file = request.files['source']
+    if source_file.filename == '':
+        return jsonify({'success': False, 'error': 'No source image selected'})
     
     try:
+        # Save uploaded source file
+        if source_file and allowed_file(source_file.filename):
+            source_filename = secure_filename(source_file.filename)
+            timestamp = int(time.time())
+            source_filename = f"{timestamp}_{source_filename}"
+            source_path = os.path.join(app.config['UPLOAD_FOLDER'], source_filename)
+            source_file.save(source_path)
+        else:
+            return jsonify({'success': False, 'error': 'Invalid file format'})
+        
         # Read source and template images
         source_img = cv2.imread(source_path)
         template_img = cv2.imread(template_path)
