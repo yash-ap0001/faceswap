@@ -653,33 +653,19 @@ function initializePage() {
                     });
                 }
                     
-                    // Get all Pinterest templates first
-                    const pinterestTemplates = data.templates.filter(template => 
+                    // ONLY get Pinterest templates - no fallbacks anymore
+                    const templates = data.templates.filter(template => 
                         template.template_type === 'pinterest' || 
                         template.url.includes('/pinterest/') || 
                         (template.path && template.path.includes('/pinterest/')));
                     
-                    // Get other templates as fallback
-                    const otherTemplates = data.templates.filter(template => 
-                        !(template.template_type === 'pinterest' || 
-                          template.url.includes('/pinterest/') || 
-                          (template.path && template.path.includes('/pinterest/'))));
+                    console.log(`Found ${templates.length} Pinterest templates for ${ceremonyType}`);
                     
-                    console.log(`Found ${pinterestTemplates.length} Pinterest templates and ${otherTemplates.length} other templates for ${ceremonyType}`);
-                    
-                    // Display all Pinterest templates first (without header if only these are available)
-                    if (pinterestTemplates.length > 0) {
-                        // If we also have other templates, add a header
-                        if (otherTemplates.length > 0) {
-                            const typeHeader = document.createElement('div');
-                            typeHeader.className = 'col-12 mt-3 mb-2';
-                            typeHeader.innerHTML = `<h5 class="text-capitalize">Pinterest Templates</h5>`;
-                            templateContainer.appendChild(typeHeader);
-                        }
-                        
+                    // Display all Pinterest templates
+                    if (templates.length > 0) {
                         // Add all Pinterest templates
-                        pinterestTemplates.forEach((template, index) => {
-                            console.log(`Creating Pinterest template element ${index+1}/${pinterestTemplates.length} for ${ceremonyType}:`, template);
+                        templates.forEach((template, index) => {
+                            console.log(`Creating Pinterest template element ${index+1}/${templates.length} for ${ceremonyType}:`, template);
                             
                             const col = document.createElement('div');
                             col.className = 'col-md-3 col-sm-4 col-6 mb-3';
@@ -719,111 +705,10 @@ function initializePage() {
                         });
                     }
                     
-                    // Only show other templates if we don't have Pinterest templates
-                    if (pinterestTemplates.length === 0 && otherTemplates.length > 0) {
-                        // Group other templates by type
-                        const templatesByType = {};
-                        
-                        // Group templates by type
-                        otherTemplates.forEach((template, index) => {
-                            const type = template.template_type || 'other';
-                            
-                            if (!templatesByType[type]) {
-                                templatesByType[type] = [];
-                            }
-                            templatesByType[type].push(template);
-                        });
-                        
-                        // Create headers for each template type
-                        Object.keys(templatesByType).forEach(type => {
-                            // Add section header
-                            const typeHeader = document.createElement('div');
-                            typeHeader.className = 'col-12 mt-3 mb-2';
-                            typeHeader.innerHTML = `<h5 class="text-capitalize">${type} Templates</h5>`;
-                            templateContainer.appendChild(typeHeader);
-                            
-                            // Add the templates for this type
-                            templatesByType[type].forEach((template, index) => {
-                                console.log(`Creating template element ${index+1}/${templatesByType[type].length} for ${ceremonyType} (${type}):`, template);
-                                
-                                const col = document.createElement('div');
-                                col.className = 'col-md-3 col-sm-4 col-6 mb-3';
-                                
-                                const card = document.createElement('div');
-                                card.className = 'card h-100 bg-secondary template-card';
-                                card.dataset.templateUrl = template.url;
-                                card.dataset.templateId = template.id;
-                                card.dataset.templatePath = template.path || '';
-                                card.dataset.templateType = template.template_type;
-                                card.dataset.ceremony = ceremonyType;
-                                
-                                // Add checkbox for selection mode (hidden by default)
-                                const checkboxWrapper = document.createElement('div');
-                                checkboxWrapper.className = 'template-checkbox-wrapper position-absolute top-0 end-0 m-2 d-none';
-                                
-                                const checkbox = document.createElement('input');
-                                checkbox.type = 'checkbox';
-                                checkbox.className = 'form-check-input template-checkbox';
-                                checkbox.dataset.templateId = template.id;
-                                checkbox.dataset.templateUrl = template.url;
-                                checkbox.dataset.templatePath = template.path || '';
-                            
-                                checkboxWrapper.appendChild(checkbox);
-                                
-                                const img = document.createElement('img');
-                                img.src = template.url;
-                                img.className = 'card-img-top';
-                                img.alt = 'Template';
-                                img.style.height = '150px';
-                                img.style.objectFit = 'cover';
-                                
-                                // Add error handling for image loading
-                                img.onerror = function() {
-                                    console.error(`Failed to load image for template ${template.id} from URL: ${template.url}`);
-                                    img.src = '/static/img/placeholder.svg';
-                                    img.alt = 'Image load failed';
-                                };
-                                
-                                const cardBody = document.createElement('div');
-                                cardBody.className = 'card-body p-2';
-                                
-                                const typeLabel = document.createElement('p');
-                                typeLabel.className = 'card-text small mb-0';
-                                typeLabel.textContent = template.template_type || 'pinterest';
-                                
-                                // Add selection button for using in face swap
-                                const selectBtn = document.createElement('button');
-                                selectBtn.className = 'btn btn-sm btn-outline-light mt-2 w-100 use-template-btn';
-                                selectBtn.textContent = 'Use This Template';
-                                selectBtn.onclick = function() {
-                                    // Auto-select the corresponding ceremony type and template type in the form
-                                    const bridalStyleRadio = document.getElementById(ceremonyType);
-                                    if (bridalStyleRadio) {
-                                        bridalStyleRadio.checked = true;
-                                    }
-                                    
-                                    // For compatibility, we'll still handle template types if they exist
-                                    // but they're not needed anymore since we use Pinterest templates directly
-                                    const templateType = 'pinterest';
-                                    
-                                    // Visual indication of selection
-                                    document.querySelectorAll('.template-card').forEach(card => {
-                                        card.classList.remove('border-primary');
-                                        card.classList.remove('border-3');
-                                    });
-                                    card.classList.add('border-primary');
-                                    card.classList.add('border-3');
-                                };
-                        
-                                cardBody.appendChild(typeLabel);
-                                cardBody.appendChild(selectBtn);
-                                card.appendChild(checkboxWrapper);
-                                card.appendChild(img);
-                                card.appendChild(cardBody);
-                                col.appendChild(card);
-                                
-                                templateContainer.appendChild(col);
-                    });
+                    // Handle case when no templates are found
+                    else {
+                        templateContainer.innerHTML = `<div class="col-12 text-center text-muted"><p>No ${ceremonyType} templates found</p></div>`;
+                    }
                 } else {
                     // No templates found
                     templateContainer.innerHTML = `<div class="col-12 text-center text-muted"><p>No ${ceremonyType} templates found</p></div>`;
