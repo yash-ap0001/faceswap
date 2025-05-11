@@ -161,17 +161,7 @@
         border-radius: 10px;
     }
     
-    /* Carousel styles */
-    #selectedTemplatesCarousel {
-        max-width: 400px;
-        margin: 0 auto;
-    }
-    
-    .carousel-inner {
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    
+    /* Selected template styles */    
     .selected-template-card {
         position: relative;
         border-radius: 10px;
@@ -180,21 +170,20 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         transition: all 0.2s ease;
         flex: 0 0 auto;
-        width: 100%;
-        max-width: 400px;
+        width: 180px; 
+        height: 240px;
     }
     
     .selected-template-card:hover {
         box-shadow: 0 8px 20px rgba(142, 68, 173, 0.5);
         border-color: #9b59b6;
+        transform: translateY(-5px);
     }
     
     .selected-template-img {
-        height: 400px;
-        min-height: 400px;
-        max-height: 400px;
-        object-fit: cover;
+        height: 100%;
         width: 100%;
+        object-fit: cover;
     }
     
     .selected-template-overlay {
@@ -514,7 +503,7 @@
                             </div>
                         </div>
                         <div class="card-body bg-dark p-3">
-                            <div class="row row-cols-1 row-cols-md-3 g-3" id="selectedTemplatesThumbnails">
+                            <div class="templates-container d-flex overflow-auto py-2" style="gap: 10px;" id="selectedTemplatesThumbnails">
                                 <!-- Selected template thumbnails will be added here dynamically -->
                             </div>
                         </div>
@@ -995,23 +984,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 const img = card.querySelector('img');
                 const imageUrl = img ? img.src : '';
                 
-                // Create column div
-                const colDiv = document.createElement('div');
-                colDiv.className = 'col';
+                // Create template card for the horizontal scrolling display
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'selected-template-card animate__animated animate__fadeIn';
+                cardDiv.setAttribute('data-template-path', templatePath);
                 
-                // Create template card
-                colDiv.innerHTML = `
-                    <div class="selected-template-card animate__animated animate__fadeIn">
-                        <span class="badge bg-primary selected-template-badge">${ceremonyType}</span>
-                        <button class="selected-template-remove" aria-label="Remove template">
-                            <i class="fas fa-times"></i>
-                        </button>
-                        <img src="${imageUrl}" class="selected-template-img d-block w-100" alt="${ceremonyType} template">
-                    </div>
+                // Fill the card with content
+                cardDiv.innerHTML = `
+                    <span class="badge bg-primary selected-template-badge">${ceremonyType}</span>
+                    <button class="selected-template-remove" aria-label="Remove template">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <img src="${imageUrl}" class="selected-template-img" alt="${ceremonyType} template">
                 `;
                 
                 // Add click listener to remove button
-                const removeBtn = colDiv.querySelector('.selected-template-remove');
+                const removeBtn = cardDiv.querySelector('.selected-template-remove');
                 removeBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -1020,16 +1008,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     checkbox.checked = false;
                     card.classList.remove('selected');
                     
-                    // Remove the column
-                    colDiv.classList.add('animate__fadeOut');
+                    // Add fade-out animation then remove
+                    cardDiv.classList.add('animate__fadeOut');
                     setTimeout(() => {
-                        colDiv.remove();
+                        cardDiv.remove();
                         updateSelectedCount();
                     }, 300);
                 });
                 
-                // Add the column to the container
-                thumbnailsContainer.appendChild(colDiv);
+                // Add the card to the container
+                thumbnailsContainer.appendChild(cardDiv);
             });
             
         } else {
