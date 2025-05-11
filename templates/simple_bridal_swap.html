@@ -1,0 +1,1033 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<style>
+    /* Template cards */
+    .template-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        border: 2px solid transparent;
+    }
+    
+    .template-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    
+    /* Selection mode styling */
+    .template-checkbox-wrapper {
+        z-index: 15;
+        display: none;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(0, 0, 0, 0.7);
+        border-radius: 4px;
+        padding: 6px;
+        border: 2px solid rgba(142, 68, 173, 0.7);
+    }
+    
+    .template-selection-mode .template-checkbox-wrapper {
+        display: block;
+    }
+    
+    .template-checkbox {
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        margin: 0;
+    }
+    
+    .template-card.selected,
+    .template-card:has(.template-checkbox:checked) {
+        border: 3px solid #8e44ad !important;
+        box-shadow: 0 0 15px rgba(142, 68, 173, 0.8);
+        transform: scale(1.02);
+        transition: all 0.2s ease;
+    }
+    
+    /* Selected indicator overlay */
+    .template-card.selected::after,
+    .template-card:has(.template-checkbox:checked)::after {
+        content: '✓';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 3px solid #8e44ad;
+        pointer-events: none;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 40px;
+        font-weight: bold;
+        text-shadow: 0 0 10px rgba(0,0,0,0.8);
+        background-color: rgba(142, 68, 173, 0.35);
+    }
+    
+    /* Results styling */
+    .results-container {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 15px;
+        padding: 15px 5px;
+        align-items: stretch;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.3) rgba(0,0,0,0.2);
+    }
+    
+    .results-container::-webkit-scrollbar {
+        height: 8px;
+    }
+    
+    .results-container::-webkit-scrollbar-track {
+        background: rgba(0,0,0,0.2);
+        border-radius: 4px;
+    }
+    
+    .results-container::-webkit-scrollbar-thumb {
+        background-color: rgba(255,255,255,0.3);
+        border-radius: 4px;
+    }
+    
+    .result-card {
+        flex: 0 0 280px;
+        min-width: 280px;
+        max-width: 280px;
+        margin-right: 15px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .result-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(0,0,0,0.3);
+    }
+    
+    .result-img {
+        width: 100%;
+        height: 230px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .result-card:hover .result-img {
+        transform: scale(1.03);
+    }
+    
+    .ceremony-badge {
+        font-weight: 500;
+        color: #e9ecef;
+    }
+    
+    .selected-templates-scroll {
+        display: flex;
+        overflow-x: auto;
+        gap: 10px;
+        padding: 10px 0;
+    }
+    
+    .selected-template-item {
+        flex: 0 0 150px;
+        position: relative;
+    }
+    
+    .remove-template {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(0,0,0,0.7);
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        font-size: 12px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Unified section sizing */
+    .unified-section {
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .unified-section-body {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Step indicators */
+    .step-indicator {
+        display: flex;
+        margin-bottom: 20px;
+    }
+    
+    .step {
+        display: flex;
+        align-items: center;
+        color: #6c757d;
+        position: relative;
+        margin-right: 40px;
+    }
+    
+    .step-active {
+        color: #fff;
+        font-weight: 500;
+    }
+    
+    .step-number {
+        width: 30px;
+        height: 30px;
+        background-color: #343a40;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 8px;
+    }
+    
+    .step-active .step-number {
+        background-color: #8e44ad;
+    }
+    
+    .step::after {
+        content: '';
+        position: absolute;
+        right: -30px;
+        top: 15px;
+        width: 20px;
+        height: 2px;
+        background-color: #343a40;
+    }
+    
+    .step:last-child::after {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow-lg mb-4 border-0">
+            <div class="card-header bg-primary bg-gradient">
+                <h1 class="h3 mb-0 text-center text-white">
+                    <i class="fas fa-user-bride me-2"></i>Indian Bridal Face Swap
+                </h1>
+            </div>
+            <div class="card-body bg-dark text-light">
+                <!-- Step indicators -->
+                <div class="step-indicator mb-4">
+                    <div class="step step-active" id="step1-indicator">
+                        <div class="step-number">1</div>
+                        <span>Upload Photo</span>
+                    </div>
+                    <div class="step" id="step2-indicator">
+                        <div class="step-number">2</div>
+                        <span>Choose Style</span>
+                    </div>
+                    <div class="step" id="step3-indicator">
+                        <div class="step-number">3</div>
+                        <span>See Results</span>
+                    </div>
+                </div>
+                
+                <div id="model-status-alert" class="alert alert-warning border-0 shadow-sm d-none" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="model-status-message">Checking model status...</span>
+                </div>
+
+                <form id="upload-form" enctype="multipart/form-data">
+                    <!-- Upload Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card mb-3 bg-dark border border-secondary">
+                                <div class="card-header bg-dark text-light border-bottom border-secondary">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-upload me-2"></i>Upload Your Photo
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="custom-file-upload">
+                                            <input type="file" name="file" id="file" class="form-control bg-dark text-light border-secondary" accept="image/*" required>
+                                            <small class="form-text text-muted">Upload a photo with your face clearly visible.</small>
+                                        </div>
+                                    </div>
+                                    <div id="uploaded-image-container" class="text-center d-none">
+                                        <h6 class="text-muted mb-2">Your Photo</h6>
+                                        <img id="uploaded-image" class="img-fluid mb-3 rounded shadow-sm" style="max-height: 250px; width: auto;" alt="Uploaded Image">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card mb-3 bg-dark border border-secondary">
+                                <div class="card-header bg-dark text-light border-bottom border-secondary">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-magic me-2"></i>Choose Style
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Ceremony Type</label>
+                                        <select class="form-select bg-dark text-light border-secondary" id="ceremony-select" name="style">
+                                            <option value="haldi">Haldi Ceremony</option>
+                                            <option value="mehendi">Mehendi Function</option>
+                                            <option value="wedding">Wedding Ceremony</option>
+                                            <option value="reception">Reception</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2 mt-4">
+                                        <button id="single-swap-btn" type="button" class="btn btn-primary w-50">
+                                            <i class="fas fa-bolt me-2"></i>Quick Create
+                                        </button>
+                                        <button id="browse-templates-btn" type="button" class="btn btn-outline-light w-50">
+                                            <i class="fas fa-images me-2"></i>Browse Templates
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- UNIFIED TEMPLATE SELECTION AREA -->
+                    <div id="unified-template-area" class="card bg-dark border border-secondary d-none mb-4">
+                        <div class="card-header bg-dark text-light border-bottom border-secondary d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-images me-2"></i><span id="template-area-title">Template Gallery</span>
+                            </h5>
+                            <div class="d-flex align-items-center">
+                                <div class="form-check form-switch me-3">
+                                    <input class="form-check-input" type="checkbox" id="multi-select-toggle">
+                                    <label class="form-check-label" for="multi-select-toggle">Multi-select</label>
+                                </div>
+                                <button id="close-template-area-btn" class="btn btn-sm btn-outline-light">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <!-- Template Navigation Tabs -->
+                            <div class="p-3">
+                                <ul class="nav nav-pills" id="template-tabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="haldi-tab" data-bs-toggle="pill" data-bs-target="#haldi-panel" 
+                                                type="button" role="tab" aria-controls="haldi-panel" aria-selected="true">
+                                            Haldi
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="mehendi-tab" data-bs-toggle="pill" data-bs-target="#mehendi-panel" 
+                                                type="button" role="tab" aria-controls="mehendi-panel" aria-selected="false">
+                                            Mehendi
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="wedding-tab" data-bs-toggle="pill" data-bs-target="#wedding-panel" 
+                                                type="button" role="tab" aria-controls="wedding-panel" aria-selected="false">
+                                            Wedding
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="reception-tab" data-bs-toggle="pill" data-bs-target="#reception-panel" 
+                                                type="button" role="tab" aria-controls="reception-panel" aria-selected="false">
+                                            Reception
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Template Galleries -->
+                            <div class="tab-content border-top border-secondary p-3" id="template-tabContent">
+                                <div class="tab-pane fade show active" id="haldi-panel" role="tabpanel" aria-labelledby="haldi-tab">
+                                    <div class="template-loading text-center py-5">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading templates...</span>
+                                        </div>
+                                        <p class="mt-2">Loading Haldi ceremony templates...</p>
+                                    </div>
+                                    <div class="template-grid row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3"></div>
+                                </div>
+                                
+                                <div class="tab-pane fade" id="mehendi-panel" role="tabpanel" aria-labelledby="mehendi-tab">
+                                    <div class="template-loading text-center py-5">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading templates...</span>
+                                        </div>
+                                        <p class="mt-2">Loading Mehendi function templates...</p>
+                                    </div>
+                                    <div class="template-grid row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3"></div>
+                                </div>
+                                
+                                <div class="tab-pane fade" id="wedding-panel" role="tabpanel" aria-labelledby="wedding-tab">
+                                    <div class="template-loading text-center py-5">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading templates...</span>
+                                        </div>
+                                        <p class="mt-2">Loading Wedding ceremony templates...</p>
+                                    </div>
+                                    <div class="template-grid row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3"></div>
+                                </div>
+                                
+                                <div class="tab-pane fade" id="reception-panel" role="tabpanel" aria-labelledby="reception-tab">
+                                    <div class="template-loading text-center py-5">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading templates...</span>
+                                        </div>
+                                        <p class="mt-2">Loading Reception templates...</p>
+                                    </div>
+                                    <div class="template-grid row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Selected Templates - Both Single and Multi -->
+                            <div id="selected-templates-panel" class="px-3 pb-3 pt-2 border-top border-secondary d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Selected Templates (<span id="selected-count">0</span>)</h5>
+                                    <button id="clear-selection-btn" type="button" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-times me-1"></i>Clear
+                                    </button>
+                                </div>
+                                <div class="selected-templates-scroll bg-black bg-opacity-25 rounded p-3 mb-3">
+                                    <div id="selected-templates-list" class="d-flex flex-nowrap gap-3"></div>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button id="process-templates-btn" type="button" class="btn btn-primary">
+                                        <i class="fas fa-magic me-2"></i>Create Bridal Look
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Loading Indicator -->
+                <div id="loading-container" class="text-center my-5 d-none">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h4 class="mt-3 text-light">Creating your bridal look...</h4>
+                    <p class="text-muted">This may take a moment as we apply AI face swapping.</p>
+                </div>
+                
+                <!-- Error Message -->
+                <div id="error-container" class="alert alert-danger border-0 shadow-sm my-4 d-none" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="error-message">An error occurred. Please try again.</span>
+                </div>
+                
+                <!-- UNIFIED RESULTS SECTION - For both single and multiple results -->
+                <div id="unified-results-section" class="my-4 d-none">
+                    <div class="card bg-dark shadow-lg border-0">
+                        <div class="card-header bg-primary bg-gradient text-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h3 class="mb-0"><i class="fas fa-crown me-2"></i><span id="results-title">Your Bridal Look</span></h3>
+                                <button id="back-to-templates-btn" class="btn btn-sm btn-outline-light">
+                                    <i class="fas fa-arrow-left me-1"></i>Back
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body bg-dark">
+                            <!-- Source Image (always shown once) -->
+                            <div class="source-image-container text-center mb-4 pb-3 border-bottom border-secondary">
+                                <h5 class="mb-3"><i class="fas fa-user me-2"></i>Your Photo</h5>
+                                <img id="source-display-image" class="img-fluid rounded shadow-sm" style="max-height: 200px;" alt="Your uploaded photo">
+                            </div>
+                            
+                            <!-- Results Display Area - Works for both single and multiple results -->
+                            <div class="results-section">
+                                <h5 class="mb-3"><i class="fas fa-magic me-2"></i>Your Bridal Look</h5>
+                                
+                                <!-- Results Container - Scrollable horizontal for multi, centered for single -->
+                                <div class="results-container"></div>
+                                
+                                <div class="d-flex justify-content-center mt-4 pt-3 border-top border-secondary">
+                                    <button id="try-different-btn" class="btn btn-outline-light me-2">
+                                        <i class="fas fa-redo me-2"></i>Try Different Style
+                                    </button>
+                                    <button id="add-more-templates-btn" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>Add More Looks
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM elements
+    const uploadForm = document.getElementById('upload-form');
+    const fileInput = document.getElementById('file');
+    const uploadedImageContainer = document.getElementById('uploaded-image-container');
+    const uploadedImage = document.getElementById('uploaded-image');
+    const ceremonySelect = document.getElementById('ceremony-select');
+    const singleSwapBtn = document.getElementById('single-swap-btn');
+    const browseTemplatesBtn = document.getElementById('browse-templates-btn');
+    const unifiedTemplateArea = document.getElementById('unified-template-area');
+    const multiSelectToggle = document.getElementById('multi-select-toggle');
+    const closeTemplateAreaBtn = document.getElementById('close-template-area-btn');
+    const selectedTemplatesPanel = document.getElementById('selected-templates-panel');
+    const selectedTemplatesList = document.getElementById('selected-templates-list');
+    const selectedCount = document.getElementById('selected-count');
+    const clearSelectionBtn = document.getElementById('clear-selection-btn');
+    const processTemplatesBtn = document.getElementById('process-templates-btn');
+    const loadingContainer = document.getElementById('loading-container');
+    const errorContainer = document.getElementById('error-container');
+    const errorMessage = document.getElementById('error-message');
+    const unifiedResultsSection = document.getElementById('unified-results-section');
+    const resultsContainer = document.querySelector('.results-container');
+    const sourceDisplayImage = document.getElementById('source-display-image');
+    const tryDifferentBtn = document.getElementById('try-different-btn');
+    const addMoreTemplatesBtn = document.getElementById('add-more-templates-btn');
+    const backToTemplatesBtn = document.getElementById('back-to-templates-btn');
+    const resultsTitle = document.getElementById('results-title');
+    const templateAreaTitle = document.getElementById('template-area-title');
+    
+    // Step indicators
+    const step1Indicator = document.getElementById('step1-indicator');
+    const step2Indicator = document.getElementById('step2-indicator');
+    const step3Indicator = document.getElementById('step3-indicator');
+    
+    // State variables
+    let selectedTemplates = [];
+    let currentCeremony = 'haldi';
+    let isMultiSelectMode = false;
+    let userImage = null;
+    
+    // File upload preview
+    fileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedImage.src = e.target.result;
+                sourceDisplayImage.src = e.target.result;
+                uploadedImageContainer.classList.remove('d-none');
+                userImage = e.target.result;
+                
+                // Activate step 2
+                step1Indicator.classList.remove('step-active');
+                step2Indicator.classList.add('step-active');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Ceremony select change
+    ceremonySelect.addEventListener('change', function() {
+        currentCeremony = this.value;
+        
+        // If template area is visible, activate the corresponding tab
+        if (!unifiedTemplateArea.classList.contains('d-none')) {
+            document.querySelector(`#template-tabs .nav-link[id="${currentCeremony}-tab"]`).click();
+        }
+    });
+    
+    // Quick Create button
+    singleSwapBtn.addEventListener('click', function() {
+        if (!fileInput.files[0]) {
+            showError('Please upload your photo first.');
+            return;
+        }
+        
+        isMultiSelectMode = false;
+        processSingleTemplate();
+    });
+    
+    // Browse Templates button
+    browseTemplatesBtn.addEventListener('click', function() {
+        if (!fileInput.files[0]) {
+            showError('Please upload your photo first.');
+            return;
+        }
+        
+        // Show template area
+        unifiedTemplateArea.classList.remove('d-none');
+        
+        // Set title based on multi-select mode
+        updateTemplateAreaTitle();
+        
+        // Load templates for current ceremony
+        loadTemplates(currentCeremony);
+        
+        // Activate relevant tab
+        document.querySelector(`#template-tabs .nav-link[id="${currentCeremony}-tab"]`).click();
+    });
+    
+    // Multi-select toggle
+    multiSelectToggle.addEventListener('change', function() {
+        isMultiSelectMode = this.checked;
+        document.body.classList.toggle('template-selection-mode', isMultiSelectMode);
+        updateTemplateAreaTitle();
+        
+        // Clear selection when switching modes
+        clearSelection();
+    });
+    
+    // Close template area button
+    closeTemplateAreaBtn.addEventListener('click', function() {
+        unifiedTemplateArea.classList.add('d-none');
+        clearSelection();
+    });
+    
+    // Clear selection button
+    clearSelectionBtn.addEventListener('click', clearSelection);
+    
+    // Process templates button
+    processTemplatesBtn.addEventListener('click', function() {
+        if (selectedTemplates.length === 0) {
+            showError('Please select at least one template.');
+            return;
+        }
+        
+        if (selectedTemplates.length === 1) {
+            processSingleTemplate(selectedTemplates[0]);
+        } else {
+            processMultipleTemplates();
+        }
+    });
+    
+    // Try different button
+    tryDifferentBtn.addEventListener('click', function() {
+        unifiedResultsSection.classList.add('d-none');
+        clearResults();
+        
+        // Activate step 2 again
+        step3Indicator.classList.remove('step-active');
+        step2Indicator.classList.add('step-active');
+    });
+    
+    // Add more templates button
+    addMoreTemplatesBtn.addEventListener('click', function() {
+        unifiedResultsSection.classList.add('d-none');
+        unifiedTemplateArea.classList.remove('d-none');
+        
+        // Ensure multi-select mode is active
+        if (!isMultiSelectMode) {
+            multiSelectToggle.checked = true;
+            isMultiSelectMode = true;
+            document.body.classList.add('template-selection-mode');
+            updateTemplateAreaTitle();
+        }
+        
+        // Activate step 2 again
+        step3Indicator.classList.remove('step-active');
+        step2Indicator.classList.add('step-active');
+    });
+    
+    // Back to templates button
+    backToTemplatesBtn.addEventListener('click', function() {
+        unifiedResultsSection.classList.add('d-none');
+        unifiedTemplateArea.classList.remove('d-none');
+        
+        // Activate step 2 again
+        step3Indicator.classList.remove('step-active');
+        step2Indicator.classList.add('step-active');
+    });
+    
+    // Template tab clicks
+    document.querySelectorAll('#template-tabs .nav-link').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const ceremonyType = this.id.replace('-tab', '');
+            loadTemplates(ceremonyType);
+        });
+    });
+    
+    // Function to load templates
+    function loadTemplates(ceremonyType) {
+        const templateGrid = document.querySelector(`#${ceremonyType}-panel .template-grid`);
+        const loadingIndicator = document.querySelector(`#${ceremonyType}-panel .template-loading`);
+        
+        // Show loading
+        templateGrid.innerHTML = '';
+        loadingIndicator.classList.remove('d-none');
+        
+        // Fetch templates
+        fetch(`/get_templates?ceremony=${ceremonyType}&cache=${Date.now()}`)
+            .then(response => response.json())
+            .then(data => {
+                loadingIndicator.classList.add('d-none');
+                
+                if (data.templates && data.templates.length > 0) {
+                    data.templates.forEach((template, index) => {
+                        const templateCard = createTemplateCard(template, ceremonyType, index);
+                        templateGrid.appendChild(templateCard);
+                    });
+                } else {
+                    templateGrid.innerHTML = `<div class="col-12 text-center py-5">
+                        <p class="text-muted">No templates found for ${ceremonyType} ceremony.</p>
+                    </div>`;
+                }
+            })
+            .catch(error => {
+                loadingIndicator.classList.add('d-none');
+                templateGrid.innerHTML = `<div class="col-12 text-center py-5">
+                    <p class="text-danger">Error loading templates. Please try again.</p>
+                </div>`;
+                console.error('Error fetching templates:', error);
+            });
+    }
+    
+    // Function to create template card
+    function createTemplateCard(template, ceremonyType, index) {
+        const cardCol = document.createElement('div');
+        cardCol.className = 'col';
+        
+        const isSelected = selectedTemplates.some(t => t.path === template.path);
+        
+        cardCol.innerHTML = `
+            <div class="card template-card h-100 bg-dark border border-secondary ${isSelected ? 'selected' : ''}">
+                <div class="template-checkbox-wrapper">
+                    <input type="checkbox" class="template-checkbox" data-ceremony="${ceremonyType}" 
+                           data-template-path="${template.path}" ${isSelected ? 'checked' : ''}>
+                </div>
+                <img src="${template.url}" class="card-img-top" alt="${ceremonyType} template" 
+                     style="height: 200px; object-fit: cover;">
+                <div class="card-footer bg-dark text-light">
+                    <small class="text-muted">${ceremonyType} Style ${index + 1}</small>
+                </div>
+            </div>
+        `;
+        
+        // Add click handler
+        const card = cardCol.querySelector('.template-card');
+        const checkbox = cardCol.querySelector('.template-checkbox');
+        
+        card.addEventListener('click', function(e) {
+            if (isMultiSelectMode) {
+                // In multi-select mode, toggle the checkbox
+                checkbox.checked = !checkbox.checked;
+                handleTemplateSelection(checkbox, ceremonyType, template);
+            } else {
+                // In single select mode, select this template only
+                clearSelection();
+                checkbox.checked = true;
+                card.classList.add('selected');
+                selectedTemplates = [{
+                    ceremony: ceremonyType,
+                    path: template.path
+                }];
+                updateSelectedTemplatesPanel();
+            }
+        });
+        
+        checkbox.addEventListener('change', function(e) {
+            e.stopPropagation();
+            handleTemplateSelection(this, ceremonyType, template);
+        });
+        
+        return cardCol;
+    }
+    
+    // Handle template selection/deselection
+    function handleTemplateSelection(checkbox, ceremonyType, template) {
+        const card = checkbox.closest('.template-card');
+        
+        if (checkbox.checked) {
+            // Add to selection
+            card.classList.add('selected');
+            selectedTemplates.push({
+                ceremony: ceremonyType,
+                path: template.path
+            });
+        } else {
+            // Remove from selection
+            card.classList.remove('selected');
+            selectedTemplates = selectedTemplates.filter(t => t.path !== template.path);
+        }
+        
+        updateSelectedTemplatesPanel();
+    }
+    
+    // Update selected templates panel
+    function updateSelectedTemplatesPanel() {
+        if (selectedTemplates.length > 0) {
+            selectedTemplatesPanel.classList.remove('d-none');
+            selectedCount.textContent = selectedTemplates.length;
+            
+            // Update selected templates list
+            selectedTemplatesList.innerHTML = '';
+            
+            selectedTemplates.forEach((template, index) => {
+                const templateItem = document.createElement('div');
+                templateItem.className = 'selected-template-item';
+                templateItem.innerHTML = `
+                    <div class="card bg-dark border border-secondary h-100">
+                        <img src="/uploads/templates/${template.path}" class="card-img-top" 
+                             alt="${template.ceremony} template" style="height: 100px; object-fit: cover;">
+                        <div class="card-footer p-1 bg-dark text-center">
+                            <small class="text-light">${template.ceremony}</small>
+                        </div>
+                        <button type="button" class="remove-template" data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                
+                const removeBtn = templateItem.querySelector('.remove-template');
+                removeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const idx = parseInt(this.dataset.index);
+                    removeTemplate(idx);
+                });
+                
+                selectedTemplatesList.appendChild(templateItem);
+            });
+        } else {
+            selectedTemplatesPanel.classList.add('d-none');
+        }
+    }
+    
+    // Remove template from selection
+    function removeTemplate(index) {
+        const template = selectedTemplates[index];
+        selectedTemplates.splice(index, 1);
+        
+        // Update checkbox in template grid
+        const checkbox = document.querySelector(`.template-checkbox[data-template-path="${template.path}"]`);
+        if (checkbox) {
+            checkbox.checked = false;
+            checkbox.closest('.template-card').classList.remove('selected');
+        }
+        
+        updateSelectedTemplatesPanel();
+    }
+    
+    // Clear selection
+    function clearSelection() {
+        selectedTemplates = [];
+        
+        // Uncheck all checkboxes
+        document.querySelectorAll('.template-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+            checkbox.closest('.template-card').classList.remove('selected');
+        });
+        
+        updateSelectedTemplatesPanel();
+    }
+    
+    // Process single template
+    function processSingleTemplate(template) {
+        // Show loading
+        loadingContainer.classList.remove('d-none');
+        unifiedTemplateArea.classList.add('d-none');
+        errorContainer.classList.add('d-none');
+        
+        const formData = new FormData(uploadForm);
+        
+        // If template provided, use it
+        if (template) {
+            formData.append('template_path', template.path);
+            formData.append('ceremony_type', template.ceremony);
+        } else {
+            // Otherwise use selected ceremony
+            formData.append('style', ceremonySelect.value);
+        }
+        
+        // Send request
+        fetch('/bridal_swap', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingContainer.classList.add('d-none');
+            
+            if (data.success) {
+                showSingleResult(data);
+            } else {
+                showError(data.message || 'Error processing image');
+            }
+        })
+        .catch(error => {
+            loadingContainer.classList.add('d-none');
+            showError('Network error. Please try again.');
+            console.error('Error:', error);
+        });
+    }
+    
+    // Process multiple templates
+    function processMultipleTemplates() {
+        // Show loading
+        loadingContainer.classList.remove('d-none');
+        unifiedTemplateArea.classList.add('d-none');
+        errorContainer.classList.add('d-none');
+        
+        const formData = new FormData(uploadForm);
+        
+        // Add selected templates
+        selectedTemplates.forEach((template, index) => {
+            formData.append(`template_${index}`, template.path);
+            formData.append(`ceremony_${index}`, template.ceremony);
+        });
+        
+        formData.append('template_count', selectedTemplates.length);
+        
+        // Send request
+        fetch('/bridal_swap_multi', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingContainer.classList.add('d-none');
+            
+            if (data.success) {
+                showMultiResults(data);
+            } else {
+                showError(data.message || 'Error processing images');
+            }
+        })
+        .catch(error => {
+            loadingContainer.classList.add('d-none');
+            showError('Network error. Please try again.');
+            console.error('Error:', error);
+        });
+    }
+    
+    // Show single result
+    function showSingleResult(data) {
+        // Activate step 3
+        step2Indicator.classList.remove('step-active');
+        step3Indicator.classList.add('step-active');
+        
+        // Update result section
+        unifiedResultsSection.classList.remove('d-none');
+        resultsTitle.textContent = 'Your Bridal Look';
+        
+        // Clear previous results
+        clearResults();
+        
+        // Create result card
+        const resultCard = document.createElement('div');
+        resultCard.className = 'result-card mx-auto';
+        
+        resultCard.innerHTML = `
+            <div class="card bg-dark border-0 shadow position-relative">
+                <div class="card-img-top position-relative overflow-hidden" style="height: 230px;">
+                    <img src="${data.result_path}" class="result-img" alt="Bridal result">
+                    <div class="position-absolute top-0 end-0 m-2">
+                        <span class="badge bg-primary">${data.ceremony_type || ceremonySelect.value}</span>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center bg-dark text-light">
+                    <span class="ceremony-badge"><i class="fas fa-check-circle text-success me-1"></i> ${data.ceremony_type || ceremonySelect.value}</span>
+                    <div class="btn-group">
+                        <a href="${data.result_path}" class="btn btn-sm btn-success" download>
+                            <i class="fas fa-download"></i> Save
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        resultsContainer.appendChild(resultCard);
+        
+        // Update add more button visibility
+        addMoreTemplatesBtn.classList.remove('d-none');
+    }
+    
+    // Show multiple results
+    function showMultiResults(data) {
+        // Activate step 3
+        step2Indicator.classList.remove('step-active');
+        step3Indicator.classList.add('step-active');
+        
+        // Update result section
+        unifiedResultsSection.classList.remove('d-none');
+        resultsTitle.textContent = 'Your Bridal Looks';
+        
+        // Clear previous results
+        clearResults();
+        
+        // Create result cards
+        data.results.forEach(result => {
+            const resultCard = document.createElement('div');
+            resultCard.className = 'result-card';
+            
+            resultCard.innerHTML = `
+                <div class="card bg-dark border-0 shadow position-relative">
+                    <div class="card-img-top position-relative overflow-hidden" style="height: 230px;">
+                        <img src="${result.result_image}" class="result-img" alt="Bridal result for ${result.ceremony_type}">
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-primary">${result.ceremony_type}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center bg-dark text-light">
+                        <span class="ceremony-badge"><i class="fas fa-check-circle text-success me-1"></i> ${result.ceremony_type}</span>
+                        <div class="btn-group">
+                            <a href="${result.result_image}" class="btn btn-sm btn-success" download>
+                                <i class="fas fa-download"></i> Save
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            resultsContainer.appendChild(resultCard);
+        });
+        
+        // Update add more button visibility
+        addMoreTemplatesBtn.classList.remove('d-none');
+    }
+    
+    // Clear results
+    function clearResults() {
+        resultsContainer.innerHTML = '';
+    }
+    
+    // Show error
+    function showError(message) {
+        errorContainer.classList.remove('d-none');
+        errorMessage.textContent = message;
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            errorContainer.classList.add('d-none');
+        }, 5000);
+    }
+    
+    // Update template area title based on mode
+    function updateTemplateAreaTitle() {
+        templateAreaTitle.textContent = isMultiSelectMode ? 'Select Multiple Templates' : 'Choose a Template';
+    }
+    
+    // Check model status on page load
+    fetch('/check_models')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.face_detection_model || !data.face_swap_model) {
+                const modelStatusAlert = document.getElementById('model-status-alert');
+                const modelStatusMessage = document.getElementById('model-status-message');
+                
+                modelStatusMessage.textContent = 'Some required models are not loaded. Face swap functionality may be limited.';
+                modelStatusAlert.classList.remove('d-none');
+            }
+        })
+        .catch(error => {
+            console.error('Error checking model status:', error);
+        });
+});
+</script>
+{% endblock %}
