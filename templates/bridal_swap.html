@@ -1267,9 +1267,37 @@ document.addEventListener('DOMContentLoaded', function() {
             if (loadingContainer) loadingContainer.classList.add('d-none');
             
             if (data.success) {
-                // Display all results
+                console.log('Server indicated success, checking for results data');
+                // Make sure results exists and is an array
+                if (!data.results) {
+                    console.warn('No results array found in response, creating empty array');
+                    data.results = [];
+                }
+                
+                // If this is a single result (from traditional endpoint)
+                if (data.multi === false && data.result_image) {
+                    console.log('Converting single result to multi-result format');
+                    // Create a synthetic results array with the single result
+                    const singleResult = {
+                        result_image: data.result_image,
+                        ceremony: data.style || selectedTemplates[0]?.ceremony || 'unknown',
+                        index: 0
+                    };
+                    
+                    // Use an array with the single result
+                    data.results = [singleResult];
+                }
+                
+                // Display results with proper checks
                 displayMultiResults(data.results, selectedTemplates);
                 console.log('Successfully displayed results');
+                
+                // Show the multi-results container explicitly
+                const multiResultsContainer = document.getElementById('multi-results-container');
+                if (multiResultsContainer) {
+                    multiResultsContainer.classList.remove('d-none');
+                    multiResultsContainer.scrollIntoView({ behavior: 'smooth' });
+                }
             } else {
                 showError(data.error || 'An unknown error occurred.');
                 console.error('Error from server:', data.error);
@@ -1293,6 +1321,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayMultiResults(results, selectedTemplates) {
         console.log('Display multi results called with:', results?.length || 0, 'results');
         
+        // Ensure results is an array
+        if (!results) {
+            console.warn('Results array is undefined or null, using empty array');
+            results = [];
+        }
+        
+        // Ensure selectedTemplates is an array
+        if (!selectedTemplates) {
+            console.warn('Selected templates array is undefined or null, using empty array');
+            selectedTemplates = [];
+        }
+        
         const multiResultsContainer = document.getElementById('multi-results-container');
         
         // Make sure the container exists
@@ -1313,15 +1353,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log('Found multi-results containers, processing results...');
         
-        // Add new results to our global array
-        results.forEach((result, index) => {
-            const template = selectedTemplates[index];
-            allProcessedResults.push({
-                result: result,
-                template: template,
-                timestamp: new Date().getTime()
+        // Add new results to our global array with careful validation
+        if (Array.isArray(results) && results.length > 0) {
+            results.forEach((result, index) => {
+                // Ensure we have a valid template object
+                const template = (index < selectedTemplates.length) ? selectedTemplates[index] : null;
+                
+                allProcessedResults.push({
+                    result: result,
+                    template: template,
+                    timestamp: new Date().getTime()
+                });
             });
-        });
+        } else {
+            console.warn('No results to process');
+        }
         
         console.log('Total processed results:', allProcessedResults.length);
         
