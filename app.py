@@ -1275,6 +1275,7 @@ def bridal_swap_multi():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/templates', methods=['GET'])
+@app.route('/get_templates')
 def get_templates():
     """
     API endpoint to get available templates for a specific ceremony type.
@@ -1671,10 +1672,11 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/check-models')
+@app.route('/check_models')
 def check_models():
     status = {
-        'face_detection': faceapp is not None,
-        'face_swap': swapper is not None,
+        'face_detection_model': faceapp is not None,
+        'face_swap_model': swapper is not None,
         'demo_mode': demo_mode
     }
     return jsonify(status)
