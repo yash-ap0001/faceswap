@@ -2,6 +2,149 @@
 
 {% block style %}
 <style>
+    /* Transparent modal styling */
+    .modal-transparent .modal-content {
+        background-color: rgba(33, 33, 33, 0.9);
+        backdrop-filter: blur(5px);
+    }
+    
+    /* Loading overlay */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+    
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: var(--primary-purple);
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    
+    .face-swap-controls {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+    
+    .face-swap-controls .btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    
+    .face-swap-controls .btn i {
+        font-size: 24px;
+    }
+    
+    .face-swap-photo-container {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin: 0 auto 15px;
+        background-color: rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px dashed rgba(255, 255, 255, 0.3);
+    }
+    
+    .face-swap-photo-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .photo-placeholder-icon {
+        font-size: 48px;
+        opacity: 0.5;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .template-selection-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .template-card {
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    
+    .template-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .template-card.selected {
+        border: 3px solid var(--primary-purple);
+    }
+    
+    .template-card .card-img-top {
+        height: 250px;
+        object-fit: cover;
+    }
+    
+    .ceremony-label {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: rgba(0,0,0,0.6);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+    
+    .btn-swap {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background-color: var(--primary-purple);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .template-card:hover .btn-swap {
+        opacity: 1;
+    }
+    
     :root {
         --primary-purple: #5e35b1;
         --secondary-purple: #7e57c2;
@@ -2118,4 +2261,272 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 </div>
+
+<!-- Floating Face Swap Controls -->
+<div class="face-swap-controls">
+    <button class="btn btn-primary" id="openPhotoUploadBtn" title="Upload Your Photo">
+        <i class="fas fa-camera"></i>
+    </button>
+    <button class="btn btn-success d-none" id="startSwappingBtn" title="Start Face Swapping">
+        <i class="fas fa-magic"></i>
+    </button>
+</div>
+
+<!-- Transparent Photo Upload Modal -->
+<div class="modal fade" id="photoUploadModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-transparent">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Upload Your Photo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="face-swap-photo-container mb-4">
+                    <img id="userPhotoPreview" class="d-none" alt="Your photo preview">
+                    <i id="photoPlaceholder" class="fas fa-user photo-placeholder-icon"></i>
+                </div>
+                
+                <input type="file" class="form-control mb-4" id="userPhotoInput" accept=".jpg,.jpeg,.png" style="max-width: 300px; margin: 0 auto;">
+                
+                <div class="alert alert-info">
+                    <small>Upload a clear, front-facing photo for best results. After uploading, click on any template to create your face swap.</small>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="continueBtn" disabled>Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Results Preview Modal -->
+<div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title">Face Swap Result</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="faceSwapResult" class="img-fluid rounded shadow-lg" alt="Face swap result">
+            </div>
+            <div class="modal-footer">
+                <a id="downloadResultBtn" href="#" class="btn btn-primary" download>
+                    <i class="fas fa-download me-2"></i> Download
+                </a>
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay d-none">
+    <div class="spinner mb-3"></div>
+    <h4 class="text-white" id="loadingMessage">Processing...</h4>
+</div>
+
+<script>
+// Add transparent modals and face swapping functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const photoUploadBtn = document.getElementById('openPhotoUploadBtn');
+    const startSwappingBtn = document.getElementById('startSwappingBtn');
+    const userPhotoInput = document.getElementById('userPhotoInput');
+    const userPhotoPreview = document.getElementById('userPhotoPreview');
+    const photoPlaceholder = document.getElementById('photoPlaceholder');
+    const continueBtn = document.getElementById('continueBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingMessage = document.getElementById('loadingMessage');
+    const faceSwapResult = document.getElementById('faceSwapResult');
+    const downloadResultBtn = document.getElementById('downloadResultBtn');
+    
+    // Global variables
+    window.userPhotoFile = null;
+    
+    // Initialize modals
+    const photoUploadModal = new bootstrap.Modal(document.getElementById('photoUploadModal'));
+    const resultsModal = new bootstrap.Modal(document.getElementById('resultsModal'));
+    
+    // Event listeners
+    photoUploadBtn.addEventListener('click', function() {
+        photoUploadModal.show();
+    });
+    
+    // Handle photo upload
+    userPhotoInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                userPhotoPreview.src = e.target.result;
+                userPhotoPreview.classList.remove('d-none');
+                photoPlaceholder.classList.add('d-none');
+                
+                // Store the file for later use
+                window.userPhotoFile = userPhotoInput.files[0];
+                
+                // Enable the continue button
+                continueBtn.disabled = false;
+            };
+            
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+    
+    // Continue button
+    continueBtn.addEventListener('click', function() {
+        // Hide the modal
+        photoUploadModal.hide();
+        
+        // Show the start swapping button
+        startSwappingBtn.classList.remove('d-none');
+        
+        // Show a notification that user can click on templates
+        showNotification('Your photo has been uploaded! Click on any template to create a face swap.');
+    });
+    
+    // Add click handlers to all template images
+    document.querySelectorAll('.preview-image').forEach(img => {
+        img.addEventListener('click', function() {
+            // Check if we have a user photo
+            if (!window.userPhotoFile) {
+                photoUploadModal.show();
+                return;
+            }
+            
+            // Get template info
+            const templatePath = this.getAttribute('data-template-path');
+            const ceremony = this.getAttribute('data-ceremony');
+            
+            // Process the face swap
+            processFaceSwap(templatePath, ceremony);
+        });
+    });
+    
+    // Process face swap
+    function processFaceSwap(templatePath, ceremonyType) {
+        // Show loading overlay
+        showLoading('Creating your face swap...');
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('source', window.userPhotoFile);
+        formData.append('style', ceremonyType);
+        formData.append('template_path', templatePath);
+        
+        // Send AJAX request
+        fetch('/bridal-swap', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            
+            if (data.success) {
+                // Show the result
+                showResult(data.result_image);
+            } else {
+                showError(data.error || 'Failed to process image');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            showError('An error occurred: ' + error.message);
+        });
+    }
+    
+    // Show face swap result
+    function showResult(resultImagePath) {
+        faceSwapResult.src = resultImagePath;
+        downloadResultBtn.href = resultImagePath;
+        downloadResultBtn.download = 'face-swap-' + new Date().getTime() + '.jpg';
+        
+        // Show the results modal
+        resultsModal.show();
+    }
+    
+    // Show loading overlay
+    function showLoading(message = 'Processing...') {
+        if (loadingMessage) {
+            loadingMessage.textContent = message;
+        }
+        loadingOverlay.classList.remove('d-none');
+    }
+    
+    // Hide loading overlay
+    function hideLoading() {
+        loadingOverlay.classList.add('d-none');
+    }
+    
+    // Show error message
+    function showError(message) {
+        // Create alert if it doesn't exist
+        if (!document.getElementById('alertMessage')) {
+            const alertDiv = document.createElement('div');
+            alertDiv.id = 'alertMessage';
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-4 shadow';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+                <span id="alertText"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.body.appendChild(alertDiv);
+        }
+        
+        // Update and show the alert
+        const alertDiv = document.getElementById('alertMessage');
+        const alertText = document.getElementById('alertText');
+        
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-4 shadow';
+        alertText.textContent = message;
+        
+        // Show the alert
+        const bsAlert = new bootstrap.Alert(alertDiv);
+        
+        // Auto-dismiss after 3 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                bsAlert.close();
+            }
+        }, 3000);
+    }
+    
+    // Show notification
+    function showNotification(message) {
+        // Create alert if it doesn't exist
+        if (!document.getElementById('alertMessage')) {
+            const alertDiv = document.createElement('div');
+            alertDiv.id = 'alertMessage';
+            alertDiv.className = 'alert alert-info alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-4 shadow';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+                <span id="alertText"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.body.appendChild(alertDiv);
+        }
+        
+        // Update and show the alert
+        const alertDiv = document.getElementById('alertMessage');
+        const alertText = document.getElementById('alertText');
+        
+        alertDiv.className = 'alert alert-info alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-4 shadow';
+        alertText.textContent = message;
+        
+        // Show the alert
+        const bsAlert = new bootstrap.Alert(alertDiv);
+        
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                bsAlert.close();
+            }
+        }, 5000);
+    }
+});
+</script>
+
 {% endblock %}
