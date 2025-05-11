@@ -627,6 +627,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const templatePreviewContainer = document.getElementById('template-preview-container');
     const templatePreview = document.getElementById('template-preview');
     const templateUrlInput = document.getElementById('template-url');
+    // Additional elements for multi-template processing
+    const processSelectedTemplatesBtn = document.getElementById('processSelectedTemplatesBtn');
     
     // Function to use a template (called when a template is selected)
     function useTemplate(templateCard) {
@@ -979,9 +981,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Also update the new process button in the selected templates preview
-        const processSelectedTemplatesBtn = document.getElementById('processSelectedTemplatesBtn');
         if (processSelectedTemplatesBtn) {
-            const sourceInput = document.getElementById('source-input');
             const hasSourceImage = sourceInput && sourceInput.files.length > 0;
             
             processSelectedTemplatesBtn.disabled = (count === 0 || count > 5 || !hasSourceImage);
@@ -1107,7 +1107,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Add event listener to the new process selected templates button in the preview section
-    const processSelectedTemplatesBtn = document.getElementById('processSelectedTemplatesBtn');
     if (processSelectedTemplatesBtn) {
         processSelectedTemplatesBtn.addEventListener('click', function() {
             processSelectedTemplates();
@@ -1116,11 +1115,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to process selected templates
     function processSelectedTemplates() {
+        console.log('Process Selected Templates function called');
+        
+        // Get the source input element
+        const sourceInput = document.getElementById('source-input');
+        
         // Check if source image is selected
-        if (!sourceInput.files.length) {
+        if (!sourceInput || !sourceInput.files.length) {
             showError('Please upload your photo first.');
+            console.error('Source input not found or no file selected');
             return;
         }
+        
+        console.log('Source file found:', sourceInput.files[0].name);
         
         // Select both cards with .selected class and those with checked checkboxes
         const selectedCards = Array.from(document.querySelectorAll('.template-card.selected, .template-card:has(.template-checkbox:checked)'));
@@ -1167,10 +1174,17 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Selected templates data:', JSON.stringify(selectedTemplates));
         
         // Show loading state
-        loadingContainer.classList.remove('d-none');
-        resultContainer.classList.add('d-none');
-        document.getElementById('multi-results-container').classList.add('d-none');
-        errorContainer.classList.add('d-none');
+        const loadingContainer = document.getElementById('loading-container');
+        const resultContainer = document.getElementById('result-container');
+        const errorContainer = document.getElementById('error-container');
+        const multiResultsContainer = document.getElementById('multi-results-container');
+        
+        if (loadingContainer) loadingContainer.classList.remove('d-none');
+        if (resultContainer) resultContainer.classList.add('d-none');
+        if (multiResultsContainer) multiResultsContainer.classList.add('d-none');
+        if (errorContainer) errorContainer.classList.add('d-none');
+        
+        console.log('Loading state shown, preparing form data');
         
         // Create form data with source image and selected templates
         const formData = new FormData();
@@ -1189,19 +1203,32 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Received response:', response.status);
+            return response.json();
+        })
         .then(data => {
-            loadingContainer.classList.add('d-none');
+            console.log('Received data:', data);
+            
+            // Hide loading indicator
+            if (loadingContainer) loadingContainer.classList.add('d-none');
             
             if (data.success) {
                 // Display all results
                 displayMultiResults(data.results, selectedTemplates);
+                console.log('Successfully displayed results');
             } else {
                 showError(data.error || 'An unknown error occurred.');
+                console.error('Error from server:', data.error);
             }
         })
         .catch(error => {
-            loadingContainer.classList.add('d-none');
+            console.error('Fetch error:', error);
+            
+            // Hide loading indicator
+            if (loadingContainer) loadingContainer.classList.add('d-none');
+            
+            // Show error
             showError('Network error: ' + error.message);
         });
     }
