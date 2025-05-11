@@ -127,6 +127,17 @@
         color: #e9ecef;
     }
     
+    /* Button flash animation */
+    @keyframes btn-flash {
+        0% { background-color: var(--bs-primary); color: white; transform: scale(1); }
+        50% { background-color: var(--bs-info); color: white; transform: scale(1.1); }
+        100% { background-color: var(--bs-primary); color: white; transform: scale(1); }
+    }
+    
+    .btn-flash {
+        animation: btn-flash 0.75s ease 2;
+    }
+    
     /* Remove old footer styles that are no longer needed */
     
     /* Selection count badge */
@@ -986,15 +997,53 @@ document.addEventListener('DOMContentLoaded', function() {
             behavior: 'smooth'
         });
         
-        // Add event listener to try again button
+        // Add event listeners to buttons in the multi-results section
         const multiTryAgainBtn = document.getElementById('multi-try-again-btn');
+        const selectMoreBtn = document.getElementById('select-more-btn');
+        
         if (multiTryAgainBtn) {
             multiTryAgainBtn.addEventListener('click', function() {
                 // Reset selection mode and clear results
                 if (toggleSelectionModeBtn) {
                     toggleSelectionModeBtn.click(); // This will turn off selection mode
                 }
+                
+                // Clear all selections
+                document.querySelectorAll('.template-card').forEach(card => {
+                    card.classList.remove('selected');
+                    const checkbox = card.querySelector('.template-checkbox');
+                    if (checkbox) checkbox.checked = false;
+                });
+                
+                // Reset selection count
+                updateSelectionCount(0);
+                
+                // Hide results
                 multiResultsContainer.classList.add('d-none');
+                
+                // Scroll back to templates section
+                document.querySelector('.template-tab-content').scrollIntoView({behavior: 'smooth'});
+            });
+        }
+        
+        if (selectMoreBtn) {
+            selectMoreBtn.addEventListener('click', function() {
+                // Keep the existing results visible
+                // Turn on selection mode if it's not already on
+                if (toggleSelectionModeBtn && !isSelectionModeActive) {
+                    toggleSelectionModeBtn.click(); // This will turn on selection mode
+                }
+                
+                // Scroll to templates section
+                document.querySelector('.template-tab-content').scrollIntoView({behavior: 'smooth'});
+                
+                // Flash the selection mode button to draw attention
+                if (toggleSelectionModeBtn) {
+                    toggleSelectionModeBtn.classList.add('btn-flash');
+                    setTimeout(() => {
+                        toggleSelectionModeBtn.classList.remove('btn-flash');
+                    }, 1500);
+                }
             });
         }
     }
