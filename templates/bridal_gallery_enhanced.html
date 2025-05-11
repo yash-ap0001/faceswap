@@ -384,34 +384,34 @@
             </a>
         </div>
         
-        <!-- Real Photos Section -->
-        <div class="template-type-section real-templates">
+        <!-- Pinterest Templates Section -->
+        <div class="template-type-section pinterest-templates">
             <div class="template-category-header">
-                <span class="template-type-title">Real Photos</span>
+                <span class="template-type-title">Pinterest Templates</span>
                 <button class="show-more-btn">
                     <i class="fas fa-th me-1"></i> Show More
                 </button>
             </div>
             <div class="template-variations">
-                {% if templates[ceremony_type].real %}
+                {% if templates[ceremony_type].pinterest %}
                 <div class="variation-card">
                     <div class="bridal-card shadow-sm">
                         <div class="category-badge">{{ ceremony_type|title }}</div>
-                        <div class="template-type-badge">Real</div>
+                        <div class="template-type-badge">Pinterest</div>
                         <div class="template-img-container">
-                            <img src="{{ templates[ceremony_type].real }}" class="template-img" alt="{{ ceremony_type|title }} Real Template">
-                            <a href="/bridal-swap?style={{ ceremony_type }}&template_type=real" class="btn-floating btn-try">
+                            <img src="{{ templates[ceremony_type].pinterest }}" class="template-img" alt="{{ ceremony_type|title }} Pinterest Template">
+                            <a href="/bridal-swap?style={{ ceremony_type }}&template_type=pinterest" class="btn-floating btn-try">
                                 <i class="fas fa-magic"></i>
                             </a>
                         </div>
                         <div class="card-body">
-                            <h6 class="card-title">{{ ceremony_type|title }} Real</h6>
-                            <p class="card-text small">Authentic traditional outfit and jewelry</p>
+                            <h6 class="card-title">{{ ceremony_type|title }} Pinterest</h6>
+                            <p class="card-text small">Curated traditional bridal look</p>
                         </div>
                     </div>
                 </div>
                 {% else %}
-                <div class="alert alert-secondary">No real templates available for {{ ceremony_type|title }}</div>
+                <div class="alert alert-secondary">No Pinterest templates available for {{ ceremony_type|title }}</div>
                 {% endif %}
             </div>
         </div>
