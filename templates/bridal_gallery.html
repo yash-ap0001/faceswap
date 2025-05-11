@@ -278,21 +278,8 @@
     <div class="card mb-4 shadow">
         <div class="card-body p-2">
             <div class="row align-items-center">
-                <div class="col-md-6">
-                    <div class="d-flex gap-3 align-items-center">
-                        <div class="btn-group" role="group">
-                            <input type="radio" class="btn-check" name="templateType" id="real" value="real" checked autocomplete="off">
-                            <label class="btn btn-outline-secondary" for="real">Real Photos</label>
-                            
-                            <input type="radio" class="btn-check" name="templateType" id="natural" value="natural" autocomplete="off">
-                            <label class="btn btn-outline-secondary" for="natural">Natural Style</label>
-                            
-                            <input type="radio" class="btn-check" name="templateType" id="ai" value="ai" autocomplete="off">
-                            <label class="btn btn-outline-secondary" for="ai">AI Generated</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
+                <!-- Template type filters removed - Using only Pinterest photos now -->
+                <div class="col-12">
                     <div class="d-flex gap-2 justify-content-md-end mt-3 mt-md-0">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" id="cat-haldi" value="haldi" checked>
@@ -520,8 +507,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Get selected template type
-        const templateType = document.querySelector('input[name="templateType"]:checked').value;
+        // Always use Pinterest templates
+        const templateType = 'pinterest';
         
         // Get selected categories
         const selectedCategories = [];
