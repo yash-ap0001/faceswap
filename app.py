@@ -662,23 +662,33 @@ def delete_templates():
     
     for path in template_paths:
         try:
-            # Validate the path - ensure it starts with uploads/templates
-            if not path or not path.startswith('uploads/templates/'):
+            # Validate the path - ensure it starts with /uploads/templates
+            if not path or not (path.startswith('/uploads/templates/') or path.startswith('uploads/templates/')):
                 errors.append(f"Invalid path: {path}")
                 continue
                 
+            # Convert relative URLs to filesystem paths
+            if path.startswith('/'):
+                # Remove leading slash for filesystem path
+                fs_path = path[1:]
+            else:
+                fs_path = path
+                
+            app.logger.info(f"Attempting to delete template: {fs_path}")
+                
             # Ensure the path exists
-            if not os.path.exists(path):
-                errors.append(f"File not found: {path}")
+            if not os.path.exists(fs_path):
+                errors.append(f"File not found: {fs_path}")
                 continue
                 
             # Delete the file
-            os.remove(path)
+            os.remove(fs_path)
             deleted_count += 1
-            app.logger.info(f"Deleted template: {path}")
+            app.logger.info(f"Deleted template: {fs_path}")
             
         except Exception as e:
             errors.append(f"Error deleting {path}: {str(e)}")
+            app.logger.error(f"Exception during delete: {str(e)}")
     
     return jsonify({
         "success": True,
