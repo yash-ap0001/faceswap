@@ -1039,7 +1039,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Call initialization when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
         initializeCarouselsCollapsed();
-        initializeSelectionModes();
         
         // Initialize global variables for selection
         window.currentMode = 'single'; // Default to single template mode
@@ -1066,6 +1065,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
+        
+        // Initialize selection modes
+        initializeSelectionModes();
+        
+        // Handler for template clicks based on the current mode
+        window.handleTemplateClick = function(event, templatePath, ceremonyType) {
+            // Check if this was a click on a button and ignore if so
+            if (event.target.tagName === 'BUTTON' || event.target.closest('button')) {
+                return;
+            }
+            
+            console.log(`Template clicked: ${templatePath}, mode: ${window.currentMode}`);
+            
+            if (window.currentMode === 'single') {
+                // In single mode, show modal and then process the single template
+                prepareSingleSwap(event, templatePath, ceremonyType);
+            } else {
+                // In multi mode, toggle selection for batch processing
+                toggleTemplateSelection(event, templatePath, ceremonyType);
+            }
+        };
         
         // Clear selection button
         if (clearSelectionBtn) {
