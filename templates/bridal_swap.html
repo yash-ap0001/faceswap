@@ -945,6 +945,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Global variable to store all processed results
+    let allProcessedResults = [];
+    
     // Function to display multiple results
     function displayMultiResults(results, selectedTemplates) {
         const multiResultsContainer = document.getElementById('multi-results-container');
@@ -955,17 +958,38 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Add new results to our global array
+        results.forEach((result, index) => {
+            const template = selectedTemplates[index];
+            allProcessedResults.push({
+                result: result,
+                template: template,
+                timestamp: new Date().getTime()
+            });
+        });
+        
+        console.log('Total processed results:', allProcessedResults.length);
+        
         // Clear previous results
         multiResultsGrid.innerHTML = '';
         
-        // Create a card for each result
-        results.forEach((result, index) => {
-            const template = selectedTemplates[index];
+        // Create a card for each result in our global array
+        allProcessedResults.forEach((item, index) => {
+            const result = item.result;
+            const template = item.template;
             
             const resultCard = document.createElement('div');
             resultCard.className = 'multi-result-card';
+            resultCard.setAttribute('data-result-index', index);
+            
+            // Add a "new" indicator if this result was just added (in last 10 seconds)
+            const isNew = (new Date().getTime() - item.timestamp) < 10000;
+            const newBadge = isNew ? `<div class="position-absolute top-0 start-0 m-2">
+                <span class="badge bg-success">NEW</span>
+            </div>` : '';
+            
             // Log result data for debugging
-            console.log('Processing result:', result);
+            console.log(`Building card ${index}:`, result);
             
             resultCard.innerHTML = `
                 <div class="card h-100 bg-dark border-0 shadow position-relative">
@@ -975,18 +999,38 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="position-absolute top-0 end-0 m-2">
                             <span class="badge bg-primary">${template.ceremony.charAt(0).toUpperCase() + template.ceremony.slice(1)}</span>
                         </div>
+                        ${newBadge}
                     </div>
                     <div class="card-footer d-flex justify-content-between align-items-center bg-dark text-light">
                         <span class="ceremony-badge"><i class="fas fa-check-circle text-success me-1"></i> ${template.ceremony.charAt(0).toUpperCase() + template.ceremony.slice(1)}</span>
-                        <a href="${result.result_path}" class="btn btn-sm btn-success" download title="Download this image">
-                            <i class="fas fa-download"></i> Save
-                        </a>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <a href="${result.result_path}" class="btn btn-sm btn-success" download title="Download this image">
+                                <i class="fas fa-download"></i> Save
+                            </a>
+                        </div>
                     </div>
                 </div>
             `;
             
             multiResultsGrid.appendChild(resultCard);
         });
+        
+        // Add event listeners to remove buttons
+        document.querySelectorAll('.remove-result-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                removeProcessedResult(index);
+            });
+        });
+        
+        // Update header text with count
+        const headerText = multiResultsContainer.querySelector('h3');
+        if (headerText) {
+            headerText.innerHTML = `<i class="fas fa-images me-2"></i>Your Multiple Bridal Looks (${allProcessedResults.length})`;
+        }
         
         // Show the results container
         multiResultsContainer.classList.remove('d-none');
@@ -996,14 +1040,36 @@ document.addEventListener('DOMContentLoaded', function() {
             top: multiResultsContainer.offsetTop,
             behavior: 'smooth'
         });
-        
-        // Add event listeners to buttons in the multi-results section
+    }
+    
+    // Function to remove a processed result
+    function removeProcessedResult(index) {
+        if (index >= 0 && index < allProcessedResults.length) {
+            // Remove the result from the array
+            allProcessedResults.splice(index, 1);
+            
+            // If no results left, hide the container
+            if (allProcessedResults.length === 0) {
+                document.getElementById('multi-results-container').classList.add('d-none');
+                return;
+            }
+            
+            // Otherwise, refresh the display with remaining results
+            displayMultiResults([], []);
+        }
+    }
+    
+    // Add event listeners to buttons in the results section after page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Find the buttons
         const multiTryAgainBtn = document.getElementById('multi-try-again-btn');
         const selectMoreBtn = document.getElementById('select-more-btn');
         
         if (multiTryAgainBtn) {
             multiTryAgainBtn.addEventListener('click', function() {
-                // Reset selection mode and clear results
+                console.log('Try Again button clicked');
+                
+                // Reset selection mode and clear all results
                 if (toggleSelectionModeBtn) {
                     toggleSelectionModeBtn.click(); // This will turn off selection mode
                 }
@@ -1018,8 +1084,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Reset selection count
                 updateSelectionCount(0);
                 
-                // Hide results
-                multiResultsContainer.classList.add('d-none');
+                // Clear all processed results
+                allProcessedResults = [];
+                
+                // Hide results container
+                document.getElementById('multi-results-container').classList.add('d-none');
                 
                 // Scroll back to templates section
                 document.querySelector('.template-tab-content').scrollIntoView({behavior: 'smooth'});
@@ -1028,6 +1097,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (selectMoreBtn) {
             selectMoreBtn.addEventListener('click', function() {
+                console.log('Select More button clicked');
+                
                 // Keep the existing results visible
                 // Turn on selection mode if it's not already on
                 if (toggleSelectionModeBtn && !isSelectionModeActive) {
@@ -1046,7 +1117,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
-    }
+    });
 
     function checkModels() {
         fetch('/check-models')
