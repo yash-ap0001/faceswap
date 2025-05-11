@@ -355,7 +355,7 @@
             <div class="card-body">
                 <div class="alert alert-info" role="alert">
                     <i class="fas fa-info-circle me-2"></i>
-                    Upload your photo to see yourself in traditional Indian bridal attire for different ceremonies.
+
                 </div>
                 
                 <div id="model-status-alert" class="alert alert-warning d-none" role="alert">
@@ -1703,9 +1703,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     modelStatusMessage.textContent = 'Some models are not loaded properly. The application may not work correctly.';
                     
                     if (!data.face_detection) {
-                        modelStatusMessage.textContent = 'Face detection model is not loaded. Please check server logs.';
+                        modelStatusMessage.textContent = '';
                     } else if (!data.face_swap) {
-                        modelStatusMessage.textContent = 'Face swap model is not loaded. Please check server logs.';
+                        modelStatusMessage.textContent = '';
                     }
                 } else {
                     modelStatusAlert.classList.add('d-none');
