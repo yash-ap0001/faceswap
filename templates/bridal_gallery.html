@@ -264,9 +264,15 @@
     }
     
     .template-actions {
-        opacity: 0.8;
+        opacity: 0;
         transition: all 0.3s ease;
         z-index: 20;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.7);
+        padding: 10px;
     }
     
     .template-card:hover .template-actions {
@@ -274,14 +280,12 @@
     }
     
     .single-swap-btn, .template-select-btn {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
+        padding: 8px 15px;
+        display: inline-block;
         transition: all 0.2s ease;
+        border-radius: 5px;
+        font-size: 0.9rem;
+        font-weight: 500;
     }
     
     .single-swap-btn:hover, .template-select-btn:hover {
@@ -500,13 +504,16 @@
     <div class="card mb-4 shadow d-none" id="multiSelectionInterface">
         <div class="card-header bg-primary text-white">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-tasks me-2"></i> Selected Templates (<span id="selectedCount">0</span>/5)</h5>
+                <h5 class="mb-0"><i class="fas fa-images me-2"></i> Multi-Template Face Swap (<span id="selectedCount">0</span>/5)</h5>
                 <button type="button" class="btn btn-sm btn-light" id="clearSelectionBtn">
-                    <i class="fas fa-times"></i> Clear Selection
+                    <i class="fas fa-times"></i> Clear All
                 </button>
             </div>
         </div>
         <div class="card-body">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> Process multiple templates with a single photo. Upload your photo below to create face swaps for all selected templates at once.
+            </div>
             <div class="row g-3">
                 <div class="col-md-4">
                     <div class="mb-3">
@@ -530,7 +537,7 @@
             </div>
             <div class="text-center mt-3">
                 <button class="btn btn-primary btn-lg" id="processMultipleBtn" disabled>
-                    <i class="fas fa-magic me-2"></i> Create Face Swaps
+                    <i class="fas fa-magic me-2"></i> Process All Selected Templates
                 </button>
             </div>
         </div>
@@ -612,37 +619,31 @@
                                     </span>
                                 </div>
                                 
-                                <!-- Controls overlay with action buttons -->
-                                <div class="position-absolute top-0 end-0 p-2 template-actions d-flex gap-2">
+                                <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" style="cursor: pointer;" onclick="showFullsizePreview('{{ template.url }}', '{{ ceremony }}')">
+                                
+                                <!-- Action buttons overlay on hover -->
+                                <div class="position-absolute bottom-0 left-0 right-0 p-2 d-flex justify-content-center template-actions gap-2" style="background: rgba(0,0,0,0.7);">
                                     <!-- Single swap button -->
-                                    <button class="btn btn-sm btn-icon btn-primary single-swap-btn"
-                                            data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" title="Single swap"
+                                    <button class="btn btn-sm btn-primary single-swap-btn"
+                                            data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}"
                                             onclick="prepareSingleSwap(event, '{{ template.url }}', '{{ ceremony }}')">
-                                        <i class="fas fa-user"></i>
+                                        Single Swap
                                     </button>
 
                                     <!-- Multi-selection button -->
-                                    <button class="btn btn-sm btn-icon btn-outline-primary template-select-btn"
-                                            data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" title="Add to multi-selection"
+                                    <button class="btn btn-sm btn-secondary template-select-btn"
+                                            data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}"
                                             onclick="toggleTemplateSelection(event, '{{ template.url }}', '{{ ceremony }}')">
-                                        <i class="fas fa-users"></i>
+                                        Add to Multi
                                     </button>
                                 </div>
                                 
-                                <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" style="cursor: pointer;" onclick="showFullsizePreview('{{ template.url }}', '{{ ceremony }}')">
-                                
-                                <!-- Template Selection Overlay (Hidden by default) -->
-                                <div class="position-absolute top-0 start-0 p-2 d-none select-badge">
-                                    <span class="badge bg-primary rounded-circle">
-                                        <i class="fas fa-check"></i>
+                                <!-- Selected indicator (Hidden by default) -->
+                                <div class="position-absolute top-0 end-0 p-2 d-none select-badge">
+                                    <span class="badge bg-success rounded-pill">
+                                        Selected for Multi-Swap
                                     </span>
                                 </div>
-                                
-                                <!-- Individual delete button (visible on hover) -->
-                                <button class="btn btn-sm btn-outline-danger delete-template-btn position-absolute bottom-0 end-0 m-2" 
-                                        data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
                             </div>
                         </div>
                     {% endfor %}
