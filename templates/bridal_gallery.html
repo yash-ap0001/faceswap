@@ -1066,6 +1066,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+        // Add click event handlers to all bridal cards
+        document.querySelectorAll('.bridal-card').forEach(card => {
+            card.addEventListener('click', function(event) {
+                const templatePath = this.getAttribute('data-template-path');
+                const ceremonyType = this.getAttribute('data-ceremony');
+                
+                if (window.currentMode === 'single') {
+                    // Single template mode - open the single swap dialog
+                    prepareSingleSwap(event, templatePath, ceremonyType);
+                } else {
+                    // Multi template mode - toggle selection
+                    toggleTemplateSelection(event, templatePath, ceremonyType);
+                }
+            });
+        });
+        
         // Initialize selection modes
         initializeSelectionModes();
         
@@ -1924,6 +1940,58 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update the interface
         updateSelectionInterface();
+    }
+    
+    // Initialize the selection modes (single/multi)
+    function initializeSelectionModes() {
+        const singleModeRadio = document.getElementById('single-mode');
+        const multiModeRadio = document.getElementById('multi-mode');
+        const singleModeDesc = document.getElementById('single-mode-desc');
+        const multiModeDesc = document.getElementById('multi-mode-desc');
+        
+        if (singleModeRadio && multiModeRadio) {
+            // Single mode selection
+            singleModeRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    window.currentMode = 'single';
+                    if (window.multiSelectionInterface) {
+                        window.multiSelectionInterface.classList.add('d-none');
+                    }
+                    if (singleModeDesc) singleModeDesc.classList.remove('d-none');
+                    if (multiModeDesc) multiModeDesc.classList.add('d-none');
+                    
+                    // Update preview hints
+                    document.querySelectorAll('.preview-hint small').forEach(hint => {
+                        hint.textContent = 'Click to use this template';
+                    });
+                    
+                    // Clear any selections
+                    clearTemplateSelection();
+                }
+            });
+            
+            // Multi mode selection
+            multiModeRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    window.currentMode = 'multi';
+                    if (singleModeDesc) singleModeDesc.classList.add('d-none');
+                    if (multiModeDesc) multiModeDesc.classList.remove('d-none');
+                    
+                    // Update preview hints
+                    document.querySelectorAll('.preview-hint small').forEach(hint => {
+                        hint.textContent = 'Click to select for multi-swap';
+                    });
+                    
+                    // Show multi-selection interface if it exists
+                    if (window.multiSelectionInterface) {
+                        window.multiSelectionInterface.classList.remove('d-none');
+                    }
+                    
+                    // Clear any selections
+                    clearTemplateSelection();
+                }
+            });
+        }
     }
     
     // Handle single template face swap
