@@ -515,7 +515,7 @@
                         <div class="card-header bg-success bg-gradient text-white">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Selected Templates</h5>
-                                <span class="badge bg-light text-dark rounded-pill" id="selectedCountBadge">0</span>
+                                <span class="badge bg-light text-dark rounded-pill" id="selectedCountBadge"><span id="selectedCount">0</span></span>
                             </div>
                         </div>
                         <div class="card-body bg-dark p-3">
@@ -952,6 +952,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const toggleSelectionModeBtn = document.getElementById('toggleSelectionModeBtn');
     const toggleSelectionModeBtn2 = document.getElementById('toggleSelectionModeBtn2');
     
+    // Function to update form for multi-template processing
+    function updateFormForMultiTemplates() {
+        const form = document.getElementById('upload-form');
+        const selectedCheckboxes = document.querySelectorAll('.template-checkbox:checked');
+        const count = selectedCheckboxes.length;
+        
+        if (form) {
+            // If we have multiple templates selected, change form to use bridal-swap-multi
+            if (count > 0 && count <= 5) {
+                form.action = "{{ url_for('bridal_swap_multi') }}";
+                form.method = "post";
+                form.enctype = "multipart/form-data";
+                console.log('Updated form for multi-template processing');
+            } else {
+                // Default back to single template mode
+                form.action = "{{ url_for('bridal_swap') }}";
+                form.method = "post";
+                form.enctype = "multipart/form-data";
+                console.log('Reset form to single template processing');
+            }
+        }
+    }
+    
     // Function to toggle selection mode 
     function toggleSelectionMode() {
         isSelectionMode = !isSelectionMode;
@@ -1172,11 +1195,43 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             // Hide the preview row if no templates or too many selected
             if (count === 0) {
-                selectedTemplatesRow.classList.add('d-none');
-            } else {
-                // Show warning if too many templates
-                templateContainer.innerHTML = '<div class="alert alert-warning w-100">Please select a maximum of 5 templates</div>';
-                selectedTemplatesRow.classList.remove('d-none');
+                // Hide both preview areas
+                if (selectedTemplatesRow) {
+                    selectedTemplatesRow.classList.add('d-none');
+                }
+                
+                // Add empty message to the thumbnails container
+                thumbnailsContainer.innerHTML = `
+                    <div class="empty-message text-muted w-100 text-center d-flex align-items-center justify-content-center">
+                        <p>Selected templates will appear here</p>
+                    </div>
+                `;
+                
+                // Disable the submit button
+                const submitBtn = document.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                }
+            } else if (count > 5) {
+                // Show warning for too many templates
+                if (templateContainer) {
+                    templateContainer.innerHTML = '<div class="alert alert-warning w-100">Please select a maximum of 5 templates</div>';
+                    selectedTemplatesRow.classList.remove('d-none');
+                }
+                
+                // Also show warning in the main preview container
+                thumbnailsContainer.innerHTML = `
+                    <div class="alert alert-warning w-100 text-center">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Please select a maximum of 5 templates
+                    </div>
+                `;
+            }
+            
+            // Reset the template count for form submission
+            let templateCountInput = document.querySelector('input[name="template_count"]');
+            if (templateCountInput) {
+                templateCountInput.value = count > 5 ? 0 : count;
             }
         }
         
@@ -1880,7 +1935,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                 }
                             }
                             
+                            // Update selected count and related UI
                             updateSelectedCount();
+                            
+                            // Update form action and method for multi-template processing
+                            updateFormForMultiTemplates();
                         });
                     }
                     
