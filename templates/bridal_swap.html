@@ -748,101 +748,150 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Form submission
-    uploadForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        if (!sourceInput.files.length) {
-            console.error('Please select your photo.');
-            return;
-        }
-        
-        // Check if template URL is available
-        if (!templateUrlInput || !templateUrlInput.value) {
-            // Find a template to use
-            const selectedTemplate = document.querySelector('.template-card.selected');
-            if (selectedTemplate) {
-                const templatePath = selectedTemplate.getAttribute('data-template-path');
-                if (templatePath) {
-                    // Create template URL input if it doesn't exist
-                    if (!templateUrlInput) {
-                        console.log('Creating template URL input');
-                        const hiddenInput = document.createElement('input');
-                        hiddenInput.type = 'hidden';
-                        hiddenInput.id = 'template-url';
-                        hiddenInput.name = 'template_url';
-                        hiddenInput.value = templatePath;
-                        uploadForm.appendChild(hiddenInput);
-                    } else {
-                        templateUrlInput.value = templatePath;
-                    }
-                } else {
-                    console.error('No template path found on selected template');
-                    return;
-                }
-            } else {
-                console.error('Please select a template from the available templates section.');
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Form submission triggered');
+            
+            if (!sourceInput || !sourceInput.files.length) {
+                console.error('Please select your photo.');
                 return;
             }
-        }
-
-        // Get selected bridal style
-        const selectedStyle = document.querySelector('input[name="bridalStyle"]:checked').value;
-
-        // Check file sizes
-        const maxSize = 16 * 1024 * 1024; // 16MB
-        if (sourceInput.files[0].size > maxSize) {
-            showError('File size exceeds the maximum limit of 16MB.');
-            return;
-        }
-
-        // Check file types
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        if (!allowedTypes.includes(sourceInput.files[0].type)) {
-            showError('Only JPG, JPEG and PNG files are allowed.');
-            return;
-        }
-
-        // Show loading
-        loadingContainer.classList.remove('d-none');
-        // Error container removed
-        resultContainer.classList.add('d-none');
-        swapBtn.disabled = true;
-
-        // Create form data
-        const formData = new FormData();
-        formData.append('source', sourceInput.files[0]);
-        formData.append('style', selectedStyle);
-        formData.append('template_url', templateUrlInput.value);
-
-        // Send AJAX request
-        fetch('/bridal-swap', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            loadingContainer.classList.add('d-none');
-            swapBtn.disabled = false;
-
-            if (data.success) {
-                resultImage.src = `/uploads/${data.result_image}`;
-                downloadBtn.href = `/uploads/${data.result_image}`;
-                downloadBtn.download = data.result_image;
-                resultContainer.classList.remove('d-none');
-                window.scrollTo({
-                    top: resultContainer.offsetTop,
-                    behavior: 'smooth'
-                });
-            } else {
-                showError(data.error || 'An unknown error occurred.');
+            
+            // Check if template URL is available
+            if (!templateUrlInput || !templateUrlInput.value) {
+                // Find a template to use
+                const selectedTemplate = document.querySelector('.template-card.selected-template');
+                if (selectedTemplate) {
+                    const templatePath = selectedTemplate.dataset.templatePath;
+                    if (templatePath) {
+                        // Create template URL input if it doesn't exist
+                        if (!templateUrlInput) {
+                            console.log('Creating template URL input');
+                            const hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.id = 'template-url';
+                            hiddenInput.name = 'template_url';
+                            hiddenInput.value = templatePath;
+                            uploadForm.appendChild(hiddenInput);
+                        } else {
+                            templateUrlInput.value = templatePath;
+                        }
+                        console.log('Setting template URL to:', templatePath);
+                    } else {
+                        console.error('No template path found on selected template');
+                        return;
+                    }
+                } else {
+                    console.error('Please select a template from the available templates section.');
+                    return;
+                }
             }
-        })
-        .catch(error => {
-            loadingContainer.classList.add('d-none');
-            swapBtn.disabled = false;
-            showError('Network error: ' + error.message);
+
+            // Get selected bridal style
+            const selectedStyleElement = document.querySelector('input[name="bridalStyle"]:checked');
+            if (!selectedStyleElement) {
+                console.error('No bridal style selected.');
+                return;
+            }
+            const selectedStyle = selectedStyleElement.value;
+            console.log('Selected style:', selectedStyle);
+
+            // Check file sizes
+            const maxSize = 16 * 1024 * 1024; // 16MB
+            if (sourceInput.files[0].size > maxSize) {
+                showError('File size exceeds the maximum limit of 16MB.');
+                return;
+            }
+
+            // Check file types
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!allowedTypes.includes(sourceInput.files[0].type)) {
+                showError('Only JPG, JPEG and PNG files are allowed.');
+                return;
+            }
+
+            // Show loading
+            if (loadingContainer) {
+                loadingContainer.classList.remove('d-none');
+            }
+            
+            if (resultContainer) {
+                resultContainer.classList.add('d-none');
+            }
+            
+            if (swapBtn) {
+                swapBtn.disabled = true;
+            }
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('source', sourceInput.files[0]);
+            formData.append('style', selectedStyle);
+            formData.append('template_url', templateUrlInput.value);
+            
+            console.log('Submitting form with:', {
+                source: sourceInput.files[0].name,
+                style: selectedStyle,
+                template_url: templateUrlInput.value
+            });
+
+            // Send AJAX request
+            fetch('/bridal-swap', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                
+                if (loadingContainer) {
+                    loadingContainer.classList.add('d-none');
+                }
+                
+                if (swapBtn) {
+                    swapBtn.disabled = false;
+                }
+
+                if (data.success) {
+                    if (resultImage) {
+                        resultImage.src = `/uploads/${data.result_image}`;
+                    }
+                    
+                    if (downloadBtn) {
+                        downloadBtn.href = `/uploads/${data.result_image}`;
+                        downloadBtn.download = data.result_image;
+                    }
+                    
+                    if (resultContainer) {
+                        resultContainer.classList.remove('d-none');
+                        window.scrollTo({
+                            top: resultContainer.offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                } else {
+                    showError(data.error || 'An unknown error occurred.');
+                }
+            })
+            .catch(error => {
+                console.error('AJAX error:', error);
+                
+                if (loadingContainer) {
+                    loadingContainer.classList.add('d-none');
+                }
+                
+                if (swapBtn) {
+                    swapBtn.disabled = false;
+                }
+                
+                showError('Network error: ' + error.message);
+            });
         });
-    });
+    }
 
     // Helper functions
     function handleFileInputChange(input, preview, placeholder) {
