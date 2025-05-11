@@ -848,7 +848,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Multi-template selection functionality
     const toggleSelectionModeBtn = document.getElementById('toggleSelectionModeBtn');
-    const processSelectedBtn = document.getElementById('processSelectedBtn');
     const selectedCount = document.getElementById('selectedCount');
     let isSelectionMode = false;
     
@@ -865,7 +864,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 toggleSelectionModeBtn.innerHTML = '<i class="fas fa-times"></i> Cancel Selection';
                 toggleSelectionModeBtn.classList.remove('btn-outline-light');
                 toggleSelectionModeBtn.classList.add('btn-outline-danger');
-                processSelectedBtn.classList.remove('d-none');
                 if (selectionCountWrapper) selectionCountWrapper.classList.remove('d-none');
                 
                 // Start with no templates selected by default when entering selection mode
@@ -878,15 +876,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Reset all selections on entering selection mode');
                 updateSelectedCount();
                 
-                // Show a message to guide the user
-                showMessage('Select up to 5 templates from any ceremony and click "Process Selected Templates"');
+                // Log selection mode guidance
+                console.log('Guide: Select up to 5 templates and use the Process Selected Templates button');
             } else {
                 // Exiting selection mode
                 console.log('Exiting template selection mode');
                 toggleSelectionModeBtn.innerHTML = '<i class="fas fa-check-square"></i> Multi-Select';
                 toggleSelectionModeBtn.classList.add('btn-outline-light');
                 toggleSelectionModeBtn.classList.remove('btn-outline-danger');
-                processSelectedBtn.classList.add('d-none');
                 if (selectionCountWrapper) selectionCountWrapper.classList.add('d-none');
                 
                 // Hide the thumbnails preview when exiting selection mode
@@ -940,16 +937,7 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedCount.textContent = count;
         }
         
-        // Enable/disable the process buttons based on selection count
-        if (processSelectedBtn) {
-            processSelectedBtn.disabled = (count === 0 || count > 5);
-            
-            if (count > 5) {
-                processSelectedBtn.title = 'Please select a maximum of 5 templates';
-            } else {
-                processSelectedBtn.title = '';
-            }
-        }
+        // Process button has been consolidated in the main button area
         
         // Also update the new process button in the selected templates preview
         if (processSelectedTemplatesBtn) {
@@ -1071,14 +1059,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Add event listener to the process selected button
-    if (processSelectedBtn) {
-        processSelectedBtn.addEventListener('click', function() {
-            processSelectedTemplates();
-        });
-    }
-    
-    // Add event listener to the new process selected templates button in the preview section
+    // Add event listener to the process selected templates button
     if (processSelectedTemplatesBtn) {
         processSelectedTemplatesBtn.addEventListener('click', function() {
             processSelectedTemplates();
