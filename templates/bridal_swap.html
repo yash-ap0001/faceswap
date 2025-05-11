@@ -48,9 +48,19 @@
         transition: all 0.3s ease;
     }
     
-    /* Show checkboxes only in selection mode */
+    /* Template selection mode styles */
+    .template-checkbox-wrapper {
+        display: none;
+        z-index: 10;
+    }
+    
     body.template-selection-mode .template-checkbox-wrapper {
         display: block;
+    }
+    
+    .template-card.selected {
+        border: 3px solid #8e44ad !important;
+        box-shadow: 0 0 10px rgba(142, 68, 173, 0.6);
     }
     
     /* Multi-results display */
@@ -216,7 +226,7 @@
                 <!-- Multi-Template Results -->
                 <div id="multi-results-container" class="mt-4 d-none">
                     <h4 class="text-center mb-3">Your Multiple Bridal Looks</h4>
-                    <div class="multi-results-grid"></div>
+                    <div class="multi-results-container"></div>
                     <div class="text-center mt-4">
                         <button id="multi-try-again-btn" class="btn btn-secondary">
                             <i class="fas fa-redo me-2"></i>Try Different Templates
@@ -275,7 +285,7 @@
                     <button id="toggleSelectionModeBtn" type="button" class="btn btn-outline-light btn-sm">
                         <i class="fas fa-check-square"></i> Multi-Select
                     </button>
-                    <div id="selectionCountWrapper">
+                    <div id="selectionCountWrapper" class="d-none">
                         <span class="badge bg-primary rounded-pill me-2">
                             <span id="selectedCount">0</span> selected
                         </span>
@@ -604,11 +614,14 @@ document.addEventListener('DOMContentLoaded', function() {
             isSelectionMode = !isSelectionMode;
             document.body.classList.toggle('template-selection-mode', isSelectionMode);
             
+            const selectionCountWrapper = document.getElementById('selectionCountWrapper');
+            
             if (isSelectionMode) {
                 toggleSelectionModeBtn.innerHTML = '<i class="fas fa-times"></i> Cancel Selection';
                 toggleSelectionModeBtn.classList.remove('btn-outline-light');
                 toggleSelectionModeBtn.classList.add('btn-outline-danger');
                 processSelectedBtn.classList.remove('d-none');
+                if (selectionCountWrapper) selectionCountWrapper.classList.remove('d-none');
                 
                 // Clear any existing selections when entering selection mode
                 document.querySelectorAll('.template-checkbox').forEach(checkbox => {
@@ -623,6 +636,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 toggleSelectionModeBtn.classList.add('btn-outline-light');
                 toggleSelectionModeBtn.classList.remove('btn-outline-danger');
                 processSelectedBtn.classList.add('d-none');
+                if (selectionCountWrapper) selectionCountWrapper.classList.add('d-none');
             }
         });
     }
@@ -735,7 +749,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to display multiple results
     function displayMultiResults(results, selectedTemplates) {
         const multiResultsContainer = document.getElementById('multi-results-container');
-        const multiResultsGrid = multiResultsContainer.querySelector('.multi-results-grid');
+        const multiResultsGrid = multiResultsContainer.querySelector('.multi-results-container');
         
         if (!multiResultsContainer || !multiResultsGrid) {
             console.error('Multi-results container not found');
