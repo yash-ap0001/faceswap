@@ -52,6 +52,36 @@
     body.template-selection-mode .template-checkbox-wrapper {
         display: block;
     }
+    
+    /* Multi-results display */
+    .multi-results-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .multi-result-card {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .multi-result-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .multi-result-img {
+        width: 100%;
+        height: 350px;
+        object-fit: cover;
+    }
+    
+    .multi-result-footer {
+        padding: 10px;
+        background-color: rgba(0, 0, 0, 0.7);
+    }
 </style>
 {% endblock %}
 
@@ -167,6 +197,7 @@
                     </div>
                 </form>
 
+                <!-- Single Template Result -->
                 <div id="result-container" class="mt-4 d-none">
                     <h4 class="text-center mb-3">Your Bridal Look</h4>
                     <div class="text-center mb-3">
@@ -178,6 +209,17 @@
                         </a>
                         <button id="try-again-btn" class="btn btn-secondary">
                             <i class="fas fa-redo me-2"></i>Try Another Style
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Multi-Template Results -->
+                <div id="multi-results-container" class="mt-4 d-none">
+                    <h4 class="text-center mb-3">Your Multiple Bridal Looks</h4>
+                    <div class="multi-results-grid"></div>
+                    <div class="text-center mt-4">
+                        <button id="multi-try-again-btn" class="btn btn-secondary">
+                            <i class="fas fa-redo me-2"></i>Try Different Templates
                         </button>
                     </div>
                 </div>
@@ -201,6 +243,12 @@
             <div class="card-header bg-dark d-flex justify-content-between align-items-center">
                 <h2 class="h4 mb-0">Available Templates</h2>
                 <div class="btn-group">
+                    <button id="toggleSelectionModeBtn" class="btn btn-outline-light btn-sm me-2">
+                        <i class="fas fa-check-square"></i> Multi-Select
+                    </button>
+                    <button id="processSelectedBtn" class="btn btn-primary btn-sm me-2 d-none">
+                        <i class="fas fa-magic"></i> Process Selected (<span id="selectedCount">0</span>)
+                    </button>
                     <button id="refreshTemplatesBtn" class="btn btn-outline-light btn-sm">
                         <i class="fas fa-sync-alt"></i> Refresh
                     </button>
@@ -529,6 +577,201 @@ document.addEventListener('DOMContentLoaded', function() {
             behavior: 'smooth'
         });
     }
+    
+    // Multi-template selection functionality
+    const toggleSelectionModeBtn = document.getElementById('toggleSelectionModeBtn');
+    const processSelectedBtn = document.getElementById('processSelectedBtn');
+    const selectedCount = document.getElementById('selectedCount');
+    let isSelectionMode = false;
+    
+    if (toggleSelectionModeBtn) {
+        toggleSelectionModeBtn.addEventListener('click', function() {
+            isSelectionMode = !isSelectionMode;
+            document.body.classList.toggle('template-selection-mode', isSelectionMode);
+            
+            if (isSelectionMode) {
+                toggleSelectionModeBtn.innerHTML = '<i class="fas fa-times"></i> Cancel Selection';
+                toggleSelectionModeBtn.classList.remove('btn-outline-light');
+                toggleSelectionModeBtn.classList.add('btn-outline-danger');
+                processSelectedBtn.classList.remove('d-none');
+                
+                // Clear any existing selections when entering selection mode
+                document.querySelectorAll('.template-checkbox').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                document.querySelectorAll('.template-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                updateSelectedCount();
+            } else {
+                toggleSelectionModeBtn.innerHTML = '<i class="fas fa-check-square"></i> Multi-Select';
+                toggleSelectionModeBtn.classList.add('btn-outline-light');
+                toggleSelectionModeBtn.classList.remove('btn-outline-danger');
+                processSelectedBtn.classList.add('d-none');
+            }
+        });
+    }
+    
+    // Function to update selected count
+    function updateSelectedCount() {
+        const count = document.querySelectorAll('.template-checkbox:checked').length;
+        if (selectedCount) {
+            selectedCount.textContent = count;
+        }
+        
+        // Enable/disable the process button based on selection count
+        if (processSelectedBtn) {
+            if (count > 0 && count <= 5) {
+                processSelectedBtn.disabled = false;
+            } else {
+                processSelectedBtn.disabled = (count === 0 || count > 5);
+            }
+            
+            if (count > 5) {
+                processSelectedBtn.title = 'Please select a maximum of 5 templates';
+            } else {
+                processSelectedBtn.title = '';
+            }
+        }
+    }
+    
+    // Add event listener to all checkboxes (for future checkboxes as well)
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('template-checkbox')) {
+            const card = e.target.closest('.template-card');
+            if (card) {
+                card.classList.toggle('selected', e.target.checked);
+                updateSelectedCount();
+            }
+        }
+    });
+    
+    // Add event listener to the process selected button
+    if (processSelectedBtn) {
+        processSelectedBtn.addEventListener('click', function() {
+            processSelectedTemplates();
+        });
+    }
+    
+    // Function to process selected templates
+    function processSelectedTemplates() {
+        // Check if source image is selected
+        if (!sourceInput.files.length) {
+            showError('Please upload your photo first.');
+            return;
+        }
+        
+        const selectedTemplates = Array.from(document.querySelectorAll('.template-card.selected')).map(card => ({
+            path: card.dataset.templatePath,
+            ceremony: card.dataset.ceremony,
+            url: card.dataset.templateUrl,
+        }));
+        
+        if (selectedTemplates.length === 0) {
+            showError('Please select at least one template.');
+            return;
+        }
+        
+        if (selectedTemplates.length > 5) {
+            showError('Please select a maximum of 5 templates.');
+            return;
+        }
+        
+        // Show loading state
+        loadingContainer.classList.remove('d-none');
+        resultContainer.classList.add('d-none');
+        document.getElementById('multi-results-container').classList.add('d-none');
+        errorContainer.classList.add('d-none');
+        
+        // Create form data with source image and selected templates
+        const formData = new FormData();
+        formData.append('source', sourceInput.files[0]);
+        
+        // Add all selected template paths
+        selectedTemplates.forEach((template, index) => {
+            formData.append(`template_${index}`, template.path);
+            formData.append(`ceremony_${index}`, template.ceremony);
+        });
+        
+        formData.append('template_count', selectedTemplates.length);
+        
+        // Send AJAX request
+        fetch('/bridal-swap-multi', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingContainer.classList.add('d-none');
+            
+            if (data.success) {
+                // Display all results
+                displayMultiResults(data.results, selectedTemplates);
+            } else {
+                showError(data.error || 'An unknown error occurred.');
+            }
+        })
+        .catch(error => {
+            loadingContainer.classList.add('d-none');
+            showError('Network error: ' + error.message);
+        });
+    }
+    
+    // Function to display multiple results
+    function displayMultiResults(results, selectedTemplates) {
+        const multiResultsContainer = document.getElementById('multi-results-container');
+        const multiResultsGrid = multiResultsContainer.querySelector('.multi-results-grid');
+        
+        if (!multiResultsContainer || !multiResultsGrid) {
+            console.error('Multi-results container not found');
+            return;
+        }
+        
+        // Clear previous results
+        multiResultsGrid.innerHTML = '';
+        
+        // Create a card for each result
+        results.forEach((result, index) => {
+            const template = selectedTemplates[index];
+            
+            const resultCard = document.createElement('div');
+            resultCard.className = 'multi-result-card';
+            resultCard.innerHTML = `
+                <div class="position-relative">
+                    <img src="${result.result_path}" class="multi-result-img" alt="Result for ${template.ceremony}">
+                    <div class="multi-result-footer">
+                        <h5 class="mb-1">${template.ceremony.charAt(0).toUpperCase() + template.ceremony.slice(1)} Ceremony</h5>
+                        <a href="${result.result_path}" class="btn btn-sm btn-success" download>
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    </div>
+                </div>
+            `;
+            
+            multiResultsGrid.appendChild(resultCard);
+        });
+        
+        // Show the results container
+        multiResultsContainer.classList.remove('d-none');
+        
+        // Scroll to results
+        window.scrollTo({
+            top: multiResultsContainer.offsetTop,
+            behavior: 'smooth'
+        });
+        
+        // Add event listener to try again button
+        const multiTryAgainBtn = document.getElementById('multi-try-again-btn');
+        if (multiTryAgainBtn) {
+            multiTryAgainBtn.addEventListener('click', function() {
+                // Reset selection mode and clear results
+                if (toggleSelectionModeBtn) {
+                    toggleSelectionModeBtn.click(); // This will turn off selection mode
+                }
+                multiResultsContainer.classList.add('d-none');
+            });
+        }
+    }
 
     function checkModels() {
         fetch('/check-models')
@@ -643,6 +886,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="position-relative overflow-hidden" style="height: 350px;">
                             <img src="${template.url}" class="card-img-top template-img" 
                                 alt="${ceremonyType} template" style="height: 350px; object-fit: cover;">
+                            
+                            <div class="position-absolute top-0 end-0 m-2 template-checkbox-wrapper">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input template-checkbox" 
+                                        id="template-check-${ceremonyType}-${index}">
+                                </div>
+                            </div>
+                            
                             <div class="position-absolute bottom-0 start-0 end-0 p-2 bg-dark bg-opacity-75">
                                 <button type="button" class="btn btn-sm btn-primary w-100 select-template-btn">
                                     <i class="fas fa-magic me-1"></i> Use This Template
