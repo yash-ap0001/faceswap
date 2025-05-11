@@ -529,6 +529,54 @@ function initializePage() {
     
     // Template preview functionality
     
+    // Function to clear all templates for a specific ceremony
+    function clearAllTemplates(ceremonyType) {
+        console.log(`Clearing all templates for ${ceremonyType}`);
+        
+        // Show loading state in the template container
+        const templateContainer = document.querySelector(`#${ceremonyType}-templates .template-container`);
+        if (templateContainer) {
+            templateContainer.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-danger" role="status"><span class="visually-hidden">Clearing templates...</span></div><div class="mt-3">Removing templates...</div></div>';
+        }
+        
+        // Send delete request to server
+        fetch('/delete-templates', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                ceremony_type: ceremonyType,
+                clear_all: true
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log(`Successfully removed ${data.deleted_count} templates for ${ceremonyType}`);
+                
+                // Show success message
+                alert(`Successfully removed ${data.deleted_count} templates for ${ceremonyType} ceremony.`);
+                
+                // Reload templates for the current ceremony to reflect changes
+                loadTemplates(ceremonyType);
+            } else {
+                console.error(`Error clearing templates: ${data.message || 'Unknown error'}`);
+                alert(`Error: ${data.message || 'Failed to clear templates'}`);
+                
+                // Reload templates anyway to refresh the view
+                loadTemplates(ceremonyType);
+            }
+        })
+        .catch(error => {
+            console.error('Error clearing templates:', error);
+            alert('Network error while clearing templates. Please try again.');
+            
+            // Reload templates anyway to refresh the view
+            loadTemplates(ceremonyType);
+        });
+    }
+    
     // Function to load templates for a specific ceremony type
     function loadTemplates(ceremonyType) {
         console.log(`Loading templates for ${ceremonyType}`);
@@ -603,6 +651,17 @@ function initializePage() {
                     </div>
                 `;
                 templateContainer.appendChild(templateCount);
+                
+                // Add event listener for the clear templates button we just created
+                const clearBtn = templateCount.querySelector('.clear-templates-btn');
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', function() {
+                        const ceremonyType = this.dataset.ceremony;
+                        if (confirm(`Are you sure you want to clear ALL templates for the ${ceremonyType} ceremony? This action cannot be undone.`)) {
+                            clearAllTemplates(ceremonyType);
+                        }
+                    });
+                }
                     
                     // Group templates by type
                     const templatesByType = {};
