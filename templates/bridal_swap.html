@@ -406,9 +406,8 @@ function initializePage() {
             return;
         }
 
-        // Get selected bridal style and template type
+        // Get selected bridal style - we're now using Pinterest templates directly based on ceremony type
         const selectedStyle = document.querySelector('input[name="bridalStyle"]:checked').value;
-        const selectedTemplateType = document.querySelector('input[name="templateType"]:checked').value;
 
         // Check file sizes
         const maxSize = 16 * 1024 * 1024; // 16MB
@@ -434,7 +433,6 @@ function initializePage() {
         const formData = new FormData();
         formData.append('source', sourceInput.files[0]);
         formData.append('style', selectedStyle);
-        formData.append('template_type', selectedTemplateType);
 
         // Send AJAX request
         fetch('/bridal-swap', {
@@ -655,41 +653,101 @@ function initializePage() {
                     });
                 }
                     
-                    // Group templates by type
-                    const templatesByType = {};
-                    console.log(`Grouping ${data.templates.length} templates by type for ${ceremonyType}`);
+                    // Get all Pinterest templates first
+                    const pinterestTemplates = data.templates.filter(template => 
+                        template.template_type === 'pinterest' || 
+                        template.url.includes('/pinterest/') || 
+                        (template.path && template.path.includes('/pinterest/')));
                     
-                    // Debug log individual templates by type
-                    data.templates.forEach((template, index) => {
-                        const type = template.template_type || 'other';
-                        console.log(`Template ${index+1}/${data.templates.length}: ${type} - ${template.url}`);
-                        
-                        if (!templatesByType[type]) {
-                            console.log(`Creating new template group: ${type}`);
-                            templatesByType[type] = [];
+                    // Get other templates as fallback
+                    const otherTemplates = data.templates.filter(template => 
+                        !(template.template_type === 'pinterest' || 
+                          template.url.includes('/pinterest/') || 
+                          (template.path && template.path.includes('/pinterest/'))));
+                    
+                    console.log(`Found ${pinterestTemplates.length} Pinterest templates and ${otherTemplates.length} other templates for ${ceremonyType}`);
+                    
+                    // Display all Pinterest templates first (without header if only these are available)
+                    if (pinterestTemplates.length > 0) {
+                        // If we also have other templates, add a header
+                        if (otherTemplates.length > 0) {
+                            const typeHeader = document.createElement('div');
+                            typeHeader.className = 'col-12 mt-3 mb-2';
+                            typeHeader.innerHTML = `<h5 class="text-capitalize">Pinterest Templates</h5>`;
+                            templateContainer.appendChild(typeHeader);
                         }
-                        templatesByType[type].push(template);
-                    });
-                    
-                    // Log summary of template counts by type
-                    Object.keys(templatesByType).forEach(type => {
-                        console.log(`Found ${templatesByType[type].length} templates of type: ${type}`);
-                    });
-                    
-                    // Create headers for each template type
-                    Object.keys(templatesByType).forEach(type => {
-                        // Add section header
-                        const typeHeader = document.createElement('div');
-                        typeHeader.className = 'col-12 mt-3 mb-2';
-                        typeHeader.innerHTML = `<h5 class="text-capitalize">${type} Templates</h5>`;
-                        templateContainer.appendChild(typeHeader);
                         
-                        // Add the templates for this type
-                        templatesByType[type].forEach((template, index) => {
-                            console.log(`Creating template element ${index+1}/${templatesByType[type].length} for ${ceremonyType} (${type}):`, template);
+                        // Add all Pinterest templates
+                        pinterestTemplates.forEach((template, index) => {
+                            console.log(`Creating Pinterest template element ${index+1}/${pinterestTemplates.length} for ${ceremonyType}:`, template);
                             
                             const col = document.createElement('div');
                             col.className = 'col-md-3 col-sm-4 col-6 mb-3';
+                            
+                            const card = document.createElement('div');
+                            card.className = 'card h-100 bg-secondary template-card';
+                            card.dataset.templateUrl = template.url;
+                            card.dataset.templateId = template.id;
+                            card.dataset.templatePath = template.path || '';
+                            card.dataset.templateType = 'pinterest';
+                            card.dataset.ceremony = ceremonyType;
+                            
+                            templateContainer.appendChild(col);
+                            col.appendChild(card);
+                            
+                            // Add card content - image and overlay
+                            card.innerHTML = `
+                                <div class="card-img-container">
+                                    <img src="${template.url}" class="card-img-top template-img" alt="${ceremonyType} template">
+                                    <div class="template-overlay d-flex align-items-center justify-content-center">
+                                        <button type="button" class="btn btn-sm btn-light select-template-btn">
+                                            <i class="fas fa-check me-1"></i> Select
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            // Add event listener to select button
+                            const selectBtn = card.querySelector('.select-template-btn');
+                            if (selectBtn) {
+                                selectBtn.addEventListener('click', function() {
+                                    const templateUrl = this.closest('.template-card').dataset.templateUrl;
+                                    console.log(`Selected template: ${templateUrl}`);
+                                    selectTemplate(this.closest('.template-card'));
+                                });
+                            }
+                        });
+                    }
+                    
+                    // Only show other templates if we don't have Pinterest templates
+                    if (pinterestTemplates.length === 0 && otherTemplates.length > 0) {
+                        // Group other templates by type
+                        const templatesByType = {};
+                        
+                        // Group templates by type
+                        otherTemplates.forEach((template, index) => {
+                            const type = template.template_type || 'other';
+                            
+                            if (!templatesByType[type]) {
+                                templatesByType[type] = [];
+                            }
+                            templatesByType[type].push(template);
+                        });
+                        
+                        // Create headers for each template type
+                        Object.keys(templatesByType).forEach(type => {
+                            // Add section header
+                            const typeHeader = document.createElement('div');
+                            typeHeader.className = 'col-12 mt-3 mb-2';
+                            typeHeader.innerHTML = `<h5 class="text-capitalize">${type} Templates</h5>`;
+                            templateContainer.appendChild(typeHeader);
+                            
+                            // Add the templates for this type
+                            templatesByType[type].forEach((template, index) => {
+                                console.log(`Creating template element ${index+1}/${templatesByType[type].length} for ${ceremonyType} (${type}):`, template);
+                                
+                                const col = document.createElement('div');
+                                col.className = 'col-md-3 col-sm-4 col-6 mb-3';
                             
                             const card = document.createElement('div');
                             card.className = 'card h-100 bg-secondary template-card';
