@@ -725,6 +725,52 @@
         </div>
     </div>
 </div>
+
+<!-- Multi-selection Interface (hidden by default) -->
+<div class="container-fluid fixed-bottom bg-dark p-3 d-none" id="multi-selection-interface" style="border-top: 1px solid #333; box-shadow: 0 -2px 10px rgba(0,0,0,0.2); z-index: 1000;">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="d-flex align-items-center">
+                <h4 class="mb-0 me-3">Selected Templates: <span id="selected-count" class="badge bg-primary">0</span></h4>
+                <button class="btn btn-sm btn-outline-secondary me-2" id="clear-selection-btn">
+                    <i class="fas fa-times me-1"></i> Clear Selection
+                </button>
+            </div>
+            <div class="row row-cols-5 g-2 mt-2" id="selected-templates-preview">
+                <!-- Selected templates will be displayed here -->
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-dark border border-secondary h-100">
+                <div class="card-body p-2">
+                    <div class="row h-100">
+                        <div class="col-md-8">
+                            <h5>Upload Your Face Image</h5>
+                            <p class="text-muted small">Upload a clear face photo to apply to selected templates</p>
+                            <div class="input-group mb-2">
+                                <input type="file" class="form-control form-control-sm" id="multi-source-input" accept="image/jpeg,image/png,image/jpg">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="image-preview position-relative h-100 d-flex justify-content-center align-items-center" style="border: 1px dashed #6c757d; border-radius: 5px;">
+                                <div id="multi-source-placeholder" class="text-center p-2">
+                                    <i class="fas fa-user-circle fa-3x mb-2 text-muted"></i>
+                                    <p class="text-muted small mb-0">Image preview</p>
+                                </div>
+                                <img id="multi-source-preview" class="img-fluid d-none" style="max-height: 100px; max-width: 100%;" alt="Source preview">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-dark border-top border-secondary p-2">
+                    <button class="btn btn-primary btn-block w-100" id="process-multiple-btn" disabled>
+                        <i class="fas fa-magic me-2"></i> Create Face Swaps for Selected Templates
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -738,6 +784,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const generateBtn = document.getElementById('generate-btn');
     const templateCards = document.querySelectorAll('.bridal-card');
     const emptyResults = document.getElementById('empty-results');
+    
+    // Multi-selection Elements
+    const multiSelectionInterface = document.getElementById('multi-selection-interface');
+    const selectedCount = document.getElementById('selected-count');
+    const selectedTemplatesPreview = document.getElementById('selected-templates-preview');
+    const clearSelectionBtn = document.getElementById('clear-selection-btn');
+    const multiSourceInput = document.getElementById('multi-source-input');
+    const multiSourcePreview = document.getElementById('multi-source-preview');
+    const multiSourcePlaceholder = document.getElementById('multi-source-placeholder');
+    const processMultipleBtn = document.getElementById('process-multiple-btn');
+    
+    // Variables for multi-selection
+    let selectedTemplates = [];
+    let multiSourceFile = null;
+    let currentPreviewTemplate = null;
     const resultGallery = document.getElementById('result-gallery');
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingMessage = document.getElementById('loading-message');
