@@ -961,7 +961,7 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedCount.textContent = count;
         }
         
-        // Enable/disable the process button based on selection count
+        // Enable/disable the process buttons based on selection count
         if (processSelectedBtn) {
             processSelectedBtn.disabled = (count === 0 || count > 5);
             
@@ -969,6 +969,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 processSelectedBtn.title = 'Please select a maximum of 5 templates';
             } else {
                 processSelectedBtn.title = '';
+            }
+        }
+        
+        // Also update the new process button in the selected templates preview
+        const processSelectedTemplatesBtn = document.getElementById('processSelectedTemplatesBtn');
+        if (processSelectedTemplatesBtn) {
+            const sourceInput = document.getElementById('source-input');
+            const hasSourceImage = sourceInput && sourceInput.files.length > 0;
+            
+            processSelectedTemplatesBtn.disabled = (count === 0 || count > 5 || !hasSourceImage);
+            
+            if (count > 5) {
+                processSelectedTemplatesBtn.title = 'Please select a maximum of 5 templates';
+            } else if (!hasSourceImage) {
+                processSelectedTemplatesBtn.title = 'Please upload your photo first';
+            } else {
+                processSelectedTemplatesBtn.title = '';
             }
         }
         
@@ -1079,6 +1096,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event listener to the process selected button
     if (processSelectedBtn) {
         processSelectedBtn.addEventListener('click', function() {
+            processSelectedTemplates();
+        });
+    }
+    
+    // Add event listener to the new process selected templates button in the preview section
+    const processSelectedTemplatesBtn = document.getElementById('processSelectedTemplatesBtn');
+    if (processSelectedTemplatesBtn) {
+        processSelectedTemplatesBtn.addEventListener('click', function() {
             processSelectedTemplates();
         });
     }
