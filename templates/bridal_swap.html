@@ -1043,6 +1043,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const cardDiv = document.createElement('div');
                 cardDiv.className = 'selected-template-card animate__animated animate__fadeIn';
                 cardDiv.setAttribute('data-template-path', templatePath);
+                cardDiv.setAttribute('data-ceremony', ceremonyType); // Set ceremony type attribute
                 cardDiv.style.width = '180px';
                 cardDiv.style.height = '240px';
                 cardDiv.style.flexShrink = '0';
@@ -1183,7 +1184,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedTemplates = uniqueCards.map(card => {
             console.log('Processing card with dataset:', card.dataset);
             const templatePath = card.dataset.templatePath || card.dataset.path;
-            const ceremony = card.dataset.ceremony;
+            
+            // Use a default ceremony value if not set (helps with backward compatibility)
+            const ceremony = card.dataset.ceremony || 'wedding';
             
             console.log(`Template: ${templatePath}, Ceremony: ${ceremony}`);
             
@@ -1223,13 +1226,28 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData();
         formData.append('source', sourceInput.files[0]);
         
-        // Add all selected template paths
-        selectedTemplates.forEach((template, index) => {
-            formData.append(`template_${index}`, template.path);
-            formData.append(`ceremony_${index}`, template.ceremony);
-        });
+        // Debug selected templates before sending
+        console.log('Templates to be sent in formData:', selectedTemplates);
         
+        // Add template count first
         formData.append('template_count', selectedTemplates.length);
+        console.log(`Added template_count: ${selectedTemplates.length}`);
+        
+        // Add all selected template paths with better error handling
+        selectedTemplates.forEach((template, index) => {
+            if (!template.path) {
+                console.error(`Template ${index} missing path:`, template);
+                return;
+            }
+            
+            // Always include a ceremony value (fallback to 'wedding' if not set)
+            const ceremonyType = template.ceremony || 'wedding';
+            
+            formData.append(`template_${index}`, template.path);
+            formData.append(`ceremony_${index}`, ceremonyType);
+            
+            console.log(`Added template ${index}: path=${template.path}, ceremony=${ceremonyType}`);
+        });
         
         // Send AJAX request
         fetch('/bridal-swap-multi', {
@@ -1562,6 +1580,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     card.dataset.templatePath = template.path || template.url;
                     card.dataset.templateType = 'pinterest';
                     card.dataset.ceremony = ceremonyType;
+                    
+                    // Debug the card dataset attributes
+                    console.log(`Card created for ${ceremonyType}:`, {
+                        url: card.dataset.templateUrl,
+                        path: card.dataset.templatePath,
+                        ceremony: card.dataset.ceremony
+                    });
                     
                     card.innerHTML = `
                         <div class="position-relative overflow-hidden" style="height: 350px;">

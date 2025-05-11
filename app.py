@@ -1033,8 +1033,15 @@ def bridal_swap_multi():
     if not allowed_file(source_file.filename):
         return jsonify({'success': False, 'error': 'Invalid file format for source image'}), 400
     
+    # Log all form data for debugging
+    logger.info("Received form data for multi-swap:")
+    for key, value in request.form.items():
+        logger.info(f"  {key}: {value}")
+    
     # Get template count
     template_count = int(request.form.get('template_count', '0'))
+    logger.info(f"Template count from form: {template_count}")
+    
     if template_count <= 0 or template_count > 5:
         return jsonify({'success': False, 'error': 'Invalid number of templates. Please select 1-5 templates.'}), 400
     
@@ -1043,10 +1050,16 @@ def bridal_swap_multi():
     ceremony_types = []
     for i in range(template_count):
         template_path = request.form.get(f'template_{i}')
-        ceremony_type = request.form.get(f'ceremony_{i}')
+        ceremony_type = request.form.get(f'ceremony_{i}', 'unknown')
         
-        if not template_path or not os.path.exists(template_path):
-            return jsonify({'success': False, 'error': f'Template {i+1} not found'}), 400
+        logger.info(f"Template {i+1}: Path={template_path}, Ceremony={ceremony_type}")
+        
+        if not template_path:
+            return jsonify({'success': False, 'error': f'Template {i+1} path not provided'}), 400
+            
+        if not os.path.exists(template_path):
+            logger.error(f"Template file not found: {template_path}")
+            return jsonify({'success': False, 'error': f'Template {i+1} file not found'}), 400
         
         template_paths.append(template_path)
         ceremony_types.append(ceremony_type)
