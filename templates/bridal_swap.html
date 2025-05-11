@@ -168,10 +168,11 @@
         overflow: hidden;
         border: 2px solid var(--bs-primary);
         box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        transition: all 0.2s ease;
-        flex: 0 0 auto;
-        width: 180px; 
-        height: 240px;
+        transition: all 0.3s ease;
+        flex: 0 0 auto !important;
+        width: 180px !important;
+        height: 240px !important;
+        margin-right: 15px;
     }
     
     .selected-template-card:hover {
@@ -181,9 +182,16 @@
     }
     
     .selected-template-img {
-        height: 100%;
-        width: 100%;
-        object-fit: cover;
+        height: 100% !important;
+        width: 100% !important;
+        object-fit: cover !important;
+    }
+    
+    /* Empty message styling */
+    .empty-message {
+        min-height: 240px;
+        color: #6c757d;
+        font-style: italic;
     }
     
     .selected-template-overlay {
@@ -503,8 +511,11 @@
                             </div>
                         </div>
                         <div class="card-body bg-dark p-3">
-                            <div class="templates-container d-flex overflow-auto py-2" style="gap: 10px;" id="selectedTemplatesThumbnails">
+                            <div class="d-flex flex-nowrap overflow-auto py-2" style="gap: 15px; min-height: 240px;" id="selectedTemplatesThumbnails">
                                 <!-- Selected template thumbnails will be added here dynamically -->
+                                <div class="empty-message text-muted w-100 text-center d-flex align-items-center justify-content-center">
+                                    <p>Selected templates will appear here</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -988,6 +999,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const cardDiv = document.createElement('div');
                 cardDiv.className = 'selected-template-card animate__animated animate__fadeIn';
                 cardDiv.setAttribute('data-template-path', templatePath);
+                cardDiv.style.width = '180px';
+                cardDiv.style.height = '240px';
+                cardDiv.style.flexShrink = '0';
+                cardDiv.style.flexGrow = '0';
                 
                 // Fill the card with content
                 cardDiv.innerHTML = `
@@ -995,7 +1010,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <button class="selected-template-remove" aria-label="Remove template">
                         <i class="fas fa-times"></i>
                     </button>
-                    <img src="${imageUrl}" class="selected-template-img" alt="${ceremonyType} template">
+                    <img src="${imageUrl}" class="selected-template-img" alt="${ceremonyType} template" style="width: 100%; height: 100%; object-fit: cover;">
                 `;
                 
                 // Add click listener to remove button
@@ -1021,8 +1036,15 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
         } else {
-            // Hide preview if no templates selected
-            selectedTemplatesPreview.classList.add('d-none');
+            // Show empty state with message
+            thumbnailsContainer.innerHTML = `
+                <div class="empty-message text-muted w-100 text-center d-flex align-items-center justify-content-center">
+                    <p>Selected templates will appear here</p>
+                </div>
+            `;
+            
+            // Show the section but with empty message
+            selectedTemplatesPreview.classList.remove('d-none');
         }
     }
     
