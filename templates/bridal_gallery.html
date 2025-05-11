@@ -476,9 +476,14 @@
             {% endif %}
             {{ ceremony|title }} Ceremony
         </h3>
-        <button class="btn btn-sm btn-outline-primary toggle-row-btn" data-target="{{ ceremony }}-row">
-            <i class="fas fa-chevron-down"></i> Expand All
-        </button>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-danger toggle-select-mode-btn" data-ceremony="{{ ceremony }}" title="Manage Templates">
+                <i class="fas fa-cog"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-primary toggle-row-btn" data-target="{{ ceremony }}-row" title="Expand All">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
     </div>
     
     <!-- Template Carousel with Arrow Navigation -->
@@ -495,9 +500,6 @@
         
         <!-- Delete Tools -->
         <div class="template-management-tools mb-2">
-            <button class="btn btn-sm btn-outline-danger toggle-select-mode-btn" data-ceremony="{{ ceremony }}">
-                <i class="fas fa-trash me-1"></i> Manage Templates
-            </button>
             <div class="bulk-actions d-none" id="{{ ceremony }}-bulk-actions">
                 <button class="btn btn-sm btn-danger delete-selected-btn" data-ceremony="{{ ceremony }}">
                     <i class="fas fa-trash-alt me-1"></i> Delete Selected
