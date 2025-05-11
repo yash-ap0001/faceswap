@@ -762,7 +762,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Current state for delete and preview operations
     let currentDeletePath = null;
     let currentPreviewTemplate = null;
-    let selectedTemplates = [];
     
     // Multi-Selection Elements
     const multiSelectionInterface = document.getElementById('multiSelectionInterface');
@@ -852,15 +851,21 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.toggle-row-btn').forEach(button => {
         button.addEventListener('click', function() {
             const targetId = this.getAttribute('data-target');
-            const carousel = document.getElementById(targetId.replace('-row', '-carousel'));
+            const ceremony = targetId.replace('-row', '');
+            const carousel = document.getElementById(`${ceremony}-carousel`);
             const cards = carousel.querySelectorAll('.template-card');
             const icon = this.querySelector('i');
             
+            console.log(`Toggle row button clicked for ${ceremony}`);
+            console.log(`Found ${cards.length} cards in carousel`);
+            
             // Check current state (expanded or collapsed)
             const isExpanded = this.classList.contains('expanded');
+            console.log(`Current state: ${isExpanded ? 'expanded' : 'collapsed'}`);
             
             if (isExpanded) {
                 // Collapse - show only first 4
+                console.log('Collapsing to show only first 4 cards');
                 cards.forEach((card, index) => {
                     if (index < 4) {
                         card.classList.remove('d-none');
@@ -878,6 +883,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.setAttribute('title', 'Expand All');
             } else {
                 // Expand - show all
+                console.log('Expanding to show all cards');
                 cards.forEach(card => {
                     card.classList.remove('d-none');
                 });
