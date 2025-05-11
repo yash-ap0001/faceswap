@@ -1057,22 +1057,33 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Show the selected templates preview section
+        // Show/hide selected templates preview based on count
         const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
-        if (selectedTemplatesPreview) {
-            if (count > 0) {
-                selectedTemplatesPreview.classList.remove('d-none');
-            } else {
-                selectedTemplatesPreview.classList.add('d-none');
-            }
+        const thumbnailsContainer = document.getElementById('selectedTemplatesThumbnails');
+        
+        if (!selectedTemplatesPreview || !thumbnailsContainer) {
+            console.error('Could not find preview containers');
+            return;
         }
         
-        // Update the selected templates preview row
-        const selectedTemplatesRow = document.getElementById('selected-templates-row');
-        const templateContainer = selectedTemplatesRow.querySelector('.d-flex');
+        // Update visibility of the preview section
+        if (count > 0) {
+            selectedTemplatesPreview.classList.remove('d-none');
+        } else {
+            selectedTemplatesPreview.classList.add('d-none');
+        }
         
-        // Clear current preview
-        templateContainer.innerHTML = '';
+        // Clear the thumbnails container
+        thumbnailsContainer.innerHTML = '';
+        
+        // Also update the selected templates row (legacy section)
+        const selectedTemplatesRow = document.getElementById('selected-templates-row');
+        const templateContainer = selectedTemplatesRow ? selectedTemplatesRow.querySelector('.d-flex') : null;
+        
+        if (templateContainer) {
+            // Clear current row preview
+            templateContainer.innerHTML = '';
+        }
         
         // Debug selected cards
         selectedCheckboxes.forEach(checkbox => {
@@ -1086,34 +1097,62 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         if (count > 0 && count <= 5) {
-            // Add each selected template to the preview row
+            // Remove any empty message
+            const emptyMessage = thumbnailsContainer.querySelector('.empty-message');
+            if (emptyMessage) {
+                emptyMessage.remove();
+            }
+            
+            // Add each selected template to both preview areas
             selectedCheckboxes.forEach((checkbox, index) => {
                 const card = checkbox.closest('.template-card');
                 const imgSrc = card.querySelector('img').src;
                 const ceremony = card.dataset.ceremony || 'unknown';
                 const path = card.dataset.templatePath || '';
                 
-                const templatePreview = document.createElement('div');
-                templatePreview.className = 'position-relative';
-                templatePreview.style.height = '200px';
-                templatePreview.style.flexShrink = '0';
-                templatePreview.style.marginRight = '15px';
+                console.log(`Adding preview for template ${index}:`, {imgSrc, ceremony, path});
                 
-                templatePreview.innerHTML = `
-                    <img src="${imgSrc}" alt="${ceremony} template" class="h-100 rounded shadow-sm" 
-                         style="object-fit: cover; border: 2px solid var(--bs-primary);">
-                    <span class="badge bg-primary position-absolute top-0 start-0 m-2">${ceremony}</span>
-                    <input type="hidden" name="template_${index}" value="${path}">
-                    <input type="hidden" name="ceremony_${index}" value="${ceremony}">
-                    <!-- Debug info -->
-                    <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 start-0 m-2">${path.split('/').pop()}</span>
+                // 1. Add to the main thumbnails container
+                const thumbnailPreview = document.createElement('div');
+                thumbnailPreview.className = 'position-relative';
+                thumbnailPreview.style.height = '220px';
+                thumbnailPreview.style.flexShrink = '0';
+                thumbnailPreview.style.width = '180px';
+                
+                thumbnailPreview.innerHTML = `
+                    <div class="card bg-dark h-100">
+                        <img src="${imgSrc}" alt="${ceremony} template" class="card-img-top h-75" 
+                             style="object-fit: cover;">
+                        <div class="card-body p-2">
+                            <span class="badge bg-primary">${ceremony}</span>
+                            <small class="d-block text-truncate mt-1">${path.split('/').pop()}</small>
+                        </div>
+                        <input type="hidden" name="template_${index}" value="${path}">
+                        <input type="hidden" name="ceremony_${index}" value="${ceremony}">
+                    </div>
                 `;
                 
-                templateContainer.appendChild(templatePreview);
+                thumbnailsContainer.appendChild(thumbnailPreview);
+                
+                // 2. If the row container exists, add there too for backward compatibility
+                if (templateContainer) {
+                    const rowPreview = document.createElement('div');
+                    rowPreview.className = 'position-relative';
+                    rowPreview.style.height = '200px';
+                    rowPreview.style.flexShrink = '0';
+                    rowPreview.style.marginRight = '15px';
+                    
+                    rowPreview.innerHTML = `
+                        <img src="${imgSrc}" alt="${ceremony} template" class="h-100 rounded shadow-sm" 
+                             style="object-fit: cover; border: 2px solid var(--bs-primary);">
+                        <span class="badge bg-primary position-absolute top-0 start-0 m-2">${ceremony}</span>
+                        <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 start-0 m-2">${path.split('/').pop()}</span>
+                    `;
+                    
+                    templateContainer.appendChild(rowPreview);
+                    selectedTemplatesRow.classList.remove('d-none');
+                }
             });
-            
-            // Show the preview row
-            selectedTemplatesRow.classList.remove('d-none');
             
             // Add a count hidden field to the form
             let templateCountInput = document.querySelector('input[name="template_count"]');
@@ -1124,6 +1163,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('upload-form').appendChild(templateCountInput);
             }
             templateCountInput.value = count;
+            
+            // Enable the submit button
+            const submitBtn = document.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+            }
         } else {
             // Hide the preview row if no templates or too many selected
             if (count === 0) {
@@ -1850,34 +1895,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     }
                     
-                    // Add click event to the checkbox
-                    const checkbox = card.querySelector('.template-checkbox');
-                    if (checkbox) {
-                        checkbox.addEventListener('change', function(e) {
-                            e.stopPropagation(); // Prevent the card click event
-                            const card = this.closest('.template-card');
-                            if (card) {
-                                card.classList.toggle('selected', this.checked);
-                                console.log('Checkbox changed:', this.checked, 'Card selected:', card.classList.contains('selected'));
-                                updateSelectedCount();
-                            }
-                        });
-                        
-                        // Also listen for clicks on the card when in selection mode
-                        card.addEventListener('click', function(e) {
-                            // Only handle clicks in selection mode and not on the checkbox or button itself
-                            if (isSelectionMode && 
-                                !e.target.classList.contains('template-checkbox') && 
-                                !e.target.closest('.select-template-btn')) {
-                                checkbox.checked = !checkbox.checked;
-                                this.classList.toggle('selected', checkbox.checked);
-                                console.log('Card clicked in selection mode, now selected:', this.classList.contains('selected'));
-                                // Update the selected count and thumbnail preview
-                                updateSelectedCount();
-                                e.preventDefault();
-                                e.stopPropagation();
-                            }
-                        });
+                    // We already have a direct event listener and card click handler above
                     }
                 });
             })
