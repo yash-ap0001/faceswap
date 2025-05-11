@@ -1473,62 +1473,84 @@ document.addEventListener('DOMContentLoaded', function() {
                     const resultCard = document.createElement('div');
                     resultCard.className = 'multi-result-card';
                     resultCard.setAttribute('data-result-index', index);
-            
-            // Add a "new" indicator if this result was just added (in last 10 seconds)
-            const isNew = (new Date().getTime() - item.timestamp) < 10000;
-            const newBadge = isNew ? `<div class="position-absolute top-0 start-0 m-2">
-                <span class="badge bg-success">NEW</span>
-            </div>` : '';
-            
-            resultCard.innerHTML = `
-                <div class="card h-100 bg-dark border-0 shadow position-relative">
-                    <div class="card-img-top position-relative overflow-hidden" style="height: 350px;">
-                        <img src="${result.result_path}" class="multi-result-img" alt="Result for ${displayCeremony}" 
-                            style="width: 100%; height: 100%; object-fit: cover;">
-                        <div class="position-absolute top-0 end-0 m-2">
-                            <span class="badge bg-primary">${displayCeremony}</span>
+                
+                    // Add a "new" indicator if this result was just added (in last 10 seconds)
+                    const isNew = (new Date().getTime() - item.timestamp) < 10000;
+                    const newBadge = isNew ? `<div class="position-absolute top-0 start-0 m-2">
+                        <span class="badge bg-success">NEW</span>
+                    </div>` : '';
+                    
+                    // Ensure we have a path to display the image from
+                    const resultPath = result.result_path || result.result_image || '';
+                    if (!resultPath) {
+                        console.warn('No result path found for card:', result);
+                    }
+                    
+                    resultCard.innerHTML = `
+                        <div class="card h-100 bg-dark border-0 shadow position-relative">
+                            <div class="card-img-top position-relative overflow-hidden" style="height: 350px;">
+                                <img src="${resultPath}" class="multi-result-img" alt="Result for ${displayCeremony}" 
+                                    style="width: 100%; height: 100%; object-fit: cover;">
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <span class="badge bg-primary">${displayCeremony}</span>
+                                </div>
+                                ${newBadge}
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center bg-dark text-light">
+                                <span class="ceremony-badge"><i class="fas fa-check-circle text-success me-1"></i> ${displayCeremony}</span>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <a href="${resultPath}" class="btn btn-sm btn-success" download title="Download this image">
+                                        <i class="fas fa-download"></i> Save
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        ${newBadge}
-                    </div>
-                    <div class="card-footer d-flex justify-content-between align-items-center bg-dark text-light">
-                        <span class="ceremony-badge"><i class="fas fa-check-circle text-success me-1"></i> ${displayCeremony}</span>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <a href="${result.result_path}" class="btn btn-sm btn-success" download title="Download this image">
-                                <i class="fas fa-download"></i> Save
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            multiResultsGrid.appendChild(resultCard);
-        });
-        
-        // Add event listeners to remove buttons
-        document.querySelectorAll('.remove-result-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const index = parseInt(this.getAttribute('data-index'));
-                removeProcessedResult(index);
+                    `;
+                    
+                    multiResultsGrid.appendChild(resultCard);
+                } catch (cardError) {
+                    console.error(`Error processing result item ${index}:`, cardError);
+                }
             });
-        });
-        
-        // Update header text with count
-        const headerText = multiResultsContainer.querySelector('h3');
-        if (headerText) {
-            headerText.innerHTML = `<i class="fas fa-images me-2"></i>Your Multiple Bridal Looks (${allProcessedResults.length})`;
+            
+            try {
+                // Add event listeners to remove buttons (with nullcheck)
+                const removeButtons = document.querySelectorAll('.remove-result-btn');
+                console.log(`Found ${removeButtons.length} remove buttons to attach events to`);
+                
+                if (removeButtons && removeButtons.length > 0) {
+                    removeButtons.forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const index = parseInt(this.getAttribute('data-index'));
+                            removeProcessedResult(index);
+                        });
+                    });
+                }
+                
+                // Update header text with count
+                const headerText = multiResultsContainer.querySelector('h3');
+                if (headerText) {
+                    headerText.innerHTML = `<i class="fas fa-images me-2"></i>Your Multiple Bridal Looks (${allProcessedResults.length})`;
+                }
+                
+                // Show the results container
+                multiResultsContainer.classList.remove('d-none');
+                
+                // Scroll to results
+                window.scrollTo({
+                    top: multiResultsContainer.offsetTop,
+                    behavior: 'smooth'
+                });
+            } catch (finalError) {
+                console.error('Error in final stage of displayMultiResults:', finalError);
+            }
+        } catch (overallError) {
+            console.error('Critical error in displayMultiResults:', overallError);
+            showError('Error displaying results: ' + overallError.message);
         }
-        
-        // Show the results container
-        multiResultsContainer.classList.remove('d-none');
-        
-        // Scroll to results
-        window.scrollTo({
-            top: multiResultsContainer.offsetTop,
-            behavior: 'smooth'
-        });
     }
     
     // Function to remove a processed result
