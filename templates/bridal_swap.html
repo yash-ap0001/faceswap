@@ -291,9 +291,11 @@
     
     /* Multi-results display */
     .multi-results-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px;
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 15px;
+        padding: 10px 5px;
     }
     
     .multi-result-card {
@@ -301,6 +303,9 @@
         border-radius: 8px;
         overflow: hidden;
         transition: all 0.3s ease;
+        flex: 0 0 280px; /* Fixed width */
+        min-width: 280px; /* Ensure minimum width */
+        max-width: 280px; /* Maximum width */
     }
     
     .multi-result-card:hover {
