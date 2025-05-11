@@ -632,8 +632,11 @@
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4" id="{{ ceremony }}-cards">
                 {% if all_templates[ceremony]|length > 0 %}
                     {% for template in all_templates[ceremony] %}
-                        <div class="col template-card mb-4 {% if loop.index0 >= 4 %}extra-card{% endif %}" data-index="{{ loop.index0 }}" data-template-path="{{ template.url }}">
-                            <div class="card shadow-sm bridal-card position-relative" data-style="{{ ceremony }}">
+                        <div class="col template-card mb-4 {% if loop.index0 >= 4 %}extra-card{% endif %}" data-index="{{ loop.index0 }}">
+                            <div class="card shadow-sm bridal-card position-relative" 
+                                data-template-path="{{ template.url }}"
+                                data-ceremony="{{ ceremony }}"
+                                data-style="{{ ceremony }}">
                                 <!-- Selection checkbox (hidden by default) -->
                                 <div class="template-select-overlay d-none">
                                     <div class="form-check">
@@ -653,8 +656,7 @@
                                     loading="lazy" 
                                     data-template-path="{{ template.url }}" 
                                     data-ceremony="{{ ceremony }}" 
-                                    style="cursor: pointer;" 
-                                    onclick="handleTemplateClick(event, '{{ template.url }}', '{{ ceremony }}')">
+                                    style="cursor: pointer;">
                                 
                                 <!-- Preview hint on hover -->
                                 <div class="position-absolute bottom-0 left-0 right-0 p-2 text-center preview-hint" 
@@ -1071,6 +1073,8 @@ document.addEventListener('DOMContentLoaded', function() {
             card.addEventListener('click', function(event) {
                 const templatePath = this.getAttribute('data-template-path');
                 const ceremonyType = this.getAttribute('data-ceremony');
+                
+                console.log("Template click: ", templatePath, ceremonyType);
                 
                 if (window.currentMode === 'single') {
                     // Single template mode - open the single swap dialog
