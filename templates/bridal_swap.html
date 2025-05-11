@@ -1258,15 +1258,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error(`Template ${index} missing path:`, template);
                     return;
                 }
-            
-            // Always include a ceremony value (fallback to 'wedding' if not set)
-            const ceremonyType = template.ceremony || 'wedding';
-            
-            formData.append(`template_${index}`, template.path);
-            formData.append(`ceremony_${index}`, ceremonyType);
-            
-            console.log(`Added template ${index}: path=${template.path}, ceremony=${ceremonyType}`);
-        });
+                
+                // Always include a ceremony value (fallback to 'wedding' if not set)
+                const ceremonyType = template.ceremony || 'wedding';
+                
+                // Use both the indexed version for the server to handle individual templates
+                formData.append(`template_${index}`, template.path);
+                formData.append(`ceremony_${index}`, ceremonyType);
+                
+                // Also append to templates[] array for compatibility with the server's getlist('templates[]') method
+                formData.append('templates[]', template.path);
+                
+                console.log(`Added template ${index}: path=${template.path}, ceremony=${ceremonyType}`);
+            });
         
         // Send AJAX request - use the Create Bride Look endpoint with multi=true flag
         formData.append('multi', 'true'); // Add flag to tell the endpoint this is a multi-template request
@@ -1500,7 +1504,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>` : '';
                     
                     // Ensure we have a path to display the image from
+                    // Server might return result_image (multi-template) or result_path (single template)
                     const resultPath = result.result_path || result.result_image || '';
+                    
+                    // Full URL path for displaying the image
+                    const resultFullPath = resultPath ? `/uploads/${resultPath}` : '';
+                    
                     if (!resultPath) {
                         console.warn('No result path found for card:', result);
                     }
