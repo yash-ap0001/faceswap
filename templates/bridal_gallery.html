@@ -1376,7 +1376,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     let statusMessage = 'Some models are not loaded properly.';
                     
                     if (!data.face_detection) {
-                        statusMessage = 'Face detection model is not loaded.';
+                        statusMessage = '';
                     } else if (!data.face_swap) {
                         statusMessage = 'Face swap model is not loaded.';
                     }
