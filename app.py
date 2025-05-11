@@ -935,7 +935,9 @@ def bridal_swap():
     
     source_file = request.files['source']
     selected_style = request.form.get('style', 'haldi')
-    # We'll use Pinterest templates directly instead of other template types
+    template_url = request.form.get('template_url')  # Get the user-selected template URL
+    
+    logger.info(f"Received face swap request with style: {selected_style}, template URL: {template_url}")
     
     if source_file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
@@ -960,8 +962,15 @@ def bridal_swap():
         if not source_faces:
             return jsonify({'error': 'No face detected in your photo. Please upload a clear photo with your face visible.'}), 400
         
-        # Get the template image directly from Pinterest based on ceremony type
-        target_img, target_path = get_pinterest_template_for_ceremony(selected_style)
+        # Use the user-selected template if provided, otherwise fall back to a random one
+        if template_url and os.path.exists(template_url):
+            logger.info(f"Using user-selected template: {template_url}")
+            target_img = cv2.imread(template_url)
+            target_path = template_url
+        else:
+            logger.info(f"User-selected template not found or not provided, using random template for ceremony: {selected_style}")
+            # Get the template image directly from Pinterest based on ceremony type
+            target_img, target_path = get_pinterest_template_for_ceremony(selected_style)
         
         if target_img is None:
             return jsonify({'error': 'Failed to load bridal template image'}), 500
