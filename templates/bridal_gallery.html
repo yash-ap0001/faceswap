@@ -568,19 +568,7 @@
         </div>
         
         <!-- Delete Tools -->
-        <div class="template-management-tools mb-2">
-            <div class="bulk-actions d-none" id="{{ ceremony }}-bulk-actions">
-                <button class="btn btn-sm btn-danger delete-selected-btn" data-ceremony="{{ ceremony }}">
-                    <i class="fas fa-trash-alt me-1"></i> Delete Selected
-                </button>
-                <button class="btn btn-sm btn-danger delete-all-btn" data-ceremony="{{ ceremony }}">
-                    <i class="fas fa-times-circle me-1"></i> Delete All {{ ceremony|title }}
-                </button>
-                <button class="btn btn-sm btn-secondary cancel-select-btn" data-ceremony="{{ ceremony }}">
-                    <i class="fas fa-times me-1"></i> Cancel
-                </button>
-            </div>
-        </div>
+        <!-- Template management tools removed as requested -->
         
         <!-- Cards Row - Showing Only a Few at a Time -->
         <div class="template-row">
@@ -605,11 +593,7 @@
                                 </div>
                                 
                                 <!-- Multi-selection button (always visible for quick selection) -->
-                                <button class="btn btn-sm btn-primary position-absolute top-0 end-0 m-2 template-select-btn"
-                                        data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" title="Add to selection"
-                                        onclick="toggleTemplateSelection(event, '{{ template.url }}', '{{ ceremony }}')">
-                                    <i class="fas fa-plus"></i>
-                                </button>
+                                <!-- Plus button removed as requested -->
                                 
                                 <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" style="cursor: pointer;" onclick="showFullsizePreview('{{ template.url }}', '{{ ceremony }}')">
                                 
@@ -620,11 +604,7 @@
                                     </span>
                                 </div>
                                 
-                                <!-- Individual delete button (visible on hover) -->
-                                <button class="btn btn-sm btn-outline-danger delete-template-btn position-absolute bottom-0 end-0 m-2" 
-                                        data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                <!-- Delete button removed as requested -->
                             </div>
                         </div>
                     {% endfor %}
