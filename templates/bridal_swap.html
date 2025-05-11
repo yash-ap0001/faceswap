@@ -138,6 +138,65 @@
         animation: btn-flash 0.75s ease 2;
     }
     
+    /* Selected templates thumbnail preview */
+    .selected-template-thumbnail {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 2px solid var(--bs-primary);
+        background-color: var(--bs-dark);
+        transition: transform 0.2s ease;
+    }
+    
+    .selected-template-thumbnail:hover {
+        transform: scale(1.05);
+    }
+    
+    .selected-template-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .selected-template-thumbnail .ceremony-label {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 3px;
+        font-size: 0.7rem;
+        background-color: rgba(0,0,0,0.7);
+        color: white;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .selected-template-thumbnail .remove-thumbnail {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 20px;
+        height: 20px;
+        background-color: rgba(0,0,0,0.7);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.7rem;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    
+    .selected-template-thumbnail:hover .remove-thumbnail {
+        opacity: 1;
+    }
+    
     /* Remove old footer styles that are no longer needed */
     
     /* Selection count badge */
@@ -397,6 +456,14 @@
                 </div>
             </div>
             <div class="card-body">
+                <!-- Selected templates preview area -->
+                <div id="selectedTemplatesPreview" class="mb-3 pb-3 border-bottom d-none">
+                    <h5 class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Selected Templates</h5>
+                    <div class="d-flex flex-wrap gap-2" id="selectedTemplatesThumbnails">
+                        <!-- Selected template thumbnails will be added here dynamically -->
+                    </div>
+                </div>
+                
                 <ul class="nav nav-tabs" id="templateTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="haldi-tab" data-bs-toggle="tab" data-bs-target="#haldi-templates" type="button" role="tab">Haldi</button>
@@ -805,7 +872,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to update selected count
     function updateSelectedCount() {
-        const count = document.querySelectorAll('.template-checkbox:checked').length;
+        const selectedCheckboxes = document.querySelectorAll('.template-checkbox:checked');
+        const count = selectedCheckboxes.length;
+        
         if (selectedCount) {
             selectedCount.textContent = count;
         }
@@ -822,6 +891,62 @@ document.addEventListener('DOMContentLoaded', function() {
                 processSelectedBtn.title = 'Please select a maximum of 5 templates';
             } else {
                 processSelectedBtn.title = '';
+            }
+        }
+        
+        // Update the thumbnails preview
+        const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
+        const thumbnailsContainer = document.getElementById('selectedTemplatesThumbnails');
+        
+        if (selectedTemplatesPreview && thumbnailsContainer) {
+            // Clear existing thumbnails
+            thumbnailsContainer.innerHTML = '';
+            
+            if (count > 0) {
+                // Show the preview container
+                selectedTemplatesPreview.classList.remove('d-none');
+                
+                // Add thumbnail for each selected template
+                selectedCheckboxes.forEach((checkbox, index) => {
+                    const card = checkbox.closest('.template-card');
+                    if (!card) return;
+                    
+                    const templatePath = card.dataset.templatePath || card.dataset.path;
+                    const ceremonyType = card.dataset.ceremony;
+                    const imageUrl = card.querySelector('img').src;
+                    
+                    // Create thumbnail element
+                    const thumbnail = document.createElement('div');
+                    thumbnail.className = 'selected-template-thumbnail';
+                    thumbnail.dataset.templatePath = templatePath;
+                    
+                    thumbnail.innerHTML = `
+                        <img src="${imageUrl}" alt="${ceremonyType} template">
+                        <div class="ceremony-label">${ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1)}</div>
+                        <div class="remove-thumbnail" data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    `;
+                    
+                    // Add click handler to remove button
+                    const removeBtn = thumbnail.querySelector('.remove-thumbnail');
+                    if (removeBtn) {
+                        removeBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            // Uncheck the corresponding checkbox
+                            checkbox.checked = false;
+                            // Update card styling
+                            checkbox.closest('.template-card').classList.remove('selected');
+                            // Update counts and preview
+                            updateSelectedCount();
+                        });
+                    }
+                    
+                    thumbnailsContainer.appendChild(thumbnail);
+                });
+            } else {
+                // Hide the preview container if no templates selected
+                selectedTemplatesPreview.classList.add('d-none');
             }
         }
     }
