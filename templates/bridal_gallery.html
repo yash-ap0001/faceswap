@@ -2258,7 +2258,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (data.success) {
                 // Redirect to results page
-                window.location.href = '/bridal-results?session=' + data.session_id;
+                console.log("Processing successful, redirecting to results page");
+                window.location.href = '/bridal-results';
             } else {
                 showError(data.error || 'Failed to process images');
             }

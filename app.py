@@ -2,6 +2,7 @@ import os
 import cv2
 import numpy as np
 import time
+import uuid
 from flask import Flask, request, jsonify, render_template, send_from_directory, redirect, url_for, session
 import insightface
 from insightface.app import FaceAnalysis
@@ -851,7 +852,11 @@ def bridal_results():
     template_paths = session.get('template_paths', [])
     
     if not source_path or not template_paths:
+        app.logger.error("Missing source_path or template_paths in session")
+        app.logger.debug(f"Session data: source_path={source_path}, template_paths={template_paths}")
         return redirect(url_for('bridal_gallery'))
+    
+    app.logger.info(f"Rendering results page with {len(template_paths)} templates")
     
     # Process will happen on this page with JavaScript
     return render_template('bridal_results.html', 
@@ -879,24 +884,39 @@ def process_template():
         return jsonify({'success': False, 'error': 'Missing source or template path'})
     
     try:
+        app.logger.info(f"Processing template: source={source_path}, template={template_path}")
+        
         # Read source and template images
         source_img = cv2.imread(source_path)
         template_img = cv2.imread(template_path)
         
-        if source_img is None or template_img is None:
-            return jsonify({'success': False, 'error': 'Failed to read images'})
+        if source_img is None:
+            app.logger.error(f"Failed to read source image: {source_path}")
+            return jsonify({'success': False, 'error': 'Failed to read source image'})
+        
+        if template_img is None:
+            app.logger.error(f"Failed to read template image: {template_path}")
+            return jsonify({'success': False, 'error': 'Failed to read template image'})
             
         # Detect faces
+        app.logger.info("Detecting faces in source image")
         source_faces = faceapp.get(source_img)
+        
+        app.logger.info("Detecting faces in template image")
         target_faces = faceapp.get(template_img)
         
         if not source_faces:
+            app.logger.error("No face detected in source image")
             return jsonify({'success': False, 'error': 'No face detected in source image'})
             
         if not target_faces:
+            app.logger.error("No face detected in template image")
             return jsonify({'success': False, 'error': 'No face detected in template image'})
+        
+        app.logger.info(f"Found {len(source_faces)} faces in source image and {len(target_faces)} faces in template image")
             
         # Perform face swap
+        app.logger.info("Performing face swap")
         result_img = swapper.get(template_img, target_faces[0], source_faces[0], source_img)
         
         # Save result
@@ -908,16 +928,25 @@ def process_template():
         os.makedirs(os.path.dirname(result_path), exist_ok=True)
         
         # Save the result
-        cv2.imwrite(result_path, result_img)
+        app.logger.info(f"Saving result to {result_path}")
+        success = cv2.imwrite(result_path, result_img)
+        
+        if not success:
+            app.logger.error(f"Failed to save result image to {result_path}")
+            return jsonify({'success': False, 'error': 'Failed to save result image'})
+        
+        result_url = f"/uploads/results/{result_filename}"
+        app.logger.info(f"Success! Result available at {result_url}")
         
         # Return the result path for display
         return jsonify({
             'success': True,
-            'result_path': f"/uploads/results/{result_filename}"
+            'result_path': result_url
         })
         
     except Exception as e:
         app.logger.error(f"Error processing template: {str(e)}")
+        app.logger.error(traceback.format_exc())
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/bridal-swap', methods=['GET', 'POST'])
