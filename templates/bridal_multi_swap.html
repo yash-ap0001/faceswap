@@ -600,14 +600,37 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Process the template
         try {
-            const formData = new FormData();
-            formData.append('source', uploadedFile);
-            formData.append('style', template.ceremony);
-            formData.append('template_type', template.type);
+            // First save the source image if not already done
+            if (!template.source_path) {
+                const sourceFormData = new FormData();
+                sourceFormData.append('file', uploadedFile);
+                
+                const sourceResponse = await fetch('/upload-file', {
+                    method: 'POST',
+                    body: sourceFormData
+                });
+                
+                const sourceData = await sourceResponse.json();
+                
+                if (!sourceData.success) {
+                    throw new Error(sourceData.error || 'Failed to upload source image');
+                }
+                
+                template.source_path = sourceData.path;
+            }
             
-            const response = await fetch('/bridal-swap', {
+            // Now process the template with the saved source image
+            console.log(`Processing template: source=${template.source_path}, template=${template.path}`);
+            
+            const response = await fetch('/process_template', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    source_path: template.source_path,
+                    template_path: template.path
+                })
             });
             
             const data = await response.json();
@@ -618,20 +641,20 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Update the result card
             const resultImg = resultCard.querySelector('.result-img');
-            resultImg.src = `/uploads/${data.result_image}`;
+            resultImg.src = data.result_path;
             
             // Store result for download all function
             processedResults.push({
-                url: `/uploads/${data.result_image}`,
-                filename: data.result_image
+                url: data.result_path,
+                filename: data.result_path.split('/').pop()
             });
             
             // Add download handler
             const downloadBtn = resultCard.querySelector('.download-btn');
             downloadBtn.addEventListener('click', function() {
                 const link = document.createElement('a');
-                link.href = `/uploads/${data.result_image}`;
-                link.download = data.result_image;
+                link.href = data.result_path;
+                link.download = data.result_path.split('/').pop();
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);

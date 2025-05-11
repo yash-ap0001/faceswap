@@ -804,37 +804,54 @@ def multi_face_swap():
     - JSON with results or error message
     """
     if faceapp is None or swapper is None:
+        app.logger.error("Face detection or face swap models not loaded")
         return jsonify({'success': False, 'error': 'Models not loaded. Please check server logs.'}), 500
         
     if 'source' not in request.files:
+        app.logger.error("No source file in request")
         return jsonify({'success': False, 'error': 'No source image provided'})
     
     source_file = request.files['source']
+    app.logger.info(f"Received source file: {source_file.filename}")
+    
     if source_file.filename == '':
+        app.logger.error("Empty source filename")
         return jsonify({'success': False, 'error': 'No source image selected'})
     
     if not allowed_file(source_file.filename):
+        app.logger.error(f"Invalid file format: {source_file.filename}")
         return jsonify({'success': False, 'error': 'Invalid file format'})
     
     # Get template paths from the form
     template_paths = request.form.getlist('templates[]')
+    app.logger.info(f"Received {len(template_paths)} template paths")
+    
     if not template_paths:
+        app.logger.error("No templates selected")
         return jsonify({'success': False, 'error': 'No templates selected'})
     
     try:
         # Save the source image
         source_filename = secure_filename(source_file.filename)
         source_path = os.path.join(app.config['UPLOAD_FOLDER'], source_filename)
+        app.logger.info(f"Saving source image to {source_path}")
         source_file.save(source_path)
+        
+        # Validate source image was saved properly
+        if not os.path.exists(source_path):
+            app.logger.error(f"Failed to save source image at {source_path}")
+            return jsonify({'success': False, 'error': 'Failed to save source image'})
         
         # Store paths in session for the results page
         session['source_path'] = source_path
         session['template_paths'] = template_paths
+        app.logger.info(f"Stored in session: source_path={source_path}, {len(template_paths)} templates")
         
         # Create a unique session ID for tracking this process
         session_id = str(uuid.uuid4())
+        app.logger.info(f"Created session_id: {session_id}")
         
-        # Redirect to results page
+        # Return success response
         return jsonify({
             'success': True, 
             'session_id': session_id,
@@ -843,6 +860,7 @@ def multi_face_swap():
         
     except Exception as e:
         app.logger.error(f"Error in multi-face swap: {str(e)}")
+        app.logger.error(traceback.format_exc())
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/bridal_results')
