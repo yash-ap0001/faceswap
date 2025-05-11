@@ -62,14 +62,14 @@
         cursor: pointer;
         transition: all 0.3s ease;
         border: 2px solid transparent;
-        height: 250px;
+        height: 350px;  /* Increased for taller portrait images */
         overflow: hidden;
         padding: 0;
     }
     
     .card-img-top {
         width: 100%;
-        height: 250px;
+        height: 350px;  /* Increased for taller portrait images */
         object-fit: cover;
         object-position: top;
     }
@@ -111,7 +111,7 @@
     
     .result-image {
         width: 100%;
-        height: 250px;
+        height: 350px;
         object-fit: cover;
         object-position: top;
     }
@@ -471,7 +471,7 @@
             <div class="row" id="{{ ceremony }}-cards">
                 {% if all_templates[ceremony]|length > 0 %}
                     {% for template in all_templates[ceremony] %}
-                        <div class="col-md-4 template-card mb-4" data-index="{{ loop.index0 }}" data-template-path="{{ template.url }}">
+                        <div class="col-md-3 template-card mb-4" data-index="{{ loop.index0 }}" data-template-path="{{ template.url }}">
                             <div class="card shadow-sm bridal-card position-relative" data-style="{{ ceremony }}">
                                 <!-- Selection checkbox (hidden by default) -->
                                 <div class="template-select-overlay d-none">
@@ -698,8 +698,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Determine navigation direction
             const isNext = this.classList.contains('next-btn');
-            const currentPage = Math.floor(Math.min(...visibleIndices) / 3);
-            const totalPages = Math.ceil(cards.length / 3);
+            const currentPage = Math.floor(Math.min(...visibleIndices) / 4);
+            const totalPages = Math.ceil(cards.length / 4);
             let newPage = isNext ? currentPage + 1 : currentPage - 1;
             
             // Ensure page is in bounds
@@ -707,8 +707,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (newPage >= totalPages) newPage = 0;
             
             // Update display
-            const startIdx = newPage * 3;
-            const endIdx = startIdx + 3;
+            const startIdx = newPage * 4;
+            const endIdx = startIdx + 4;
             
             cards.forEach(card => {
                 const cardIndex = parseInt(card.getAttribute('data-index'));
@@ -721,11 +721,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Initialize each carousel to show first 3 cards
+    // Initialize each carousel to show first 4 cards
     document.querySelectorAll('.template-carousel').forEach(carousel => {
         const cards = carousel.querySelectorAll('.template-card');
         cards.forEach((card, index) => {
-            if (index < 3) {
+            if (index < 4) {
                 card.classList.remove('d-none');
             } else {
                 card.classList.add('d-none');
