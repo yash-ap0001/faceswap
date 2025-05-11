@@ -1073,7 +1073,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     // Create result card
-                    addResultCard(data.result_image, title, category, style);
+                    addResultCard(data.result_image, category, style);
                     resolve();
                 } else {
                     showError(data.error || 'Failed to process image');
@@ -1088,7 +1088,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Add a result card to the gallery
-    function addResultCard(imagePath, title, category, style) {
+    function addResultCard(imagePath, category, style) {
         const existingCard = document.querySelector(`.result-card[data-style="${style}"]`);
         if (existingCard) {
             existingCard.remove();
