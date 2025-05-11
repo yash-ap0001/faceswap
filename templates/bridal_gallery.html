@@ -471,13 +471,43 @@
         </div>
     </div>
 
-    <!-- Settings Bar -->
+    <!-- Selection Mode Card -->
     <div class="card mb-4 shadow">
-        <div class="card-body p-2">
-            <div class="row align-items-center">
-                <!-- Template type filters removed - Using only Pinterest photos now -->
-                <div class="col-12">
-                    <div class="d-flex gap-2 justify-content-md-end mt-3 mt-md-0">
+        <div class="card-header bg-dark">
+            <h5 class="mb-0">Selection Mode</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Mode Selection -->
+                    <div class="btn-group w-100 mb-3" role="group" aria-label="Selection mode">
+                        <input type="radio" class="btn-check" name="selection-mode" id="single-mode" autocomplete="off" checked>
+                        <label class="btn btn-outline-primary" for="single-mode">
+                            <i class="fas fa-user me-2"></i>Single Template Mode
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="selection-mode" id="multi-mode" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="multi-mode">
+                            <i class="fas fa-users me-2"></i>Multi-Template Mode
+                        </label>
+                    </div>
+                    
+                    <!-- Mode description -->
+                    <div id="mode-description" class="alert alert-info">
+                        <div id="single-mode-desc">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Single Template Mode:</strong> Click on any template to create a face swap with just that one image.
+                        </div>
+                        <div id="multi-mode-desc" class="d-none">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Multi-Template Mode:</strong> Click to select up to 5 templates across different ceremonies, then process them all at once.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <!-- Ceremony filters -->
+                    <h6 class="mb-2">Show Ceremonies:</h6>
+                    <div class="d-flex flex-wrap gap-2">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" id="cat-haldi" value="haldi" checked>
                             <label class="form-check-label" for="cat-haldi">Haldi</label>
@@ -619,30 +649,17 @@
                                     </span>
                                 </div>
                                 
-                                <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" style="cursor: pointer;" onclick="showFullsizePreview('{{ template.url }}', '{{ ceremony }}')">
+                                <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" 
+                                    loading="lazy" 
+                                    data-template-path="{{ template.url }}" 
+                                    data-ceremony="{{ ceremony }}" 
+                                    style="cursor: pointer;" 
+                                    onclick="handleTemplateClick(event, '{{ template.url }}', '{{ ceremony }}')">
                                 
-                                <!-- Action buttons overlay on hover -->
-                                <div class="position-absolute bottom-0 left-0 right-0 p-2 d-flex justify-content-center template-actions gap-2" style="background: rgba(0,0,0,0.7);">
-                                    <!-- Single swap button -->
-                                    <button class="btn btn-sm btn-primary single-swap-btn"
-                                            data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}"
-                                            onclick="prepareSingleSwap(event, '{{ template.url }}', '{{ ceremony }}')">
-                                        Single Swap
-                                    </button>
-
-                                    <!-- Multi-selection button -->
-                                    <button class="btn btn-sm btn-secondary template-select-btn"
-                                            data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}"
-                                            onclick="toggleTemplateSelection(event, '{{ template.url }}', '{{ ceremony }}')">
-                                        Add to Multi
-                                    </button>
-                                </div>
-                                
-                                <!-- Selected indicator (Hidden by default) -->
-                                <div class="position-absolute top-0 end-0 p-2 d-none select-badge">
-                                    <span class="badge bg-success rounded-pill">
-                                        Selected for Multi-Swap
-                                    </span>
+                                <!-- Preview hint on hover -->
+                                <div class="position-absolute bottom-0 left-0 right-0 p-2 text-center preview-hint" 
+                                     style="background: rgba(0,0,0,0.7); opacity: 0;">
+                                    <small class="text-white">Click to select</small>
                                 </div>
                             </div>
                         </div>
@@ -1022,8 +1039,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Call initialization when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
         initializeCarouselsCollapsed();
+        initializeSelectionModes();
         
-        // Initialize global variables for multi-selection
+        // Initialize global variables for selection
+        window.currentMode = 'single'; // Default to single template mode
         window.selectedTemplates = [];
         window.multiSelectionInterface = document.getElementById('multiSelectionInterface');
         window.selectedCount = document.getElementById('selectedCount');
@@ -1033,6 +1052,20 @@ document.addEventListener('DOMContentLoaded', function() {
         window.multiSourceInput = document.getElementById('multiSourceInput');
         window.multiSourcePreview = document.getElementById('multiSourcePreview');
         window.multiSourcePlaceholder = document.getElementById('multiSourcePlaceholder');
+        
+        // Initialize preview hint for all template cards
+        const previewHints = document.querySelectorAll('.preview-hint');
+        previewHints.forEach(hint => {
+            const card = hint.closest('.card');
+            if (card) {
+                card.addEventListener('mouseenter', () => {
+                    hint.style.opacity = '1';
+                });
+                card.addEventListener('mouseleave', () => {
+                    hint.style.opacity = '0';
+                });
+            }
+        });
         
         // Clear selection button
         if (clearSelectionBtn) {
