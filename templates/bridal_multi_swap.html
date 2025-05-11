@@ -563,12 +563,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function updateSelectedTemplates() {
         const checkboxes = document.querySelectorAll('.template-checkbox:checked');
-        selectedTemplates = Array.from(checkboxes).map(checkbox => ({
-            id: checkbox.value,
-            ceremony: checkbox.dataset.ceremony,
-            type: checkbox.dataset.type,
-            element: checkbox.closest('.template-card')
-        }));
+        selectedTemplates = Array.from(checkboxes).map(checkbox => {
+            const templateCard = checkbox.closest('.template-card');
+            return {
+                id: checkbox.value,
+                ceremony: checkbox.dataset.ceremony,
+                type: templateCard.dataset.type || 'pinterest', // Default to pinterest if not specified
+                path: templateCard.dataset.path, // Important for process_template endpoint
+                element: templateCard
+            };
+        });
         
         updateProcessButtonState();
     }
@@ -589,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <img class="result-img" alt="${capitalize(template.ceremony)} face swap">
             </div>
             <div class="result-controls">
-                <span class="text-white">${capitalize(template.ceremony)} ${capitalize(template.type)}</span>
+                <span class="text-white">${capitalize(template.ceremony)} Style</span>
                 <button class="btn btn-sm btn-outline-light download-btn">
                     <i class="fas fa-download"></i>
                 </button>
