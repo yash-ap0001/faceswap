@@ -24,52 +24,37 @@ document.addEventListener('DOMContentLoaded', function() {
     checkModels();
 
     // File input change handlers
-    if (sourceInput) {
-        sourceInput.addEventListener('change', function() {
-            handleFileInputChange(this, sourcePreview, sourcePlaceholder);
-        });
-    }
+    sourceInput.addEventListener('change', function() {
+        handleFileInputChange(this, sourcePreview, sourcePlaceholder);
+    });
 
-    if (targetInput) {
-        targetInput.addEventListener('change', function() {
-            handleFileInputChange(this, targetPreview, targetPlaceholder);
-        });
-    }
+    targetInput.addEventListener('change', function() {
+        handleFileInputChange(this, targetPreview, targetPlaceholder);
+    });
 
     // Clear button handlers
-    if (sourceClearBtn) {
-        sourceClearBtn.addEventListener('click', function() {
-            clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
-        });
-    }
+    sourceClearBtn.addEventListener('click', function() {
+        clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
+    });
 
-    if (targetClearBtn) {
-        targetClearBtn.addEventListener('click', function() {
-            clearFileInput(targetInput, targetPreview, targetPlaceholder);
-        });
-    }
+    targetClearBtn.addEventListener('click', function() {
+        clearFileInput(targetInput, targetPreview, targetPlaceholder);
+    });
 
     // Try again button handler
-    if (tryAgainBtn) {
-        tryAgainBtn.addEventListener('click', function() {
-            if (resultContainer) resultContainer.classList.add('d-none');
-            if (uploadForm) uploadForm.reset();
-            if (sourceInput && sourcePreview && sourcePlaceholder) {
-                clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
-            }
-            if (targetInput && targetPreview && targetPlaceholder) {
-                clearFileInput(targetInput, targetPreview, targetPlaceholder);
-            }
-            if (errorContainer) errorContainer.classList.add('d-none');
-        });
-    }
+    tryAgainBtn.addEventListener('click', function() {
+        resultContainer.classList.add('d-none');
+        uploadForm.reset();
+        clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
+        clearFileInput(targetInput, targetPreview, targetPlaceholder);
+        errorContainer.classList.add('d-none');
+    });
 
     // Form submission
-    if (uploadForm) {
-        uploadForm.addEventListener('submit', function(e) {
+    uploadForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        if (!sourceInput || !sourceInput.files.length || !targetInput || !targetInput.files.length) {
+        if (!sourceInput.files.length || !targetInput.files.length) {
             showError('Please select both source and target images.');
             return;
         }
@@ -90,10 +75,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Show loading
-        if (loadingContainer) loadingContainer.classList.remove('d-none');
-        if (errorContainer) errorContainer.classList.add('d-none');
-        if (resultContainer) resultContainer.classList.add('d-none');
-        if (swapBtn) swapBtn.disabled = true;
+        loadingContainer.classList.remove('d-none');
+        errorContainer.classList.add('d-none');
+        resultContainer.classList.add('d-none');
+        swapBtn.disabled = true;
 
         // Create form data
         const formData = new FormData();
@@ -107,18 +92,16 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            if (loadingContainer) loadingContainer.classList.add('d-none');
-            if (swapBtn) swapBtn.disabled = false;
+            loadingContainer.classList.add('d-none');
+            swapBtn.disabled = false;
 
             if (data.success) {
-                if (resultImage) resultImage.src = `/uploads/${data.result_image}`;
-                if (downloadBtn) {
-                    downloadBtn.href = `/uploads/${data.result_image}`;
-                    downloadBtn.download = data.result_image;
-                }
+                resultImage.src = `/uploads/${data.result_image}`;
+                downloadBtn.href = `/uploads/${data.result_image}`;
+                downloadBtn.download = data.result_image;
                 
                 // Show result container
-                if (resultContainer) resultContainer.classList.remove('d-none');
+                resultContainer.classList.remove('d-none');
                 
                 // If in demo mode, display an additional message
                 if (data.demo_mode) {
@@ -132,9 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         demoAlert.textContent = data.message || 'Running in demonstration mode. The image shows detected faces instead of actual face swapping.';
                         
                         // Insert it before the result image
-                        if (resultContainer && resultImage) {
-                            resultContainer.insertBefore(demoAlert, resultImage.parentNode);
-                        }
+                        resultContainer.insertBefore(demoAlert, resultImage.parentNode);
                     } else {
                         // Update existing alert
                         demoAlert.textContent = data.message || 'Running in demonstration mode. The image shows detected faces instead of actual face swapping.';
@@ -148,19 +129,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 
-                if (resultContainer) {
-                    window.scrollTo({
-                        top: resultContainer.offsetTop,
-                        behavior: 'smooth'
-                    });
-                }
+                window.scrollTo({
+                    top: resultContainer.offsetTop,
+                    behavior: 'smooth'
+                });
             } else {
                 showError(data.error || 'An unknown error occurred.');
             }
         })
         .catch(error => {
-            if (loadingContainer) loadingContainer.classList.add('d-none');
-            if (swapBtn) swapBtn.disabled = false;
+            loadingContainer.classList.add('d-none');
+            swapBtn.disabled = false;
             showError('Network error: ' + error.message);
         });
     });
@@ -187,14 +166,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showError(message) {
-        if (errorMessage) errorMessage.textContent = message;
-        if (errorContainer) {
-            errorContainer.classList.remove('d-none');
-            window.scrollTo({
-                top: errorContainer.offsetTop,
-                behavior: 'smooth'
-            });
-        }
+        errorMessage.textContent = message;
+        errorContainer.classList.remove('d-none');
+        window.scrollTo({
+            top: errorContainer.offsetTop,
+            behavior: 'smooth'
+        });
     }
 
     function checkModels() {

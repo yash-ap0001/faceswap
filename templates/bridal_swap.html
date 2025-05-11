@@ -435,19 +435,17 @@
 
                 <!-- Single Template Result -->
                 <div id="result-container" class="mt-4 d-none">
-                    <div class="single-result-container">
-                        <h4 class="text-center mb-3">Your Bridal Look</h4>
-                        <div class="text-center mb-3">
-                            <img id="result-image" class="img-fluid result-image" alt="Bridal face swap result">
-                        </div>
-                        <div class="text-center">
-                            <a id="download-btn" class="btn btn-success me-2" download>
-                                <i class="fas fa-download me-2"></i>Download
-                            </a>
-                            <button id="try-again-btn" class="btn btn-secondary">
-                                <i class="fas fa-redo me-2"></i>Try Another Style
-                            </button>
-                        </div>
+                    <h4 class="text-center mb-3">Your Bridal Look</h4>
+                    <div class="text-center mb-3">
+                        <img id="result-image" class="img-fluid result-image" alt="Bridal face swap result">
+                    </div>
+                    <div class="text-center">
+                        <a id="download-btn" class="btn btn-success me-2" download>
+                            <i class="fas fa-download me-2"></i>Download
+                        </a>
+                        <button id="try-again-btn" class="btn btn-secondary">
+                            <i class="fas fa-redo me-2"></i>Try Another Style
+                        </button>
                     </div>
                 </div>
                 
@@ -459,7 +457,7 @@
                             <p class="text-light mt-2 mb-0">Here are your bridal looks for different ceremonies</p>
                         </div>
                         <div class="card-body bg-dark pt-4">
-                            <div class="multi-results-grid row g-3"></div>
+                            <div class="multi-results-container"></div>
                             <div class="text-center mt-4 pt-3 border-top border-secondary">
                                 <button id="multi-try-again-btn" class="btn btn-lg btn-outline-light">
                                     <i class="fas fa-redo me-2"></i>Try Different Templates
@@ -756,16 +754,8 @@ document.addEventListener('DOMContentLoaded', function() {
     sourceInput.addEventListener('change', function() {
         handleFileInputChange(this, sourcePreview, sourcePlaceholder);
         
-        // Debug info on file selection
-        console.log('Source image selected: ', this.files[0] ? this.files[0].name : 'none');
-        
         // Update the process button state when source image changes
         updateSelectedCount();
-        
-        // Force check template selections again
-        console.log('Checking template selections after image upload');
-        const templates = document.querySelectorAll('.template-checkbox:checked');
-        console.log('Selected templates count: ', templates.length);
     });
 
     // Clear button handlers
@@ -791,197 +781,59 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Get all selected templates via checkboxes
-        const selectedCheckboxes = document.querySelectorAll('.template-checkbox:checked');
-        
-        // If no templates are selected via checkboxes, use the single template if it's set
-        if (selectedCheckboxes.length === 0) {
-            if (!templateUrlInput.value) {
-                showError('Please select at least one template from the available templates section.');
-                return;
-            }
-            
-            // Get selected bridal style
-            const selectedStyle = document.querySelector('input[name="bridalStyle"]:checked').value;
-    
-            // Check file sizes
-            const maxSize = 16 * 1024 * 1024; // 16MB
-            if (sourceInput.files[0].size > maxSize) {
-                showError('File size exceeds the maximum limit of 16MB.');
-                return;
-            }
-    
-            // Check file types
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-            if (!allowedTypes.includes(sourceInput.files[0].type)) {
-                showError('Only JPG, JPEG and PNG files are allowed.');
-                return;
-            }
-    
-            // Show loading
-            loadingContainer.classList.remove('d-none');
-            errorContainer.classList.add('d-none');
-            resultContainer.classList.add('d-none');
-            swapBtn.disabled = true;
-    
-            // Create form data for single template
-            const formData = new FormData();
-            formData.append('source', sourceInput.files[0]);
-            formData.append('style', selectedStyle);
-            formData.append('template_url', templateUrlInput.value);
-    
-            // Send AJAX request
-            fetch('/bridal-swap', {
-                method: 'POST',
-                body: formData
-            })
-            
-        } else {
-            // Process multiple templates
-            console.log(`Processing ${selectedCheckboxes.length} selected templates`);
-            
-            // Get selected bridal style
-            const selectedStyle = document.querySelector('input[name="bridalStyle"]:checked').value;
-    
-            // Check file sizes
-            const maxSize = 16 * 1024 * 1024; // 16MB
-            if (sourceInput.files[0].size > maxSize) {
-                showError('File size exceeds the maximum limit of 16MB.');
-                return;
-            }
-    
-            // Check file types
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-            if (!allowedTypes.includes(sourceInput.files[0].type)) {
-                showError('Only JPG, JPEG and PNG files are allowed.');
-                return;
-            }
-    
-            // Show loading
-            loadingContainer.classList.remove('d-none');
-            errorContainer.classList.add('d-none');
-            resultContainer.classList.add('d-none');
-            swapBtn.disabled = true;
-            
-            // Extract template data
-            const selectedTemplates = Array.from(selectedCheckboxes).map(checkbox => {
-                const card = checkbox.closest('.template-card');
-                return {
-                    path: card.dataset.templatePath || card.dataset.url,
-                    ceremony: card.dataset.ceremony || selectedStyle
-                };
-            });
-            
-            // Create form data for multiple templates
-            const formData = new FormData();
-            formData.append('source', sourceInput.files[0]);
-            
-            // Add template count
-            formData.append('template_count', selectedTemplates.length);
-            
-            // Add all selected template paths
-            selectedTemplates.forEach((template, index) => {
-                formData.append(`template_${index}`, template.path);
-                formData.append(`ceremony_${index}`, template.ceremony);
-            });
-            
-            // Send AJAX request to multi-template endpoint
-            fetch('/bridal-swap-multi', {
-                method: 'POST',
-                body: formData
-            })
+        if (!templateUrlInput.value) {
+            showError('Please select a template from the available templates section.');
+            return;
+        }
+
+        // Get selected bridal style
+        const selectedStyle = document.querySelector('input[name="bridalStyle"]:checked').value;
+
+        // Check file sizes
+        const maxSize = 16 * 1024 * 1024; // 16MB
+        if (sourceInput.files[0].size > maxSize) {
+            showError('File size exceeds the maximum limit of 16MB.');
+            return;
+        }
+
+        // Check file types
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (!allowedTypes.includes(sourceInput.files[0].type)) {
+            showError('Only JPG, JPEG and PNG files are allowed.');
+            return;
+        }
+
+        // Show loading
+        loadingContainer.classList.remove('d-none');
+        errorContainer.classList.add('d-none');
+        resultContainer.classList.add('d-none');
+        swapBtn.disabled = true;
+
+        // Create form data
+        const formData = new FormData();
+        formData.append('source', sourceInput.files[0]);
+        formData.append('style', selectedStyle);
+        formData.append('template_url', templateUrlInput.value);
+
+        // Send AJAX request
+        fetch('/bridal-swap', {
+            method: 'POST',
+            body: formData
+        })
         .then(response => response.json())
         .then(data => {
             loadingContainer.classList.add('d-none');
             swapBtn.disabled = false;
 
             if (data.success) {
-                // Check if we have multi-results from bridal-swap-multi
-                if (data.results && Array.isArray(data.results)) {
-                    console.log('Received multiple results:', data.results.length);
-                    
-                    // Clear existing content
-                    resultContainer.innerHTML = '';
-                    
-                    // Add a container for the results
-                    const resultContent = document.createElement('div');
-                    resultContent.className = 'multi-result-container p-3';
-                    resultContainer.appendChild(resultContent);
-                    
-                    // Add a heading for the results
-                    const resultsHeading = document.createElement('h3');
-                    resultsHeading.className = 'text-center mb-4';
-                    resultsHeading.textContent = 'Your Bridal Looks';
-                    resultContent.appendChild(resultsHeading);
-                    
-                    // Create a row for the results
-                    const resultsRow = document.createElement('div');
-                    resultsRow.className = 'row g-3';
-                    resultContent.appendChild(resultsRow);
-                    
-                    // Add each result card
-                    data.results.forEach((result, index) => {
-                        // Create a card for each result
-                        const resultCard = document.createElement('div');
-                        resultCard.className = 'col-md-4 col-lg-3 mb-4';
-                        
-                        // Get ceremony name or default
-                        const ceremonyName = result.ceremony_type || `Look ${index + 1}`;
-                        
-                        resultCard.innerHTML = `
-                            <div class="card h-100 result-card">
-                                <div class="card-img-container">
-                                    <img src="${result.path}" class="card-img-top result-img" alt="Bridal Look ${index + 1}">
-                                </div>
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">${ceremonyName}</h5>
-                                    <a href="${result.path}" class="btn btn-sm btn-primary mt-2" download>Download</a>
-                                </div>
-                            </div>
-                        `;
-                        
-                        resultsRow.appendChild(resultCard);
-                    });
-                    
-                    // Add styles for result cards
-                    if (!document.getElementById('result-card-styles')) {
-                        const style = document.createElement('style');
-                        style.id = 'result-card-styles';
-                        style.innerHTML = `
-                            .result-card {
-                                transition: transform 0.3s, box-shadow 0.3s;
-                                border: 1px solid rgba(255,255,255,0.2);
-                            }
-                            .result-card:hover {
-                                transform: translateY(-5px);
-                                box-shadow: 0 10px 15px rgba(0,0,0,0.3);
-                            }
-                            .result-img {
-                                object-fit: cover;
-                                height: 280px;
-                                width: 100%;
-                            }
-                        `;
-                        document.head.appendChild(style);
-                    }
-                    
-                    // Show the container
-                    resultContainer.classList.remove('d-none');
-                    window.scrollTo({
-                        top: resultContainer.offsetTop,
-                        behavior: 'smooth'
-                    });
-                } else {
-                    // Single result from bridal-swap
-                    resultImage.src = `/uploads/${data.result_image}`;
-                    downloadBtn.href = `/uploads/${data.result_image}`;
-                    downloadBtn.download = data.result_image;
-                    resultContainer.classList.remove('d-none');
-                    window.scrollTo({
-                        top: resultContainer.offsetTop,
-                        behavior: 'smooth'
-                    });
-                }
+                resultImage.src = `/uploads/${data.result_image}`;
+                downloadBtn.href = `/uploads/${data.result_image}`;
+                downloadBtn.download = data.result_image;
+                resultContainer.classList.remove('d-none');
+                window.scrollTo({
+                    top: resultContainer.offsetTop,
+                    behavior: 'smooth'
+                });
             } else {
                 showError(data.error || 'An unknown error occurred.');
             }
@@ -1130,84 +982,22 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedCount.textContent = count;
         }
         
-        // Check source image status
-        const hasSourceImage = sourceInput && sourceInput.files && sourceInput.files.length > 0;
-        console.log('Source image status:', hasSourceImage ? 'Image uploaded' : 'No image uploaded');
-        
-        // Process button in main form
-        if (swapBtn) {
-            // Main "Create Bridal Look" button should be enabled when checkboxes are selected
-            // The original logic already handles the template input field for standard mode
-            if (selectedCheckboxes.length > 0) {
-                console.log('Templates selected: Enabling main swap button');
-                swapBtn.classList.add('btn-success');
-                swapBtn.disabled = !hasSourceImage;
-            } else {
-                swapBtn.classList.remove('btn-success');
-            }
-        }
-        
-        // Button in template selection card
+        // Enable/disable the process buttons based on selection count
         if (processSelectedBtn) {
-            console.log('Updating processSelectedBtn state:', {
-                count: count,
-                hasSourceImage: hasSourceImage
-            });
-            
-            // This button should be enabled only when both conditions are met
-            const shouldEnable = (count > 0 && count <= 5 && hasSourceImage);
-            processSelectedBtn.disabled = !shouldEnable;
+            processSelectedBtn.disabled = (count === 0 || count > 5);
             
             if (count > 5) {
                 processSelectedBtn.title = 'Please select a maximum of 5 templates';
-            } else if (!hasSourceImage) {
-                processSelectedBtn.title = 'Please upload your photo';
-            } else if (count === 0) {
-                processSelectedBtn.title = 'Please select at least one template';
             } else {
-                processSelectedBtn.title = 'Click to process selected templates';
-            }
-            
-            // Add visual style when enabled
-            if (shouldEnable) {
-                processSelectedBtn.classList.add('btn-success');
-                processSelectedBtn.classList.remove('btn-primary');
-                
-                // Add a flash animation to draw attention
-                processSelectedBtn.classList.add('btn-flash');
-                setTimeout(() => {
-                    processSelectedBtn.classList.remove('btn-flash');
-                }, 1000);
-            } else {
-                processSelectedBtn.classList.remove('btn-success');
-                processSelectedBtn.classList.add('btn-primary');
+                processSelectedBtn.title = '';
             }
         }
         
-        // Button in selected templates preview
+        // Also update the new process button in the selected templates preview
         if (processSelectedTemplatesBtn) {
-            console.log('Updating processSelectedTemplatesBtn state:', {
-                count: count,
-                hasSourceImage: hasSourceImage
-            });
+            const hasSourceImage = sourceInput && sourceInput.files.length > 0;
             
-            // This should mirror the behavior of processSelectedBtn
-            const shouldEnable = (count > 0 && count <= 5 && hasSourceImage);
-            processSelectedTemplatesBtn.disabled = !shouldEnable;
-            
-            // Add visual style when enabled
-            if (shouldEnable) {
-                processSelectedTemplatesBtn.classList.add('btn-success');
-                processSelectedTemplatesBtn.classList.remove('btn-primary');
-                // Add a flash animation to draw attention
-                processSelectedTemplatesBtn.classList.add('btn-flash');
-                setTimeout(() => {
-                    processSelectedTemplatesBtn.classList.remove('btn-flash');
-                }, 1500);
-            } else {
-                processSelectedTemplatesBtn.classList.add('btn-primary');
-                processSelectedTemplatesBtn.classList.remove('btn-success');
-            }
+            processSelectedTemplatesBtn.disabled = (count === 0 || count > 5 || !hasSourceImage);
             
             if (count > 5) {
                 processSelectedTemplatesBtn.title = 'Please select a maximum of 5 templates';
@@ -1501,44 +1291,21 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayMultiResults(results, selectedTemplates) {
         console.log('Display multi results called with:', results?.length || 0, 'results');
         
-        // First try to find the dedicated multi-results container
-        let multiResultsContainer = document.getElementById('multi-results-container');
+        const multiResultsContainer = document.getElementById('multi-results-container');
         
-        // If it doesn't exist, we'll use the regular result container
+        // Make sure the container exists
         if (!multiResultsContainer) {
-            console.log('Dedicated multi-results container not found, using regular result container');
-            multiResultsContainer = document.getElementById('result-container');
-            
-            // Make sure the container exists
-            if (!multiResultsContainer) {
-                console.error('No result container found at all');
-                showError('Unable to display results - container not found');
-                return;
-            }
-            
-            // Clear the result container and add our multi-result structure
-            multiResultsContainer.innerHTML = `
-                <div class="multi-results-wrapper">
-                    <h3 class="text-center mb-4">Your Bridal Looks</h3>
-                    <div class="multi-results-grid row g-3"></div>
-                </div>
-            `;
-            
-            // Show the container
-            multiResultsContainer.classList.remove('d-none');
-        } else {
-            // Use the existing container but make it visible
-            multiResultsContainer.classList.remove('d-none');
+            console.error('Multi-results container not found');
+            showError('Unable to display results - container not found');
+            return;
         }
         
-        // Find the grid within the container (try multiple selectors to handle both cases)
-        const multiResultsGrid = multiResultsContainer.querySelector('.multi-results-grid') || 
-                                 multiResultsContainer.querySelector('.row') ||
-                                 multiResultsContainer;
+        // Find the grid within the container
+        const multiResultsGrid = multiResultsContainer.querySelector('.multi-results-container');
         
         if (!multiResultsGrid) {
-            console.error('Could not find any suitable container for results');
-            showError('Unable to display results - grid element not found');
+            console.error('Multi-results grid not found');
+            showError('Unable to display results - grid not found');
             return;
         }
         
@@ -1568,25 +1335,16 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`Building card ${index} with:`, {
                 resultData: result,
                 templateData: template,
-                ceremonyFromResult: result.ceremony_type || result.ceremony,
-                ceremonyFromTemplate: template.ceremony,
-                resultPath: result.path || result.result_path
+                ceremonyFromResult: result.ceremony,
+                ceremonyFromTemplate: template.ceremony
             });
             
-            // Determine the image path with fallbacks (format varies between endpoints)
-            const imagePath = result.path || result.result_path;
-            if (!imagePath) {
-                console.error('Missing image path for result', result);
-                return; // Skip this result
-            }
-            
             // Determine ceremony type with fallbacks
-            const ceremonyType = result.ceremony_type || result.ceremony || template.ceremony || 'wedding';
+            const ceremonyType = result.ceremony || template.ceremony || 'wedding';
             const displayCeremony = ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1);
             
-            // Create the card
             const resultCard = document.createElement('div');
-            resultCard.className = 'col-md-4 col-lg-3 mb-4';
+            resultCard.className = 'multi-result-card';
             resultCard.setAttribute('data-result-index', index);
             
             // Add a "new" indicator if this result was just added (in last 10 seconds)
@@ -1596,23 +1354,24 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>` : '';
             
             resultCard.innerHTML = `
-                <div class="card h-100 result-card">
-                    <div class="card-img-container position-relative">
-                        <img src="${imagePath}" class="card-img-top result-img" alt="Result for ${displayCeremony}">
+                <div class="card h-100 bg-dark border-0 shadow position-relative">
+                    <div class="card-img-top position-relative overflow-hidden" style="height: 350px;">
+                        <img src="${result.result_path}" class="multi-result-img" alt="Result for ${displayCeremony}" 
+                            style="width: 100%; height: 100%; object-fit: cover;">
                         <div class="position-absolute top-0 end-0 m-2">
                             <span class="badge bg-primary">${displayCeremony}</span>
                         </div>
                         ${newBadge}
                     </div>
-                    <div class="card-body text-center">
-                        <h5 class="card-title">${displayCeremony}</h5>
-                        <div class="mt-2">
-                            <a href="${imagePath}" class="btn btn-sm btn-primary" download title="Download this image">
-                                Download
-                            </a>
+                    <div class="card-footer d-flex justify-content-between align-items-center bg-dark text-light">
+                        <span class="ceremony-badge"><i class="fas fa-check-circle text-success me-1"></i> ${displayCeremony}</span>
+                        <div class="btn-group">
                             <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
-                                <i class="bi bi-trash"></i>
+                                <i class="fas fa-trash"></i>
                             </button>
+                            <a href="${result.result_path}" class="btn btn-sm btn-success" download title="Download this image">
+                                <i class="fas fa-download"></i> Save
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -1632,36 +1391,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update header text with count
         const headerText = multiResultsContainer.querySelector('h3');
         if (headerText) {
-            headerText.textContent = `Your Bridal Looks (${allProcessedResults.length})`;
+            headerText.innerHTML = `<i class="fas fa-images me-2"></i>Your Multiple Bridal Looks (${allProcessedResults.length})`;
         }
         
-        // Add CSS styles for the result cards if not already present
-        if (!document.getElementById('result-card-styles')) {
-            const style = document.createElement('style');
-            style.id = 'result-card-styles';
-            style.textContent = `
-                .result-card {
-                    transition: transform 0.3s, box-shadow 0.3s;
-                    border: 1px solid rgba(255,255,255,0.2);
-                }
-                .result-card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 10px 15px rgba(0,0,0,0.3);
-                }
-                .result-img {
-                    object-fit: cover;
-                    height: 280px;
-                    width: 100%;
-                }
-                .card-img-container {
-                    overflow: hidden;
-                }
-            `;
-            document.head.appendChild(style);
-        }
-        
-        // Show the results container and scroll to it
+        // Show the results container
         multiResultsContainer.classList.remove('d-none');
+        
+        // Scroll to results
         window.scrollTo({
             top: multiResultsContainer.offsetTop,
             behavior: 'smooth'

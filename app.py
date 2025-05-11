@@ -1109,21 +1109,23 @@ def bridal_swap_multi():
                 
                 # Perform the swap with proper error handling
                 try:
-                    # Direct face swap approach matching the working bridal_swap function
+                    # Direct face swap approach - similar to how it works in the Create Bride Look function
                     try:
+                        # This is how it works in the traditional bridal_swap function
+                        # First, we get faces with face detection
+                        source_face_box = source_face['bbox'].astype(int)
+                        source_face_landmarks = source_face['kps']
+                        target_face_box = target_face['bbox'].astype(int)
+                        target_face_landmarks = target_face['kps']
+                        
                         # Log detection results
-                        logger.info(f"Source face detected. Starting face swap operation.")
+                        logger.info(f"Source face: box={source_face_box.tolist()}, landmarks shape={source_face_landmarks.shape}")
+                        logger.info(f"Target face: box={target_face_box.tolist()}, landmarks shape={target_face_landmarks.shape}")
                         
-                        # Fixed approach to match how it's done in the working bridal_swap function
-                        # Based on how the insightface.model_zoo.inswapper works
-                        src_face = source_face
-                        dst_face = target_face
-                        
-                        # This is exactly how it's called in the working bridal_swap function
-                        # Don't add the paste_back parameter as it's causing an error
-                        result_img = swapper.get(template_img, dst_face, src_face)
+                        # Direct approach with swapper
+                        # This is the same approach used in bridal_swap that works
+                        result_img = swapper.get(template_img, target_face, source_face, source_img)
                         logger.info(f"Face swap successful")
-                        
                     except Exception as inner_error:
                         logger.error(f"Face swap operation failed: {inner_error}")
                         logger.error(f"Detailed error: {traceback.format_exc()}")
