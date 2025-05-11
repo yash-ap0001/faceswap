@@ -1173,13 +1173,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show loading state
         const loadingContainer = document.getElementById('loading-container');
         const resultContainer = document.getElementById('result-container');
-        const errorContainer = document.getElementById('error-container');
+        // Error container removed
         const multiResultsContainer = document.getElementById('multi-results-container');
         
         if (loadingContainer) loadingContainer.classList.remove('d-none');
         if (resultContainer) resultContainer.classList.add('d-none');
         if (multiResultsContainer) multiResultsContainer.classList.add('d-none');
-        if (errorContainer) errorContainer.classList.add('d-none');
+        // Error container removed
         
         console.log('Loading state shown, preparing form data');
         
