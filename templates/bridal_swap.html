@@ -299,6 +299,10 @@
         align-items: flex-start;
         scrollbar-width: thin;
         scrollbar-color: rgba(255,255,255,0.3) rgba(0,0,0,0.2);
+        white-space: nowrap;
+        max-height: 310px;
+        height: 310px;
+        min-height: 310px;
     }
     
     /* Style scrollbar for webkit browsers */
@@ -326,6 +330,27 @@
         max-width: 280px; /* Maximum width */
         margin-bottom: 0; /* Remove bottom margin to keep in one row */
         height: 280px; /* Fixed height to match template cards */
+        display: inline-block; /* Force inline display */
+        vertical-align: top; /* Align top */
+    }
+    
+    /* Force max height on card components */
+    .multi-result-card .card {
+        max-height: 280px !important;
+        overflow: hidden !important;
+    }
+    
+    .multi-result-card .card-img-top {
+        height: 230px !important;
+        max-height: 230px !important;
+        overflow: hidden !important;
+    }
+    
+    .multi-result-card .card-footer {
+        height: 50px !important;
+        max-height: 50px !important;
+        padding: 0.25rem 0.5rem !important;
+        overflow: hidden !important;
     }
     
     .multi-result-card:hover {
