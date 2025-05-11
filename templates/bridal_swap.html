@@ -299,8 +299,9 @@
 {% block scripts %}
 <script>
 // Main initialization function for the entire page
-function initializePage() {
+document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing bridal swap page');
+    
     // DOM Elements
     const uploadForm = document.getElementById('upload-form');
     const sourceInput = document.getElementById('source-input');
@@ -317,6 +318,61 @@ function initializePage() {
     const errorMessage = document.getElementById('error-message');
     const modelStatusAlert = document.getElementById('model-status-alert');
     const modelStatusMessage = document.getElementById('model-status-message');
+    
+    // Function to use a template (called when a template is selected)
+    function useTemplate(templateCard) {
+        if (!templateCard) {
+            console.error('No template card provided');
+            return;
+        }
+        
+        console.log('Using template:', templateCard.dataset);
+        
+        // Extract template info
+        const templatePath = templateCard.dataset.templatePath;
+        const ceremonyType = templateCard.dataset.ceremony;
+        
+        if (!templatePath) {
+            console.error('Template path is missing');
+            return;
+        }
+        
+        // Apply visual selection to this template
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.classList.remove('selected-template');
+        });
+        templateCard.classList.add('selected-template');
+        
+        // Show a subtle highlight on the selected template
+        templateCard.querySelector('img').classList.add('selected-glow');
+        
+        // Visual feedback in the upload form
+        const templatePreviewContainer = document.getElementById('template-preview-container');
+        if (templatePreviewContainer) {
+            templatePreviewContainer.classList.remove('d-none');
+            const templatePreview = document.getElementById('template-preview');
+            if (templatePreview) {
+                templatePreview.src = templatePath;
+                templatePreview.alt = `Selected ${ceremonyType} template`;
+                
+                // Add ceremony type as a data attribute
+                templatePreview.dataset.ceremony = ceremonyType;
+            }
+        }
+        
+        // Update hidden form field
+        const templateUrlInput = document.getElementById('template-url');
+        if (templateUrlInput) {
+            templateUrlInput.value = templatePath;
+        }
+        
+        // Enable the swap button if both source and template are selected
+        if (sourceInput && sourceInput.files.length > 0) {
+            if (swapBtn) {
+                swapBtn.disabled = false;
+            }
+        }
+    }
     
     // Initialize template features
     const refreshTemplatesBtn = document.getElementById('refreshTemplatesBtn');
@@ -340,9 +396,40 @@ function initializePage() {
         });
     });
     
-    // Function to initialize the page
+    // Toggle select mode for templates
+    const toggleSelectModeBtn = document.getElementById('toggleSelectModeBtn');
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    
+    if (toggleSelectModeBtn) {
+        toggleSelectModeBtn.addEventListener('click', function() {
+            const templateCards = document.querySelectorAll('.template-card');
+            if (templateCards.length === 0) {
+                showError("No templates available to select");
+                return;
+            }
+            
+            document.body.classList.toggle('select-mode');
+            
+            if (document.body.classList.contains('select-mode')) {
+                toggleSelectModeBtn.innerHTML = '<i class="fas fa-times"></i> Cancel';
+                deleteSelectedBtn.style.display = 'inline-block';
+                templateCards.forEach(card => {
+                    card.classList.add('selectable');
+                });
+            } else {
+                toggleSelectModeBtn.innerHTML = '<i class="fas fa-check-square"></i> Select Mode';
+                deleteSelectedBtn.style.display = 'none';
+                templateCards.forEach(card => {
+                    card.classList.remove('selectable');
+                    card.classList.remove('selected');
+                });
+            }
+        });
+    }
+    
+    // Define initialization function
     function initializePage() {
-        console.log('Initializing bridal swap page');
+        console.log('Initializing bridal swap page components');
         
         // Set up ceremony tab navigation
         setupCeremonyTabs();
@@ -355,6 +442,9 @@ function initializePage() {
         
         console.log('Page initialization complete');
     }
+    
+    // Initialize the page by setting up everything
+    initializePage();
     
     // Setup ceremony tabs with event listeners
     function setupCeremonyTabs() {
@@ -581,7 +671,7 @@ function initializePage() {
         console.log(`Template container for ${ceremonyType} found:`, templateContainer);
         
         // Display loading state
-        templateContainer.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        templateContainer.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Loading templates...</p></div>';
         
         // Add a timestamp to prevent caching
         const timestamp = Date.now();
@@ -592,6 +682,9 @@ function initializePage() {
         fetch(apiUrl)
             .then(response => {
                 console.log(`Templates fetched for ${ceremonyType} at ${timestamp}, status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch templates: ${response.status} ${response.statusText}`);
+                }
                 return response.json();
             })
             .then(data => {
@@ -600,7 +693,8 @@ function initializePage() {
                 // Clear loading state
                 templateContainer.innerHTML = '';
                 
-                if (!data.has_templates) {
+                // Ensure data has the expected format
+                if (!data || (data.has_templates === false && !data.templates)) {
                     console.log(`No templates found for ${ceremonyType}`);
                     
                     // Display no templates message
@@ -621,7 +715,29 @@ function initializePage() {
                     return;
                 }
                 
-                console.log(`Found ${data.templates.length} templates for ${ceremonyType}`);
+                // Use templates from the response
+                const templates = data.templates || [];
+                
+                console.log(`Found ${templates.length} templates for ${ceremonyType}`);
+                
+                if (templates.length === 0) {
+                    // Display no templates message if the array is empty
+                    const noTemplatesMsg = document.createElement('div');
+                    noTemplatesMsg.className = 'col-12 text-center py-5';
+                    noTemplatesMsg.innerHTML = `
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            No templates found for ${ceremonyType} ceremony.
+                            <div class="mt-3">
+                                <a href="/bulk-upload" class="btn btn-sm btn-outline-dark">
+                                    <i class="fas fa-upload me-1"></i> Upload Templates
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    templateContainer.appendChild(noTemplatesMsg);
+                    return;
+                }
                 
                 // Display template count with timestamp information
                 const templateCount = document.createElement('div');
@@ -630,9 +746,7 @@ function initializePage() {
                     <div class="alert alert-info d-flex justify-content-between align-items-center">
                         <div>
                             <i class="fas fa-info-circle me-2"></i>
-                            <span class="template-update-info" data-ceremony="${ceremonyType}">
-                            </span>
-                            Found ${data.templates.length} templates for ${ceremonyType} ceremony.
+                            Found ${templates.length} templates for ${ceremonyType} ceremony.
                             <span class="small text-muted ms-2">Last updated: ${new Date().toLocaleTimeString()}</span>
                         </div>
                         <button type="button" class="btn btn-danger btn-sm clear-templates-btn" data-ceremony="${ceremonyType}">
@@ -652,53 +766,86 @@ function initializePage() {
                         }
                     });
                 }
+                
+                // Display all templates
+                templates.forEach((template, index) => {
+                    console.log(`Creating template element ${index+1}/${templates.length} for ${ceremonyType}:`, template);
                     
-                    // Use all templates returned by the server - server now ONLY returns Pinterest templates
-                    const templates = data.templates;
+                    const col = document.createElement('div');
+                    col.className = 'col-md-3 col-sm-4 col-6 mb-3';
                     
-                    console.log(`Found ${templates.length} Pinterest templates for ${ceremonyType}`);
+                    const card = document.createElement('div');
+                    card.className = 'card h-100 bg-dark template-card';
+                    card.dataset.templateUrl = template.url;
+                    card.dataset.templateId = template.id || '';
+                    card.dataset.templatePath = template.path || template.url;
+                    card.dataset.templateType = 'pinterest';
+                    card.dataset.ceremony = ceremonyType;
                     
-                    // Display all Pinterest templates
-                    if (templates.length > 0) {
-                        // Add all Pinterest templates
-                        templates.forEach((template, index) => {
-                            console.log(`Creating Pinterest template element ${index+1}/${templates.length} for ${ceremonyType}:`, template);
+                    templateContainer.appendChild(col);
+                    col.appendChild(card);
+                    
+                    // Create the card content with a click event to select it
+                    card.innerHTML = `
+                        <div class="position-relative overflow-hidden" style="height: 350px;">
+                            <img src="${template.url}" class="card-img-top template-img" 
+                                alt="${ceremonyType} template" style="height: 350px; object-fit: cover;">
                             
-                            const col = document.createElement('div');
-                            col.className = 'col-md-3 col-sm-4 col-6 mb-3';
+                            <div class="position-absolute top-0 end-0 m-2 template-checkbox-wrapper">
+                                <input type="checkbox" class="template-checkbox form-check-input" 
+                                    title="Select this template">
+                            </div>
                             
-                            const card = document.createElement('div');
-                            card.className = 'card h-100 bg-secondary template-card';
-                            card.dataset.templateUrl = template.url;
-                            card.dataset.templateId = template.id;
-                            card.dataset.templatePath = template.path || '';
-                            card.dataset.templateType = 'pinterest';
-                            card.dataset.ceremony = ceremonyType;
-                            
-                            templateContainer.appendChild(col);
-                            col.appendChild(card);
-                            
-                            // Add card content - image and overlay
-                            card.innerHTML = `
-                                <div class="card-img-container">
-                                    <img src="${template.url}" class="card-img-top template-img" alt="${ceremonyType} template">
-                                    <div class="template-overlay d-flex align-items-center justify-content-center">
-                                        <button type="button" class="btn btn-sm btn-light select-template-btn">
-                                            <i class="fas fa-check me-1"></i> Select
-                                        </button>
-                                    </div>
-                                </div>
-                            `;
-                            
-                            // Add event listener to select button
-                            const selectBtn = card.querySelector('.select-template-btn');
-                            if (selectBtn) {
-                                selectBtn.addEventListener('click', function() {
-                                    const templateUrl = this.closest('.template-card').dataset.templateUrl;
-                                    console.log(`Selected template: ${templateUrl}`);
-                                    selectTemplate(this.closest('.template-card'));
-                                });
+                            <div class="position-absolute bottom-0 start-0 end-0 p-2 bg-dark bg-opacity-75">
+                                <button type="button" class="btn btn-sm btn-primary w-100 select-template-btn">
+                                    <i class="fas fa-magic me-1"></i> Use This Template
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add event listener to the whole card
+                    card.addEventListener('click', function(e) {
+                        // Don't trigger if checkbox was clicked directly
+                        if (e.target.classList.contains('template-checkbox')) {
+                            return;
+                        }
+                        
+                        if (document.body.classList.contains('select-mode')) {
+                            // In select mode, toggle the selection
+                            this.classList.toggle('selected');
+                            const checkbox = this.querySelector('.template-checkbox');
+                            if (checkbox) {
+                                checkbox.checked = this.classList.contains('selected');
                             }
+                        } else {
+                            // In normal mode, use this template
+                            useTemplate(this);
+                        }
+                    });
+                    
+                    // Add event listener to select button
+                    const selectBtn = card.querySelector('.select-template-btn');
+                    if (selectBtn) {
+                        selectBtn.addEventListener('click', function(e) {
+                            e.stopPropagation(); // Prevent the card click event
+                            useTemplate(this.closest('.template-card'));
+                        });
+                    }
+                    
+                    // Add event listener to checkbox
+                    const checkbox = card.querySelector('.template-checkbox');
+                    if (checkbox) {
+                        checkbox.addEventListener('change', function(e) {
+                            e.stopPropagation(); // Prevent the card click event
+                            const card = this.closest('.template-card');
+                            if (this.checked) {
+                                card.classList.add('selected');
+                            } else {
+                                card.classList.remove('selected');
+                            }
+                        });
+                    }
                         });
                     }
                     
