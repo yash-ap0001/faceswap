@@ -1109,36 +1109,29 @@ def bridal_swap_multi():
                 
                 # Perform the swap with proper error handling
                 try:
-                    # Handle array comparison issues by converting face objects to simple dictionaries
-                    # This avoids the "truth value of array is ambiguous" error
-                    simplified_source_face = {}
-                    simplified_target_face = {}
-
-                    # Extract only the scalar values from face detection
-                    for key, value in source_face.items():
-                        if key != 'embedding' and key != 'normed_embedding':
-                            if isinstance(value, np.ndarray):
-                                simplified_source_face[key] = value.tolist() if value.size < 10 else value
-                            else:
-                                simplified_source_face[key] = value
-                    
-                    for key, value in target_face.items():
-                        if key != 'embedding' and key != 'normed_embedding':
-                            if isinstance(value, np.ndarray):
-                                simplified_target_face[key] = value.tolist() if value.size < 10 else value
-                            else:
-                                simplified_target_face[key] = value
-                    
-                    logger.info(f"Simplified face objects for comparison")
-                    
+                    # Direct face swap approach - similar to how it works in the Create Bride Look function
                     try:
-                        # Perform the actual swap with the original face objects
-                        # but use the simplified ones for any comparison operations
+                        # This is how it works in the traditional bridal_swap function
+                        # First, we get faces with face detection
+                        source_face_box = source_face['bbox'].astype(int)
+                        source_face_landmarks = source_face['kps']
+                        target_face_box = target_face['bbox'].astype(int)
+                        target_face_landmarks = target_face['kps']
+                        
+                        # Log detection results
+                        logger.info(f"Source face: box={source_face_box.tolist()}, landmarks shape={source_face_landmarks.shape}")
+                        logger.info(f"Target face: box={target_face_box.tolist()}, landmarks shape={target_face_landmarks.shape}")
+                        
+                        # Direct approach with swapper
+                        # This is the same approach used in bridal_swap that works
                         result_img = swapper.get(template_img, target_face, source_face, source_img)
+                        logger.info(f"Face swap successful")
                     except Exception as inner_error:
                         logger.error(f"Face swap operation failed: {inner_error}")
+                        logger.error(f"Detailed error: {traceback.format_exc()}")
                         # Create a demo result with face boxes for debugging
                         result_img = create_demo_result(source_img, template_img, source_face, target_face)
+                        logger.info(f"Created fallback result with face boxes due to error")
                     
                 except Exception as swap_error:
                     logger.error(f"Face swap operation failed: {swap_error}")
