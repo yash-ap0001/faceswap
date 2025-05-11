@@ -80,7 +80,11 @@
     }
     
     .bridal-card.selected {
-        border-color: var(--accent-color);
+        border: 3px solid var(--bs-primary);
+    }
+    
+    .select-badge {
+        z-index: 10;
     }
     
     .image-preview-container {
@@ -385,6 +389,47 @@
 </div>
 
 <div class="container-fluid py-4">
+    <!-- Multi-Selection Interface -->
+    <div class="card mb-4 shadow d-none" id="multiSelectionInterface">
+        <div class="card-header bg-dark d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-images me-2"></i> Selected Templates (<span id="selectedCount">0</span>/5)
+            </h5>
+            <button class="btn btn-sm btn-outline-danger" id="clearSelectionBtn">
+                <i class="fas fa-times me-1"></i> Clear Selection
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="mb-3">
+                        <label for="multiSourceInput" class="form-label">Upload Your Photo</label>
+                        <input type="file" class="form-control" id="multiSourceInput" accept=".jpg,.jpeg,.png">
+                    </div>
+                    <div class="image-preview-container mb-3" style="height: 200px; overflow: hidden;">
+                        <img id="multiSourcePreview" class="img-fluid d-none" alt="Your photo preview" style="max-height: 200px;">
+                        <div id="multiSourcePlaceholder" class="text-center">
+                            <i class="fas fa-user-circle mb-2" style="font-size: 4rem; opacity: 0.5;"></i>
+                            <p class="text-muted">No photo selected yet<br>Please upload a clear frontal photo</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="selected-templates" id="selectedTemplatesContainer">
+                        <div class="row row-cols-2 row-cols-lg-5 g-2" id="selectedTemplatesPreview">
+                            <!-- Selected templates will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <button class="btn btn-primary btn-lg" id="processMultipleBtn" disabled>
+                    <i class="fas fa-magic me-2"></i> Create Face Swaps for Selected Templates
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Settings Bar -->
     <div class="card mb-4 shadow">
         <div class="card-body p-2">
@@ -481,7 +526,15 @@
                                     </div>
                                 </div>
                                 
-                                <img src="{{ template.url }}" class="card-img-top" alt="{{ ceremony|title }} Template" loading="lazy">
+                                <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}">
+                                
+                                <!-- Template Selection Overlay (Hidden by default) -->
+                                <div class="position-absolute top-0 start-0 p-2 d-none select-badge">
+                                    <span class="badge bg-primary rounded-circle">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                </div>
+                                
                                 <!-- Individual delete button (visible on hover) -->
                                 <button class="btn btn-sm btn-outline-danger delete-template-btn position-absolute bottom-0 end-0 m-2" 
                                         data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}">
@@ -691,10 +744,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize modals
     const fullGalleryModal = new bootstrap.Modal(document.getElementById('fullGalleryModal'));
     const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    const imagePreviewModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     
-    // Current state for delete operations
+    // Current state for delete and preview operations
     let currentDeletePath = null;
+    let currentPreviewTemplate = null;
+    let selectedTemplates = [];
+    
+    // Multi-Selection Elements
+    const multiSelectionInterface = document.getElementById('multiSelectionInterface');
+    const selectedCount = document.getElementById('selectedCount');
+    const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
+    const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+    const processMultipleBtn = document.getElementById('processMultipleBtn');
+    const multiSourceInput = document.getElementById('multiSourceInput');
+    const multiSourcePreview = document.getElementById('multiSourcePreview');
+    const multiSourcePlaceholder = document.getElementById('multiSourcePlaceholder');
+    let multiSourceFile = null;
     let currentDeleteCeremony = null;
     let currentBulkDeletePaths = [];
     
