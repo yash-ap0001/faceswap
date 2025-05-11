@@ -90,30 +90,7 @@
         z-index: 10;
     }
     
-    /* Multi-result styles */
-    
-    .multi-result-card {
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    .multi-result-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 20px rgba(0,0,0,0.3);
-    }
-    
-    .multi-result-img {
-        width: 100%;
-        height: 230px; /* Reduced height to match template image style */
-        object-fit: cover;
-        transition: transform 0.5s ease;
-    }
-    
-    .multi-result-card:hover .multi-result-img {
-        transform: scale(1.03);
-    }
+    /* Multi-result styles - see consolidated styles at bottom */
     
     /* Badge styling for ceremony type */
     .ceremony-badge {
@@ -290,13 +267,12 @@
         overflow-x: auto;
         gap: 15px;
         padding: 15px 5px;
-        align-items: flex-start;
+        align-items: stretch;
         scrollbar-width: thin;
         scrollbar-color: rgba(255,255,255,0.3) rgba(0,0,0,0.2);
         white-space: nowrap;
-        max-height: 310px;
-        height: 310px;
-        min-height: 310px;
+        height: auto;
+        min-height: 300px;
     }
     
     /* Style scrollbar for webkit browsers */
@@ -323,9 +299,8 @@
         min-width: 280px; /* Ensure minimum width */
         max-width: 280px; /* Maximum width */
         margin-bottom: 0; /* Remove bottom margin to keep in one row */
-        height: 280px; /* Fixed height to match template cards */
-        display: inline-block; /* Force inline display */
-        vertical-align: top; /* Align top */
+        margin-right: 15px; /* Add right margin for spacing */
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
     }
     
     /* Force max height on card components */
@@ -354,13 +329,16 @@
     
     .multi-result-img {
         width: 100%;
-        height: 350px;
+        height: 230px;
         object-fit: cover;
+        transition: transform 0.3s ease;
     }
     
     .multi-result-footer {
         padding: 10px;
         background-color: rgba(0, 0, 0, 0.7);
+        height: 50px;
+        overflow: hidden;
     }
 </style>
 {% endblock %}
@@ -501,7 +479,7 @@
                             <p class="text-light mt-2 mb-0">Here are your bridal looks for different ceremonies</p>
                         </div>
                         <div class="card-body bg-dark pt-4">
-                            <div class="multi-results-container"></div>
+                            <div class="multi-results-container d-flex flex-nowrap"></div>
                             <div class="text-center mt-4 pt-3 border-top border-secondary">
                                 <button id="multi-try-again-btn" class="btn btn-lg btn-outline-light">
                                     <i class="fas fa-redo me-2"></i>Try Different Templates
