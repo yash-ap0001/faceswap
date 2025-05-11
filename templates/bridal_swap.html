@@ -278,28 +278,10 @@
     .template-checkbox-wrapper {
         display: none;
         z-index: 10;
-        position: absolute;
-        top: 8px;
-        left: 8px;
     }
     
     body.template-selection-mode .template-checkbox-wrapper {
         display: block;
-    }
-    
-    /* Selected templates preview styles */
-    #selectedTemplatesThumbnails {
-        min-height: 240px;
-    }
-    
-    #selectedTemplatesThumbnails .card {
-        transition: all 0.3s ease;
-        border: 2px solid var(--bs-dark);
-    }
-    
-    #selectedTemplatesThumbnails .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
     }
     
     .template-card.selected {
@@ -446,16 +428,8 @@
 
                     <div class="text-center">
                         <button type="submit" id="swap-btn" class="btn btn-primary">
-                            <i class="fas fa-magic me-2"></i>Create Bride Look
+                            <i class="fas fa-magic me-2"></i>Create Bridal Look
                         </button>
-                    </div>
-                    
-                    <!-- Selected templates preview row with fixed height -->
-                    <div id="selected-templates-row" class="mt-4 mb-3 d-none">
-                        <h5 class="mb-3 text-center">Selected Templates</h5>
-                        <div class="d-flex overflow-auto position-relative" style="height: 200px; gap: 15px;">
-                            <!-- Selected templates will be shown here -->
-                        </div>
                     </div>
                 </form>
 
@@ -518,9 +492,9 @@
                     <button id="toggleSelectionModeBtn" class="btn btn-outline-light btn-sm me-2">
                         <i class="fas fa-check-square"></i> Multi-Select
                     </button>
-                    <span id="selectionCountBadge" class="badge bg-primary me-2 d-none">
-                        <span id="selectedCount">0</span> selected
-                    </span>
+                    <button id="processSelectedBtn" class="btn btn-primary btn-sm me-2 d-none">
+                        <i class="fas fa-magic"></i> Process Selected (<span id="selectedCount">0</span>)
+                    </button>
                     <button id="refreshTemplatesBtn" class="btn btn-outline-light btn-sm">
                         <i class="fas fa-sync-alt"></i> Refresh
                     </button>
@@ -533,7 +507,7 @@
                         <div class="card-header bg-success bg-gradient text-white">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Selected Templates</h5>
-                                <span class="badge bg-light text-dark rounded-pill" id="selectedCountBadge"><span id="selectedCount">0</span></span>
+                                <span class="badge bg-light text-dark rounded-pill" id="selectedCountBadge">0</span>
                             </div>
                         </div>
                         <div class="card-body bg-dark p-3">
@@ -544,9 +518,12 @@
                                 </div>
                             </div>
                             
-                            <!-- Template count message -->
+                            <!-- Process Button -->
                             <div class="mt-3 text-center">
-                                <div class="text-muted mt-2 small">Select up to 5 templates and use the "Create Bridal Look" button above</div>
+                                <button id="processSelectedTemplatesBtn" class="btn btn-primary btn-lg" disabled>
+                                    <i class="fas fa-wand-magic-sparkles me-2"></i> Process Selected Templates
+                                </button>
+                                <div class="text-muted mt-2 small">Select at least 1 template and upload your photo to process</div>
                             </div>
                         </div>
                     </div>
@@ -569,7 +546,7 @@
                 
                 <!-- Multi-selection controls -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <button id="toggleSelectionModeBtn2" type="button" class="btn btn-outline-light btn-sm">
+                    <button id="toggleSelectionModeBtn" type="button" class="btn btn-outline-light btn-sm">
                         <i class="fas fa-check-square"></i> Multi-Select
                     </button>
                     <div id="selectionCountWrapper" class="d-none">
@@ -651,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const templatePreview = document.getElementById('template-preview');
     const templateUrlInput = document.getElementById('template-url');
     // Additional elements for multi-template processing
-    // No longer need a separate process button as we've integrated with the main "Create Bride Look" button
+    const processSelectedTemplatesBtn = document.getElementById('processSelectedTemplatesBtn');
     
     // Function to use a template (called when a template is selected)
     function useTemplate(templateCard) {
@@ -804,6 +781,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        if (!templateUrlInput.value) {
+            showError('Please select a template from the available templates section.');
+            return;
+        }
+
         // Get selected bridal style
         const selectedStyle = document.querySelector('input[name="bridalStyle"]:checked').value;
 
@@ -820,81 +802,17 @@ document.addEventListener('DOMContentLoaded', function() {
             showError('Only JPG, JPEG and PNG files are allowed.');
             return;
         }
-        
-        // Check if we have selected templates in multi-select mode
-        const selectedCheckboxes = document.querySelectorAll('.template-checkbox:checked');
-        const templateCountInput = document.querySelector('input[name="template_count"]');
-        
-        // Create form data
-        const formData = new FormData();
-        formData.append('source', sourceInput.files[0]);
-        formData.append('style', selectedStyle);
-        
-        // If we have selected templates in multi-template mode
-        if (selectedCheckboxes.length > 0 && selectedCheckboxes.length <= 5) {
-            // Show loading
-            loadingContainer.classList.remove('d-none');
-            errorContainer.classList.add('d-none');
-            resultContainer.classList.add('d-none');
-            swapBtn.disabled = true;
-            
-            // Change form action to multi-template processing endpoint
-            uploadForm.action = "{{ url_for('bridal_swap_multi') }}";
-            uploadForm.method = "post";
-            
-            // Add template count and template info
-            formData.append('template_count', selectedCheckboxes.length);
-            
-            // Add template paths and ceremony types
-            selectedCheckboxes.forEach((checkbox, index) => {
-                const card = checkbox.closest('.template-card');
-                const path = card.dataset.templatePath || card.dataset.path;
-                const ceremony = card.dataset.ceremony || 'unknown';
-                
-                console.log(`Adding template ${index}:`, path, ceremony);
-                formData.append(`template_${index}`, path);
-                formData.append(`ceremony_${index}`, ceremony);
-            });
-            
-            // Use the multi-template endpoint
-            fetch("{{ url_for('bridal_swap_multi') }}", {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                loadingContainer.classList.add('d-none');
-                swapBtn.disabled = false;
 
-                if (data.success) {
-                    // Redirect to the results page
-                    window.location.href = data.redirect_url;
-                } else {
-                    showError(data.error || 'An error occurred during processing.');
-                }
-            })
-            .catch(error => {
-                loadingContainer.classList.add('d-none');
-                swapBtn.disabled = false;
-                showError('Network error: ' + error.message);
-            });
-            
-            return;
-        }
-        
-        // If no templates selected in multi-select mode, use the default single template approach
-        if (!templateUrlInput.value) {
-            showError('Please select a template from the available templates section or choose multiple templates using Multi-Select.');
-            return;
-        }
-        
-        // Show loading for single template
+        // Show loading
         loadingContainer.classList.remove('d-none');
         errorContainer.classList.add('d-none');
         resultContainer.classList.add('d-none');
         swapBtn.disabled = true;
 
-        // Add single template
+        // Create form data
+        const formData = new FormData();
+        formData.append('source', sourceInput.files[0]);
+        formData.append('style', selectedStyle);
         formData.append('template_url', templateUrlInput.value);
 
         // Send AJAX request
@@ -972,89 +890,54 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Multi-template selection functionality
     const toggleSelectionModeBtn = document.getElementById('toggleSelectionModeBtn');
-    const toggleSelectionModeBtn2 = document.getElementById('toggleSelectionModeBtn2');
-    
-    // Function to update form for multi-template processing
-    function updateFormForMultiTemplates() {
-        const form = document.getElementById('upload-form');
-        const selectedCheckboxes = document.querySelectorAll('.template-checkbox:checked');
-        const count = selectedCheckboxes.length;
-        
-        if (form) {
-            // If we have multiple templates selected, change form to use bridal-swap-multi
-            if (count > 0 && count <= 5) {
-                form.action = "{{ url_for('bridal_swap_multi') }}";
-                form.method = "post";
-                form.enctype = "multipart/form-data";
-                console.log('Updated form for multi-template processing');
-            } else {
-                // Default back to single template mode
-                form.action = "{{ url_for('bridal_swap') }}";
-                form.method = "post";
-                form.enctype = "multipart/form-data";
-                console.log('Reset form to single template processing');
-            }
-        }
-    }
-    
-    // Function to toggle selection mode 
-    function toggleSelectionMode() {
-        isSelectionMode = !isSelectionMode;
-        document.body.classList.toggle('template-selection-mode', isSelectionMode);
-        
-        // Update both buttons to match state
-        const btns = [toggleSelectionModeBtn, toggleSelectionModeBtn2].filter(btn => btn !== null);
-        
-        if (isSelectionMode) {
-            // Entering selection mode
-            console.log('Entering template selection mode');
-            btns.forEach(btn => {
-                btn.innerHTML = '<i class="fas fa-times"></i> Cancel Selection';
-                btn.classList.remove('btn-outline-light');
-                btn.classList.add('btn-danger');
-            });
-            
-            // Show the selection count badge
-            const countBadges = document.querySelectorAll('#selectionCountBadge, #selectionCountWrapper');
-            countBadges.forEach(badge => badge.classList.remove('d-none'));
-            
-            // Update the selected count
-            updateSelectedCount();
-        } else {
-            // Exiting selection mode  
-            console.log('Exiting template selection mode');
-            btns.forEach(btn => {
-                btn.innerHTML = '<i class="fas fa-check-square"></i> Multi-Select';
-                btn.classList.remove('btn-danger');
-                btn.classList.add('btn-outline-light');
-            });
-            
-            // Hide the selection count badge  
-            const countBadges = document.querySelectorAll('#selectionCountBadge, #selectionCountWrapper');
-            countBadges.forEach(badge => badge.classList.add('d-none'));
-            
-            // Hide selected templates row
-            selectedTemplatesRow.classList.add('d-none');
-            
-            // Uncheck all checkboxes
-            document.querySelectorAll('.template-checkbox').forEach(checkbox => {
-                checkbox.checked = false;
-                const card = checkbox.closest('.template-card');
-                if (card) card.classList.remove('selected');
-            });
-        }
-    }
-    const selectionCountBadge = document.getElementById('selectionCountBadge');
+    const processSelectedBtn = document.getElementById('processSelectedBtn');
     const selectedCount = document.getElementById('selectedCount');
-    const selectedTemplatesRow = document.getElementById('selected-templates-row');
+    let isSelectionMode = false;
     
-    // Add event listeners to both toggle selection mode buttons
     if (toggleSelectionModeBtn) {
-        toggleSelectionModeBtn.addEventListener('click', toggleSelectionMode);
-    }
-    
-    if (toggleSelectionModeBtn2) {
-        toggleSelectionModeBtn2.addEventListener('click', toggleSelectionMode);
+        toggleSelectionModeBtn.addEventListener('click', function() {
+            isSelectionMode = !isSelectionMode;
+            document.body.classList.toggle('template-selection-mode', isSelectionMode);
+            
+            const selectionCountWrapper = document.getElementById('selectionCountWrapper');
+            
+            if (isSelectionMode) {
+                // Entering selection mode
+                console.log('Entering template selection mode');
+                toggleSelectionModeBtn.innerHTML = '<i class="fas fa-times"></i> Cancel Selection';
+                toggleSelectionModeBtn.classList.remove('btn-outline-light');
+                toggleSelectionModeBtn.classList.add('btn-outline-danger');
+                processSelectedBtn.classList.remove('d-none');
+                if (selectionCountWrapper) selectionCountWrapper.classList.remove('d-none');
+                
+                // Start with no templates selected by default when entering selection mode
+                document.querySelectorAll('.template-checkbox').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                document.querySelectorAll('.template-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                console.log('Reset all selections on entering selection mode');
+                updateSelectedCount();
+                
+                // Show a message to guide the user
+                showMessage('Select up to 5 templates from any ceremony and click "Process Selected Templates"');
+            } else {
+                // Exiting selection mode
+                console.log('Exiting template selection mode');
+                toggleSelectionModeBtn.innerHTML = '<i class="fas fa-check-square"></i> Multi-Select';
+                toggleSelectionModeBtn.classList.add('btn-outline-light');
+                toggleSelectionModeBtn.classList.remove('btn-outline-danger');
+                processSelectedBtn.classList.add('d-none');
+                if (selectionCountWrapper) selectionCountWrapper.classList.add('d-none');
+                
+                // Hide the thumbnails preview when exiting selection mode
+                const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
+                if (selectedTemplatesPreview) {
+                    selectedTemplatesPreview.classList.add('d-none');
+                }
+            }
+        });
     }
     
     // Helper function to show a temporary message
@@ -1088,198 +971,40 @@ document.addEventListener('DOMContentLoaded', function() {
         const count = selectedCheckboxes.length;
         console.log(`Found ${count} selected checkboxes`);
         
-        // Update all selectedCount elements in the UI
-        document.querySelectorAll('[id="selectedCount"]').forEach(el => {
-            el.textContent = count;
-        });
-        
-        // Update the counter in the badges and wrappers
-        document.querySelectorAll('#selectionCountBadge, #selectionCountWrapper').forEach(el => {
-            if (count > 0) {
-                el.classList.remove('d-none');
-            } else {
-                el.classList.add('d-none');
-            }
-        });
-        
-        // Show/hide selected templates preview based on count
-        const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
-        const thumbnailsContainer = document.getElementById('selectedTemplatesThumbnails');
-        
-        if (!selectedTemplatesPreview || !thumbnailsContainer) {
-            console.error('Could not find preview containers');
-            return;
+        // Update the counter in the badge
+        const countBadge = document.getElementById('selectedCountBadge');
+        if (countBadge) {
+            countBadge.textContent = count;
         }
         
-        // Update visibility of the preview section
-        if (count > 0) {
-            selectedTemplatesPreview.classList.remove('d-none');
-        } else {
-            selectedTemplatesPreview.classList.add('d-none');
+        // Update the counter text
+        if (selectedCount) {
+            selectedCount.textContent = count;
         }
         
-        // Clear the thumbnails container
-        thumbnailsContainer.innerHTML = '';
-        
-        // Also update the selected templates row (legacy section)
-        const selectedTemplatesRow = document.getElementById('selected-templates-row');
-        const templateContainer = selectedTemplatesRow ? selectedTemplatesRow.querySelector('.d-flex') : null;
-        
-        if (templateContainer) {
-            // Clear current row preview
-            templateContainer.innerHTML = '';
-        }
-        
-        // Debug selected cards
-        selectedCheckboxes.forEach(checkbox => {
-            const card = checkbox.closest('.template-card');
-            console.log('Selected template card:', {
-                url: card.dataset.templateUrl,
-                path: card.dataset.templatePath,
-                id: card.dataset.templateId,
-                ceremony: card.dataset.ceremony
-            });
-        });
-        
-        if (count > 0 && count <= 5) {
-            // Remove any empty message
-            const emptyMessage = thumbnailsContainer.querySelector('.empty-message');
-            if (emptyMessage) {
-                emptyMessage.remove();
-            }
+        // Enable/disable the process buttons based on selection count
+        if (processSelectedBtn) {
+            processSelectedBtn.disabled = (count === 0 || count > 5);
             
-            // Add each selected template to both preview areas
-            selectedCheckboxes.forEach((checkbox, index) => {
-                const card = checkbox.closest('.template-card');
-                const imgSrc = card.querySelector('img').src;
-                const ceremony = card.dataset.ceremony || 'unknown';
-                const path = card.dataset.templatePath || '';
-                
-                console.log(`Adding preview for template ${index}:`, {imgSrc, ceremony, path});
-                
-                // 1. Add to the main thumbnails container
-                const thumbnailPreview = document.createElement('div');
-                thumbnailPreview.className = 'position-relative';
-                thumbnailPreview.style.height = '220px';
-                thumbnailPreview.style.flexShrink = '0';
-                thumbnailPreview.style.width = '180px';
-                
-                thumbnailPreview.innerHTML = `
-                    <div class="card bg-dark h-100">
-                        <img src="${imgSrc}" alt="${ceremony} template" class="card-img-top h-75" 
-                             style="object-fit: cover;">
-                        <div class="card-body p-2">
-                            <span class="badge bg-primary">${ceremony}</span>
-                            <small class="d-block text-truncate mt-1">${path.split('/').pop()}</small>
-                        </div>
-                        <input type="hidden" name="template_${index}" value="${path}">
-                        <input type="hidden" name="ceremony_${index}" value="${ceremony}">
-                    </div>
-                `;
-                
-                thumbnailsContainer.appendChild(thumbnailPreview);
-                
-                // 2. If the row container exists, add there too for backward compatibility
-                if (templateContainer) {
-                    const rowPreview = document.createElement('div');
-                    rowPreview.className = 'position-relative';
-                    rowPreview.style.height = '200px';
-                    rowPreview.style.flexShrink = '0';
-                    rowPreview.style.marginRight = '15px';
-                    
-                    rowPreview.innerHTML = `
-                        <img src="${imgSrc}" alt="${ceremony} template" class="h-100 rounded shadow-sm" 
-                             style="object-fit: cover; border: 2px solid var(--bs-primary);">
-                        <span class="badge bg-primary position-absolute top-0 start-0 m-2">${ceremony}</span>
-                        <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 start-0 m-2">${path.split('/').pop()}</span>
-                    `;
-                    
-                    templateContainer.appendChild(rowPreview);
-                    selectedTemplatesRow.classList.remove('d-none');
-                }
-            });
-            
-            // Add a count hidden field to the form
-            let templateCountInput = document.querySelector('input[name="template_count"]');
-            if (!templateCountInput) {
-                templateCountInput = document.createElement('input');
-                templateCountInput.type = 'hidden';
-                templateCountInput.name = 'template_count';
-                document.getElementById('upload-form').appendChild(templateCountInput);
-            }
-            templateCountInput.value = count;
-            
-            // Enable the submit button
-            const submitBtn = document.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.disabled = false;
-            }
-        } else {
-            // Hide the preview row if no templates or too many selected
-            if (count === 0) {
-                // Hide both preview areas
-                if (selectedTemplatesRow) {
-                    selectedTemplatesRow.classList.add('d-none');
-                }
-                
-                // Add empty message to the thumbnails container
-                thumbnailsContainer.innerHTML = `
-                    <div class="empty-message text-muted w-100 text-center d-flex align-items-center justify-content-center">
-                        <p>Selected templates will appear here</p>
-                    </div>
-                `;
-                
-                // Disable the submit button
-                const submitBtn = document.querySelector('button[type="submit"]');
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                }
-            } else if (count > 5) {
-                // Show warning for too many templates
-                if (templateContainer) {
-                    templateContainer.innerHTML = '<div class="alert alert-warning w-100">Please select a maximum of 5 templates</div>';
-                    selectedTemplatesRow.classList.remove('d-none');
-                }
-                
-                // Also show warning in the main preview container
-                thumbnailsContainer.innerHTML = `
-                    <div class="alert alert-warning w-100 text-center">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        Please select a maximum of 5 templates
-                    </div>
-                `;
-            }
-            
-            // Reset the template count for form submission
-            let templateCountInput = document.querySelector('input[name="template_count"]');
-            if (templateCountInput) {
-                templateCountInput.value = count > 5 ? 0 : count;
-            }
-        }
-        
-        // Update the Create Bride Look button based on selection
-        if (swapBtn) {
-            const hasSourceImage = sourceInput && sourceInput.files.length > 0;
-            const hasSomeTemplates = count > 0 && count <= 5;
-            
-            // If we have selected templates, the Create Bride Look button will use those
-            // otherwise, it will use the single template method
-            if (hasSomeTemplates && hasSourceImage) {
-                swapBtn.innerHTML = `<i class="fas fa-magic me-1"></i> Create Bride Look (${count} templates)`;
-                // Ensure the button is enabled when we have both source image and selected templates
-                swapBtn.disabled = false;
-            } else {
-                swapBtn.innerHTML = `<i class="fas fa-magic me-1"></i> Create Bride Look`;
-                // Button will be enabled/disabled based on single template selection in the original flow
-            }
-            
-            // Set a title on the button to explain limitations
             if (count > 5) {
-                swapBtn.title = 'Please select a maximum of 5 templates';
-            } else if (!hasSourceImage) {
-                swapBtn.title = 'Please upload your photo first';
+                processSelectedBtn.title = 'Please select a maximum of 5 templates';
             } else {
-                swapBtn.title = '';
+                processSelectedBtn.title = '';
+            }
+        }
+        
+        // Also update the new process button in the selected templates preview
+        if (processSelectedTemplatesBtn) {
+            const hasSourceImage = sourceInput && sourceInput.files.length > 0;
+            
+            processSelectedTemplatesBtn.disabled = (count === 0 || count > 5 || !hasSourceImage);
+            
+            if (count > 5) {
+                processSelectedTemplatesBtn.title = 'Please select a maximum of 5 templates';
+            } else if (!hasSourceImage) {
+                processSelectedTemplatesBtn.title = 'Please upload your photo first';
+            } else {
+                processSelectedTemplatesBtn.title = '';
             }
         }
         
@@ -1396,22 +1121,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Add event listener to the new process selected templates button in the preview section
-    // We've now integrated the multi-template functionality into the main form submission
+    if (processSelectedTemplatesBtn) {
+        processSelectedTemplatesBtn.addEventListener('click', function() {
+            processSelectedTemplates();
+        });
+    }
     
     // Function to process selected templates
     function processSelectedTemplates() {
         console.log('Process Selected Templates function called');
-        
-        // Debug card attributes
-        const allTemplateCards = document.querySelectorAll('.template-card');
-        allTemplateCards.forEach(card => {
-            console.log('Template card data attributes:', {
-                templateUrl: card.dataset.templateUrl,
-                templatePath: card.dataset.templatePath,
-                templateId: card.dataset.templateId,
-                ceremony: card.dataset.ceremony
-            });
-        });
         
         // Get the source input element
         const sourceInput = document.getElementById('source-input');
@@ -1921,16 +1639,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (checkbox) {
                                 checkbox.checked = !checkbox.checked;
                                 this.classList.toggle('selected', checkbox.checked);
-                                console.log('Toggled checkbox to:', checkbox.checked, 'on template:', this.dataset.templatePath);
-                                
-                                // Show the selected templates preview
-                                if (checkbox.checked) {
-                                    const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
-                                    if (selectedTemplatesPreview) {
-                                        selectedTemplatesPreview.classList.remove('d-none');
-                                    }
-                                }
-                                
+                                console.log('Toggled checkbox to:', checkbox.checked);
                                 updateSelectedCount();
                             }
                             return;
@@ -1939,31 +1648,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.log('Using template in single mode');
                         useTemplate(this);
                     });
-                    
-                    // Add direct event listener to checkbox for changes
-                    const checkbox = card.querySelector('.template-checkbox');
-                    if (checkbox) {
-                        checkbox.addEventListener('change', function(e) {
-                            e.stopPropagation(); // Prevent the card click event
-                            const templateCard = this.closest('.template-card');
-                            templateCard.classList.toggle('selected', this.checked);
-                            console.log(`Checkbox directly changed to ${this.checked} for template:`, templateCard.dataset.templatePath);
-                            
-                            // Show the selected templates preview
-                            if (this.checked) {
-                                const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
-                                if (selectedTemplatesPreview) {
-                                    selectedTemplatesPreview.classList.remove('d-none');
-                                }
-                            }
-                            
-                            // Update selected count and related UI
-                            updateSelectedCount();
-                            
-                            // Update form action and method for multi-template processing
-                            updateFormForMultiTemplates();
-                        });
-                    }
                     
                     // Add click event to the select button
                     const selectBtn = card.querySelector('.select-template-btn');
@@ -1976,7 +1660,34 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     }
                     
-                    // We already have a direct event listener and card click handler above
+                    // Add click event to the checkbox
+                    const checkbox = card.querySelector('.template-checkbox');
+                    if (checkbox) {
+                        checkbox.addEventListener('change', function(e) {
+                            e.stopPropagation(); // Prevent the card click event
+                            const card = this.closest('.template-card');
+                            if (card) {
+                                card.classList.toggle('selected', this.checked);
+                                console.log('Checkbox changed:', this.checked, 'Card selected:', card.classList.contains('selected'));
+                                updateSelectedCount();
+                            }
+                        });
+                        
+                        // Also listen for clicks on the card when in selection mode
+                        card.addEventListener('click', function(e) {
+                            // Only handle clicks in selection mode and not on the checkbox or button itself
+                            if (isSelectionMode && 
+                                !e.target.classList.contains('template-checkbox') && 
+                                !e.target.closest('.select-template-btn')) {
+                                checkbox.checked = !checkbox.checked;
+                                this.classList.toggle('selected', checkbox.checked);
+                                console.log('Card clicked in selection mode, now selected:', this.classList.contains('selected'));
+                                // Update the selected count and thumbnail preview
+                                updateSelectedCount();
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                        });
                     }
                 });
             })
