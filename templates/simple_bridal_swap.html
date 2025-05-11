@@ -229,19 +229,20 @@
                 </h1>
             </div>
             <div class="card-body bg-dark text-light">
-                <!-- Step indicators -->
-                <div class="step-indicator mb-4">
-                    <div class="step step-active" id="step1-indicator">
-                        <div class="step-number">1</div>
-                        <span>Upload Photo</span>
-                    </div>
-                    <div class="step" id="step2-indicator">
-                        <div class="step-number">2</div>
-                        <span>Choose Style</span>
-                    </div>
-                    <div class="step" id="step3-indicator">
-                        <div class="step-number">3</div>
-                        <span>See Results</span>
+                <!-- Template Selection Preview -->
+                <div id="selected-templates-area" class="d-none mb-4">
+                    <div class="card bg-dark border border-secondary">
+                        <div class="card-header bg-dark text-light border-bottom border-secondary">
+                            <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Selected Templates</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="selected-templates-container" class="selected-templates-scroll"></div>
+                            <div class="text-center mt-3">
+                                <button id="process-selected-btn" class="btn btn-success" type="button">
+                                    <i class="fas fa-magic me-2"></i>Create My Bridal Look
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -504,10 +505,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultsTitle = document.getElementById('results-title');
     const templateAreaTitle = document.getElementById('template-area-title');
     
-    // Step indicators
-    const step1Indicator = document.getElementById('step1-indicator');
-    const step2Indicator = document.getElementById('step2-indicator');
-    const step3Indicator = document.getElementById('step3-indicator');
+    // Selected templates
+    const selectedTemplatesArea = document.getElementById('selected-templates-area');
+    const selectedTemplatesContainer = document.getElementById('selected-templates-container');
+    const processSelectedBtn = document.getElementById('process-selected-btn');
     
     // State variables
     let selectedTemplates = [];
