@@ -751,11 +751,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // File input change handlers
     sourceInput.addEventListener('change', function() {
         handleFileInputChange(this, sourcePreview, sourcePlaceholder);
+        
+        // Update the process button state when source image changes
+        updateSelectedCount();
     });
 
     // Clear button handlers
     sourceClearBtn.addEventListener('click', function() {
         clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
+        
+        // Update the process button state when source image is cleared
+        updateSelectedCount();
     });
 
     // Try again button handler
