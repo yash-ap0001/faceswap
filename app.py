@@ -812,7 +812,7 @@ def bridal_swap():
     
     source_file = request.files['source']
     selected_style = request.form.get('style', 'haldi')
-    template_type = request.form.get('template_type', 'natural')
+    template_type = request.form.get('template_type', 'pinterest')
     
     if source_file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
@@ -1033,10 +1033,10 @@ def get_bridal_template(style, template_type='natural'):
         style = 'wedding'
     
     # Validate template type
-    valid_types = ['real', 'natural', 'ai']
+    valid_types = ['real', 'natural', 'ai', 'pinterest']
     if template_type not in valid_types:
-        logger.warning(f"Invalid template type: {template_type}. Using 'natural' as fallback.")
-        template_type = 'natural'
+        logger.warning(f"Invalid template type: {template_type}. Using 'pinterest' as fallback.")
+        template_type = 'pinterest'
     
     # Create template directories if they don't exist
     template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
