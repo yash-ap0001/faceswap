@@ -259,7 +259,7 @@
     }
     
     /* Template rows after the first one */
-    .template-card.hidden-card {
+    .template-card.extra-card {
         display: none;
     }
     
@@ -509,7 +509,7 @@
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4" id="{{ ceremony }}-cards">
                 {% if all_templates[ceremony]|length > 0 %}
                     {% for template in all_templates[ceremony] %}
-                        <div class="col template-card mb-4 {% if loop.index0 >= 4 %}hidden-card{% endif %}" data-index="{{ loop.index0 }}" data-template-path="{{ template.url }}">
+                        <div class="col template-card mb-4 {% if loop.index0 >= 4 %}extra-card{% endif %}" data-index="{{ loop.index0 }}" data-template-path="{{ template.url }}">
                             <div class="card shadow-sm bridal-card position-relative" data-style="{{ ceremony }}">
                                 <!-- Selection checkbox (hidden by default) -->
                                 <div class="template-select-overlay d-none">
@@ -884,23 +884,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Fix and simplify expand/collapse functionality
+    // Simple expand/collapse functionality
     document.querySelectorAll('.toggle-row-btn').forEach(button => {
         button.addEventListener('click', function() {
             const targetId = this.getAttribute('data-target');
             const ceremony = targetId.replace('-row', '');
-            const carousel = document.getElementById(`${ceremony}-carousel`);
+            const container = document.getElementById(`${ceremony}-cards`);
             
-            if (!carousel) {
-                console.error(`Carousel not found: ${ceremony}-carousel`);
+            if (!container) {
+                console.error(`Card container not found: ${ceremony}-cards`);
                 return;
             }
             
-            const hiddenCards = carousel.querySelectorAll('.template-card.hidden-card');
-            const icon = this.querySelector('i');
-            
+            const extraCards = container.querySelectorAll('.template-card.extra-card');
             console.log(`Toggle row button clicked for ${ceremony}`);
-            console.log(`Found ${hiddenCards.length} hidden cards`);
+            console.log(`Found ${extraCards.length} extra cards`);
             
             // Check current state (expanded or collapsed)
             const isExpanded = this.classList.contains('expanded');
@@ -909,7 +907,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isExpanded) {
                 // Collapse - hide extra cards
                 console.log('Collapsing to show only first row');
-                hiddenCards.forEach(card => {
+                extraCards.forEach(card => {
                     card.style.display = 'none';
                 });
                 
@@ -917,16 +915,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.classList.remove('expanded');
                 this.classList.remove('btn-primary');
                 this.classList.add('btn-outline-primary');
-                if (icon) {
-                    icon.classList.remove('fa-chevron-up');
-                    icon.classList.add('fa-chevron-down');
-                }
-                this.setAttribute('title', 'Expand All');
-                this.innerHTML = '<i class="fas fa-chevron-down"></i>'; // Ensure icon is added
+                this.innerHTML = '<i class="fas fa-chevron-down"></i> Show All';
+                this.setAttribute('title', 'Show All Templates');
             } else {
                 // Expand - show all cards
                 console.log('Expanding to show all cards');
-                hiddenCards.forEach(card => {
+                extraCards.forEach(card => {
                     card.style.display = 'block';
                 });
                 
@@ -934,27 +928,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.classList.add('expanded');
                 this.classList.remove('btn-outline-primary');
                 this.classList.add('btn-primary');
-                if (icon) {
-                    icon.classList.remove('fa-chevron-down');
-                    icon.classList.add('fa-chevron-up');
-                }
-                this.setAttribute('title', 'Collapse');
-                this.innerHTML = '<i class="fas fa-chevron-up"></i>'; // Ensure icon is added
+                this.innerHTML = '<i class="fas fa-chevron-up"></i> Show Less';
+                this.setAttribute('title', 'Show Fewer Templates');
             }
         });
     });
     
-    // Initialize all carousels to show only the first row
+    // Initialize all sections to show only the first row
     function initializeCarouselsCollapsed() {
-        console.log('Initializing all carousels in collapsed state');
-        document.querySelectorAll('.template-carousel').forEach(carousel => {
-            // Hide all cards with the hidden-card class
-            const hiddenCards = carousel.querySelectorAll('.template-card.hidden-card');
-            console.log(`Setting initial state for ${carousel.id} with ${hiddenCards.length} hidden cards`);
-            
-            hiddenCards.forEach(card => {
-                card.style.display = 'none';
-            });
+        console.log('Initializing all sections in collapsed state');
+        
+        // Hide all cards with the extra-card class
+        const extraCards = document.querySelectorAll('.template-card.extra-card');
+        console.log(`Found ${extraCards.length} extra cards to hide initially`);
+        
+        extraCards.forEach(card => {
+            card.style.display = 'none';
         });
         
         // Make sure all toggle buttons are in collapsed state
@@ -963,11 +952,8 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.classList.remove('expanded');
             btn.classList.remove('btn-primary');
             btn.classList.add('btn-outline-primary');
-            if (icon) {
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
-            }
-            btn.setAttribute('title', 'Expand All');
+            btn.innerHTML = '<i class="fas fa-chevron-down"></i> Show All';
+            btn.setAttribute('title', 'Show All Templates');
         });
     }
     
