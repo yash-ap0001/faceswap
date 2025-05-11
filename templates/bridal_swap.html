@@ -1229,16 +1229,35 @@ document.addEventListener('DOMContentLoaded', function() {
         // Debug selected templates before sending
         console.log('Templates to be sent in formData:', selectedTemplates);
         
+        // Ensure selectedTemplates is an array before proceeding
+        if (!selectedTemplates || !Array.isArray(selectedTemplates)) {
+            console.error('selectedTemplates is not an array:', selectedTemplates);
+            showError('Error: No templates selected or invalid template data');
+            return; // Exit function early 
+        }
+        
+        if (selectedTemplates.length === 0) {
+            console.error('No templates selected (empty array)');
+            showError('Error: Please select at least one template');
+            return; // Exit function early
+        }
+        
         // Add template count first
         formData.append('template_count', selectedTemplates.length);
         console.log(`Added template_count: ${selectedTemplates.length}`);
         
-        // Add all selected template paths with better error handling
-        selectedTemplates.forEach((template, index) => {
-            if (!template.path) {
-                console.error(`Template ${index} missing path:`, template);
-                return;
-            }
+        try {
+            // Add all selected template paths with better error handling
+            selectedTemplates.forEach((template, index) => {
+                if (!template || typeof template !== 'object') {
+                    console.error(`Template ${index} is not a valid object:`, template);
+                    return;
+                }
+                
+                if (!template.path) {
+                    console.error(`Template ${index} missing path:`, template);
+                    return;
+                }
             
             // Always include a ceremony value (fallback to 'wedding' if not set)
             const ceremonyType = template.ceremony || 'wedding';
