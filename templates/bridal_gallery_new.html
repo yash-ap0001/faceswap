@@ -726,7 +726,7 @@
                 });
                 
                 // Send request to process templates
-                fetch('/multi-face-swap', {
+                fetch('/multi_face_swap', {
                     method: 'POST',
                     body: formData
                 })
@@ -736,7 +736,7 @@
                     
                     if (data.success) {
                         // Redirect to results page
-                        window.location.href = '/bridal-results';
+                        window.location.href = '/bridal_results';
                     } else {
                         document.getElementById('error-message').textContent = data.error || 'Failed to process templates';
                         new bootstrap.Modal(document.getElementById('errorModal')).show();

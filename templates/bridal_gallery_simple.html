@@ -614,7 +614,7 @@
             });
             
             // Submit the form
-            fetch('/multi-face-swap', {
+            fetch('/multi_face_swap', {
                 method: 'POST',
                 body: formData
             })
@@ -623,7 +623,7 @@
                 loadingOverlay.classList.add('d-none');
                 
                 if (data.success) {
-                    window.location.href = '/bridal-results';
+                    window.location.href = '/bridal_results';
                 } else {
                     alert(data.error || 'Failed to process templates');
                 }
