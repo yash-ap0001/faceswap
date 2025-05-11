@@ -1244,6 +1244,214 @@ document.addEventListener('DOMContentLoaded', function() {
         errorModal.show();
     }
     
+    // Image Preview and Multi-selection Functionality
+    function setupImagePreviewHandlers() {
+        // Preview image click handler
+        document.querySelectorAll('.preview-image').forEach(img => {
+            img.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const templatePath = this.getAttribute('data-template-path');
+                const ceremony = this.getAttribute('data-ceremony');
+                
+                // Show full image in modal
+                const previewImg = document.getElementById('previewModalImage');
+                previewImg.src = templatePath;
+                currentPreviewTemplate = { 
+                    path: templatePath,
+                    ceremony: ceremony
+                };
+                
+                const selectBtn = document.getElementById('selectTemplateBtn');
+                selectBtn.disabled = isTemplateSelected(templatePath);
+                selectBtn.innerHTML = isTemplateSelected(templatePath) ? 
+                    '<i class="fas fa-check me-1"></i> Already Selected' : 
+                    '<i class="fas fa-check-circle me-1"></i> Select for Face Swap';
+                    
+                imagePreviewModal.show();
+            });
+        });
+        
+        // Select template button in modal
+        document.getElementById('selectTemplateBtn').addEventListener('click', function() {
+            if (currentPreviewTemplate && selectedTemplates.length < 5) {
+                selectTemplate(currentPreviewTemplate.path, currentPreviewTemplate.ceremony);
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-check me-1"></i> Already Selected';
+                // Don't close modal, let user continue viewing
+            }
+        });
+        
+        // Multi-source input change handler
+        multiSourceInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                multiSourceFile = this.files[0];
+                
+                reader.onload = function(e) {
+                    multiSourcePreview.src = e.target.result;
+                    multiSourcePreview.classList.remove('d-none');
+                    multiSourcePlaceholder.classList.add('d-none');
+                    processMultipleBtn.disabled = selectedTemplates.length === 0;
+                };
+                
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                multiSourceFile = null;
+                multiSourcePreview.classList.add('d-none');
+                multiSourcePlaceholder.classList.remove('d-none');
+                processMultipleBtn.disabled = true;
+            }
+        });
+        
+        // Clear all selected templates
+        clearSelectionBtn.addEventListener('click', function() {
+            clearSelectedTemplates();
+        });
+        
+        // Process multiple templates button
+        processMultipleBtn.addEventListener('click', async function() {
+            if (!multiSourceFile || selectedTemplates.length === 0) {
+                showError('Please upload an image and select at least one template.');
+                return;
+            }
+            
+            const loadingSpinner = '<span class="spinner-border spinner-border-sm me-2"></span> Processing...';
+            const originalHTML = this.innerHTML;
+            this.disabled = true;
+            this.innerHTML = loadingSpinner;
+            
+            try {
+                // Create FormData
+                const formData = new FormData();
+                formData.append('source', multiSourceFile);
+                
+                // Add all template paths
+                selectedTemplates.forEach((template, index) => {
+                    formData.append('templates[]', template.path);
+                });
+                
+                // Send to bridal_swap with the first template, then we'll process the rest
+                window.location.href = `/bridal_swap?style=${selectedTemplates[0].ceremony}&multi=true`;
+                
+            } catch (error) {
+                console.error('Error processing images:', error);
+                showError('Failed to process images. Please try again.');
+                this.disabled = false;
+                this.innerHTML = originalHTML;
+            }
+        });
+    }
+    
+    // Select a template
+    function selectTemplate(templatePath, ceremony) {
+        if (selectedTemplates.length >= 5) {
+            showError('You can only select up to 5 templates.');
+            return;
+        }
+        
+        if (!isTemplateSelected(templatePath)) {
+            selectedTemplates.push({
+                path: templatePath,
+                ceremony: ceremony
+            });
+            
+            // Mark template as selected in the gallery
+            const card = document.querySelector(`.preview-image[data-template-path="${templatePath}"]`).closest('.bridal-card');
+            card.classList.add('selected');
+            
+            // Show selection badge
+            const badge = card.querySelector('.select-badge');
+            if (badge) badge.classList.remove('d-none');
+            
+            updateSelectionInterface();
+        }
+    }
+    
+    // Check if template is already selected
+    function isTemplateSelected(templatePath) {
+        return selectedTemplates.some(t => t.path === templatePath);
+    }
+    
+    // Update the multi-selection interface
+    function updateSelectionInterface() {
+        if (selectedTemplates.length > 0) {
+            multiSelectionInterface.classList.remove('d-none');
+            selectedCount.textContent = selectedTemplates.length;
+            
+            // Update the preview
+            selectedTemplatesPreview.innerHTML = '';
+            selectedTemplates.forEach((template, index) => {
+                const previewCol = document.createElement('div');
+                previewCol.className = 'col';
+                previewCol.innerHTML = `
+                    <div class="position-relative">
+                        <img src="${template.path}" class="img-thumbnail" alt="Selected template ${index+1}" style="height: 100px; object-fit: cover;">
+                        <button class="btn btn-sm btn-danger position-absolute top-0 end-0 remove-template-btn" 
+                                data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                selectedTemplatesPreview.appendChild(previewCol);
+            });
+            
+            // Add event listeners to remove buttons
+            document.querySelectorAll('.remove-template-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    removeTemplateByIndex(index);
+                });
+            });
+            
+            // Enable/disable process button based on source image
+            processMultipleBtn.disabled = !multiSourceFile;
+        } else {
+            multiSelectionInterface.classList.add('d-none');
+        }
+    }
+    
+    // Remove a template by index
+    function removeTemplateByIndex(index) {
+        if (index >= 0 && index < selectedTemplates.length) {
+            const removed = selectedTemplates.splice(index, 1)[0];
+            
+            // Remove selection styling from gallery
+            const card = document.querySelector(`.preview-image[data-template-path="${removed.path}"]`).closest('.bridal-card');
+            if (card) {
+                card.classList.remove('selected');
+                
+                // Hide selection badge
+                const badge = card.querySelector('.select-badge');
+                if (badge) badge.classList.add('d-none');
+            }
+            
+            updateSelectionInterface();
+        }
+    }
+    
+    // Clear all selected templates
+    function clearSelectedTemplates() {
+        // Remove all selection styling
+        selectedTemplates.forEach(template => {
+            const card = document.querySelector(`.preview-image[data-template-path="${template.path}"]`).closest('.bridal-card');
+            if (card) {
+                card.classList.remove('selected');
+                
+                // Hide selection badge
+                const badge = card.querySelector('.select-badge');
+                if (badge) badge.classList.add('d-none');
+            }
+        });
+        
+        selectedTemplates = [];
+        updateSelectionInterface();
+    }
+    
+    // Initialize the image preview and multi-selection handlers
+    setupImagePreviewHandlers();
+    
     // Expose removeResult to global scope
     window.removeResult = function(style) {
         const card = document.querySelector(`.result-card[data-style="${style}"]`);
