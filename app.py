@@ -458,10 +458,10 @@ def bridal_gallery():
                         )
     
     return render_template(
-        'bridal_gallery_enhanced.html',
+        'bridal_gallery.html',
         templates=templates,
         ceremony_types=ceremony_types,
-        template_types=template_types
+        template_types=['pinterest']  # Only use Pinterest templates
     )
 
 # Bride section routes
