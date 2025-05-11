@@ -752,13 +752,37 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         if (!sourceInput.files.length) {
-            showError('Please select your photo.');
+            console.error('Please select your photo.');
             return;
         }
         
-        if (!templateUrlInput.value) {
-            showError('Please select a template from the available templates section.');
-            return;
+        // Check if template URL is available
+        if (!templateUrlInput || !templateUrlInput.value) {
+            // Find a template to use
+            const selectedTemplate = document.querySelector('.template-card.selected');
+            if (selectedTemplate) {
+                const templatePath = selectedTemplate.getAttribute('data-template-path');
+                if (templatePath) {
+                    // Create template URL input if it doesn't exist
+                    if (!templateUrlInput) {
+                        console.log('Creating template URL input');
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.id = 'template-url';
+                        hiddenInput.name = 'template_url';
+                        hiddenInput.value = templatePath;
+                        uploadForm.appendChild(hiddenInput);
+                    } else {
+                        templateUrlInput.value = templatePath;
+                    }
+                } else {
+                    console.error('No template path found on selected template');
+                    return;
+                }
+            } else {
+                console.error('Please select a template from the available templates section.');
+                return;
+            }
         }
 
         // Get selected bridal style
