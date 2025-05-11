@@ -1707,6 +1707,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function addTemplateToSelection(template) {
         if (selectedTemplates.length >= 5) {
             showError('You can only select up to 5 templates.');
+            
+            // Uncheck the checkbox that was just checked
+            const checkbox = document.querySelector(`.template-checkbox[data-template-path="${template.path}"]`);
+            if (checkbox) checkbox.checked = false;
+            
             return false;
         }
         
@@ -1717,13 +1722,22 @@ document.addEventListener('DOMContentLoaded', function() {
             updateSelectionInterface();
             
             // Find the card and mark it as selected
-            const card = document.querySelector(`.preview-image[data-template-path="${template.path}"]`).closest('.bridal-card');
+            const card = document.querySelector(`.bridal-card[data-template-path="${template.path}"]`);
             if (card) {
                 card.classList.add('selected');
                 
                 // Show selection badge
                 const badge = card.querySelector('.select-badge');
                 if (badge) badge.classList.remove('d-none');
+                
+                // Make sure the checkbox is checked
+                const checkbox = card.querySelector('.template-checkbox');
+                if (checkbox) checkbox.checked = true;
+                
+                // Enable process button if we have a source image
+                if (window.multiSourceInput && window.multiSourceInput.files && window.multiSourceInput.files[0] && window.processMultipleBtn) {
+                    window.processMultipleBtn.disabled = false;
+                }
                 
                 // Update selection button if it exists
                 const selectBtn = card.querySelector('.template-select-btn');
@@ -1752,13 +1766,22 @@ document.addEventListener('DOMContentLoaded', function() {
             updateSelectionInterface();
             
             // Find the card and unmark it
-            const card = document.querySelector(`.preview-image[data-template-path="${removed.path}"]`).closest('.bridal-card');
+            const card = document.querySelector(`.bridal-card[data-template-path="${templatePath}"]`);
             if (card) {
                 card.classList.remove('selected');
                 
                 // Hide selection badge
                 const badge = card.querySelector('.select-badge');
                 if (badge) badge.classList.add('d-none');
+                
+                // Make sure the checkbox is unchecked
+                const checkbox = card.querySelector('.template-checkbox');
+                if (checkbox) checkbox.checked = false;
+                
+                // Disable process button if no templates are selected
+                if (selectedTemplates.length === 0 && window.processMultipleBtn) {
+                    window.processMultipleBtn.disabled = true;
+                }
                 
                 // Update selection button if it exists
                 const selectBtn = card.querySelector('.template-select-btn');
