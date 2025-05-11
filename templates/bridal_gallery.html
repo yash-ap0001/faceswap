@@ -307,29 +307,9 @@
     }
     
     /* View more button styles */
-    .view-more-btn {
-        transition: all 0.3s ease;
-    }
+    /* Removed view-more button styles */
     
-    .view-more-btn.expanded {
-        background-color: var(--primary-purple);
-        color: white;
-    }
-    
-    /* Modal styles for fullscreen gallery */
-    .fullscreen-gallery-modal .modal-dialog {
-        max-width: 95%;
-        margin: 10px auto;
-        height: 90vh;
-    }
-    
-    .fullscreen-gallery-modal .modal-content {
-        height: 100%;
-    }
-    
-    .fullscreen-gallery-modal .modal-body {
-        overflow-y: auto;
-    }
+    /* Removed fullscreen gallery styles */
 </style>
 {% endblock %}
 
@@ -778,7 +758,6 @@ document.addEventListener('DOMContentLoaded', function() {
     checkModels();
     
     // Initialize modals
-    const fullGalleryModal = new bootstrap.Modal(document.getElementById('fullGalleryModal'));
     const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
     const imagePreviewModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
@@ -858,43 +837,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // View More buttons
-    document.querySelectorAll('.view-more-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const ceremony = this.getAttribute('data-ceremony');
-            const carousel = document.getElementById(`${ceremony}-carousel`);
-            const cards = carousel.querySelectorAll('.template-card');
-            
-            // Prepare gallery modal
-            document.getElementById('fullGalleryTitle').textContent = 
-                `All ${ceremony.charAt(0).toUpperCase() + ceremony.slice(1)} Templates`;
-            
-            // Fill gallery grid
-            const galleryGrid = document.getElementById('fullGalleryGrid');
-            galleryGrid.innerHTML = '';
-            
-            cards.forEach(card => {
-                const templatePath = card.getAttribute('data-template-path');
-                const clonedCard = card.cloneNode(true);
-                clonedCard.classList.remove('d-none');
-                
-                // Add selection checkbox
-                const selectOverlay = document.createElement('div');
-                selectOverlay.className = 'template-select-overlay gallery-select d-none';
-                selectOverlay.innerHTML = `
-                    <div class="form-check">
-                        <input class="form-check-input gallery-checkbox" type="checkbox" 
-                               value="${templatePath}" data-ceremony="${ceremony}">
-                    </div>
-                `;
-                
-                clonedCard.querySelector('.card').appendChild(selectOverlay);
-                galleryGrid.appendChild(clonedCard);
-            });
-            
-            // Show modal
-            fullGalleryModal.show();
-        });
-    });
+    // Removed view-more button event handlers (no longer needed)
     
     // Delete buttons
     document.querySelectorAll('.delete-template-btn').forEach(button => {
