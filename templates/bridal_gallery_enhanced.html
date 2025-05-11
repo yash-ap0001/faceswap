@@ -329,21 +329,7 @@
         <div class="card-body p-2">
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <div class="d-flex gap-3 align-items-center">
-                        <div class="btn-group" role="group">
-                            <input type="radio" class="btn-check" name="templateType" id="all-types" value="all" checked autocomplete="off">
-                            <label class="btn btn-outline-secondary" for="all-types">All Types</label>
-                            
-                            <input type="radio" class="btn-check" name="templateType" id="real" value="real" autocomplete="off">
-                            <label class="btn btn-outline-secondary" for="real">Real Photos</label>
-                            
-                            <input type="radio" class="btn-check" name="templateType" id="natural" value="natural" autocomplete="off">
-                            <label class="btn btn-outline-secondary" for="natural">Natural Style</label>
-                            
-                            <input type="radio" class="btn-check" name="templateType" id="ai" value="ai" autocomplete="off">
-                            <label class="btn btn-outline-secondary" for="ai">AI Generated</label>
-                        </div>
-                    </div>
+                    <!-- Template type filter buttons removed - Using only Pinterest photos now -->
                 </div>
                 <div class="col-md-6">
                     <div class="d-flex gap-2 justify-content-md-end mt-3 mt-md-0">
@@ -532,11 +518,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Template type filter
-    const templateTypeRadios = document.querySelectorAll('input[name="templateType"]');
-    templateTypeRadios.forEach(radio => {
-        radio.addEventListener('change', filterTemplates);
-    });
+    // Template type filtering removed - Using only Pinterest photos now
     
     // Ceremony type filter
     const ceremonyCheckboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -587,8 +569,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function filterTemplates() {
-    // Get selected template type
-    const selectedType = document.querySelector('input[name="templateType"]:checked').value;
+    // Template type filtering removed - Using only Pinterest photos now
     
     // Get selected ceremonies
     const selectedCeremonies = [];
@@ -606,20 +587,10 @@ function filterTemplates() {
         }
     });
     
-    // Show/hide template type sections based on selection
-    if (selectedType === 'all') {
-        document.querySelectorAll('.template-type-section').forEach(section => {
-            section.style.display = 'block';
-        });
-    } else {
-        document.querySelectorAll('.template-type-section').forEach(section => {
-            if (section.classList.contains(`${selectedType}-templates`)) {
-                section.style.display = 'block';
-            } else {
-                section.style.display = 'none';
-            }
-        });
-    }
+    // No longer filtering by template type - all templates are Pinterest now
+    document.querySelectorAll('.template-type-section').forEach(section => {
+        section.style.display = 'block';
+    });
 }
 </script>
 {% endblock %}
