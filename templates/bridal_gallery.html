@@ -216,52 +216,125 @@
         100% { transform: rotate(360deg); }
     }
     
-    /* Horizontal scrolling row styles */
-    .template-row {
+    /* Carousel and navigation styles */
+    .template-carousel {
         position: relative;
+        margin-bottom: 40px;
     }
     
-    .template-scroll-wrapper {
-        position: relative;
-        overflow: hidden;
+    .carousel-nav-buttons {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        transform: translateY(-50%);
+        z-index: 10;
+        display: flex;
+        justify-content: space-between;
+        pointer-events: none;
     }
     
-    .template-scroll-wrapper .d-flex {
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
-        scrollbar-color: var(--primary-purple) rgba(0,0,0,0.1);
+    .carousel-nav-btn {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
+        transition: opacity 0.3s;
+        pointer-events: auto;
     }
     
-    .template-scroll-wrapper .d-flex::-webkit-scrollbar {
-        height: 8px;
-    }
-    
-    .template-scroll-wrapper .d-flex::-webkit-scrollbar-track {
-        background: rgba(0,0,0,0.1);
-        border-radius: 4px;
-    }
-    
-    .template-scroll-wrapper .d-flex::-webkit-scrollbar-thumb {
-        background-color: var(--primary-purple);
-        border-radius: 4px;
+    .carousel-nav-btn:hover {
+        opacity: 1;
     }
     
     .template-card {
-        transition: transform 0.3s ease;
+        transition: transform 0.3s ease, opacity 0.2s ease;
     }
     
     .template-card:hover {
         transform: translateY(-5px);
     }
     
-    /* Toggle button styles */
-    .toggle-row-btn {
+    /* Template management styles */
+    .template-management-tools {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
+    }
+    
+    .bulk-actions {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .template-select-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 5;
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-end;
+        padding: 15px;
+    }
+    
+    .template-select-overlay .form-check {
+        background-color: white;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .template-checkbox {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    
+    .delete-template-btn {
+        visibility: hidden;
+        opacity: 0;
+        transition: visibility 0s, opacity 0.3s;
+    }
+    
+    .bridal-card:hover .delete-template-btn {
+        visibility: visible;
+        opacity: 1;
+    }
+    
+    /* View more button styles */
+    .view-more-btn {
         transition: all 0.3s ease;
     }
     
-    .toggle-row-btn.expanded i {
-        transform: rotate(180deg);
+    .view-more-btn.expanded {
+        background-color: var(--primary-purple);
+        color: white;
+    }
+    
+    /* Modal styles for fullscreen gallery */
+    .fullscreen-gallery-modal .modal-dialog {
+        max-width: 95%;
+        margin: 10px auto;
+        height: 90vh;
+    }
+    
+    .fullscreen-gallery-modal .modal-content {
+        height: 100%;
+    }
+    
+    .fullscreen-gallery-modal .modal-body {
+        overflow-y: auto;
     }
 </style>
 {% endblock %}
@@ -373,20 +446,63 @@
         </button>
     </div>
     
-    <!-- Template Row - Scrollable Horizontal Container -->
-    <div class="template-row mb-4" id="{{ ceremony }}-row">
-        <div class="template-scroll-wrapper">
-            <div class="d-flex flex-nowrap overflow-auto pb-3">
+    <!-- Template Carousel with Arrow Navigation -->
+    <div class="template-carousel position-relative mb-4" id="{{ ceremony }}-carousel">
+        <!-- Left/Right Navigation Arrows -->
+        <div class="carousel-nav-buttons">
+            <button class="btn btn-dark carousel-nav-btn prev-btn" data-target="{{ ceremony }}-carousel">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="btn btn-dark carousel-nav-btn next-btn" data-target="{{ ceremony }}-carousel">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        
+        <!-- Delete Tools -->
+        <div class="template-management-tools mb-2">
+            <button class="btn btn-sm btn-outline-danger toggle-select-mode-btn" data-ceremony="{{ ceremony }}">
+                <i class="fas fa-trash me-1"></i> Manage Templates
+            </button>
+            <div class="bulk-actions d-none" id="{{ ceremony }}-bulk-actions">
+                <button class="btn btn-sm btn-danger delete-selected-btn" data-ceremony="{{ ceremony }}">
+                    <i class="fas fa-trash-alt me-1"></i> Delete Selected
+                </button>
+                <button class="btn btn-sm btn-danger delete-all-btn" data-ceremony="{{ ceremony }}">
+                    <i class="fas fa-times-circle me-1"></i> Delete All {{ ceremony|title }}
+                </button>
+                <button class="btn btn-sm btn-secondary cancel-select-btn" data-ceremony="{{ ceremony }}">
+                    <i class="fas fa-times me-1"></i> Cancel
+                </button>
+            </div>
+        </div>
+        
+        <!-- Cards Row - Showing Only a Few at a Time -->
+        <div class="template-row">
+            <div class="row" id="{{ ceremony }}-cards">
                 {% if all_templates[ceremony]|length > 0 %}
                     {% for template in all_templates[ceremony] %}
-                        <div class="template-card me-3" style="min-width: 280px; max-width: 280px;">
-                            <div class="card shadow-sm bridal-card" data-style="{{ ceremony }}">
+                        <div class="col-md-4 template-card mb-4" data-index="{{ loop.index0 }}" data-template-path="{{ template.url }}">
+                            <div class="card shadow-sm bridal-card position-relative" data-style="{{ ceremony }}">
+                                <!-- Selection checkbox (hidden by default) -->
+                                <div class="template-select-overlay d-none">
+                                    <div class="form-check">
+                                        <input class="form-check-input template-checkbox" type="checkbox" value="{{ template.url }}" id="check-{{ ceremony }}-{{ loop.index }}">
+                                        <label class="form-check-label" for="check-{{ ceremony }}-{{ loop.index }}"></label>
+                                    </div>
+                                </div>
+                                
                                 <div class="category-badge">{{ ceremony|title }}</div>
                                 <img src="{{ template.url }}" class="card-img-top" alt="{{ ceremony|title }} Template" 
                                      style="height: 300px; object-fit: cover;">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ template.title }}</h5>
                                     <p class="card-text small">{{ template.description }}</p>
+                                    
+                                    <!-- Individual delete button (visible on hover) -->
+                                    <button class="btn btn-sm btn-outline-danger delete-template-btn position-absolute bottom-0 end-0 m-2" 
+                                            data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -400,6 +516,13 @@
                     </div>
                 {% endif %}
             </div>
+        </div>
+        
+        <!-- View More Button -->
+        <div class="text-center mt-3">
+            <button class="btn btn-outline-primary view-more-btn" data-ceremony="{{ ceremony }}">
+                <i class="fas fa-images me-1"></i> View All {{ ceremony|title }} Templates
+            </button>
         </div>
     </div>
 </div>
@@ -488,6 +611,56 @@
         </div>
     </div>
 </div>
+
+<!-- Fullscreen Gallery Modal -->
+<div class="modal fade fullscreen-gallery-modal" id="fullGalleryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="fullGalleryTitle">All Templates</h5>
+                <div class="d-flex ms-auto me-2">
+                    <div class="form-check form-switch me-3">
+                        <input class="form-check-input" type="checkbox" id="gallerySelectAll">
+                        <label class="form-check-label" for="gallerySelectAll">Select All</label>
+                    </div>
+                    <button type="button" id="galleryDeleteSelected" class="btn btn-sm btn-danger me-2 d-none">
+                        <i class="fas fa-trash-alt me-1"></i> Delete Selected
+                    </button>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="fullGalleryBody">
+                <div class="container-fluid">
+                    <div class="row" id="fullGalleryGrid">
+                        <!-- Templates will be inserted here -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm Delete</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="delete-confirm-message">
+                Are you sure you want to delete this template? This action cannot be undone.
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -511,24 +684,275 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check model status
     checkModels();
     
-    // Initialize expand/collapse buttons for template rows
-    document.querySelectorAll('.toggle-row-btn').forEach(button => {
+    // Initialize modals
+    const fullGalleryModal = new bootstrap.Modal(document.getElementById('fullGalleryModal'));
+    const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    
+    // Current state for delete operations
+    let currentDeletePath = null;
+    let currentDeleteCeremony = null;
+    let currentBulkDeletePaths = [];
+    
+    // Initialize carousel navigation
+    document.querySelectorAll('.carousel-nav-btn').forEach(button => {
         button.addEventListener('click', function() {
-            const targetId = this.getAttribute('data-target');
-            const targetRow = document.getElementById(targetId);
+            const carouselId = this.getAttribute('data-target');
+            const carouselEl = document.getElementById(carouselId);
+            const cardRow = carouselEl.querySelector('.row');
+            const cards = cardRow.querySelectorAll('.template-card');
             
-            if (this.classList.contains('expanded')) {
-                // Collapse to show only first few cards
-                this.classList.remove('expanded');
-                this.innerHTML = '<i class="fas fa-chevron-down"></i> Expand All';
-                targetRow.querySelector('.d-flex').style.overflowX = 'auto';
+            // Get visible cards
+            const visibleCards = Array.from(cards).filter(card => 
+                !card.classList.contains('d-none'));
+            
+            // Skip if no cards
+            if (visibleCards.length === 0) return;
+            
+            // Get current visible indices
+            const visibleIndices = visibleCards.map(card => 
+                parseInt(card.getAttribute('data-index')));
+            
+            // Determine navigation direction
+            const isNext = this.classList.contains('next-btn');
+            const currentPage = Math.floor(Math.min(...visibleIndices) / 3);
+            const totalPages = Math.ceil(cards.length / 3);
+            let newPage = isNext ? currentPage + 1 : currentPage - 1;
+            
+            // Ensure page is in bounds
+            if (newPage < 0) newPage = totalPages - 1;
+            if (newPage >= totalPages) newPage = 0;
+            
+            // Update display
+            const startIdx = newPage * 3;
+            const endIdx = startIdx + 3;
+            
+            cards.forEach(card => {
+                const cardIndex = parseInt(card.getAttribute('data-index'));
+                if (cardIndex >= startIdx && cardIndex < endIdx) {
+                    card.classList.remove('d-none');
+                } else {
+                    card.classList.add('d-none');
+                }
+            });
+        });
+    });
+    
+    // Initialize each carousel to show first 3 cards
+    document.querySelectorAll('.template-carousel').forEach(carousel => {
+        const cards = carousel.querySelectorAll('.template-card');
+        cards.forEach((card, index) => {
+            if (index < 3) {
+                card.classList.remove('d-none');
             } else {
-                // Expand to show all cards
-                this.classList.add('expanded');
-                this.innerHTML = '<i class="fas fa-chevron-up"></i> Collapse';
-                targetRow.querySelector('.d-flex').style.overflowX = 'visible';
+                card.classList.add('d-none');
             }
         });
+    });
+    
+    // View More buttons
+    document.querySelectorAll('.view-more-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const ceremony = this.getAttribute('data-ceremony');
+            const carousel = document.getElementById(`${ceremony}-carousel`);
+            const cards = carousel.querySelectorAll('.template-card');
+            
+            // Prepare gallery modal
+            document.getElementById('fullGalleryTitle').textContent = 
+                `All ${ceremony.charAt(0).toUpperCase() + ceremony.slice(1)} Templates`;
+            
+            // Fill gallery grid
+            const galleryGrid = document.getElementById('fullGalleryGrid');
+            galleryGrid.innerHTML = '';
+            
+            cards.forEach(card => {
+                const templatePath = card.getAttribute('data-template-path');
+                const clonedCard = card.cloneNode(true);
+                clonedCard.classList.remove('d-none');
+                
+                // Add selection checkbox
+                const selectOverlay = document.createElement('div');
+                selectOverlay.className = 'template-select-overlay gallery-select d-none';
+                selectOverlay.innerHTML = `
+                    <div class="form-check">
+                        <input class="form-check-input gallery-checkbox" type="checkbox" 
+                               value="${templatePath}" data-ceremony="${ceremony}">
+                    </div>
+                `;
+                
+                clonedCard.querySelector('.card').appendChild(selectOverlay);
+                galleryGrid.appendChild(clonedCard);
+            });
+            
+            // Show modal
+            fullGalleryModal.show();
+        });
+    });
+    
+    // Delete buttons
+    document.querySelectorAll('.delete-template-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            currentDeletePath = this.getAttribute('data-template-path');
+            currentDeleteCeremony = this.getAttribute('data-ceremony');
+            document.getElementById('delete-confirm-message').textContent = 
+                `Are you sure you want to delete this ${currentDeleteCeremony} template? This action cannot be undone.`;
+            deleteConfirmModal.show();
+        });
+    });
+    
+    // Toggle select mode for bulk deletion
+    document.querySelectorAll('.toggle-select-mode-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const ceremony = this.getAttribute('data-ceremony');
+            const carousel = document.getElementById(`${ceremony}-carousel`);
+            const selectOverlays = carousel.querySelectorAll('.template-select-overlay');
+            const bulkActions = document.getElementById(`${ceremony}-bulk-actions`);
+            
+            if (bulkActions.classList.contains('d-none')) {
+                // Enter select mode
+                bulkActions.classList.remove('d-none');
+                this.classList.add('d-none');
+                selectOverlays.forEach(overlay => overlay.classList.remove('d-none'));
+            } else {
+                // Exit select mode
+                bulkActions.classList.add('d-none');
+                this.classList.remove('d-none');
+                selectOverlays.forEach(overlay => {
+                    overlay.classList.add('d-none');
+                    overlay.querySelector('input[type="checkbox"]').checked = false;
+                });
+            }
+        });
+    });
+    
+    // Cancel select mode
+    document.querySelectorAll('.cancel-select-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const ceremony = this.getAttribute('data-ceremony');
+            document.querySelector(`.toggle-select-mode-btn[data-ceremony="${ceremony}"]`).click();
+        });
+    });
+    
+    // Delete selected templates
+    document.querySelectorAll('.delete-selected-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const ceremony = this.getAttribute('data-ceremony');
+            const carousel = document.getElementById(`${ceremony}-carousel`);
+            const selectedCheckboxes = carousel.querySelectorAll('.template-checkbox:checked');
+            
+            if (selectedCheckboxes.length === 0) {
+                showError('Please select at least one template to delete.');
+                return;
+            }
+            
+            currentBulkDeletePaths = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
+            currentDeleteCeremony = ceremony;
+            
+            document.getElementById('delete-confirm-message').textContent = 
+                `Are you sure you want to delete ${selectedCheckboxes.length} template(s)? This action cannot be undone.`;
+            deleteConfirmModal.show();
+        });
+    });
+    
+    // Delete all templates for a ceremony
+    document.querySelectorAll('.delete-all-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const ceremony = this.getAttribute('data-ceremony');
+            currentDeleteCeremony = ceremony;
+            currentBulkDeletePaths = null; // Signal to delete all for this ceremony
+            
+            document.getElementById('delete-confirm-message').textContent = 
+                `Are you sure you want to delete ALL ${ceremony} templates? This action cannot be undone.`;
+            deleteConfirmModal.show();
+        });
+    });
+    
+    // Handle delete confirmation
+    confirmDeleteBtn.addEventListener('click', function() {
+        // Prepare delete request
+        let deleteData = {};
+        
+        if (currentBulkDeletePaths === null) {
+            // Delete all for ceremony
+            deleteData = {
+                ceremony_type: currentDeleteCeremony,
+                clear_all: true
+            };
+        } else if (currentBulkDeletePaths.length > 0) {
+            // Delete multiple paths
+            deleteData = {
+                template_paths: currentBulkDeletePaths
+            };
+        } else if (currentDeletePath) {
+            // Delete single path
+            deleteData = {
+                template_paths: [currentDeletePath]
+            };
+        }
+        
+        // Send delete request
+        fetch('/delete-templates', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(deleteData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Hide modals
+                deleteConfirmModal.hide();
+                fullGalleryModal.hide();
+                
+                // Reload page to reflect changes
+                location.reload();
+            } else {
+                showError(data.error || 'Failed to delete template(s)');
+            }
+        })
+        .catch(error => {
+            showError('Network error: ' + error.message);
+        });
+    });
+    
+    // Gallery select mode
+    const gallerySelectAll = document.getElementById('gallerySelectAll');
+    const galleryDeleteSelected = document.getElementById('galleryDeleteSelected');
+    
+    gallerySelectAll.addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.gallery-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        
+        galleryDeleteSelected.classList.toggle('d-none', !this.checked);
+    });
+    
+    // Enable delete button when gallery items are selected
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('gallery-checkbox')) {
+            const anyChecked = document.querySelector('.gallery-checkbox:checked') !== null;
+            galleryDeleteSelected.classList.toggle('d-none', !anyChecked);
+        }
+    });
+    
+    // Gallery delete selected
+    galleryDeleteSelected.addEventListener('click', function() {
+        const selectedCheckboxes = document.querySelectorAll('.gallery-checkbox:checked');
+        
+        if (selectedCheckboxes.length === 0) {
+            showError('Please select at least one template to delete.');
+            return;
+        }
+        
+        currentBulkDeletePaths = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
+        currentDeleteCeremony = selectedCheckboxes[0].getAttribute('data-ceremony');
+        
+        document.getElementById('delete-confirm-message').textContent = 
+            `Are you sure you want to delete ${selectedCheckboxes.length} template(s)? This action cannot be undone.`;
+        deleteConfirmModal.show();
     });
     
     // Handle file input change
