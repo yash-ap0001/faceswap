@@ -257,6 +257,11 @@
         object-fit: cover;
     }
     
+    /* Hide cards beyond the first row by default */
+    .template-card.expanded-card {
+        display: none;
+    }
+    
     /* Template management styles */
     .template-management-tools {
         display: flex;
@@ -503,7 +508,7 @@
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4" id="{{ ceremony }}-cards">
                 {% if all_templates[ceremony]|length > 0 %}
                     {% for template in all_templates[ceremony] %}
-                        <div class="col template-card mb-4" data-index="{{ loop.index0 }}" data-template-path="{{ template.url }}">
+                        <div class="col template-card mb-4 {% if loop.index0 >= 4 %}expanded-card{% endif %}" data-index="{{ loop.index0 }}" data-template-path="{{ template.url }}">
                             <div class="card shadow-sm bridal-card position-relative" data-style="{{ ceremony }}">
                                 <!-- Selection checkbox (hidden by default) -->
                                 <div class="template-select-overlay d-none">
@@ -847,25 +852,21 @@ document.addEventListener('DOMContentLoaded', function() {
             const targetId = this.getAttribute('data-target');
             const ceremony = targetId.replace('-row', '');
             const carousel = document.getElementById(`${ceremony}-carousel`);
-            const cards = carousel.querySelectorAll('.template-card');
+            const expandedCards = carousel.querySelectorAll('.template-card.expanded-card');
             const icon = this.querySelector('i');
             
             console.log(`Toggle row button clicked for ${ceremony}`);
-            console.log(`Found ${cards.length} cards in carousel`);
+            console.log(`Found ${expandedCards.length} expanded cards`);
             
             // Check current state (expanded or collapsed)
             const isExpanded = this.classList.contains('expanded');
             console.log(`Current state: ${isExpanded ? 'expanded' : 'collapsed'}`);
             
             if (isExpanded) {
-                // Collapse - show only first 4
-                console.log('Collapsing to show only first 4 cards');
-                cards.forEach((card, index) => {
-                    if (index < 4) {
-                        card.classList.remove('d-none');
-                    } else {
-                        card.classList.add('d-none');
-                    }
+                // Collapse - hide expanded cards
+                console.log('Collapsing to show only first row');
+                expandedCards.forEach(card => {
+                    card.style.display = 'none';
                 });
                 
                 // Update button appearance
@@ -876,10 +877,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon.classList.add('fa-chevron-down');
                 this.setAttribute('title', 'Expand All');
             } else {
-                // Expand - show all
+                // Expand - show all expanded cards
                 console.log('Expanding to show all cards');
-                cards.forEach(card => {
-                    card.classList.remove('d-none');
+                expandedCards.forEach(card => {
+                    card.style.display = 'block';
                 });
                 
                 // Update button appearance
@@ -893,20 +894,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Force initial state of all carousels to collapsed (only first 4 visible)
+    // Initialize all carousels to show only the first row
     function initializeCarouselsCollapsed() {
         console.log('Initializing all carousels in collapsed state');
         document.querySelectorAll('.template-carousel').forEach(carousel => {
-            const cards = carousel.querySelectorAll('.template-card');
-            console.log(`Setting initial state for ${carousel.id} with ${cards.length} cards`);
+            // Hide all expanded cards
+            const expandedCards = carousel.querySelectorAll('.template-card.expanded-card');
+            console.log(`Setting initial state for ${carousel.id} with ${expandedCards.length} expanded cards`);
             
-            // Only show first 4 cards initially
-            cards.forEach((card, index) => {
-                if (index < 4) {
-                    card.classList.remove('d-none');
-                } else {
-                    card.classList.add('d-none');
-                }
+            expandedCards.forEach(card => {
+                card.style.display = 'none';
             });
         });
         
@@ -924,8 +921,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Call initialization on page load
-    initializeCarouselsCollapsed();
+    // Call initialization when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCarouselsCollapsed();
+    });
     
     // Toggle select mode for bulk deletion
     document.querySelectorAll('.toggle-select-mode-btn').forEach(button => {
