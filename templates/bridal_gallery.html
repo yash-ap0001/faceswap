@@ -563,12 +563,7 @@
             </div>
         </div>
         
-        <!-- View More Button -->
-        <div class="text-center mt-3">
-            <button class="btn btn-outline-primary view-more-btn" data-ceremony="{{ ceremony }}">
-                <i class="fas fa-images me-1"></i> View All {{ ceremony|title }} Templates
-            </button>
-        </div>
+        <!-- No View More Button -->
     </div>
 </div>
 {% endfor %}
@@ -657,36 +652,7 @@
     </div>
 </div>
 
-<!-- Fullscreen Gallery Modal -->
-<div class="modal fade fullscreen-gallery-modal" id="fullGalleryModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content bg-dark text-light">
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title" id="fullGalleryTitle">All Templates</h5>
-                <div class="d-flex ms-auto me-2">
-                    <div class="form-check form-switch me-3">
-                        <input class="form-check-input" type="checkbox" id="gallerySelectAll">
-                        <label class="form-check-label" for="gallerySelectAll">Select All</label>
-                    </div>
-                    <button type="button" id="galleryDeleteSelected" class="btn btn-sm btn-danger me-2 d-none">
-                        <i class="fas fa-trash-alt me-1"></i> Delete Selected
-                    </button>
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="fullGalleryBody">
-                <div class="container-fluid">
-                    <div class="row" id="fullGalleryGrid">
-                        <!-- Templates will be inserted here -->
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer border-secondary">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Image Preview Modal is already defined above -->
 
 <!-- Image Preview Modal -->
 <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
