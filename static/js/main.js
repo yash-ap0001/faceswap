@@ -24,34 +24,49 @@ document.addEventListener('DOMContentLoaded', function() {
     checkModels();
 
     // File input change handlers
-    sourceInput.addEventListener('change', function() {
-        handleFileInputChange(this, sourcePreview, sourcePlaceholder);
-    });
+    if (sourceInput) {
+        sourceInput.addEventListener('change', function() {
+            handleFileInputChange(this, sourcePreview, sourcePlaceholder);
+        });
+    }
 
-    targetInput.addEventListener('change', function() {
-        handleFileInputChange(this, targetPreview, targetPlaceholder);
-    });
+    if (targetInput) {
+        targetInput.addEventListener('change', function() {
+            handleFileInputChange(this, targetPreview, targetPlaceholder);
+        });
+    }
 
     // Clear button handlers
-    sourceClearBtn.addEventListener('click', function() {
-        clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
-    });
+    if (sourceClearBtn) {
+        sourceClearBtn.addEventListener('click', function() {
+            clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
+        });
+    }
 
-    targetClearBtn.addEventListener('click', function() {
-        clearFileInput(targetInput, targetPreview, targetPlaceholder);
-    });
+    if (targetClearBtn) {
+        targetClearBtn.addEventListener('click', function() {
+            clearFileInput(targetInput, targetPreview, targetPlaceholder);
+        });
+    }
 
     // Try again button handler
-    tryAgainBtn.addEventListener('click', function() {
-        resultContainer.classList.add('d-none');
-        uploadForm.reset();
-        clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
-        clearFileInput(targetInput, targetPreview, targetPlaceholder);
-        errorContainer.classList.add('d-none');
-    });
+    if (tryAgainBtn) {
+        tryAgainBtn.addEventListener('click', function() {
+            if (resultContainer) resultContainer.classList.add('d-none');
+            if (uploadForm) uploadForm.reset();
+            if (sourceInput && sourcePreview && sourcePlaceholder) {
+                clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
+            }
+            if (targetInput && targetPreview && targetPlaceholder) {
+                clearFileInput(targetInput, targetPreview, targetPlaceholder);
+            }
+            if (errorContainer) errorContainer.classList.add('d-none');
+        });
+    }
 
     // Form submission
-    uploadForm.addEventListener('submit', function(e) {
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
         if (!sourceInput.files.length || !targetInput.files.length) {
