@@ -447,7 +447,7 @@ def bridal_gallery():
                     })
     
     return render_template(
-        'bridal_gallery.html',
+        'bridal_gallery_simple.html',
         all_templates=all_templates,
         ceremony_types=ceremony_types
     )
