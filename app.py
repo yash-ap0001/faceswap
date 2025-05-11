@@ -905,9 +905,6 @@ def get_templates():
     
     app.logger.info(f"Scanning template directory: {template_dir}")
     
-    # Define template types to search for
-    template_types = ['real', 'natural', 'ai', 'pinterest']
-    
     # Log all subdirectories in templates for debugging
     try:
         subdirs = [d for d in os.listdir(template_dir) if os.path.isdir(os.path.join(template_dir, d))]
@@ -923,59 +920,60 @@ def get_templates():
     templates = []
     template_id = 1
     
-    # First check for standard template formats
-    for template_type in template_types:
-        # Check in main directory
-        main_path = os.path.join(template_dir, f"{ceremony_type}_{template_type}.jpg")
-        if os.path.exists(main_path):
-            app.logger.info(f"Found main template: {main_path}")
-            # Calculate the URL relative to the uploads directory
-            url_path = main_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
-            templates.append({
-                'id': f"{ceremony_type}_{template_type}_{template_id}",
-                'template_type': template_type,
-                'ceremony': ceremony_type,
-                'path': main_path,
-                'url': f"{url_path}?t={int(time.time())}"
-            })
-            template_id += 1
-            
-        # Check in type subdirectory for standard file
-        subdir_path = os.path.join(template_dir, template_type, f"{ceremony_type}.jpg")
-        if os.path.exists(subdir_path):
-            app.logger.info(f"Found subdir template: {subdir_path}")
-            # Calculate the URL relative to the uploads directory
-            url_path = subdir_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
-            templates.append({
-                'id': f"{ceremony_type}_{template_type}_{template_id}",
-                'template_type': template_type,
-                'ceremony': ceremony_type,
-                'path': subdir_path,
-                'url': f"{url_path}?t={int(time.time())}"
-            })
-            template_id += 1
-            
-        # Check for additional images in the type subdirectory
-        type_dir = os.path.join(template_dir, template_type, ceremony_type)
-        if os.path.exists(type_dir) and os.path.isdir(type_dir):
-            app.logger.info(f"Scanning additional templates in: {type_dir}")
-            for file in sorted(os.listdir(type_dir)):
-                if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
-                    file_path = os.path.join(type_dir, file)
-                    if os.path.isfile(file_path):
-                        template_id_str = f"{ceremony_type}_{template_type}_{template_id}"
-                        app.logger.info(f"Found additional {template_type} template: {file_path}")
-                        
-                        # Calculate the URL relative to the uploads directory
-                        url_path = file_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
-                        templates.append({
-                            'id': template_id_str,
-                            'template_type': template_type,
-                            'ceremony': ceremony_type,
-                            'path': file_path,
-                            'url': f"{url_path}?t={int(time.time())}"
-                        })
-                        template_id += 1
+    # Now ONLY check for Pinterest templates
+    template_type = 'pinterest'
+    
+    # Check in main directory
+    main_path = os.path.join(template_dir, f"{ceremony_type}_{template_type}.jpg")
+    if os.path.exists(main_path):
+        app.logger.info(f"Found main template: {main_path}")
+        # Calculate the URL relative to the uploads directory
+        url_path = main_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
+        templates.append({
+            'id': f"{ceremony_type}_{template_type}_{template_id}",
+            'template_type': template_type,
+            'ceremony': ceremony_type,
+            'path': main_path,
+            'url': f"{url_path}?t={int(time.time())}"
+        })
+        template_id += 1
+        
+    # Check in type subdirectory for standard file
+    subdir_path = os.path.join(template_dir, template_type, f"{ceremony_type}.jpg")
+    if os.path.exists(subdir_path):
+        app.logger.info(f"Found subdir template: {subdir_path}")
+        # Calculate the URL relative to the uploads directory
+        url_path = subdir_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
+        templates.append({
+            'id': f"{ceremony_type}_{template_type}_{template_id}",
+            'template_type': template_type,
+            'ceremony': ceremony_type,
+            'path': subdir_path,
+            'url': f"{url_path}?t={int(time.time())}"
+        })
+        template_id += 1
+        
+    # Check for additional images in the type subdirectory
+    type_dir = os.path.join(template_dir, template_type, ceremony_type)
+    if os.path.exists(type_dir) and os.path.isdir(type_dir):
+        app.logger.info(f"Scanning additional templates in: {type_dir}")
+        for file in sorted(os.listdir(type_dir)):
+            if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                file_path = os.path.join(type_dir, file)
+                if os.path.isfile(file_path):
+                    template_id_str = f"{ceremony_type}_{template_type}_{template_id}"
+                    app.logger.info(f"Found additional {template_type} template: {file_path}")
+                    
+                    # Calculate the URL relative to the uploads directory
+                    url_path = file_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
+                    templates.append({
+                        'id': template_id_str,
+                        'template_type': template_type,
+                        'ceremony': ceremony_type,
+                        'path': file_path,
+                        'url': f"{url_path}?t={int(time.time())}"
+                    })
+                    template_id += 1
     
     # This section is intentionally removed as it's redundant
     # The pinterest templates are already handled in the loop above
