@@ -329,11 +329,10 @@
     .template-select-overlay {
         position: absolute;
         top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.5);
-        z-index: 5;
+        right: 0;
+        width: auto;
+        height: auto;
+        z-index: 10;
         display: flex;
         align-items: flex-start;
         justify-content: flex-end;
@@ -348,6 +347,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-purple);
+        border-color: var(--primary-purple);
     }
     
     .template-checkbox {
@@ -637,10 +643,14 @@
                                 data-template-path="{{ template.url }}"
                                 data-ceremony="{{ ceremony }}"
                                 data-style="{{ ceremony }}">
-                                <!-- Selection checkbox (hidden by default) -->
-                                <div class="template-select-overlay d-none">
+                                <!-- Selection checkbox -->
+                                <div class="template-select-overlay">
                                     <div class="form-check">
-                                        <input class="form-check-input template-checkbox" type="checkbox" value="{{ template.url }}" id="check-{{ ceremony }}-{{ loop.index }}">
+                                        <input class="form-check-input template-checkbox" type="checkbox" 
+                                               value="{{ template.url }}" 
+                                               id="check-{{ ceremony }}-{{ loop.index }}"
+                                               data-template-path="{{ template.url }}"
+                                               data-ceremony="{{ ceremony }}">
                                         <label class="form-check-label" for="check-{{ ceremony }}-{{ loop.index }}"></label>
                                     </div>
                                 </div>
@@ -1072,52 +1082,72 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialize selection modes
         initializeSelectionModes();
         
-        // Remove all inline onclick handlers from template images and add proper event listeners
-        document.querySelectorAll('.preview-image').forEach(img => {
-            // Remove any existing onclick handlers
-            img.removeAttribute('onclick');
-            
-            // Set up the new click event
-            img.addEventListener('click', function(e) {
-                // Get the template path and ceremony type from data attributes
+        // Set up event handlers for checkboxes
+        document.querySelectorAll('.template-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
                 const templatePath = this.getAttribute('data-template-path');
                 const ceremonyType = this.getAttribute('data-ceremony');
+                const card = this.closest('.bridal-card');
                 
-                console.log("Image clicked: ", templatePath, ceremonyType);
+                console.log("Checkbox changed: ", templatePath, ceremonyType, this.checked);
                 
-                // Dispatch based on the current mode
-                if (window.currentMode === 'single') {
-                    prepareSingleSwap(e, templatePath, ceremonyType);
+                if (this.checked) {
+                    // Add to selection
+                    if (window.currentMode === 'multi') {
+                        // Add to multi-selection
+                        const template = {
+                            path: templatePath,
+                            ceremony: ceremonyType
+                        };
+                        addTemplateToSelection(template);
+                        
+                        // Mark the card as selected
+                        if (card) {
+                            card.classList.add('selected');
+                            const badge = card.querySelector('.select-badge');
+                            if (badge) badge.classList.remove('d-none');
+                        }
+                    } else {
+                        // Single template mode - uncheck all other checkboxes
+                        document.querySelectorAll('.template-checkbox').forEach(cb => {
+                            if (cb !== this) {
+                                cb.checked = false;
+                                const otherCard = cb.closest('.bridal-card');
+                                if (otherCard) {
+                                    otherCard.classList.remove('selected');
+                                    const badge = otherCard.querySelector('.select-badge');
+                                    if (badge) badge.classList.add('d-none');
+                                }
+                            }
+                        });
+                        
+                        // Mark this card as selected
+                        if (card) {
+                            card.classList.add('selected');
+                            const badge = card.querySelector('.select-badge');
+                            if (badge) badge.classList.remove('d-none');
+                        }
+                        
+                        // Open the single swap dialog
+                        prepareSingleSwap(event, templatePath, ceremonyType);
+                    }
                 } else {
-                    toggleTemplateSelection(e, templatePath, ceremonyType);
+                    // Remove from selection
+                    removeTemplateFromSelection(templatePath);
+                    
+                    // Mark the card as not selected
+                    if (card) {
+                        card.classList.remove('selected');
+                        const badge = card.querySelector('.select-badge');
+                        if (badge) badge.classList.add('d-none');
+                    }
                 }
             });
         });
         
-        // Add click event handlers to all bridal cards
-        document.querySelectorAll('.bridal-card').forEach(card => {
-            // Remove any existing onclick handlers
-            card.removeAttribute('onclick');
-            
-            card.addEventListener('click', function(event) {
-                // Ignore clicks on the image itself, as those are handled separately
-                if (event.target.classList.contains('preview-image')) {
-                    return;
-                }
-                
-                const templatePath = this.getAttribute('data-template-path');
-                const ceremonyType = this.getAttribute('data-ceremony');
-                
-                console.log("Card clicked: ", templatePath, ceremonyType);
-                
-                if (window.currentMode === 'single') {
-                    // Single template mode - open the single swap dialog
-                    prepareSingleSwap(event, templatePath, ceremonyType);
-                } else {
-                    // Multi template mode - toggle selection
-                    toggleTemplateSelection(event, templatePath, ceremonyType);
-                }
-            });
+        // Remove all inline onclick handlers from template images
+        document.querySelectorAll('.preview-image').forEach(img => {
+            img.removeAttribute('onclick');
         });
         
         // Clear selection button
@@ -1941,6 +1971,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Hide selection badge
             const badge = card.querySelector('.select-badge');
             if (badge) badge.classList.add('d-none');
+            
+            // Uncheck all checkboxes
+            const checkbox = card.querySelector('.template-checkbox');
+            if (checkbox) checkbox.checked = false;
             
             // Reset selection button if it exists
             const selectBtn = card.querySelector('.template-select-btn');
