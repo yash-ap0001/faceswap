@@ -1121,9 +1121,8 @@ def bridal_swap_multi():
                         
                         # This is exactly how it's called in the working bridal_swap function
                         # Don't add the paste_back parameter as it's causing an error
-                        result = swapper.get(template_img, dst_face, src_face, source_img)
+                        result_img = swapper.get(template_img, dst_face, src_face)
                         logger.info(f"Face swap successful")
-                        result_img = result  # This is a numpy array
                         
                     except Exception as inner_error:
                         logger.error(f"Face swap operation failed: {inner_error}")
