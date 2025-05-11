@@ -1011,8 +1011,9 @@ def bridal_swap():
                     logger.info(f"Source face: box={source_face_box.tolist()}, landmarks shape={source_face_landmarks.shape}")
                     logger.info(f"Target face: box={target_face_box.tolist()}, landmarks shape={target_face_landmarks.shape}")
                     
-                    # Perform the swap
-                    result_img = swapper.get(template_img, target_face, source_face, source_img)
+                    # Perform the swap - be explicit with paste_back=True
+                    # The error shows that there's an issue with paste_back parameter when automatic conversion happens
+                    result_img = swapper.get(template_img, target_face, source_face, paste_back=True)
                     
                     # Save result
                     timestamp = int(time.time())
@@ -1064,7 +1065,7 @@ def bridal_swap():
             
             # Perform face swap
             logger.info(f"Performing face swap with style: {selected_style}, using Pinterest template")
-            result_img = swapper.get(target_img, target_faces[0], source_faces[0])
+            result_img = swapper.get(target_img, target_faces[0], source_faces[0], paste_back=True)
             
             # Save result
             timestamp = int(time.time())
@@ -1213,7 +1214,8 @@ def bridal_swap_multi():
                         
                         # Direct approach with swapper
                         # This is the same approach used in bridal_swap that works
-                        result_img = swapper.get(template_img, target_face, source_face, source_img)
+                        # Fixed to use explicit paste_back=True parameter
+                        result_img = swapper.get(template_img, target_face, source_face, paste_back=True)
                         logger.info(f"Face swap successful")
                     except Exception as inner_error:
                         logger.error(f"Face swap operation failed: {inner_error}")
@@ -1625,7 +1627,8 @@ def upload_file():
         else:
             # Perform actual face swap with the model
             logger.info("Performing face swap with the model")
-            result_img = swapper.get(target_img, target_faces[0], source_faces[0])
+            # Fixed to use explicit paste_back=True parameter
+            result_img = swapper.get(target_img, target_faces[0], source_faces[0], paste_back=True)
         
         # Save result
         output_filename = 'result_' + secure_filename(target_file.filename)
