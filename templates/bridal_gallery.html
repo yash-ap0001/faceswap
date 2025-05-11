@@ -824,35 +824,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Initialize each carousel to show first 4 cards and collapse the rest
-    document.querySelectorAll('.template-carousel').forEach(carousel => {
-        const cards = carousel.querySelectorAll('.template-card');
-        console.log(`Initializing carousel ${carousel.id} with ${cards.length} cards`);
-        
-        // Only show first 4 cards initially
-        cards.forEach((card, index) => {
-            if (index < 4) {
-                card.classList.remove('d-none');
-            } else {
-                card.classList.add('d-none');
-            }
-        });
-        
-        // Make sure the corresponding toggle button is in collapsed state
-        const ceremonyId = carousel.id.replace('-carousel', '');
-        const toggleBtn = document.querySelector(`.toggle-row-btn[data-target="${ceremonyId}-row"]`);
-        if (toggleBtn) {
-            toggleBtn.classList.remove('expanded');
-            toggleBtn.classList.remove('btn-primary');
-            toggleBtn.classList.add('btn-outline-primary');
-            const icon = toggleBtn.querySelector('i');
-            if (icon) {
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
-            }
-            toggleBtn.setAttribute('title', 'Expand All');
-        }
-    });
+    // Initialization is now handled by initializeCarouselsCollapsed() function
     
     // View More buttons
     // Removed view-more button event handlers (no longer needed)
@@ -920,6 +892,40 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Force initial state of all carousels to collapsed (only first 4 visible)
+    function initializeCarouselsCollapsed() {
+        console.log('Initializing all carousels in collapsed state');
+        document.querySelectorAll('.template-carousel').forEach(carousel => {
+            const cards = carousel.querySelectorAll('.template-card');
+            console.log(`Setting initial state for ${carousel.id} with ${cards.length} cards`);
+            
+            // Only show first 4 cards initially
+            cards.forEach((card, index) => {
+                if (index < 4) {
+                    card.classList.remove('d-none');
+                } else {
+                    card.classList.add('d-none');
+                }
+            });
+        });
+        
+        // Make sure all toggle buttons are in collapsed state
+        document.querySelectorAll('.toggle-row-btn').forEach(btn => {
+            const icon = btn.querySelector('i');
+            btn.classList.remove('expanded');
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-outline-primary');
+            if (icon) {
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+            btn.setAttribute('title', 'Expand All');
+        });
+    }
+    
+    // Call initialization on page load
+    initializeCarouselsCollapsed();
     
     // Toggle select mode for bulk deletion
     document.querySelectorAll('.toggle-select-mode-btn').forEach(button => {
