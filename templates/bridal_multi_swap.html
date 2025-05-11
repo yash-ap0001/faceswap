@@ -312,8 +312,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const tryMoreBtn = document.getElementById('try-more-btn');
     const errorContainer = document.getElementById('error-container');
     const errorMessage = document.getElementById('error-message');
-    const modelStatusAlert = document.getElementById('model-status-alert');
-    const modelStatusMessage = document.getElementById('model-status-message');
     const templatesContainer = document.getElementById('templates-container');
     const ceremonyCheckboxes = document.querySelectorAll('.ceremony-checkbox');
     
@@ -322,8 +320,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedTemplates = [];
     let processedResults = [];
     
-    // Check if models are loaded
-    checkModelsStatus();
+    // Removed model status check
     
     // Initialize template sections based on selected ceremonies
     updateTemplateSections();
@@ -423,12 +420,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .map(checkbox => checkbox.value);
             
         if (selectedCeremonies.length === 0) {
-            templatesContainer.innerHTML = `
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    Please select at least one ceremony type to see templates.
-                </div>
-            `;
+            templatesContainer.innerHTML = '';
             return;
         }
         
