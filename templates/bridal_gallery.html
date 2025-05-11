@@ -1040,6 +1040,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Call initialization when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM content loaded - initializing template interactions");
         initializeCarouselsCollapsed();
         
         // Initialize global variables for selection
@@ -1068,13 +1069,46 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Add click event handlers to all bridal cards
-        document.querySelectorAll('.bridal-card').forEach(card => {
-            card.addEventListener('click', function(event) {
+        // Initialize selection modes
+        initializeSelectionModes();
+        
+        // Remove all inline onclick handlers from template images and add proper event listeners
+        document.querySelectorAll('.preview-image').forEach(img => {
+            // Remove any existing onclick handlers
+            img.removeAttribute('onclick');
+            
+            // Set up the new click event
+            img.addEventListener('click', function(e) {
+                // Get the template path and ceremony type from data attributes
                 const templatePath = this.getAttribute('data-template-path');
                 const ceremonyType = this.getAttribute('data-ceremony');
                 
-                console.log("Template click: ", templatePath, ceremonyType);
+                console.log("Image clicked: ", templatePath, ceremonyType);
+                
+                // Dispatch based on the current mode
+                if (window.currentMode === 'single') {
+                    prepareSingleSwap(e, templatePath, ceremonyType);
+                } else {
+                    toggleTemplateSelection(e, templatePath, ceremonyType);
+                }
+            });
+        });
+        
+        // Add click event handlers to all bridal cards
+        document.querySelectorAll('.bridal-card').forEach(card => {
+            // Remove any existing onclick handlers
+            card.removeAttribute('onclick');
+            
+            card.addEventListener('click', function(event) {
+                // Ignore clicks on the image itself, as those are handled separately
+                if (event.target.classList.contains('preview-image')) {
+                    return;
+                }
+                
+                const templatePath = this.getAttribute('data-template-path');
+                const ceremonyType = this.getAttribute('data-ceremony');
+                
+                console.log("Card clicked: ", templatePath, ceremonyType);
                 
                 if (window.currentMode === 'single') {
                     // Single template mode - open the single swap dialog
@@ -1085,27 +1119,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
-        
-        // Initialize selection modes
-        initializeSelectionModes();
-        
-        // Handler for template clicks based on the current mode
-        window.handleTemplateClick = function(event, templatePath, ceremonyType) {
-            // Check if this was a click on a button and ignore if so
-            if (event.target.tagName === 'BUTTON' || event.target.closest('button')) {
-                return;
-            }
-            
-            console.log(`Template clicked: ${templatePath}, mode: ${window.currentMode}`);
-            
-            if (window.currentMode === 'single') {
-                // In single mode, show modal and then process the single template
-                prepareSingleSwap(event, templatePath, ceremonyType);
-            } else {
-                // In multi mode, toggle selection for batch processing
-                toggleTemplateSelection(event, templatePath, ceremonyType);
-            }
-        };
         
         // Clear selection button
         if (clearSelectionBtn) {
