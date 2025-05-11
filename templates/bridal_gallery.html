@@ -471,28 +471,69 @@
         </div>
     </div>
 
-    <!-- Settings Bar -->
+    <!-- Photo Upload and Processing Controls -->
     <div class="card mb-4 shadow">
-        <div class="card-body p-2">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-camera me-2"></i> Your Photo</h5>
+        </div>
+        <div class="card-body">
             <div class="row align-items-center">
-                <!-- Template type filters removed - Using only Pinterest photos now -->
-                <div class="col-12">
-                    <div class="d-flex gap-2 justify-content-md-end mt-3 mt-md-0">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="cat-haldi" value="haldi" checked>
-                            <label class="form-check-label" for="cat-haldi">Haldi</label>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="userPhotoInput" class="form-label">Upload Your Photo</label>
+                        <input type="file" class="form-control" id="userPhotoInput" accept=".jpg,.jpeg,.png">
+                    </div>
+                    <div class="image-preview-container mb-3" style="height: 180px; overflow: hidden;">
+                        <img id="userPhotoPreview" class="img-fluid d-none" alt="Your photo preview" style="max-height: 180px;">
+                        <div id="userPhotoPlaceholder" class="text-center p-4">
+                            <i class="fas fa-user-circle mb-2" style="font-size: 3rem; opacity: 0.5;"></i>
+                            <p class="text-muted">No photo selected yet<br>Please upload a clear frontal photo</p>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="cat-mehendi" value="mehendi" checked>
-                            <label class="form-check-label" for="cat-mehendi">Mehendi</label>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle me-2"></i> 
+                        <strong>How to use:</strong>
+                        <ol class="mb-0 mt-2">
+                            <li>Upload your photo using the form on the left</li>
+                            <li>Browse the templates below and click on any template you like</li>
+                            <li>The system will automatically create a face swap using your photo</li>
+                            <li>You can also select multiple templates using the checkboxes and process them all at once</li>
+                        </ol>
+                    </div>
+                    <div class="d-flex gap-2 justify-content-between mt-3">
+                        <div class="mode-selector">
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="process-mode" id="mode-single" value="single" checked>
+                                <label class="btn btn-outline-primary" for="mode-single">
+                                    <i class="fas fa-user me-1"></i> Single Processing
+                                </label>
+                                
+                                <input type="radio" class="btn-check" name="process-mode" id="mode-multi" value="multi">
+                                <label class="btn btn-outline-primary" for="mode-multi">
+                                    <i class="fas fa-users me-1"></i> Multi Selection
+                                </label>
+                            </div>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="cat-wedding" value="wedding" checked>
-                            <label class="form-check-label" for="cat-wedding">Wedding</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="cat-reception" value="reception" checked>
-                            <label class="form-check-label" for="cat-reception">Reception</label>
+                        
+                        <div class="ceremony-filter">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="cat-haldi" value="haldi" checked>
+                                <label class="form-check-label" for="cat-haldi">Haldi</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="cat-mehendi" value="mehendi" checked>
+                                <label class="form-check-label" for="cat-mehendi">Mehendi</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="cat-wedding" value="wedding" checked>
+                                <label class="form-check-label" for="cat-wedding">Wedding</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="cat-reception" value="reception" checked>
+                                <label class="form-check-label" for="cat-reception">Reception</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -619,24 +660,7 @@
                                     </span>
                                 </div>
                                 
-                                <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" style="cursor: pointer;" onclick="showFullsizePreview('{{ template.url }}', '{{ ceremony }}')">
-                                
-                                <!-- Action buttons overlay on hover -->
-                                <div class="position-absolute bottom-0 left-0 right-0 p-2 d-flex justify-content-center template-actions gap-2" style="background: rgba(0,0,0,0.7);">
-                                    <!-- Single swap button -->
-                                    <button class="btn btn-sm btn-primary single-swap-btn"
-                                            data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}"
-                                            onclick="prepareSingleSwap(event, '{{ template.url }}', '{{ ceremony }}')">
-                                        Single Swap
-                                    </button>
-
-                                    <!-- Multi-selection button -->
-                                    <button class="btn btn-sm btn-secondary template-select-btn"
-                                            data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}"
-                                            onclick="toggleTemplateSelection(event, '{{ template.url }}', '{{ ceremony }}')">
-                                        Add to Multi
-                                    </button>
-                                </div>
+                                <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" style="cursor: pointer;" onclick="handleTemplateClick('{{ template.url }}', '{{ ceremony }}')">
                                 
                                 <!-- Selected indicator (Hidden by default) -->
                                 <div class="position-absolute top-0 end-0 p-2 d-none select-badge">
