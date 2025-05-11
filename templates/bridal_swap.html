@@ -20,14 +20,15 @@
     }
     
     .template-checkbox-wrapper {
-        z-index: 10;
+        z-index: 15; /* higher z-index to ensure visibility */
         display: none;
         position: absolute;
         top: 10px;
         right: 10px;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.7);
         border-radius: 4px;
-        padding: 4px;
+        padding: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
     }
     
     .template-selection-mode .template-checkbox-wrapper {
@@ -47,8 +48,9 @@
     }
     
     /* Add a selected indicator on the card */
-    .template-card.selected::after {
-        content: '';
+    .template-card.selected::after,
+    .template-card:has(.template-checkbox:checked)::after {
+        content: '✓';
         position: absolute;
         top: 0;
         left: 0;
@@ -57,6 +59,13 @@
         border: 3px solid #8e44ad;
         pointer-events: none;
         z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 32px;
+        text-shadow: 0 0 10px rgba(0,0,0,0.8);
+        background-color: rgba(142, 68, 173, 0.3);
     }
     
     body.template-selection-mode .template-checkbox-wrapper {
@@ -809,11 +818,18 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        const selectedTemplates = Array.from(document.querySelectorAll('.template-card.selected')).map(card => ({
-            path: card.dataset.templatePath,
-            ceremony: card.dataset.ceremony,
-            url: card.dataset.templateUrl,
-        }));
+        // Select both cards with .selected class and those with checked checkboxes
+        const selectedCards = Array.from(document.querySelectorAll('.template-card.selected, .template-card:has(.template-checkbox:checked)'));
+        console.log('Found selected cards:', selectedCards.length);
+        
+        const selectedTemplates = selectedCards.map(card => {
+            console.log('Processing card:', card.dataset);
+            return {
+                path: card.dataset.templatePath || card.dataset.path,
+                ceremony: card.dataset.ceremony,
+                url: card.dataset.templateUrl || card.dataset.url,
+            };
+        });
         
         if (selectedTemplates.length === 0) {
             showError('Please select at least one template.');
@@ -1059,12 +1075,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Add click event to the card
                     // Add click events based on mode
                     card.addEventListener('click', function(e) {
+                        console.log('Card clicked, selection mode:', isSelectionMode);
+                        
                         // Don't trigger if clicking on a checkbox or the select button
                         if (e.target.classList.contains('template-checkbox') || 
-                            e.target.closest('.select-template-btn') ||
-                            isSelectionMode) {
+                            e.target.closest('.select-template-btn')) {
+                            console.log('Clicked on checkbox or button - ignoring');
                             return;
                         }
+                        
+                        if (isSelectionMode) {
+                            console.log('In selection mode, toggling selected state');
+                            // Toggle the checkbox when clicking on the card in selection mode
+                            const checkbox = this.querySelector('.template-checkbox');
+                            if (checkbox) {
+                                checkbox.checked = !checkbox.checked;
+                                this.classList.toggle('selected', checkbox.checked);
+                                console.log('Toggled checkbox to:', checkbox.checked);
+                                updateSelectedCount();
+                            }
+                            return;
+                        }
+                        
+                        console.log('Using template in single mode');
                         useTemplate(this);
                     });
                     
@@ -1087,7 +1120,23 @@ document.addEventListener('DOMContentLoaded', function() {
                             const card = this.closest('.template-card');
                             if (card) {
                                 card.classList.toggle('selected', this.checked);
+                                console.log('Checkbox changed:', this.checked, 'Card selected:', card.classList.contains('selected'));
                                 updateSelectedCount();
+                            }
+                        });
+                        
+                        // Also listen for clicks on the card when in selection mode
+                        card.addEventListener('click', function(e) {
+                            // Only handle clicks in selection mode and not on the checkbox or button itself
+                            if (isSelectionMode && 
+                                !e.target.classList.contains('template-checkbox') && 
+                                !e.target.closest('.select-template-btn')) {
+                                checkbox.checked = !checkbox.checked;
+                                this.classList.toggle('selected', checkbox.checked);
+                                console.log('Card clicked in selection mode, now selected:', this.classList.contains('selected'));
+                                updateSelectedCount();
+                                e.preventDefault();
+                                e.stopPropagation();
                             }
                         });
                     }
