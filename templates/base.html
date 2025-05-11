@@ -824,7 +824,7 @@
                 });
             }
             
-            // Toggle sidebar from navbar button
+            // Toggle sidebar from navbar button (skip if element doesn't exist)
             if (navSidebarToggle) {
                 console.log("Adding event listener to nav sidebar toggle button");
                 navSidebarToggle.addEventListener('click', function(e) {
@@ -832,6 +832,8 @@
                     e.preventDefault();
                     toggleSidebar();
                 });
+            } else {
+                console.log("Nav sidebar toggle button not found, skipping event listener");
             }
             
             // Close sidebar

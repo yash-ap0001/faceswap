@@ -252,6 +252,11 @@
         transform: translateY(-5px);
     }
     
+    .template-card img {
+        height: 350px;
+        object-fit: cover;
+    }
+    
     /* Template management styles */
     .template-management-tools {
         display: flex;
@@ -761,7 +766,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Current state for delete and preview operations
     let currentDeletePath = null;
-    let currentPreviewTemplate = null;
     
     // Multi-Selection Elements
     const multiSelectionInterface = document.getElementById('multiSelectionInterface');
@@ -820,9 +824,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Initialize each carousel to show first 4 cards
+    // Initialize each carousel to show first 4 cards and collapse the rest
     document.querySelectorAll('.template-carousel').forEach(carousel => {
         const cards = carousel.querySelectorAll('.template-card');
+        console.log(`Initializing carousel ${carousel.id} with ${cards.length} cards`);
+        
+        // Only show first 4 cards initially
         cards.forEach((card, index) => {
             if (index < 4) {
                 card.classList.remove('d-none');
@@ -830,6 +837,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 card.classList.add('d-none');
             }
         });
+        
+        // Make sure the corresponding toggle button is in collapsed state
+        const ceremonyId = carousel.id.replace('-carousel', '');
+        const toggleBtn = document.querySelector(`.toggle-row-btn[data-target="${ceremonyId}-row"]`);
+        if (toggleBtn) {
+            toggleBtn.classList.remove('expanded');
+            toggleBtn.classList.remove('btn-primary');
+            toggleBtn.classList.add('btn-outline-primary');
+            const icon = toggleBtn.querySelector('i');
+            if (icon) {
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+            toggleBtn.setAttribute('title', 'Expand All');
+        }
     });
     
     // View More buttons
