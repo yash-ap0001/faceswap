@@ -524,12 +524,18 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Selection badge (initially hidden) -->
+                                <!-- Selection badge and button (initially not selected) -->
                                 <div class="position-absolute top-0 end-0 mt-2 me-2 select-badge d-none">
                                     <span class="badge bg-primary rounded-pill">
                                         <i class="fas fa-check"></i> Selected
                                     </span>
                                 </div>
+                                
+                                <!-- Multi-selection button (always visible for quick selection) -->
+                                <button class="btn btn-sm btn-primary position-absolute top-0 end-0 m-2 template-select-btn"
+                                        data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" title="Add to selection">
+                                    <i class="fas fa-plus"></i>
+                                </button>
                                 
                                 <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" style="cursor: pointer;" onclick="showFullSizePreview(this)">
                                 
@@ -769,6 +775,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Current state for delete and preview operations
     let currentDeletePath = null;
+    
+    // Template selection state
+    let selectedTemplates = [];
     
     // Multi-Selection Elements
     const multiSelectionInterface = document.getElementById('multiSelectionInterface');
