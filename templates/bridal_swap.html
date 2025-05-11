@@ -1267,36 +1267,65 @@ document.addEventListener('DOMContentLoaded', function() {
             if (loadingContainer) loadingContainer.classList.add('d-none');
             
             if (data.success) {
-                console.log('Server indicated success, checking for results data');
-                // Make sure results exists and is an array
-                if (!data.results) {
-                    console.warn('No results array found in response, creating empty array');
-                    data.results = [];
-                }
-                
-                // If this is a single result (from traditional endpoint)
-                if (data.multi === false && data.result_image) {
-                    console.log('Converting single result to multi-result format');
-                    // Create a synthetic results array with the single result
-                    const singleResult = {
-                        result_image: data.result_image,
-                        ceremony: data.style || selectedTemplates[0]?.ceremony || 'unknown',
-                        index: 0
-                    };
+                try {
+                    console.log('Server indicated success, full response data:', data);
                     
-                    // Use an array with the single result
-                    data.results = [singleResult];
-                }
-                
-                // Display results with proper checks
-                displayMultiResults(data.results, selectedTemplates);
-                console.log('Successfully displayed results');
-                
-                // Show the multi-results container explicitly
-                const multiResultsContainer = document.getElementById('multi-results-container');
-                if (multiResultsContainer) {
-                    multiResultsContainer.classList.remove('d-none');
-                    multiResultsContainer.scrollIntoView({ behavior: 'smooth' });
+                    // Make sure results exists and is an array
+                    if (!data.results) {
+                        console.warn('No results array found in response, creating empty array');
+                        data.results = [];
+                    }
+                    
+                    // If this is a single result (from traditional endpoint)
+                    if (data.multi === false && data.result_image) {
+                        console.log('Converting single result to multi-result format');
+                        // Create a synthetic results array with the single result
+                        const singleResult = {
+                            result_image: data.result_image,
+                            ceremony: data.style || selectedTemplates[0]?.ceremony || 'unknown',
+                            index: 0
+                        };
+                        
+                        // Use an array with the single result
+                        data.results = [singleResult];
+                    }
+                    
+                    // Make one final check that results is an array before passing to display function
+                    if (!Array.isArray(data.results)) {
+                        console.warn('Results is not an array after processing, converting to array');
+                        // If it's an object with numbered keys (like { "0": {...}, "1": {...} })
+                        if (typeof data.results === 'object' && data.results !== null) {
+                            const resultsArray = [];
+                            Object.keys(data.results).forEach(key => {
+                                resultsArray.push(data.results[key]);
+                            });
+                            data.results = resultsArray;
+                        } else {
+                            // If it's something else entirely, create empty array
+                            data.results = [];
+                        }
+                    }
+                    
+                    // Print out the final data we're passing to display function
+                    console.log('Final data being passed to displayMultiResults:', {
+                        resultsArray: data.results,
+                        resultsLength: data.results.length,
+                        selectedTemplatesLength: selectedTemplates.length
+                    });
+                    
+                    // Display results with proper checks
+                    displayMultiResults(data.results, selectedTemplates);
+                    console.log('Successfully displayed results');
+                    
+                    // Show the multi-results container explicitly
+                    const multiResultsContainer = document.getElementById('multi-results-container');
+                    if (multiResultsContainer) {
+                        multiResultsContainer.classList.remove('d-none');
+                        multiResultsContainer.scrollIntoView({ behavior: 'smooth' });
+                    }
+                } catch (displayError) {
+                    console.error('Error displaying results:', displayError);
+                    showError('Error displaying results: ' + displayError.message);
                 }
             } else {
                 showError(data.error || 'An unknown error occurred.');
@@ -1374,26 +1403,76 @@ document.addEventListener('DOMContentLoaded', function() {
         // Clear previous results
         multiResultsGrid.innerHTML = '';
         
-        // Create a card for each result in our global array
-        allProcessedResults.forEach((item, index) => {
-            const result = item.result;
-            const template = item.template || {}; // Use empty object as fallback
+        // Debug information before creating cards
+        console.log('Current state before creating cards:', {
+            allProcessedResultsType: typeof allProcessedResults,
+            isArray: Array.isArray(allProcessedResults),
+            allProcessedResultsLength: allProcessedResults ? allProcessedResults.length : 'undefined',
+            firstItem: allProcessedResults && allProcessedResults.length > 0 ? allProcessedResults[0] : null
+        });
+        
+        // Only proceed if allProcessedResults is an array and has items
+        if (!Array.isArray(allProcessedResults) || allProcessedResults.length === 0) {
+            console.warn('No processed results to display, showing empty state message');
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'col-12 text-center p-5';
+            emptyMessage.innerHTML = `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No results to display yet. Select templates and upload your photo to see results.
+                </div>
+            `;
+            multiResultsGrid.appendChild(emptyMessage);
+            return;
+        }
+        
+        // Create a card for each result in our global array (with error handling)
+        try {
+            if (!Array.isArray(allProcessedResults)) {
+                throw new Error('allProcessedResults is not an array: ' + typeof allProcessedResults);
+            }
             
-            // Log data for debugging before creating card
-            console.log(`Building card ${index} with:`, {
-                resultData: result,
-                templateData: template,
-                ceremonyFromResult: result.ceremony,
-                ceremonyFromTemplate: template.ceremony
-            });
+            // If array is empty, show a message
+            if (allProcessedResults.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.className = 'col-12 text-center p-5';
+                emptyMessage.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No results available. Please select templates and upload your photo to see results.
+                    </div>
+                `;
+                multiResultsGrid.appendChild(emptyMessage);
+                return;
+            }
             
-            // Determine ceremony type with fallbacks
-            const ceremonyType = result.ceremony || template.ceremony || 'wedding';
-            const displayCeremony = ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1);
-            
-            const resultCard = document.createElement('div');
-            resultCard.className = 'multi-result-card';
-            resultCard.setAttribute('data-result-index', index);
+            // Now we can safely iterate through the array
+            allProcessedResults.forEach((item, index) => {
+                try {
+                    // Check if item is valid
+                    if (!item || typeof item !== 'object') {
+                        console.error(`Invalid item at index ${index}:`, item);
+                        return; // Skip this item
+                    }
+                    
+                    const result = item.result || {};
+                    const template = item.template || {}; // Use empty object as fallback
+                    
+                    // Log data for debugging before creating card
+                    console.log(`Building card ${index} with:`, {
+                        resultData: result,
+                        templateData: template,
+                        ceremonyFromResult: result.ceremony,
+                        ceremonyFromTemplate: template.ceremony
+                    });
+                    
+                    // Determine ceremony type with fallbacks
+                    const ceremonyType = result.ceremony || template.ceremony || 'wedding';
+                    const displayCeremony = ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1);
+                
+                    const resultCard = document.createElement('div');
+                    resultCard.className = 'multi-result-card';
+                    resultCard.setAttribute('data-result-index', index);
             
             // Add a "new" indicator if this result was just added (in last 10 seconds)
             const isNew = (new Date().getTime() - item.timestamp) < 10000;
