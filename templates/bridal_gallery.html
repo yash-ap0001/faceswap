@@ -744,9 +744,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const processMultipleBtn = document.getElementById('process-multiple-btn');
     
     // Variables for multi-selection
-    let selectedTemplates = [];
-    let multiSourceFile = null;
-    let currentPreviewTemplate = null;
     const resultGallery = document.getElementById('result-gallery');
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingMessage = document.getElementById('loading-message');
@@ -1011,43 +1008,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Gallery select mode
-    const gallerySelectAll = document.getElementById('gallerySelectAll');
-    const galleryDeleteSelected = document.getElementById('galleryDeleteSelected');
-    
-    gallerySelectAll.addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('.gallery-checkbox');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
-        
-        galleryDeleteSelected.classList.toggle('d-none', !this.checked);
-    });
-    
-    // Enable delete button when gallery items are selected
-    document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('gallery-checkbox')) {
-            const anyChecked = document.querySelector('.gallery-checkbox:checked') !== null;
-            galleryDeleteSelected.classList.toggle('d-none', !anyChecked);
-        }
-    });
-    
-    // Gallery delete selected
-    galleryDeleteSelected.addEventListener('click', function() {
-        const selectedCheckboxes = document.querySelectorAll('.gallery-checkbox:checked');
-        
-        if (selectedCheckboxes.length === 0) {
-            showError('Please select at least one template to delete.');
-            return;
-        }
-        
-        currentBulkDeletePaths = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
-        currentDeleteCeremony = selectedCheckboxes[0].getAttribute('data-ceremony');
-        
-        document.getElementById('delete-confirm-message').textContent = 
-            `Are you sure you want to delete ${selectedCheckboxes.length} template(s)? This action cannot be undone.`;
-        deleteConfirmModal.show();
-    });
+    // Removed gallery select mode (no longer needed)
     
     // Handle file input change
     sourceInput.addEventListener('change', function() {
