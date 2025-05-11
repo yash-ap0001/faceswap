@@ -786,30 +786,57 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentDeleteCeremony = null;
     let currentBulkDeletePaths = [];
     
-    // Initialize carousel navigation
+    // Improved carousel navigation with better hidden card handling
     document.querySelectorAll('.carousel-nav-btn').forEach(button => {
         button.addEventListener('click', function() {
             const carouselId = this.getAttribute('data-target');
+            console.log(`Navigating carousel: ${carouselId}`);
+            
             const carouselEl = document.getElementById(carouselId);
+            if (!carouselEl) {
+                console.error(`Carousel element not found: ${carouselId}`);
+                return;
+            }
+            
             const cardRow = carouselEl.querySelector('.row');
+            if (!cardRow) {
+                console.error(`Card row not found in carousel: ${carouselId}`);
+                return;
+            }
+            
             const cards = cardRow.querySelectorAll('.template-card');
+            if (cards.length === 0) {
+                console.log(`No cards found in carousel: ${carouselId}`);
+                return;
+            }
             
-            // Get visible cards
-            const visibleCards = Array.from(cards).filter(card => 
-                !card.classList.contains('d-none'));
+            console.log(`Found ${cards.length} total cards`);
             
-            // Skip if no cards
-            if (visibleCards.length === 0) return;
+            // Get all cards that should be considered for navigation
+            // (visible cards and those hidden by the expand/collapse mechanism)
+            const navCards = Array.from(cards).filter(card => 
+                !card.classList.contains('d-none') || !card.classList.contains('hidden-card'));
+            
+            if (navCards.length === 0) {
+                console.log('No navigable cards found');
+                return;
+            }
+            
+            console.log(`Found ${navCards.length} navigable cards`);
             
             // Get current visible indices
-            const visibleIndices = visibleCards.map(card => 
-                parseInt(card.getAttribute('data-index')));
+            const visibleIndices = navCards.map(card => {
+                const index = parseInt(card.getAttribute('data-index') || '0');
+                return isNaN(index) ? 0 : index;
+            });
             
             // Determine navigation direction
             const isNext = this.classList.contains('next-btn');
             const currentPage = Math.floor(Math.min(...visibleIndices) / 4);
-            const totalPages = Math.ceil(cards.length / 4);
+            const totalPages = Math.ceil(navCards.length / 4);
             let newPage = isNext ? currentPage + 1 : currentPage - 1;
+            
+            console.log(`Current page: ${currentPage}, Total pages: ${totalPages}, New page: ${newPage}`);
             
             // Ensure page is in bounds
             if (newPage < 0) newPage = totalPages - 1;
@@ -819,14 +846,24 @@ document.addEventListener('DOMContentLoaded', function() {
             const startIdx = newPage * 4;
             const endIdx = startIdx + 4;
             
-            cards.forEach(card => {
-                const cardIndex = parseInt(card.getAttribute('data-index'));
+            console.log(`Showing cards from index ${startIdx} to ${endIdx-1}`);
+            
+            navCards.forEach(card => {
+                const cardIndex = parseInt(card.getAttribute('data-index') || '0');
                 if (cardIndex >= startIdx && cardIndex < endIdx) {
                     card.classList.remove('d-none');
                 } else {
                     card.classList.add('d-none');
                 }
             });
+            
+            // Make sure hidden-card class cards remain properly hidden if not expanded
+            const toggleBtn = document.querySelector(`.toggle-row-btn[data-target="${carouselId.replace('carousel', 'row')}"]`);
+            if (toggleBtn && !toggleBtn.classList.contains('expanded')) {
+                carouselEl.querySelectorAll('.template-card.hidden-card').forEach(card => {
+                    card.style.display = 'none';
+                });
+            }
         });
     });
     
@@ -847,12 +884,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Expand All button functionality with simplified approach
+    // Fix and simplify expand/collapse functionality
     document.querySelectorAll('.toggle-row-btn').forEach(button => {
         button.addEventListener('click', function() {
             const targetId = this.getAttribute('data-target');
             const ceremony = targetId.replace('-row', '');
             const carousel = document.getElementById(`${ceremony}-carousel`);
+            
+            if (!carousel) {
+                console.error(`Carousel not found: ${ceremony}-carousel`);
+                return;
+            }
+            
             const hiddenCards = carousel.querySelectorAll('.template-card.hidden-card');
             const icon = this.querySelector('i');
             
@@ -874,9 +917,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.classList.remove('expanded');
                 this.classList.remove('btn-primary');
                 this.classList.add('btn-outline-primary');
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
+                if (icon) {
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                }
                 this.setAttribute('title', 'Expand All');
+                this.innerHTML = '<i class="fas fa-chevron-down"></i>'; // Ensure icon is added
             } else {
                 // Expand - show all cards
                 console.log('Expanding to show all cards');
@@ -888,9 +934,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.classList.add('expanded');
                 this.classList.remove('btn-outline-primary');
                 this.classList.add('btn-primary');
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
+                if (icon) {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                }
                 this.setAttribute('title', 'Collapse');
+                this.innerHTML = '<i class="fas fa-chevron-up"></i>'; // Ensure icon is added
             }
         });
     });
