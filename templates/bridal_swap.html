@@ -878,8 +878,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to update selected count
     function updateSelectedCount() {
+        console.log('Updating selected count...');
         const selectedCheckboxes = document.querySelectorAll('.template-checkbox:checked');
         const count = selectedCheckboxes.length;
+        console.log(`Found ${count} selected checkboxes`);
         
         if (selectedCount) {
             selectedCount.textContent = count;
@@ -900,9 +902,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        // Debug selected templates preview
+        console.log('Updating thumbnails preview...');
+        
         // Update the thumbnails preview
         const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
         const thumbnailsContainer = document.getElementById('selectedTemplatesThumbnails');
+        
+        console.log('Preview container:', selectedTemplatesPreview);
+        console.log('Thumbnails container:', thumbnailsContainer);
         
         if (selectedTemplatesPreview && thumbnailsContainer) {
             // Clear existing thumbnails
@@ -910,16 +918,26 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (count > 0) {
                 // Show the preview container
+                console.log('Count > 0, showing preview container');
                 selectedTemplatesPreview.classList.remove('d-none');
                 
                 // Add thumbnail for each selected template
                 selectedCheckboxes.forEach((checkbox, index) => {
+                    console.log(`Processing selected checkbox ${index + 1}:`, checkbox);
                     const card = checkbox.closest('.template-card');
-                    if (!card) return;
+                    if (!card) {
+                        console.log('No card found for checkbox');
+                        return;
+                    }
                     
+                    console.log('Card found:', card);
                     const templatePath = card.dataset.templatePath || card.dataset.path;
                     const ceremonyType = card.dataset.ceremony;
-                    const imageUrl = card.querySelector('img').src;
+                    const imageElement = card.querySelector('img');
+                    console.log('Image element:', imageElement);
+                    const imageUrl = imageElement ? imageElement.src : '';
+                    
+                    console.log(`Template info: path=${templatePath}, ceremony=${ceremonyType}, imageUrl=${imageUrl}`);
                     
                     // Create thumbnail element
                     const thumbnail = document.createElement('div');
@@ -928,7 +946,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     thumbnail.innerHTML = `
                         <img src="${imageUrl}" alt="${ceremonyType} template">
-                        <div class="ceremony-label">${ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1)}</div>
+                        <div class="ceremony-label">${ceremonyType ? ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1) : 'Template'}</div>
                         <div class="remove-thumbnail" data-index="${index}">
                             <i class="fas fa-times"></i>
                         </div>
@@ -939,6 +957,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (removeBtn) {
                         removeBtn.addEventListener('click', function(e) {
                             e.stopPropagation();
+                            console.log('Remove thumbnail clicked');
                             // Uncheck the corresponding checkbox
                             checkbox.checked = false;
                             // Update card styling
@@ -948,13 +967,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     }
                     
+                    console.log('Adding thumbnail to container');
                     thumbnailsContainer.appendChild(thumbnail);
                 });
             } else {
                 // Hide the preview container if no templates selected
+                console.log('No templates selected, hiding preview container');
                 selectedTemplatesPreview.classList.add('d-none');
             }
+        } else {
+            console.error('Preview container or thumbnails container not found');
         }
+        
+        console.log('Selected count update complete');
     }
     
     // We now have direct event listeners on each checkbox, but keep this for any dynamically added checkboxes
