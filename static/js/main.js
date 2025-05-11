@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
         uploadForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        if (!sourceInput.files.length || !targetInput.files.length) {
+        if (!sourceInput || !sourceInput.files.length || !targetInput || !targetInput.files.length) {
             showError('Please select both source and target images.');
             return;
         }
@@ -90,10 +90,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Show loading
-        loadingContainer.classList.remove('d-none');
-        errorContainer.classList.add('d-none');
-        resultContainer.classList.add('d-none');
-        swapBtn.disabled = true;
+        if (loadingContainer) loadingContainer.classList.remove('d-none');
+        if (errorContainer) errorContainer.classList.add('d-none');
+        if (resultContainer) resultContainer.classList.add('d-none');
+        if (swapBtn) swapBtn.disabled = true;
 
         // Create form data
         const formData = new FormData();
@@ -107,16 +107,18 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            loadingContainer.classList.add('d-none');
-            swapBtn.disabled = false;
+            if (loadingContainer) loadingContainer.classList.add('d-none');
+            if (swapBtn) swapBtn.disabled = false;
 
             if (data.success) {
-                resultImage.src = `/uploads/${data.result_image}`;
-                downloadBtn.href = `/uploads/${data.result_image}`;
-                downloadBtn.download = data.result_image;
+                if (resultImage) resultImage.src = `/uploads/${data.result_image}`;
+                if (downloadBtn) {
+                    downloadBtn.href = `/uploads/${data.result_image}`;
+                    downloadBtn.download = data.result_image;
+                }
                 
                 // Show result container
-                resultContainer.classList.remove('d-none');
+                if (resultContainer) resultContainer.classList.remove('d-none');
                 
                 // If in demo mode, display an additional message
                 if (data.demo_mode) {
@@ -130,7 +132,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         demoAlert.textContent = data.message || 'Running in demonstration mode. The image shows detected faces instead of actual face swapping.';
                         
                         // Insert it before the result image
-                        resultContainer.insertBefore(demoAlert, resultImage.parentNode);
+                        if (resultContainer && resultImage) {
+                            resultContainer.insertBefore(demoAlert, resultImage.parentNode);
+                        }
                     } else {
                         // Update existing alert
                         demoAlert.textContent = data.message || 'Running in demonstration mode. The image shows detected faces instead of actual face swapping.';
@@ -144,17 +148,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 
-                window.scrollTo({
-                    top: resultContainer.offsetTop,
-                    behavior: 'smooth'
-                });
+                if (resultContainer) {
+                    window.scrollTo({
+                        top: resultContainer.offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
             } else {
                 showError(data.error || 'An unknown error occurred.');
             }
         })
         .catch(error => {
-            loadingContainer.classList.add('d-none');
-            swapBtn.disabled = false;
+            if (loadingContainer) loadingContainer.classList.add('d-none');
+            if (swapBtn) swapBtn.disabled = false;
             showError('Network error: ' + error.message);
         });
     });
@@ -181,12 +187,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showError(message) {
-        errorMessage.textContent = message;
-        errorContainer.classList.remove('d-none');
-        window.scrollTo({
-            top: errorContainer.offsetTop,
-            behavior: 'smooth'
-        });
+        if (errorMessage) errorMessage.textContent = message;
+        if (errorContainer) {
+            errorContainer.classList.remove('d-none');
+            window.scrollTo({
+                top: errorContainer.offsetTop,
+                behavior: 'smooth'
+            });
+        }
     }
 
     function checkModels() {
