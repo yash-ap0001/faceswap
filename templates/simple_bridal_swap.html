@@ -717,71 +717,103 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Process multiple templates
-    function processMultiTemplates() {
-        // Show loading
-        loadingContainer.classList.remove('d-none');
+    async function processMultiTemplates() {
+        // Check input validation
+        if (!fileInput.files || fileInput.files.length === 0) {
+            showError('Please upload your photo first.');
+            return;
+        }
+        
+        if (selectedTemplates.length === 0) {
+            showError('Please select at least one template.');
+            return;
+        }
         
         // Hide selected templates area
         selectedTemplatesArea.classList.add('d-none');
         
-        // Prepare form data
-        const formData = new FormData();
-        formData.append('source', fileInput.files[0]);
-        formData.append('template_count', selectedTemplates.length);
+        // Show results area immediately
+        unifiedResultsSection.classList.remove('d-none');
+        resultsTitle.textContent = 'Your Bridal Looks';
         
-        // Add templates
-        selectedTemplates.forEach((template, index) => {
-            formData.append(`template_${index}`, template.path);
-            formData.append(`ceremony_${index}`, template.ceremony);
-        });
+        // Clear previous results
+        resultsContainer.innerHTML = '';
         
-        // Send request
-        fetch('/bridal-swap-multi', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            loadingContainer.classList.add('d-none');
+        // Add more button visibility
+        addMoreTemplatesBtn.classList.remove('d-none');
+        
+        // Process templates one by one with visual feedback
+        for (const template of selectedTemplates) {
+            await processIndividualTemplate(template, fileInput.files[0]);
+        }
+    }
+    
+    async function processIndividualTemplate(template, sourceFile) {
+        // Create a placeholder result card with loading indicator
+        const resultCard = document.createElement('div');
+        resultCard.className = 'multi-result-card';
+        resultCard.innerHTML = `
+            <div class="result-img-container">
+                <div class="loading-overlay d-flex align-items-center justify-content-center" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <img class="multi-result-img" alt="${template.ceremony} template">
+            </div>
+            <div class="card-body text-center py-2">
+                <h6 class="card-subtitle mb-2 text-light">${template.ceremony.charAt(0).toUpperCase() + template.ceremony.slice(1)} Ceremony</h6>
+                <p class="text-muted small">Processing...</p>
+            </div>
+        `;
+        
+        // Add to results container
+        resultsContainer.appendChild(resultCard);
+        
+        try {
+            // Prepare form data for individual template process
+            const formData = new FormData();
+            formData.append('source', sourceFile);
+            formData.append('template_path', template.path);
             
-            if (data.success) {
-                // Show results
-                unifiedResultsSection.classList.remove('d-none');
-                resultsTitle.textContent = 'Your Bridal Looks';
-                
-                // Clear previous results
-                resultsContainer.innerHTML = '';
-                
-                // Add results
-                data.results.forEach(result => {
-                    const resultCard = document.createElement('div');
-                    resultCard.className = 'multi-result-card';
-                    resultCard.innerHTML = `
-                        <div class="result-img-container">
-                            <img src="${result.result_image}" class="multi-result-img" alt="Result">
-                        </div>
-                        <div class="card-body text-center py-2">
-                            <h6 class="card-subtitle mb-2 text-light">${result.ceremony.charAt(0).toUpperCase() + result.ceremony.slice(1)} Ceremony</h6>
-                            <a href="${result.result_image}" class="btn btn-sm btn-success" download>
-                                <i class="fas fa-download me-1"></i> Save Image
-                            </a>
-                        </div>
-                    `;
-                    
-                    resultsContainer.appendChild(resultCard);
-                });
-                
-                // Update add more button visibility
-                addMoreTemplatesBtn.classList.remove('d-none');
-            } else {
-                showError(data.error || 'Failed to process the images. Please try again.');
+            // Send request to process a single template
+            const response = await fetch('/process-template', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to process template');
             }
-        })
-        .catch(error => {
-            loadingContainer.classList.add('d-none');
-            showError('Error: ' + error.message);
-            console.error('Error:', error);
-        });
+            
+            // Update the result card with the processed image
+            const resultImg = resultCard.querySelector('.multi-result-img');
+            resultImg.src = data.result_path;
+            
+            // Update the card body with download button
+            const cardBody = resultCard.querySelector('.card-body');
+            cardBody.innerHTML = `
+                <h6 class="card-subtitle mb-2 text-light">${template.ceremony.charAt(0).toUpperCase() + template.ceremony.slice(1)} Ceremony</h6>
+                <a href="${data.result_path}" class="btn btn-sm btn-success" download>
+                    <i class="fas fa-download me-1"></i> Save Image
+                </a>
+            `;
+            
+            // Remove loading overlay
+            const loadingOverlay = resultCard.querySelector('.loading-overlay');
+            if (loadingOverlay) loadingOverlay.remove();
+            
+        } catch (error) {
+            // Show error in the result card
+            resultCard.innerHTML = `
+                <div class="alert alert-danger m-0">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Error: ${error.message}
+                </div>
+            `;
+        }
     }
     
     // Show error
