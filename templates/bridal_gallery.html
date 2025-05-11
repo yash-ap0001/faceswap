@@ -280,6 +280,22 @@
         opacity: 1;
     }
     
+    /* Icon buttons */
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-icon:hover {
+        transform: scale(1.1);
+    }
+    
     /* Template rows after the first one */
     .template-card.extra-card {
         display: none;
@@ -490,10 +506,10 @@
             {{ ceremony|title }} Ceremony
         </h3>
         <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-outline-danger toggle-select-mode-btn" data-ceremony="{{ ceremony }}" title="Manage Templates">
+            <button class="btn btn-sm btn-icon btn-outline-danger toggle-select-mode-btn" data-ceremony="{{ ceremony }}" title="Manage Templates">
                 <i class="fas fa-cog"></i>
             </button>
-            <button class="btn btn-sm btn-outline-primary toggle-row-btn" data-target="{{ ceremony }}-row" title="Expand All">
+            <button class="btn btn-sm btn-icon btn-outline-primary toggle-row-btn" data-target="{{ ceremony }}-row" title="Expand All">
                 <i class="fas fa-chevron-down"></i>
             </button>
         </div>
@@ -554,7 +570,7 @@
                                     <i class="fas fa-plus"></i>
                                 </button>
                                 
-                                <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" style="cursor: pointer;" onclick="showFullSizePreview(this)">
+                                <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" style="cursor: pointer;" onclick="showFullsizePreview('{{ template.url }}', '{{ ceremony }}')">
                                 
                                 <!-- Template Selection Overlay (Hidden by default) -->
                                 <div class="position-absolute top-0 start-0 p-2 d-none select-badge">
@@ -1674,6 +1690,38 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     };
+    
+    // Function to show the full-size preview
+    function showFullsizePreview(imagePath, ceremonyType) {
+        // Set the image source
+        document.getElementById('fullsize-preview-image').src = imagePath;
+        
+        // Set the title with the ceremony type
+        document.getElementById('fullsize-preview-title').textContent = 
+            ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1) + ' Template';
+        
+        // Show the modal
+        const previewModal = new bootstrap.Modal(document.getElementById('fullsizePreviewModal'));
+        previewModal.show();
+    }
 });
 </script>
+
+<!-- Fullsize Preview Modal -->
+<div class="modal fade" id="fullsizePreviewModal" tabindex="-1" aria-labelledby="fullsizePreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="fullsize-preview-title">Template Preview</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-0">
+                <img id="fullsize-preview-image" src="" class="img-fluid" alt="Template Preview">
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
