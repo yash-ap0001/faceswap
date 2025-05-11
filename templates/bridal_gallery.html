@@ -745,7 +745,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const emptyResults = document.getElementById('empty-results');
     
     // Multi-selection Elements
-    const multiSelectionInterface = document.getElementById('multi-selection-interface');
+    // This interface is already declared below with the correct ID
     const selectedCount = document.getElementById('selected-count');
     const selectedTemplatesPreview = document.getElementById('selected-templates-preview');
     const clearSelectionBtn = document.getElementById('clear-selection-btn');
@@ -815,7 +815,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Get all cards that should be considered for navigation
             // (visible cards and those hidden by the expand/collapse mechanism)
             const navCards = Array.from(cards).filter(card => 
-                !card.classList.contains('d-none') || !card.classList.contains('hidden-card'));
+                !card.classList.contains('d-none') || !card.classList.contains('extra-card'));
             
             if (navCards.length === 0) {
                 console.log('No navigable cards found');
@@ -967,8 +967,16 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const ceremony = this.getAttribute('data-ceremony');
             const carousel = document.getElementById(`${ceremony}-carousel`);
+            if (!carousel) {
+                console.error(`Carousel not found: ${ceremony}-carousel`);
+                return;
+            }
             const selectOverlays = carousel.querySelectorAll('.template-select-overlay');
             const bulkActions = document.getElementById(`${ceremony}-bulk-actions`);
+            if (!bulkActions) {
+                console.error(`Bulk actions not found: ${ceremony}-bulk-actions`);
+                return;
+            }
             
             if (bulkActions.classList.contains('d-none')) {
                 // Enter select mode
