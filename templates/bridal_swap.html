@@ -28,7 +28,14 @@
         background-color: rgba(0, 0, 0, 0.7);
         border-radius: 4px;
         padding: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 2px solid rgba(142, 68, 173, 0.7);
+    }
+    
+    /* Make the checkboxes larger and more visible */
+    .template-checkbox {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
     }
     
     .template-selection-mode .template-checkbox-wrapper {
@@ -42,9 +49,12 @@
         margin: 0;
     }
     
-    .template-card.selected {
+    .template-card.selected,
+    .template-card:has(.template-checkbox:checked) {
         border: 3px solid #8e44ad !important;
-        box-shadow: 0 0 10px rgba(142, 68, 173, 0.7);
+        box-shadow: 0 0 15px rgba(142, 68, 173, 0.8);
+        transform: scale(1.02);
+        transition: all 0.2s ease;
     }
     
     /* Add a selected indicator on the card */
@@ -63,9 +73,15 @@
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 32px;
+        font-size: 40px;
+        font-weight: bold;
         text-shadow: 0 0 10px rgba(0,0,0,0.8);
-        background-color: rgba(142, 68, 173, 0.3);
+        background-color: rgba(142, 68, 173, 0.35);
+    }
+    
+    /* Add transition effect to all cards */
+    .template-card {
+        transition: all 0.2s ease;
     }
     
     body.template-selection-mode .template-checkbox-wrapper {
@@ -715,13 +731,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 processSelectedBtn.classList.remove('d-none');
                 if (selectionCountWrapper) selectionCountWrapper.classList.remove('d-none');
                 
-                // Clear any existing selections when entering selection mode
+                // Start with no templates selected by default when entering selection mode
                 document.querySelectorAll('.template-checkbox').forEach(checkbox => {
                     checkbox.checked = false;
                 });
                 document.querySelectorAll('.template-card').forEach(card => {
                     card.classList.remove('selected');
                 });
+                console.log('Reset all selections on entering selection mode');
                 updateSelectedCount();
                 
                 // Show a message to guide the user
@@ -822,11 +839,30 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedCards = Array.from(document.querySelectorAll('.template-card.selected, .template-card:has(.template-checkbox:checked)'));
         console.log('Found selected cards:', selectedCards.length);
         
-        const selectedTemplates = selectedCards.map(card => {
-            console.log('Processing card:', card.dataset);
+        // Remove duplicates (in case a card has both .selected class and checked checkbox)
+        const uniqueCards = [];
+        const uniquePaths = new Set();
+        
+        selectedCards.forEach(card => {
+            const path = card.dataset.templatePath || card.dataset.path;
+            if (!uniquePaths.has(path)) {
+                uniquePaths.add(path);
+                uniqueCards.push(card);
+            }
+        });
+        
+        console.log('After removing duplicates, unique cards:', uniqueCards.length);
+        
+        const selectedTemplates = uniqueCards.map(card => {
+            console.log('Processing card with dataset:', card.dataset);
+            const templatePath = card.dataset.templatePath || card.dataset.path;
+            const ceremony = card.dataset.ceremony;
+            
+            console.log(`Template: ${templatePath}, Ceremony: ${ceremony}`);
+            
             return {
-                path: card.dataset.templatePath || card.dataset.path,
-                ceremony: card.dataset.ceremony,
+                path: templatePath,
+                ceremony: ceremony,
                 url: card.dataset.templateUrl || card.dataset.url,
             };
         });
@@ -840,6 +876,8 @@ document.addEventListener('DOMContentLoaded', function() {
             showError('Please select a maximum of 5 templates.');
             return;
         }
+        
+        console.log('Selected templates data:', JSON.stringify(selectedTemplates));
         
         // Show loading state
         loadingContainer.classList.remove('d-none');
