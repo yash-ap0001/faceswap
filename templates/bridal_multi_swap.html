@@ -265,10 +265,7 @@
                         </button>
                     </div>
                     
-                    <div id="error-container" class="alert alert-danger mt-4 d-none" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        <span id="error-message"></span>
-                    </div>
+                    <!-- Error container removed -->
                 </div>
             </div>
             
@@ -310,8 +307,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultsContainer = document.getElementById('results-container');
     const downloadAllBtn = document.getElementById('download-all-btn');
     const tryMoreBtn = document.getElementById('try-more-btn');
-    const errorContainer = document.getElementById('error-container');
-    const errorMessage = document.getElementById('error-message');
+    // Error elements removed
     const templatesContainer = document.getElementById('templates-container');
     const ceremonyCheckboxes = document.querySelectorAll('.ceremony-checkbox');
     
@@ -628,6 +624,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function showError(message) {
         // Just log errors, don't display them
         console.error('Error:', message);
+        // No error display UI element
     }
     
     function capitalize(str) {
