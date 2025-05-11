@@ -844,6 +844,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 toggleSelectionModeBtn.classList.remove('btn-outline-danger');
                 processSelectedBtn.classList.add('d-none');
                 if (selectionCountWrapper) selectionCountWrapper.classList.add('d-none');
+                
+                // Hide the thumbnails preview when exiting selection mode
+                const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
+                if (selectedTemplatesPreview) {
+                    selectedTemplatesPreview.classList.add('d-none');
+                }
             }
         });
     }
@@ -1438,6 +1444,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 checkbox.checked = !checkbox.checked;
                                 this.classList.toggle('selected', checkbox.checked);
                                 console.log('Card clicked in selection mode, now selected:', this.classList.contains('selected'));
+                                // Update the selected count and thumbnail preview
                                 updateSelectedCount();
                                 e.preventDefault();
                                 e.stopPropagation();
