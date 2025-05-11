@@ -904,6 +904,17 @@ def process_template():
     try:
         app.logger.info(f"Processing template: source={source_path}, template={template_path}")
         
+        # Normalize paths to ensure they're absolute if they're not already
+        if source_path.startswith('/uploads/'):
+            # Convert from URL path to filesystem path
+            source_path = source_path.replace('/uploads/', app.config['UPLOAD_FOLDER'] + '/')
+            app.logger.info(f"Normalized source path: {source_path}")
+        
+        if template_path.startswith('/uploads/'):
+            # Convert from URL path to filesystem path
+            template_path = template_path.replace('/uploads/', app.config['UPLOAD_FOLDER'] + '/')
+            app.logger.info(f"Normalized template path: {template_path}")
+        
         # Read source and template images
         source_img = cv2.imread(source_path)
         template_img = cv2.imread(template_path)
