@@ -30,6 +30,90 @@
     .template-checkbox:hover {
         transform: scale(1.2);
     }
+    
+    /* Transparent modal styling */
+    .modal-transparent .modal-content {
+        background-color: rgba(33, 33, 33, 0.9);
+        backdrop-filter: blur(5px);
+    }
+    
+    /* Loading overlay */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+    
+    /* Floating button styling */
+    .floating-action-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: var(--primary-purple, #5e35b1);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+    
+    .floating-action-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        background-color: var(--dark-purple, #4527a0);
+    }
+    
+    .floating-action-btn i {
+        font-size: 24px;
+    }
+    
+    /* Template card hover effect */
+    .template-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .template-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .template-hover-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 10px;
+        opacity: 0;
+        transform: translateY(100%);
+        transition: all 0.3s ease;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .template-item:hover .template-hover-overlay {
+        opacity: 1;
+        transform: translateY(0);
+    }
 </style>
 {% endblock %}
 
@@ -913,6 +997,190 @@ function initializePage() {
                 alert('Error deleting templates. See console for details.');
             });
         });
+    }
+});
+</script>
+
+<!-- Floating Action Button -->
+<a href="#" class="floating-action-btn" id="quickSwapBtn" title="Quick Face Swap">
+    <i class="fas fa-magic"></i>
+</a>
+
+<!-- Transparent Quick Swap Modal -->
+<div class="modal fade" id="quickSwapModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-transparent">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Quick Face Swap</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="mb-4">
+                    <div class="rounded-circle overflow-hidden mx-auto" style="width: 120px; height: 120px; border: 2px dashed rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.2);">
+                        <img id="quickSwapPreview" class="img-fluid d-none" alt="Your photo">
+                        <i id="quickSwapPlaceholder" class="fas fa-user-plus fa-3x text-muted"></i>
+                    </div>
+                    <p class="text-light mt-2">Your Photo</p>
+                </div>
+                
+                <input type="file" class="form-control mb-4" id="quickSwapInput" accept=".jpg,.jpeg,.png" style="max-width: 300px; margin: 0 auto;">
+                
+                <div class="row g-3 mb-3">
+                    <div class="col-12">
+                        <label class="form-label text-light">Select a Ceremony</label>
+                        <select class="form-select" id="quickSwapCeremony">
+                            <option value="haldi">Haldi Ceremony</option>
+                            <option value="mehendi">Mehendi Function</option>
+                            <option value="sangeeth">Sangeeth</option>
+                            <option value="wedding">Wedding</option>
+                            <option value="reception">Reception</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <small>Upload a clear face photo for best results. We'll instantly swap your photo with a random template.</small>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="quickSwapProcessBtn" disabled>
+                    <i class="fas fa-magic me-2"></i>Create Now
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Result Modal -->
+<div class="modal fade" id="quickResultModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-transparent">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Your Face Swap Result</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="quickResultImage" class="img-fluid rounded shadow" alt="Face swap result">
+            </div>
+            <div class="modal-footer border-0">
+                <a id="quickDownloadBtn" href="#" class="btn btn-primary" download>
+                    <i class="fas fa-download me-2"></i>Download
+                </a>
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Quick Face Swap Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const quickSwapBtn = document.getElementById('quickSwapBtn');
+    const quickSwapInput = document.getElementById('quickSwapInput');
+    const quickSwapPreview = document.getElementById('quickSwapPreview');
+    const quickSwapPlaceholder = document.getElementById('quickSwapPlaceholder');
+    const quickSwapProcessBtn = document.getElementById('quickSwapProcessBtn');
+    const quickSwapCeremony = document.getElementById('quickSwapCeremony');
+    const quickResultImage = document.getElementById('quickResultImage');
+    const quickDownloadBtn = document.getElementById('quickDownloadBtn');
+    
+    // Initialize modals
+    const quickSwapModal = new bootstrap.Modal(document.getElementById('quickSwapModal'));
+    const quickResultModal = new bootstrap.Modal(document.getElementById('quickResultModal'));
+    
+    // Show quick swap modal
+    quickSwapBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        quickSwapModal.show();
+    });
+    
+    // Handle file input change
+    quickSwapInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                quickSwapPreview.src = e.target.result;
+                quickSwapPreview.classList.remove('d-none');
+                quickSwapPlaceholder.classList.add('d-none');
+                
+                // Enable process button
+                quickSwapProcessBtn.disabled = false;
+            };
+            
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+    
+    // Process quick swap
+    quickSwapProcessBtn.addEventListener('click', function() {
+        // Check if we have a photo
+        if (!quickSwapInput.files || !quickSwapInput.files[0]) {
+            showAlert('Please upload your photo first.', 'danger');
+            return;
+        }
+        
+        // Get selected ceremony
+        const ceremony = quickSwapCeremony.value;
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('source', quickSwapInput.files[0]);
+        formData.append('style', ceremony);
+        
+        // Show loading
+        quickSwapModal.hide();
+        document.getElementById('loading-container').classList.remove('d-none');
+        
+        // Process the face swap
+        fetch('/bridal-swap', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('loading-container').classList.add('d-none');
+            
+            if (data.success) {
+                // Show the result
+                quickResultImage.src = data.result_image;
+                quickDownloadBtn.href = data.result_image;
+                quickDownloadBtn.download = `${ceremony}-faceswap-${Date.now()}.jpg`;
+                
+                // Show result modal
+                quickResultModal.show();
+            } else {
+                showAlert(data.error || 'Failed to process face swap.', 'danger');
+            }
+        })
+        .catch(error => {
+            document.getElementById('loading-container').classList.add('d-none');
+            showAlert('An error occurred: ' + error.message, 'danger');
+        });
+    });
+    
+    // Helper function to show alerts
+    function showAlert(message, type = 'info') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+        alertDiv.style.zIndex = '9999';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.body.appendChild(alertDiv);
+        
+        // Auto-dismiss after 3 seconds
+        setTimeout(() => {
+            const bsAlert = bootstrap.Alert.getInstance(alertDiv);
+            if (bsAlert) {
+                bsAlert.close();
+            } else {
+                alertDiv.remove();
+            }
+        }, 3000);
     }
 });
 </script>
