@@ -2246,8 +2246,8 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('templates[]', template.path);
         });
         
-        // Send AJAX request to multi-face-swap endpoint
-        fetch('/multi-face-swap', {
+        // Send AJAX request to multi_face_swap endpoint
+        fetch('/multi_face_swap', {
             method: 'POST',
             body: formData
         })
@@ -2259,7 +2259,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 // Redirect to results page
                 console.log("Processing successful, redirecting to results page");
-                window.location.href = '/bridal-results';
+                window.location.href = '/bridal_results';
             } else {
                 showError(data.error || 'Failed to process images');
             }
