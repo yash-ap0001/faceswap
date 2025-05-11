@@ -138,70 +138,66 @@
         animation: btn-flash 0.75s ease 2;
     }
     
-    /* Selected templates thumbnail preview */
-    .selected-templates-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-        gap: 8px;
-        margin-top: 10px;
-    }
-    
-    .selected-template-thumbnail {
+    /* Selected templates preview */
+    .selected-template-card {
         position: relative;
-        width: 100%;
-        height: 60px;
-        border-radius: 4px;
+        border-radius: 10px;
         overflow: hidden;
         border: 2px solid var(--bs-primary);
-        background-color: var(--bs-dark);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         transition: all 0.2s ease;
-        box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        height: 100%;
     }
     
-    .selected-template-thumbnail:hover {
+    .selected-template-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(142, 68, 173, 0.4);
+        box-shadow: 0 8px 20px rgba(142, 68, 173, 0.5);
         border-color: #9b59b6;
     }
     
-    .selected-template-thumbnail img {
-        width: 100%;
-        height: 100%;
+    .selected-template-img {
+        height: 400px;
         object-fit: cover;
+        width: 100%;
     }
     
-    .selected-template-thumbnail .ceremony-label {
+    .selected-template-overlay {
         position: absolute;
-        bottom: 0;
-        left: 0;
+        top: 0;
         right: 0;
-        padding: 2px;
-        font-size: 0.6rem;
-        background-color: rgba(0,0,0,0.7);
-        color: white;
-        text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        text-transform: capitalize;
+        padding: 8px;
     }
     
-    .selected-template-thumbnail .remove-thumbnail {
+    .selected-template-badge {
         position: absolute;
-        top: 2px;
-        right: 2px;
-        width: 16px;
-        height: 16px;
-        background-color: rgba(0,0,0,0.7);
+        top: 10px;
+        left: 10px;
+        font-size: 0.8rem;
+        text-transform: capitalize;
+        z-index: 1;
+    }
+    
+    .selected-template-remove {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 30px;
+        height: 30px;
+        background-color: rgba(0,0,0,0.6);
         color: white;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        font-size: 0.6rem;
+        font-size: 0.9rem;
         opacity: 0;
         transition: opacity 0.2s ease;
+        z-index: 2;
+    }
+    
+    .selected-template-card:hover .selected-template-remove {
+        opacity: 1;
     }
     
     .selected-template-thumbnail:hover .remove-thumbnail {
@@ -474,13 +470,15 @@
             <div class="card-body">
                 <!-- Selected templates preview area -->
                 <div id="selectedTemplatesPreview" class="mb-3 d-none">
-                    <div class="card border-0 bg-dark shadow-sm mb-3">
-                        <div class="card-header bg-dark border-bottom border-secondary d-flex justify-content-between align-items-center py-2">
-                            <h6 class="mb-0"><i class="fas fa-check-circle text-success me-2"></i>Selected Templates</h6>
-                            <span class="badge bg-primary rounded-pill" id="selectedCountBadge">0</span>
+                    <div class="card shadow-lg border-0">
+                        <div class="card-header bg-success bg-gradient text-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Selected Templates</h5>
+                                <span class="badge bg-light text-dark rounded-pill" id="selectedCountBadge">0</span>
+                            </div>
                         </div>
-                        <div class="card-body py-2 px-3">
-                            <div class="selected-templates-grid" id="selectedTemplatesThumbnails">
+                        <div class="card-body bg-dark p-3">
+                            <div class="row g-3" id="selectedTemplatesThumbnails">
                                 <!-- Selected template thumbnails will be added here dynamically -->
                             </div>
                         </div>
@@ -957,19 +955,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 const img = card.querySelector('img');
                 const imageUrl = img ? img.src : '';
                 
-                // Create and add thumbnail
-                const thumbnail = document.createElement('div');
-                thumbnail.className = 'selected-template-thumbnail';
-                thumbnail.innerHTML = `
-                    <img src="${imageUrl}" alt="${ceremonyType} template">
-                    <div class="ceremony-label">${ceremonyType}</div>
-                    <div class="remove-thumbnail">
-                        <i class="fas fa-times"></i>
+                // Create card column
+                const colDiv = document.createElement('div');
+                colDiv.className = 'col-md-6 col-lg-4';
+                
+                // Create template card
+                colDiv.innerHTML = `
+                    <div class="selected-template-card">
+                        <span class="badge bg-primary selected-template-badge">${ceremonyType}</span>
+                        <button class="selected-template-remove" aria-label="Remove template">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <img src="${imageUrl}" class="selected-template-img" alt="${ceremonyType} template">
                     </div>
                 `;
                 
                 // Add click listener to remove button
-                const removeBtn = thumbnail.querySelector('.remove-thumbnail');
+                const removeBtn = colDiv.querySelector('.selected-template-remove');
                 removeBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -978,11 +980,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     checkbox.checked = false;
                     card.classList.remove('selected');
                     
-                    // Update preview
-                    updateSelectedCount();
+                    // Update preview with animation
+                    colDiv.classList.add('animate__animated', 'animate__fadeOut');
+                    setTimeout(() => {
+                        updateSelectedCount();
+                    }, 300);
                 });
                 
-                thumbnailsContainer.appendChild(thumbnail);
+                // Add the card to the container
+                thumbnailsContainer.appendChild(colDiv);
             });
         } else {
             // Hide preview if no templates selected
