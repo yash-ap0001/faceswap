@@ -747,7 +747,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Try again button handler
     tryAgainBtn.addEventListener('click', function() {
         resultContainer.classList.add('d-none');
-        errorContainer.classList.add('d-none');
+        // Error container removed
     });
 
     // Form submission
@@ -783,7 +783,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Show loading
         loadingContainer.classList.remove('d-none');
-        errorContainer.classList.add('d-none');
+        // Error container removed
         resultContainer.classList.add('d-none');
         swapBtn.disabled = true;
 
@@ -1638,21 +1638,19 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (!data.face_detection || !data.face_swap) {
-                    modelStatusAlert.classList.remove('d-none');
-                    modelStatusMessage.textContent = 'Some models are not loaded properly. The application may not work correctly.';
+                    console.warn('Some models are not loaded properly. The application may not work correctly.');
                     
                     if (!data.face_detection) {
-                        modelStatusMessage.textContent = '';
+                        console.warn('Face detection model not loaded');
                     } else if (!data.face_swap) {
-                        modelStatusMessage.textContent = '';
+                        console.warn('Face swap model not loaded');
                     }
                 } else {
-                    modelStatusAlert.classList.add('d-none');
+                    console.log('All models loaded successfully');
                 }
             })
             .catch(error => {
-                modelStatusAlert.classList.remove('d-none');
-                modelStatusMessage.textContent = 'Could not check model status. There might be connection issues.';
+                console.error('Could not check model status:', error);
             });
     }
     
