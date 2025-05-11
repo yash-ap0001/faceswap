@@ -139,19 +139,29 @@
     }
     
     /* Selected templates thumbnail preview */
+    .selected-templates-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
     .selected-template-thumbnail {
         position: relative;
-        width: 80px;
-        height: 80px;
+        width: 100%;
+        height: 90px;
         border-radius: 6px;
         overflow: hidden;
         border: 2px solid var(--bs-primary);
         background-color: var(--bs-dark);
-        transition: transform 0.2s ease;
+        transition: all 0.2s ease;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.3);
     }
     
     .selected-template-thumbnail:hover {
-        transform: scale(1.05);
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(142, 68, 173, 0.4);
+        border-color: #9b59b6;
     }
     
     .selected-template-thumbnail img {
@@ -165,7 +175,7 @@
         bottom: 0;
         left: 0;
         right: 0;
-        padding: 3px;
+        padding: 4px;
         font-size: 0.7rem;
         background-color: rgba(0,0,0,0.7);
         color: white;
@@ -173,14 +183,15 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        text-transform: capitalize;
     }
     
     .selected-template-thumbnail .remove-thumbnail {
         position: absolute;
-        top: 2px;
-        right: 2px;
-        width: 20px;
-        height: 20px;
+        top: 5px;
+        right: 5px;
+        width: 22px;
+        height: 22px;
         background-color: rgba(0,0,0,0.7);
         color: white;
         border-radius: 50%;
@@ -195,6 +206,11 @@
     
     .selected-template-thumbnail:hover .remove-thumbnail {
         opacity: 1;
+    }
+    
+    #selectedCountBadge {
+        font-size: 0.9rem;
+        padding: 0.35em 0.65em;
     }
     
     /* Remove old footer styles that are no longer needed */
@@ -457,9 +473,12 @@
             </div>
             <div class="card-body">
                 <!-- Selected templates preview area -->
-                <div id="selectedTemplatesPreview" class="mb-3 pb-3 border-bottom d-none">
-                    <h5 class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Selected Templates</h5>
-                    <div class="d-flex flex-wrap gap-2" id="selectedTemplatesThumbnails">
+                <div id="selectedTemplatesPreview" class="mb-4 pb-3 border-bottom d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0"><i class="fas fa-check-circle text-success me-2"></i>Selected Templates</h5>
+                        <span class="badge bg-primary rounded-pill" id="selectedCountBadge">0</span>
+                    </div>
+                    <div class="selected-templates-grid" id="selectedTemplatesThumbnails">
                         <!-- Selected template thumbnails will be added here dynamically -->
                     </div>
                 </div>
@@ -876,24 +895,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Function to update selected count
+    // Function to update selected templates and count
     function updateSelectedCount() {
-        console.log('Updating selected count...');
+        console.log('Updating selected templates preview...');
+        
+        // Get all selected checkboxes
         const selectedCheckboxes = document.querySelectorAll('.template-checkbox:checked');
         const count = selectedCheckboxes.length;
         console.log(`Found ${count} selected checkboxes`);
         
+        // Update the counter in the badge
+        const countBadge = document.getElementById('selectedCountBadge');
+        if (countBadge) {
+            countBadge.textContent = count;
+        }
+        
+        // Update the counter text
         if (selectedCount) {
             selectedCount.textContent = count;
         }
         
         // Enable/disable the process button based on selection count
         if (processSelectedBtn) {
-            if (count > 0 && count <= 5) {
-                processSelectedBtn.disabled = false;
-            } else {
-                processSelectedBtn.disabled = (count === 0 || count > 5);
-            }
+            processSelectedBtn.disabled = (count === 0 || count > 5);
             
             if (count > 5) {
                 processSelectedBtn.title = 'Please select a maximum of 5 templates';
@@ -902,84 +926,64 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Debug selected templates preview
-        console.log('Updating thumbnails preview...');
-        
-        // Update the thumbnails preview
+        // Get the preview containers
         const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
         const thumbnailsContainer = document.getElementById('selectedTemplatesThumbnails');
         
-        console.log('Preview container:', selectedTemplatesPreview);
-        console.log('Thumbnails container:', thumbnailsContainer);
-        
-        if (selectedTemplatesPreview && thumbnailsContainer) {
-            // Clear existing thumbnails
-            thumbnailsContainer.innerHTML = '';
-            
-            if (count > 0) {
-                // Show the preview container
-                console.log('Count > 0, showing preview container');
-                selectedTemplatesPreview.classList.remove('d-none');
-                
-                // Add thumbnail for each selected template
-                selectedCheckboxes.forEach((checkbox, index) => {
-                    console.log(`Processing selected checkbox ${index + 1}:`, checkbox);
-                    const card = checkbox.closest('.template-card');
-                    if (!card) {
-                        console.log('No card found for checkbox');
-                        return;
-                    }
-                    
-                    console.log('Card found:', card);
-                    const templatePath = card.dataset.templatePath || card.dataset.path;
-                    const ceremonyType = card.dataset.ceremony;
-                    const imageElement = card.querySelector('img');
-                    console.log('Image element:', imageElement);
-                    const imageUrl = imageElement ? imageElement.src : '';
-                    
-                    console.log(`Template info: path=${templatePath}, ceremony=${ceremonyType}, imageUrl=${imageUrl}`);
-                    
-                    // Create thumbnail element
-                    const thumbnail = document.createElement('div');
-                    thumbnail.className = 'selected-template-thumbnail';
-                    thumbnail.dataset.templatePath = templatePath;
-                    
-                    thumbnail.innerHTML = `
-                        <img src="${imageUrl}" alt="${ceremonyType} template">
-                        <div class="ceremony-label">${ceremonyType ? ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1) : 'Template'}</div>
-                        <div class="remove-thumbnail" data-index="${index}">
-                            <i class="fas fa-times"></i>
-                        </div>
-                    `;
-                    
-                    // Add click handler to remove button
-                    const removeBtn = thumbnail.querySelector('.remove-thumbnail');
-                    if (removeBtn) {
-                        removeBtn.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            console.log('Remove thumbnail clicked');
-                            // Uncheck the corresponding checkbox
-                            checkbox.checked = false;
-                            // Update card styling
-                            checkbox.closest('.template-card').classList.remove('selected');
-                            // Update counts and preview
-                            updateSelectedCount();
-                        });
-                    }
-                    
-                    console.log('Adding thumbnail to container');
-                    thumbnailsContainer.appendChild(thumbnail);
-                });
-            } else {
-                // Hide the preview container if no templates selected
-                console.log('No templates selected, hiding preview container');
-                selectedTemplatesPreview.classList.add('d-none');
-            }
-        } else {
-            console.error('Preview container or thumbnails container not found');
+        if (!selectedTemplatesPreview || !thumbnailsContainer) {
+            console.error('Could not find preview containers');
+            return;
         }
         
-        console.log('Selected count update complete');
+        // Clear existing thumbnails
+        thumbnailsContainer.innerHTML = '';
+        
+        // Show/hide the preview section based on selection count
+        if (count > 0) {
+            selectedTemplatesPreview.classList.remove('d-none');
+            
+            // Create thumbnails for each selected template
+            selectedCheckboxes.forEach((checkbox, index) => {
+                const card = checkbox.closest('.template-card');
+                if (!card) return;
+                
+                // Get template details from the card
+                const templatePath = card.dataset.templatePath || card.dataset.url || '';
+                const ceremonyType = card.dataset.ceremony || 'template';
+                const img = card.querySelector('img');
+                const imageUrl = img ? img.src : '';
+                
+                // Create and add thumbnail
+                const thumbnail = document.createElement('div');
+                thumbnail.className = 'selected-template-thumbnail';
+                thumbnail.innerHTML = `
+                    <img src="${imageUrl}" alt="${ceremonyType} template">
+                    <div class="ceremony-label">${ceremonyType}</div>
+                    <div class="remove-thumbnail">
+                        <i class="fas fa-times"></i>
+                    </div>
+                `;
+                
+                // Add click listener to remove button
+                const removeBtn = thumbnail.querySelector('.remove-thumbnail');
+                removeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Uncheck the checkbox
+                    checkbox.checked = false;
+                    card.classList.remove('selected');
+                    
+                    // Update preview
+                    updateSelectedCount();
+                });
+                
+                thumbnailsContainer.appendChild(thumbnail);
+            });
+        } else {
+            // Hide preview if no templates selected
+            selectedTemplatesPreview.classList.add('d-none');
+        }
     }
     
     // We now have direct event listeners on each checkbox, but keep this for any dynamically added checkboxes
