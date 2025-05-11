@@ -1763,23 +1763,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Toggle template selection
-    function toggleTemplateSelection(event, templatePath, ceremonyType) {
-        // Prevent the click from triggering the parent's click event (image preview)
-        event.stopPropagation();
-        
-        const template = {
-            path: templatePath,
-            ceremony: ceremonyType
-        };
-        
-        if (isTemplateSelected(templatePath)) {
-            // Already selected, remove it
-            removeTemplateFromSelection(templatePath);
-        } else {
-            // Not selected, add it
-            addTemplateToSelection(template);
-        }
-    }
+    // Template selection function removed as requested
     
     // Clear all selected templates
     function clearTemplateSelection() {
