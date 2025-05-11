@@ -1109,7 +1109,23 @@ def bridal_swap_multi():
                 
                 # Perform the swap with proper error handling
                 try:
-                    result_img = swapper.get(template_img, target_face, source_face, source_img)
+                    # Handle array comparison issues by extracting the bbox values explicitly
+                    source_bbox = source_face.get('bbox', None)
+                    target_bbox = target_face.get('bbox', None)
+                    
+                    # Extra safety checks for face detection results
+                    if source_bbox is None or target_bbox is None:
+                        logger.warning("Missing bbox in face detection results")
+                        result_img = create_demo_result(source_img, template_img, source_face, target_face)
+                    else:
+                        try:
+                            # Perform the actual swap
+                            result_img = swapper.get(template_img, target_face, source_face, source_img)
+                        except Exception as inner_error:
+                            logger.error(f"Face swap operation failed: {inner_error}")
+                            # Create a demo result with face boxes for debugging
+                            result_img = create_demo_result(source_img, template_img, source_face, target_face)
+                    
                 except Exception as swap_error:
                     logger.error(f"Face swap operation failed: {swap_error}")
                     # Create a demo result with face boxes for debugging

@@ -1329,7 +1329,19 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create a card for each result in our global array
         allProcessedResults.forEach((item, index) => {
             const result = item.result;
-            const template = item.template;
+            const template = item.template || {}; // Use empty object as fallback
+            
+            // Log data for debugging before creating card
+            console.log(`Building card ${index} with:`, {
+                resultData: result,
+                templateData: template,
+                ceremonyFromResult: result.ceremony,
+                ceremonyFromTemplate: template.ceremony
+            });
+            
+            // Determine ceremony type with fallbacks
+            const ceremonyType = result.ceremony || template.ceremony || 'wedding';
+            const displayCeremony = ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1);
             
             const resultCard = document.createElement('div');
             resultCard.className = 'multi-result-card';
@@ -1341,21 +1353,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span class="badge bg-success">NEW</span>
             </div>` : '';
             
-            // Log result data for debugging
-            console.log(`Building card ${index}:`, result);
-            
             resultCard.innerHTML = `
                 <div class="card h-100 bg-dark border-0 shadow position-relative">
                     <div class="card-img-top position-relative overflow-hidden" style="height: 350px;">
-                        <img src="${result.result_path}" class="multi-result-img" alt="Result for ${template.ceremony}" 
+                        <img src="${result.result_path}" class="multi-result-img" alt="Result for ${displayCeremony}" 
                             style="width: 100%; height: 100%; object-fit: cover;">
                         <div class="position-absolute top-0 end-0 m-2">
-                            <span class="badge bg-primary">${template.ceremony.charAt(0).toUpperCase() + template.ceremony.slice(1)}</span>
+                            <span class="badge bg-primary">${displayCeremony}</span>
                         </div>
                         ${newBadge}
                     </div>
                     <div class="card-footer d-flex justify-content-between align-items-center bg-dark text-light">
-                        <span class="ceremony-badge"><i class="fas fa-check-circle text-success me-1"></i> ${template.ceremony.charAt(0).toUpperCase() + template.ceremony.slice(1)}</span>
+                        <span class="ceremony-badge"><i class="fas fa-check-circle text-success me-1"></i> ${displayCeremony}</span>
                         <div class="btn-group">
                             <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
                                 <i class="fas fa-trash"></i>
