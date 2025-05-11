@@ -139,6 +139,28 @@
     }
     
     /* Selected templates preview */
+    .templates-scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--bs-primary) var(--bs-dark);
+        padding-bottom: 10px;
+    }
+    
+    .templates-scroll-container::-webkit-scrollbar {
+        height: 8px;
+    }
+    
+    .templates-scroll-container::-webkit-scrollbar-track {
+        background: var(--bs-dark);
+        border-radius: 10px;
+    }
+    
+    .templates-scroll-container::-webkit-scrollbar-thumb {
+        background-color: var(--bs-primary);
+        border-radius: 10px;
+    }
+    
     .selected-template-card {
         position: relative;
         border-radius: 10px;
@@ -146,7 +168,8 @@
         border: 2px solid var(--bs-primary);
         box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         transition: all 0.2s ease;
-        height: 100%;
+        flex: 0 0 auto;
+        width: 350px;
     }
     
     .selected-template-card:hover {
@@ -156,7 +179,7 @@
     }
     
     .selected-template-img {
-        height: 400px;
+        height: 350px;
         object-fit: cover;
         width: 100%;
     }
@@ -478,8 +501,10 @@
                             </div>
                         </div>
                         <div class="card-body bg-dark p-3">
-                            <div class="row g-3" id="selectedTemplatesThumbnails">
-                                <!-- Selected template thumbnails will be added here dynamically -->
+                            <div class="templates-scroll-container">
+                                <div class="d-flex flex-nowrap gap-3" id="selectedTemplatesThumbnails">
+                                    <!-- Selected template thumbnails will be added here dynamically -->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -937,8 +962,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Clear existing thumbnails
-        thumbnailsContainer.innerHTML = '';
+        // Remove any elements with fadeOut animation
+        const fadingCards = thumbnailsContainer.querySelectorAll('.animate__fadeOut');
+        fadingCards.forEach(card => card.remove());
         
         // Show/hide the preview section based on selection count
         if (count > 0) {
@@ -955,23 +981,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 const img = card.querySelector('img');
                 const imageUrl = img ? img.src : '';
                 
-                // Create card column
-                const colDiv = document.createElement('div');
-                colDiv.className = 'col-md-6 col-lg-4';
+                // Check if this template is already in the preview
+                const existingCard = Array.from(thumbnailsContainer.children)
+                    .find(el => el.querySelector('img')?.src === imageUrl);
+                if (existingCard) return; // Skip if already shown
                 
-                // Create template card
-                colDiv.innerHTML = `
-                    <div class="selected-template-card">
-                        <span class="badge bg-primary selected-template-badge">${ceremonyType}</span>
-                        <button class="selected-template-remove" aria-label="Remove template">
-                            <i class="fas fa-times"></i>
-                        </button>
-                        <img src="${imageUrl}" class="selected-template-img" alt="${ceremonyType} template">
-                    </div>
+                // Create template card directly (no column needed)
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'selected-template-card animate__animated animate__fadeIn';
+                
+                // Fill the card with content
+                cardDiv.innerHTML = `
+                    <span class="badge bg-primary selected-template-badge">${ceremonyType}</span>
+                    <button class="selected-template-remove" aria-label="Remove template">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <img src="${imageUrl}" class="selected-template-img" alt="${ceremonyType} template">
                 `;
                 
                 // Add click listener to remove button
-                const removeBtn = colDiv.querySelector('.selected-template-remove');
+                const removeBtn = cardDiv.querySelector('.selected-template-remove');
                 removeBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -981,14 +1010,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     card.classList.remove('selected');
                     
                     // Update preview with animation
-                    colDiv.classList.add('animate__animated', 'animate__fadeOut');
+                    cardDiv.classList.remove('animate__fadeIn');
+                    cardDiv.classList.add('animate__fadeOut');
                     setTimeout(() => {
                         updateSelectedCount();
                     }, 300);
                 });
                 
                 // Add the card to the container
-                thumbnailsContainer.appendChild(colDiv);
+                thumbnailsContainer.appendChild(cardDiv);
             });
         } else {
             // Hide preview if no templates selected
