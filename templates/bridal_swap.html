@@ -353,9 +353,15 @@
                 </h1>
             </div>
             <div class="card-body">
-                <!-- Info alert removed -->
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Upload your photo to see yourself in traditional Indian bridal attire for different ceremonies.
+                </div>
                 
-                <!-- Model status alert removed -->
+                <div id="model-status-alert" class="alert alert-warning d-none" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="model-status-message">Checking model status...</span>
+                </div>
 
                 <form id="upload-form" enctype="multipart/form-data">
                     <div class="row mb-4">
@@ -388,9 +394,42 @@
                                     <h5 class="mb-0">Choose Bridal Style</h5>
                                 </div>
                                 <div class="card-body">
-                                    <!-- Event Type selection removed -->
+                                    <p class="text-muted small">Select a traditional Indian bridal style</p>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Event Type</label>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="haldi" value="haldi" checked>
+                                            <label class="form-check-label" for="haldi">
+                                                <strong>Haldi Ceremony</strong> - Yellow saree with marigold decorations
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="mehendi" value="mehendi">
+                                            <label class="form-check-label" for="mehendi">
+                                                <strong>Mehendi Function</strong> - Green lehenga with henna designs
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="wedding" value="wedding">
+                                            <label class="form-check-label" for="wedding">
+                                                <strong>Wedding Ceremony</strong> - Traditional red bridal lehenga
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="reception" value="reception">
+                                            <label class="form-check-label" for="reception">
+                                                <strong>Reception</strong> - Stylish maroon designer gown/lehenga
+                                            </label>
+                                        </div>
+                                    </div>
 
-                                    <!-- Info text removed -->
+                                    <!-- We're now getting Pinterest images directly based on ceremony, so no template type selection needed -->
+                                    <div class="mb-3">
+                                        <p class="text-info">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            All templates are curated from Pinterest based on the selected ceremony type.
+                                        </p>
+                                    </div>
                                     
                                     <!-- Template preview container -->
                                     <div id="template-preview-container" class="mt-3 d-none">
@@ -460,7 +499,10 @@
                     <p class="mt-2">Creating your bridal look... Please wait.</p>
                 </div>
 
-                <!-- Error container removed -->
+                <div id="error-container" class="alert alert-danger mt-4 d-none" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="error-message"></span>
+                </div>
             </div>
         </div>
 
@@ -600,8 +642,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const downloadBtn = document.getElementById('download-btn');
     const tryAgainBtn = document.getElementById('try-again-btn');
     const loadingContainer = document.getElementById('loading-container');
-    // Error elements and model status elements have been removed
-    // Using console logging instead
+    const errorContainer = document.getElementById('error-container');
+    const errorMessage = document.getElementById('error-message');
+    const modelStatusAlert = document.getElementById('model-status-alert');
+    const modelStatusMessage = document.getElementById('model-status-message');
     const templatePreviewContainer = document.getElementById('template-preview-container');
     const templatePreview = document.getElementById('template-preview');
     const templateUrlInput = document.getElementById('template-url');
@@ -747,7 +791,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Try again button handler
     tryAgainBtn.addEventListener('click', function() {
         resultContainer.classList.add('d-none');
-        // Error container removed
+        errorContainer.classList.add('d-none');
     });
 
     // Form submission
@@ -783,7 +827,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Show loading
         loadingContainer.classList.remove('d-none');
-        // Error container removed
+        errorContainer.classList.add('d-none');
         resultContainer.classList.add('d-none');
         swapBtn.disabled = true;
 
@@ -845,8 +889,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showError(message) {
-        // Just log errors to console, no UI display
         console.error('Error:', message);
+        
+        // Get error elements
+        const errorContainer = document.getElementById('error-container');
+        const errorMessage = document.getElementById('error-message');
+        
+        // Update error message if element exists
+        if (errorMessage) errorMessage.textContent = message;
+        
+        // Show error container if it exists
+        if (errorContainer) errorContainer.classList.remove('d-none');
+        
+        // Scroll to error container if it exists
+        if (errorContainer) {
+            window.scrollTo({
+                top: errorContainer.offsetTop,
+                behavior: 'smooth'
+            });
+        }
     }
     
     // Multi-template selection functionality
@@ -1173,13 +1234,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show loading state
         const loadingContainer = document.getElementById('loading-container');
         const resultContainer = document.getElementById('result-container');
-        // Error container removed
+        const errorContainer = document.getElementById('error-container');
         const multiResultsContainer = document.getElementById('multi-results-container');
         
         if (loadingContainer) loadingContainer.classList.remove('d-none');
         if (resultContainer) resultContainer.classList.add('d-none');
         if (multiResultsContainer) multiResultsContainer.classList.add('d-none');
-        // Error container removed
+        if (errorContainer) errorContainer.classList.add('d-none');
         
         console.log('Loading state shown, preparing form data');
         
@@ -1638,19 +1699,21 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (!data.face_detection || !data.face_swap) {
-                    console.warn('Some models are not loaded properly. The application may not work correctly.');
+                    modelStatusAlert.classList.remove('d-none');
+                    modelStatusMessage.textContent = 'Some models are not loaded properly. The application may not work correctly.';
                     
                     if (!data.face_detection) {
-                        console.warn('Face detection model not loaded');
+                        modelStatusMessage.textContent = 'Face detection model is not loaded. Please check server logs.';
                     } else if (!data.face_swap) {
-                        console.warn('Face swap model not loaded');
+                        modelStatusMessage.textContent = 'Face swap model is not loaded. Please check server logs.';
                     }
                 } else {
-                    console.log('All models loaded successfully');
+                    modelStatusAlert.classList.add('d-none');
                 }
             })
             .catch(error => {
-                console.error('Could not check model status:', error);
+                modelStatusAlert.classList.remove('d-none');
+                modelStatusMessage.textContent = 'Could not check model status. There might be connection issues.';
             });
     }
     

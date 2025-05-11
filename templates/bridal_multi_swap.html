@@ -205,6 +205,16 @@
                     </h1>
                 </div>
                 <div class="card-body">
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Upload your photo once and see how you look in multiple bridal templates from different ceremonies.
+                    </div>
+                    
+                    <div id="model-status-alert" class="alert alert-warning d-none" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span id="model-status-message">Checking model status...</span>
+                    </div>
+                    
                     <!-- Photo Upload Section -->
                     <div class="row mb-4">
                         <div class="col-md-6 mx-auto">
@@ -265,7 +275,10 @@
                         </button>
                     </div>
                     
-                    <!-- Error container removed -->
+                    <div id="error-container" class="alert alert-danger mt-4 d-none" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span id="error-message"></span>
+                    </div>
                 </div>
             </div>
             
@@ -307,7 +320,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultsContainer = document.getElementById('results-container');
     const downloadAllBtn = document.getElementById('download-all-btn');
     const tryMoreBtn = document.getElementById('try-more-btn');
-    // Error elements removed
+    const errorContainer = document.getElementById('error-container');
+    const errorMessage = document.getElementById('error-message');
+    const modelStatusAlert = document.getElementById('model-status-alert');
+    const modelStatusMessage = document.getElementById('model-status-message');
     const templatesContainer = document.getElementById('templates-container');
     const ceremonyCheckboxes = document.querySelectorAll('.ceremony-checkbox');
     
@@ -316,7 +332,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedTemplates = [];
     let processedResults = [];
     
-    // Removed model status check
+    // Check if models are loaded
+    checkModelsStatus();
     
     // Initialize template sections based on selected ceremonies
     updateTemplateSections();
@@ -416,7 +433,12 @@ document.addEventListener('DOMContentLoaded', function() {
             .map(checkbox => checkbox.value);
             
         if (selectedCeremonies.length === 0) {
-            templatesContainer.innerHTML = '';
+            templatesContainer.innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Please select at least one ceremony type to see templates.
+                </div>
+            `;
             return;
         }
         
@@ -457,13 +479,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 const galleryEl = document.getElementById(`${ceremony}-templates`);
                 
                 if (!data.templates || data.templates.length === 0) {
-                    galleryEl.innerHTML = '';
+                    galleryEl.innerHTML = `
+                        <div class="alert alert-info w-100">
+                            No templates available for ${capitalize(ceremony)} ceremony.
+                        </div>
+                    `;
                     return;
                 }
                 
-                // Template count info removed
+                // Add template count information with timestamp
+                const countInfoEl = document.createElement('div');
+                countInfoEl.className = 'mb-3 small text-muted';
+                countInfoEl.innerHTML = `
+                    <i class="fas fa-info-circle me-1"></i>
+                    Found ${data.templates.length} templates for ${capitalize(ceremony)} ceremony.
+                    <span class="ms-2">Last updated: ${new Date().toLocaleTimeString()}</span>
+                `;
                 
                 galleryEl.innerHTML = '';
+                galleryEl.appendChild(countInfoEl);
                 
                 // Add templates to the gallery
                 data.templates.forEach(template => {
@@ -511,7 +545,11 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error loading templates:', error);
                 const galleryEl = document.getElementById(`${ceremony}-templates`);
-                galleryEl.innerHTML = '';
+                galleryEl.innerHTML = `
+                    <div class="alert alert-danger w-100">
+                        Error loading templates: ${error.message}
+                    </div>
+                `;
             });
     }
     
@@ -603,9 +641,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const loadingOverlay = resultCard.querySelector('.loading-overlay');
             loadingOverlay.remove();
         } catch (error) {
-            // Just log the error, don't display alert
-            console.error('Error processing template:', error);
-            resultCard.innerHTML = '';
+            // Show error in the result card
+            resultCard.innerHTML = `
+                <div class="alert alert-danger m-0">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Error: ${error.message}
+                </div>
+            `;
         }
     }
     
@@ -613,18 +655,24 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('/check-models')
             .then(response => response.json())
             .then(data => {
-                // No model status alerts displayed
-                console.log('Model status:', data);
+                if (!data.face_detection_model || !data.face_swap_model) {
+                    modelStatusAlert.classList.remove('d-none');
+                    modelStatusMessage.textContent = 'Face detection or face swap model not loaded. Some features may not work properly.';
+                } else {
+                    modelStatusAlert.classList.add('d-none');
+                }
             })
             .catch(error => {
                 console.error('Error checking model status:', error);
+                modelStatusAlert.classList.remove('d-none');
+                modelStatusMessage.textContent = 'Error checking model status: ' + error.message;
             });
     }
     
     function showError(message) {
-        // Just log errors, don't display them
-        console.error('Error:', message);
-        // No error display UI element
+        errorMessage.textContent = message;
+        errorContainer.classList.remove('d-none');
+        errorContainer.scrollIntoView({ behavior: 'smooth' });
     }
     
     function capitalize(str) {
