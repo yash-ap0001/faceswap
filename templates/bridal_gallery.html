@@ -263,6 +263,23 @@
         width: 100%;
     }
     
+    .template-select-btn {
+        opacity: 0.7;
+        transition: all 0.3s ease;
+        z-index: 20;
+        height: 32px;
+        width: 32px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    
+    .template-card:hover .template-select-btn {
+        opacity: 1;
+    }
+    
     /* Template rows after the first one */
     .template-card.extra-card {
         display: none;
@@ -1276,6 +1293,46 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Image Preview and Multi-selection Functionality
     function setupImagePreviewHandlers() {
+        // Quick selection buttons
+        document.querySelectorAll('.template-select-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent image preview
+                e.preventDefault();
+                
+                const templatePath = this.getAttribute('data-template-path');
+                const ceremony = this.getAttribute('data-ceremony');
+                
+                // Toggle selection
+                const isSelected = this.classList.contains('btn-success');
+                
+                if (isSelected) {
+                    // Remove from selection
+                    removeTemplateFromSelection(templatePath);
+                    this.classList.remove('btn-success');
+                    this.classList.add('btn-primary');
+                    this.innerHTML = '<i class="fas fa-plus"></i>';
+                    this.title = "Add to selection";
+                } else {
+                    // Check if we have space for more
+                    if (selectedTemplates.length >= 5) {
+                        showError('You can only select up to 5 templates.');
+                        return;
+                    }
+                    
+                    // Add to selection
+                    addTemplateToSelection({
+                        path: templatePath,
+                        ceremony: ceremony
+                    });
+                    
+                    this.classList.remove('btn-primary');
+                    this.classList.add('btn-success');
+                    this.innerHTML = '<i class="fas fa-check"></i>';
+                    this.title = "Remove from selection";
+                }
+            });
+        });
+        
         // Preview image click handler
         document.querySelectorAll('.preview-image').forEach(img => {
             img.addEventListener('click', function(e) {
@@ -1397,6 +1454,79 @@ document.addEventListener('DOMContentLoaded', function() {
             
             updateSelectionInterface();
         }
+    }
+    
+    // Add a template to the selection
+    function addTemplateToSelection(template) {
+        if (selectedTemplates.length >= 5) {
+            showError('You can only select up to 5 templates.');
+            return false;
+        }
+        
+        if (!isTemplateSelected(template.path)) {
+            selectedTemplates.push(template);
+            
+            // Update the selection interface
+            updateSelectionInterface();
+            
+            // Find the card and mark it as selected
+            const card = document.querySelector(`.preview-image[data-template-path="${template.path}"]`).closest('.bridal-card');
+            if (card) {
+                card.classList.add('selected');
+                
+                // Show selection badge
+                const badge = card.querySelector('.select-badge');
+                if (badge) badge.classList.remove('d-none');
+                
+                // Update selection button if it exists
+                const selectBtn = card.querySelector('.template-select-btn');
+                if (selectBtn) {
+                    selectBtn.classList.remove('btn-primary');
+                    selectBtn.classList.add('btn-success');
+                    selectBtn.innerHTML = '<i class="fas fa-check"></i>';
+                    selectBtn.title = "Remove from selection";
+                }
+            }
+            
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // Remove a template from the selection
+    function removeTemplateFromSelection(templatePath) {
+        const index = selectedTemplates.findIndex(template => template.path === templatePath);
+        
+        if (index !== -1) {
+            const removed = selectedTemplates.splice(index, 1)[0];
+            
+            // Update the selection interface
+            updateSelectionInterface();
+            
+            // Find the card and unmark it
+            const card = document.querySelector(`.preview-image[data-template-path="${removed.path}"]`).closest('.bridal-card');
+            if (card) {
+                card.classList.remove('selected');
+                
+                // Hide selection badge
+                const badge = card.querySelector('.select-badge');
+                if (badge) badge.classList.add('d-none');
+                
+                // Update selection button if it exists
+                const selectBtn = card.querySelector('.template-select-btn');
+                if (selectBtn) {
+                    selectBtn.classList.remove('btn-success');
+                    selectBtn.classList.add('btn-primary');
+                    selectBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                    selectBtn.title = "Add to selection";
+                }
+            }
+            
+            return true;
+        }
+        
+        return false;
     }
     
     // Check if template is already selected
