@@ -215,6 +215,54 @@
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }
+    
+    /* Horizontal scrolling row styles */
+    .template-row {
+        position: relative;
+    }
+    
+    .template-scroll-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .template-scroll-wrapper .d-flex {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-purple) rgba(0,0,0,0.1);
+    }
+    
+    .template-scroll-wrapper .d-flex::-webkit-scrollbar {
+        height: 8px;
+    }
+    
+    .template-scroll-wrapper .d-flex::-webkit-scrollbar-track {
+        background: rgba(0,0,0,0.1);
+        border-radius: 4px;
+    }
+    
+    .template-scroll-wrapper .d-flex::-webkit-scrollbar-thumb {
+        background-color: var(--primary-purple);
+        border-radius: 4px;
+    }
+    
+    .template-card {
+        transition: transform 0.3s ease;
+    }
+    
+    .template-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    /* Toggle button styles */
+    .toggle-row-btn {
+        transition: all 0.3s ease;
+    }
+    
+    .toggle-row-btn.expanded i {
+        transform: rotate(180deg);
+    }
 </style>
 {% endblock %}
 
@@ -303,72 +351,59 @@
         </div>
     </div>
     
-    <!-- Haldi Section -->
-    <div class="mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3 class="mb-0"><i class="fas fa-sun me-2 text-warning"></i>Haldi Ceremony</h3>
-            <a href="#" class="text-decoration-none">More <i class="fas fa-chevron-right ms-1"></i></a>
-        </div>
-        <div class="row" id="haldi-templates-container">
-                            <!-- Template cards will be loaded here -->
-                            <div class="col-md-4 mb-4">
-                                <div class="card shadow-sm bridal-card" data-style="haldi">
-                                    <div class="category-badge">Haldi</div>
-                                    <img src="/uploads/templates/real/weeding saree.jpg" class="card-img-top" alt="Haldi Template" style="height: 300px; object-fit: cover;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Haldi Ceremony</h5>
-                                        <p class="card-text small">Yellow saree with traditional gold jewelry</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-4 mb-4">
-                                <div class="card shadow-sm bridal-card" data-style="mehendi">
-                                    <div class="category-badge">Mehendi</div>
-                                    <img src="/uploads/templates/real/halfhand.jpg" class="card-img-top" alt="Mehendi Template" style="height: 300px; object-fit: cover;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Mehendi Function</h5>
-                                        <p class="card-text small">Beautiful henna designs with red bridal outfit</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-4 mb-4">
-                                <div class="card shadow-sm bridal-card" data-style="wedding">
-                                    <div class="category-badge">Wedding</div>
-                                    <img src="/uploads/templates/real/voni dress.jpg" class="card-img-top" alt="Wedding Template" style="height: 300px; object-fit: cover;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Wedding Ceremony</h5>
-                                        <p class="card-text small">Elegant red outfit with traditional namaste pose</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-4 mb-4">
-                                <div class="card shadow-sm bridal-card" data-style="reception">
-                                    <div class="category-badge">Reception</div>
-                                    <img src="/uploads/templates/real/jewellary.jpg" class="card-img-top" alt="Reception Template" style="height: 300px; object-fit: cover;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Jewelry Showcase</h5>
-                                        <p class="card-text small">Traditional gold jewelry with elegant saree</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-4 mb-4">
-                                <div class="card shadow-sm bridal-card" data-style="reception">
-                                    <div class="category-badge">Reception</div>
-                                    <img src="/uploads/templates/real/full dress.jpg" class="card-img-top" alt="Full Dress Template" style="height: 300px; object-fit: cover;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Full Bridal Attire</h5>
-                                        <p class="card-text small">Complete bridal look with embroidered lehenga</p>
-                                    </div>
+    {% for ceremony in ceremony_types %}
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">
+            {% if ceremony == 'haldi' %}
+            <i class="fas fa-sun me-2 text-warning"></i>
+            {% elif ceremony == 'mehendi' %}
+            <i class="fas fa-paint-brush me-2 text-success"></i>
+            {% elif ceremony == 'sangeeth' %}
+            <i class="fas fa-music me-2 text-info"></i>
+            {% elif ceremony == 'wedding' %}
+            <i class="fas fa-ring me-2 text-danger"></i>
+            {% elif ceremony == 'reception' %}
+            <i class="fas fa-glass-cheers me-2 text-purple"></i>
+            {% endif %}
+            {{ ceremony|title }} Ceremony
+        </h3>
+        <button class="btn btn-sm btn-outline-primary toggle-row-btn" data-target="{{ ceremony }}-row">
+            <i class="fas fa-chevron-down"></i> Expand All
+        </button>
+    </div>
+    
+    <!-- Template Row - Scrollable Horizontal Container -->
+    <div class="template-row mb-4" id="{{ ceremony }}-row">
+        <div class="template-scroll-wrapper">
+            <div class="d-flex flex-nowrap overflow-auto pb-3">
+                {% if all_templates[ceremony]|length > 0 %}
+                    {% for template in all_templates[ceremony] %}
+                        <div class="template-card me-3" style="min-width: 280px; max-width: 280px;">
+                            <div class="card shadow-sm bridal-card" data-style="{{ ceremony }}">
+                                <div class="category-badge">{{ ceremony|title }}</div>
+                                <img src="{{ template.url }}" class="card-img-top" alt="{{ ceremony|title }} Template" 
+                                     style="height: 300px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ template.title }}</h5>
+                                    <p class="card-text small">{{ template.description }}</p>
                                 </div>
                             </div>
                         </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No {{ ceremony|title }} templates available.
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
             
             <div class="card shadow-sm mb-4" id="results-card">
                 <div class="card-header bg-dark">
@@ -475,6 +510,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check model status
     checkModels();
+    
+    // Initialize expand/collapse buttons for template rows
+    document.querySelectorAll('.toggle-row-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const targetRow = document.getElementById(targetId);
+            
+            if (this.classList.contains('expanded')) {
+                // Collapse to show only first few cards
+                this.classList.remove('expanded');
+                this.innerHTML = '<i class="fas fa-chevron-down"></i> Expand All';
+                targetRow.querySelector('.d-flex').style.overflowX = 'auto';
+            } else {
+                // Expand to show all cards
+                this.classList.add('expanded');
+                this.innerHTML = '<i class="fas fa-chevron-up"></i> Collapse';
+                targetRow.querySelector('.d-flex').style.overflowX = 'visible';
+            }
+        });
+    });
     
     // Handle file input change
     sourceInput.addEventListener('change', function() {

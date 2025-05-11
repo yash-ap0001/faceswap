@@ -422,46 +422,34 @@ def index():
 
 @app.route('/bridal-gallery')
 def bridal_gallery():
-    # Get all template images organized by ceremony type and template type
+    # Get all template images organized by ceremony type
     template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
     
-    # Define ceremony types and template types
+    # Define ceremony types
     ceremony_types = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
-    template_types = ['real', 'natural', 'ai', 'pinterest']
     
-    # Scan for available templates
-    templates = {}
+    # Structure to store all templates
+    all_templates = {}
+    
     for ceremony in ceremony_types:
-        templates[ceremony] = {}
-        for template_type in template_types:
-            # Look for the template in the main directory
-            main_path = os.path.join(template_dir, f"{ceremony}_{template_type}.jpg")
-            # Look for the template in the type-specific subdirectory
-            subdir_path = os.path.join(template_dir, template_type, f"{ceremony}.jpg")
-            
-            if os.path.exists(main_path):
-                templates[ceremony][template_type] = f"/uploads/templates/{ceremony}_{template_type}.jpg"
-            elif os.path.exists(subdir_path):
-                templates[ceremony][template_type] = f"/uploads/templates/{template_type}/{ceremony}.jpg"
-            else:
-                # Use a placeholder if no template is available
-                templates[ceremony][template_type] = None
-                
-            # Check if AI variations exist
-            if template_type == 'ai':
-                templates[ceremony]['ai_variations'] = []
-                for i in range(1, 6):
-                    variation_path = os.path.join(template_dir, 'ai', f"{ceremony}_{i}.jpg")
-                    if os.path.exists(variation_path):
-                        templates[ceremony]['ai_variations'].append(
-                            f"/uploads/templates/ai/{ceremony}_{i}.jpg"
-                        )
+        # Set up structure for this ceremony
+        all_templates[ceremony] = []
+        
+        # Get all Pinterest templates for this ceremony
+        pinterest_dir = os.path.join(template_dir, 'pinterest', ceremony)
+        if os.path.exists(pinterest_dir):
+            for file in os.listdir(pinterest_dir):
+                if file.lower().endswith(('.jpg', '.jpeg', '.png')):
+                    all_templates[ceremony].append({
+                        'url': f"/uploads/templates/pinterest/{ceremony}/{file}",
+                        'title': f"{ceremony.title()} Style",
+                        'description': "Traditional ceremony template"
+                    })
     
     return render_template(
         'bridal_gallery.html',
-        templates=templates,
-        ceremony_types=ceremony_types,
-        template_types=['pinterest']  # Only use Pinterest templates
+        all_templates=all_templates,
+        ceremony_types=ceremony_types
     )
 
 # Bride section routes
