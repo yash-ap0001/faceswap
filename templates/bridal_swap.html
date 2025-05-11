@@ -786,11 +786,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        if (!templateUrlInput.value) {
-            showError('Please select a template from the available templates section.');
-            return;
-        }
-
         // Get selected bridal style
         const selectedStyle = document.querySelector('input[name="bridalStyle"]:checked').value;
 
@@ -807,17 +802,76 @@ document.addEventListener('DOMContentLoaded', function() {
             showError('Only JPG, JPEG and PNG files are allowed.');
             return;
         }
+        
+        // Check if we have selected templates in multi-select mode
+        const selectedCheckboxes = document.querySelectorAll('.template-checkbox:checked');
+        const templateCountInput = document.querySelector('input[name="template_count"]');
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('source', sourceInput.files[0]);
+        formData.append('style', selectedStyle);
+        
+        // If we have selected templates in multi-template mode
+        if (selectedCheckboxes.length > 0 && selectedCheckboxes.length <= 5) {
+            // Show loading
+            loadingContainer.classList.remove('d-none');
+            errorContainer.classList.add('d-none');
+            resultContainer.classList.add('d-none');
+            swapBtn.disabled = true;
+            
+            // Add template count and template info
+            formData.append('template_count', selectedCheckboxes.length);
+            
+            // Add template paths and ceremony types
+            selectedCheckboxes.forEach((checkbox, index) => {
+                const card = checkbox.closest('.template-card');
+                const path = card.dataset.path;
+                const ceremony = card.dataset.ceremony || 'unknown';
+                
+                formData.append(`template_${index}`, path);
+                formData.append(`ceremony_${index}`, ceremony);
+            });
+            
+            // Use the multi-template endpoint
+            fetch('/bridal-swap-multi', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingContainer.classList.add('d-none');
+                swapBtn.disabled = false;
 
-        // Show loading
+                if (data.success) {
+                    // Redirect to the results page
+                    window.location.href = data.redirect_url;
+                } else {
+                    showError(data.error || 'An error occurred during processing.');
+                }
+            })
+            .catch(error => {
+                loadingContainer.classList.add('d-none');
+                swapBtn.disabled = false;
+                showError('Network error: ' + error.message);
+            });
+            
+            return;
+        }
+        
+        // If no templates selected in multi-select mode, use the default single template approach
+        if (!templateUrlInput.value) {
+            showError('Please select a template from the available templates section or choose multiple templates using Multi-Select.');
+            return;
+        }
+        
+        // Show loading for single template
         loadingContainer.classList.remove('d-none');
         errorContainer.classList.add('d-none');
         resultContainer.classList.add('d-none');
         swapBtn.disabled = true;
 
-        // Create form data
-        const formData = new FormData();
-        formData.append('source', sourceInput.files[0]);
-        formData.append('style', selectedStyle);
+        // Add single template
         formData.append('template_url', templateUrlInput.value);
 
         // Send AJAX request
@@ -979,24 +1033,63 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(`Found ${count} selected checkboxes`);
         
         // Update the counter in the badge
-        const countBadge = document.getElementById('selectedCountBadge');
+        const countBadge = document.getElementById('selectionCountBadge');
         if (countBadge) {
-            countBadge.textContent = count;
+            document.getElementById('selectedCount').textContent = count;
         }
         
-        // Update the counter text
-        if (selectedCount) {
-            selectedCount.textContent = count;
-        }
+        // Update the selected templates preview row
+        const selectedTemplatesRow = document.getElementById('selected-templates-row');
+        const templateContainer = selectedTemplatesRow.querySelector('.d-flex');
         
-        // Enable/disable the process buttons based on selection count
-        if (processSelectedBtn) {
-            processSelectedBtn.disabled = (count === 0 || count > 5);
+        // Clear current preview
+        templateContainer.innerHTML = '';
+        
+        if (count > 0 && count <= 5) {
+            // Add each selected template to the preview row
+            selectedCheckboxes.forEach(checkbox => {
+                const card = checkbox.closest('.template-card');
+                const imgSrc = card.querySelector('img').src;
+                const ceremony = card.dataset.ceremony || 'unknown';
+                const path = card.dataset.path;
+                
+                const templatePreview = document.createElement('div');
+                templatePreview.className = 'position-relative';
+                templatePreview.style.height = '200px';
+                templatePreview.style.flexShrink = '0';
+                templatePreview.style.marginRight = '15px';
+                
+                templatePreview.innerHTML = `
+                    <img src="${imgSrc}" alt="${ceremony} template" class="h-100 rounded shadow-sm" 
+                         style="object-fit: cover; border: 2px solid var(--bs-primary);">
+                    <span class="badge bg-primary position-absolute top-0 start-0 m-2">${ceremony}</span>
+                    <input type="hidden" name="template_${selectedCheckboxes.indexOf(checkbox)}" value="${path}">
+                    <input type="hidden" name="ceremony_${selectedCheckboxes.indexOf(checkbox)}" value="${ceremony}">
+                `;
+                
+                templateContainer.appendChild(templatePreview);
+            });
             
-            if (count > 5) {
-                processSelectedBtn.title = 'Please select a maximum of 5 templates';
+            // Show the preview row
+            selectedTemplatesRow.classList.remove('d-none');
+            
+            // Add a count hidden field to the form
+            let templateCountInput = document.querySelector('input[name="template_count"]');
+            if (!templateCountInput) {
+                templateCountInput = document.createElement('input');
+                templateCountInput.type = 'hidden';
+                templateCountInput.name = 'template_count';
+                document.getElementById('upload-form').appendChild(templateCountInput);
+            }
+            templateCountInput.value = count;
+        } else {
+            // Hide the preview row if no templates or too many selected
+            if (count === 0) {
+                selectedTemplatesRow.classList.add('d-none');
             } else {
-                processSelectedBtn.title = '';
+                // Show warning if too many templates
+                templateContainer.innerHTML = '<div class="alert alert-warning w-100">Please select a maximum of 5 templates</div>';
+                selectedTemplatesRow.classList.remove('d-none');
             }
         }
         
