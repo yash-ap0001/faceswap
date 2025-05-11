@@ -653,11 +653,8 @@ function initializePage() {
                     });
                 }
                     
-                    // ONLY get Pinterest templates - no fallbacks anymore
-                    const templates = data.templates.filter(template => 
-                        template.template_type === 'pinterest' || 
-                        template.url.includes('/pinterest/') || 
-                        (template.path && template.path.includes('/pinterest/')));
+                    // Use all templates returned by the server - server now ONLY returns Pinterest templates
+                    const templates = data.templates;
                     
                     console.log(`Found ${templates.length} Pinterest templates for ${ceremonyType}`);
                     
