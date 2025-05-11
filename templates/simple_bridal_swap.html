@@ -47,6 +47,11 @@
         overflow: hidden;
     }
     
+    .card-body {
+        padding: 0.5rem;
+        background-color: #212121;
+    }
+    
     .template-img {
         width: 100%;
         height: 280px;
@@ -92,10 +97,21 @@
         box-shadow: 0 10px 20px rgba(0,0,0,0.3);
     }
     
+    .result-img-container {
+        position: relative;
+        height: 320px;
+        overflow: hidden;
+    }
+    
     .multi-result-img {
         width: 100%;
         height: 320px;
         object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .multi-result-card:hover .multi-result-img {
+        transform: scale(1.05);
     }
     
     .tab-content {
@@ -129,6 +145,11 @@
         width: 100%;
         height: 200px;
         object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .selected-template-card:hover .selected-template-img {
+        transform: scale(1.05);
     }
     
     .remove-template-btn {
@@ -530,6 +551,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="template-img-container">
                                 <img src="${template.url}" class="template-img" alt="${ceremonyType} template">
                             </div>
+                            <div class="card-body text-center py-2">
+                                <span class="badge bg-primary">${ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1)}</span>
+                            </div>
                         `;
                         
                         templateCard.addEventListener('click', function() {
@@ -669,10 +693,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const resultCard = document.createElement('div');
                 resultCard.className = 'multi-result-card';
                 resultCard.innerHTML = `
-                    <img src="${data.result_image}" class="multi-result-img" alt="Result">
-                    <div class="card-body text-center">
+                    <div class="result-img-container">
+                        <img src="${data.result_image}" class="multi-result-img" alt="Result">
+                    </div>
+                    <div class="card-body text-center py-2">
+                        <h6 class="card-subtitle mb-2 text-light">${currentCeremony.charAt(0).toUpperCase() + currentCeremony.slice(1)} Ceremony</h6>
                         <a href="${data.result_image}" class="btn btn-sm btn-success" download>
-                            <i class="fas fa-download"></i> Save
+                            <i class="fas fa-download me-1"></i> Save Image
                         </a>
                     </div>
                 `;
@@ -730,11 +757,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     const resultCard = document.createElement('div');
                     resultCard.className = 'multi-result-card';
                     resultCard.innerHTML = `
-                        <img src="${result.result_image}" class="multi-result-img" alt="Result">
-                        <div class="card-body text-center">
-                            <h6 class="card-subtitle mb-2 text-muted">${result.ceremony.charAt(0).toUpperCase() + result.ceremony.slice(1)}</h6>
+                        <div class="result-img-container">
+                            <img src="${result.result_image}" class="multi-result-img" alt="Result">
+                        </div>
+                        <div class="card-body text-center py-2">
+                            <h6 class="card-subtitle mb-2 text-light">${result.ceremony.charAt(0).toUpperCase() + result.ceremony.slice(1)} Ceremony</h6>
                             <a href="${result.result_image}" class="btn btn-sm btn-success" download>
-                                <i class="fas fa-download"></i> Save
+                                <i class="fas fa-download me-1"></i> Save Image
                             </a>
                         </div>
                     `;
