@@ -851,6 +851,51 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Expand All button functionality
+    document.querySelectorAll('.toggle-row-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const carousel = document.getElementById(targetId.replace('-row', '-carousel'));
+            const cards = carousel.querySelectorAll('.template-card');
+            const icon = this.querySelector('i');
+            
+            // Check current state (expanded or collapsed)
+            const isExpanded = this.classList.contains('expanded');
+            
+            if (isExpanded) {
+                // Collapse - show only first 4
+                cards.forEach((card, index) => {
+                    if (index < 4) {
+                        card.classList.remove('d-none');
+                    } else {
+                        card.classList.add('d-none');
+                    }
+                });
+                
+                // Update button appearance
+                this.classList.remove('expanded');
+                this.classList.remove('btn-primary');
+                this.classList.add('btn-outline-primary');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+                this.setAttribute('title', 'Expand All');
+            } else {
+                // Expand - show all
+                cards.forEach(card => {
+                    card.classList.remove('d-none');
+                });
+                
+                // Update button appearance
+                this.classList.add('expanded');
+                this.classList.remove('btn-outline-primary');
+                this.classList.add('btn-primary');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+                this.setAttribute('title', 'Collapse');
+            }
+        });
+    });
+    
     // Toggle select mode for bulk deletion
     document.querySelectorAll('.toggle-select-mode-btn').forEach(button => {
         button.addEventListener('click', function() {
@@ -952,9 +997,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Hide modals
+                // Hide delete confirmation modal
                 deleteConfirmModal.hide();
-                fullGalleryModal.hide();
                 
                 // Reload page to reflect changes
                 location.reload();
