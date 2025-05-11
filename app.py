@@ -1008,6 +1008,128 @@ def bridal_swap():
             os.remove(source_path)
         return jsonify({'error': str(e)}), 500
 
+@app.route('/bridal-swap-multi', methods=['POST'])
+def bridal_swap_multi():
+    """
+    Process multiple templates with the same source face.
+    Expects:
+    - source: uploaded image file
+    - template_0, template_1, etc.: paths to template images
+    - ceremony_0, ceremony_1, etc.: corresponding ceremony types
+    - template_count: number of templates
+    Returns:
+    - JSON with results array or error message
+    """
+    if faceapp is None or swapper is None:
+        return jsonify({'success': False, 'error': 'Models not loaded. Please check server logs.'}), 500
+
+    if 'source' not in request.files:
+        return jsonify({'success': False, 'error': 'No source image provided'}), 400
+    
+    source_file = request.files['source']
+    if source_file.filename == '':
+        return jsonify({'success': False, 'error': 'No source image selected'}), 400
+    
+    if not allowed_file(source_file.filename):
+        return jsonify({'success': False, 'error': 'Invalid file format for source image'}), 400
+    
+    # Get template count
+    template_count = int(request.form.get('template_count', '0'))
+    if template_count <= 0 or template_count > 5:
+        return jsonify({'success': False, 'error': 'Invalid number of templates. Please select 1-5 templates.'}), 400
+    
+    # Get template paths
+    template_paths = []
+    ceremony_types = []
+    for i in range(template_count):
+        template_path = request.form.get(f'template_{i}')
+        ceremony_type = request.form.get(f'ceremony_{i}')
+        
+        if not template_path or not os.path.exists(template_path):
+            return jsonify({'success': False, 'error': f'Template {i+1} not found'}), 400
+        
+        template_paths.append(template_path)
+        ceremony_types.append(ceremony_type)
+    
+    try:
+        # Save the source image
+        source_filename = secure_filename(source_file.filename)
+        source_path = os.path.join(app.config['UPLOAD_FOLDER'], source_filename)
+        source_file.save(source_path)
+        
+        # Read the source image
+        source_img = cv2.imread(source_path)
+        if source_img is None:
+            return jsonify({'success': False, 'error': 'Failed to read source image'}), 400
+        
+        # Detect face in source image
+        source_faces = faceapp.get(source_img)
+        if not source_faces:
+            return jsonify({'success': False, 'error': 'No face detected in your photo. Please upload a clear photo with your face visible.'}), 400
+        
+        # Create results directory if it doesn't exist
+        results_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'results')
+        os.makedirs(results_dir, exist_ok=True)
+        
+        # Process each template
+        results = []
+        for i, (template_path, ceremony_type) in enumerate(zip(template_paths, ceremony_types)):
+            try:
+                # Read template image
+                template_img = cv2.imread(template_path)
+                if template_img is None:
+                    logger.warning(f"Failed to read template image at {template_path}")
+                    continue
+                
+                # Detect face in template
+                target_faces = faceapp.get(template_img)
+                if not target_faces:
+                    logger.warning(f"No face detected in template image at {template_path}")
+                    continue
+                
+                # Perform face swap
+                logger.info(f"Processing template {i+1}/{template_count}: {ceremony_type}")
+                result_img = swapper.get(template_img, target_faces[0], source_faces[0], source_img)
+                
+                # Save result
+                timestamp = int(time.time())
+                result_filename = f"multi_{i}_{ceremony_type}_{timestamp}_{secure_filename(source_file.filename)}"
+                result_path = os.path.join(results_dir, result_filename)
+                
+                # Save the result
+                cv2.imwrite(result_path, result_img)
+                
+                # Add to results
+                results.append({
+                    'ceremony': ceremony_type,
+                    'result_path': f"/uploads/results/{result_filename}"
+                })
+                
+            except Exception as e:
+                logger.error(f"Error processing template {i+1}/{template_count}: {str(e)}")
+                # Continue with next template
+        
+        # Clean up source file
+        os.remove(source_path)
+        
+        if not results:
+            return jsonify({'success': False, 'error': 'Failed to process any templates. Please try again.'}), 500
+        
+        # Return all results
+        return jsonify({
+            'success': True,
+            'results': results,
+            'count': len(results)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in bridal_swap_multi: {str(e)}")
+        logger.error(traceback.format_exc())
+        # Clean up files in case of error
+        if 'source_path' in locals() and os.path.exists(source_path):
+            os.remove(source_path)
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/templates', methods=['GET'])
 def get_templates():
     """
