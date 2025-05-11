@@ -1075,11 +1075,18 @@ def bridal_swap():
             # Clean up the source file
             os.remove(source_path)
             
+            # For consistency with the multi-template format, also return a results array
+            # This helps the frontend handle both single and multi-template responses in the same way
             return jsonify({
                 'success': True,
                 'multi': False,
-                'result_image': output_filename,
-                'style': selected_style
+                'result_image': output_filename,  # Keep for backward compatibility
+                'style': selected_style,          # Keep for backward compatibility
+                'results': [{
+                    'result_image': output_filename,
+                    'ceremony': selected_style,
+                    'index': 0
+                }]
             })
         
     except Exception as e:

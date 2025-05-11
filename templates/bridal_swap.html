@@ -1299,9 +1299,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         data.results = [];
                     }
                     
-                    // If this is a single result (from traditional endpoint)
-                    if (data.multi === false && data.result_image) {
-                        console.log('Converting single result to multi-result format');
+                    // The server now consistently returns a results array for both single and multi-template requests
+                    // But keeping this for backward compatibility with older server versions
+                    if (data.multi === false && data.result_image && (!data.results || data.results.length === 0)) {
+                        console.log('Converting legacy single result to multi-result format');
                         // Create a synthetic results array with the single result
                         const singleResult = {
                             result_image: data.result_image,
@@ -1312,6 +1313,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Use an array with the single result
                         data.results = [singleResult];
                     }
+                    
+                    console.log('Data results after processing:', data.results);
                     
                     // Make one final check that results is an array before passing to display function
                     if (!Array.isArray(data.results)) {
@@ -1508,7 +1511,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     const resultPath = result.result_path || result.result_image || '';
                     
                     // Full URL path for displaying the image
-                    const resultFullPath = resultPath ? `/uploads/${resultPath}` : '';
+                    // Check if the path already contains /uploads/ to avoid duplication
+                    const resultFullPath = resultPath 
+                        ? (resultPath.startsWith('/uploads/') ? resultPath : `/uploads/${resultPath}`)
+                        : '';
+                    
+                    console.log(`Processing result path: ${resultPath} -> ${resultFullPath}`);
                     
                     if (!resultPath) {
                         console.warn('No result path found for card:', result);
@@ -1517,7 +1525,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     resultCard.innerHTML = `
                         <div class="card h-100 bg-dark border-0 shadow position-relative">
                             <div class="card-img-top position-relative overflow-hidden" style="height: 350px;">
-                                <img src="${resultPath}" class="multi-result-img" alt="Result for ${displayCeremony}" 
+                                <img src="${resultFullPath}" class="multi-result-img" alt="Result for ${displayCeremony}" 
                                     style="width: 100%; height: 100%; object-fit: cover;">
                                 <div class="position-absolute top-0 end-0 m-2">
                                     <span class="badge bg-primary">${displayCeremony}</span>
@@ -1530,7 +1538,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
                                         <i class="fas fa-trash"></i>
                                     </button>
-                                    <a href="${resultPath}" class="btn btn-sm btn-success" download title="Download this image">
+                                    <a href="${resultFullPath}" class="btn btn-sm btn-success" download title="Download this image">
                                         <i class="fas fa-download"></i> Save
                                     </a>
                                 </div>
