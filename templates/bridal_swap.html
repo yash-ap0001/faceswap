@@ -1103,10 +1103,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <img src="${imgSrc}" alt="${ceremony} template" class="h-100 rounded shadow-sm" 
                          style="object-fit: cover; border: 2px solid var(--bs-primary);">
                     <span class="badge bg-primary position-absolute top-0 start-0 m-2">${ceremony}</span>
-                    <input type="hidden" name="template_${selectedCheckboxes.indexOf(checkbox)}" value="${path}">
-                    <input type="hidden" name="ceremony_${selectedCheckboxes.indexOf(checkbox)}" value="${ceremony}">
+                    <input type="hidden" name="template_${index}" value="${path}">
+                    <input type="hidden" name="ceremony_${index}" value="${ceremony}">
                     <!-- Debug info -->
-                    <span class="d-none">${path}</span>
+                    <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 start-0 m-2">${path.split('/').pop()}</span>
                 `;
                 
                 templateContainer.appendChild(templatePreview);
@@ -1799,7 +1799,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (checkbox) {
                                 checkbox.checked = !checkbox.checked;
                                 this.classList.toggle('selected', checkbox.checked);
-                                console.log('Toggled checkbox to:', checkbox.checked);
+                                console.log('Toggled checkbox to:', checkbox.checked, 'on template:', this.dataset.templatePath);
+                                
+                                // Show the selected templates preview
+                                if (checkbox.checked) {
+                                    const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
+                                    if (selectedTemplatesPreview) {
+                                        selectedTemplatesPreview.classList.remove('d-none');
+                                    }
+                                }
+                                
                                 updateSelectedCount();
                             }
                             return;
@@ -1808,6 +1817,27 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.log('Using template in single mode');
                         useTemplate(this);
                     });
+                    
+                    // Add direct event listener to checkbox for changes
+                    const checkbox = card.querySelector('.template-checkbox');
+                    if (checkbox) {
+                        checkbox.addEventListener('change', function(e) {
+                            e.stopPropagation(); // Prevent the card click event
+                            const templateCard = this.closest('.template-card');
+                            templateCard.classList.toggle('selected', this.checked);
+                            console.log(`Checkbox directly changed to ${this.checked} for template:`, templateCard.dataset.templatePath);
+                            
+                            // Show the selected templates preview
+                            if (this.checked) {
+                                const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
+                                if (selectedTemplatesPreview) {
+                                    selectedTemplatesPreview.classList.remove('d-none');
+                                }
+                            }
+                            
+                            updateSelectedCount();
+                        });
+                    }
                     
                     // Add click event to the select button
                     const selectBtn = card.querySelector('.select-template-btn');
