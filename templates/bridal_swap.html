@@ -826,9 +826,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add template paths and ceremony types
             selectedCheckboxes.forEach((checkbox, index) => {
                 const card = checkbox.closest('.template-card');
-                const path = card.dataset.path;
+                const path = card.dataset.templatePath || card.dataset.path;
                 const ceremony = card.dataset.ceremony || 'unknown';
                 
+                console.log(`Adding template ${index}:`, path, ceremony);
                 formData.append(`template_${index}`, path);
                 formData.append(`ceremony_${index}`, ceremony);
             });
@@ -1051,7 +1052,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const card = checkbox.closest('.template-card');
                 const imgSrc = card.querySelector('img').src;
                 const ceremony = card.dataset.ceremony || 'unknown';
-                const path = card.dataset.path;
+                const path = card.dataset.templatePath || card.dataset.path;
                 
                 const templatePreview = document.createElement('div');
                 templatePreview.className = 'position-relative';
@@ -1065,6 +1066,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="badge bg-primary position-absolute top-0 start-0 m-2">${ceremony}</span>
                     <input type="hidden" name="template_${selectedCheckboxes.indexOf(checkbox)}" value="${path}">
                     <input type="hidden" name="ceremony_${selectedCheckboxes.indexOf(checkbox)}" value="${ceremony}">
+                    <!-- Debug info -->
+                    <span class="d-none">${path}</span>
                 `;
                 
                 templateContainer.appendChild(templatePreview);
@@ -1237,6 +1240,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to process selected templates
     function processSelectedTemplates() {
         console.log('Process Selected Templates function called');
+        
+        // Debug card attributes
+        const allTemplateCards = document.querySelectorAll('.template-card');
+        allTemplateCards.forEach(card => {
+            console.log('Template card data attributes:', {
+                templateUrl: card.dataset.templateUrl,
+                templatePath: card.dataset.templatePath,
+                templateId: card.dataset.templateId,
+                ceremony: card.dataset.ceremony
+            });
+        });
         
         // Get the source input element
         const sourceInput = document.getElementById('source-input');
