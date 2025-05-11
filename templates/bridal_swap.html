@@ -1249,8 +1249,10 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`Added template ${index}: path=${template.path}, ceremony=${ceremonyType}`);
         });
         
-        // Send AJAX request
-        fetch('/bridal-swap-multi', {
+        // Send AJAX request - use the Create Bride Look endpoint with multi=true flag
+        formData.append('multi', 'true'); // Add flag to tell the endpoint this is a multi-template request
+        
+        fetch('/bridal-swap', {
             method: 'POST',
             body: formData
         })
