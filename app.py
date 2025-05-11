@@ -1122,6 +1122,71 @@ def get_bridal_template(style, template_type='natural'):
     
     return template_img, backup_path
 
+
+def get_pinterest_template_for_ceremony(ceremony):
+    """
+    Get a random template image from the Pinterest directory for the specified ceremony.
+    
+    Args:
+        ceremony (str): The ceremony type ('haldi', 'mehendi', 'sangeeth', 'wedding', or 'reception')
+        
+    Returns:
+        tuple: (template_img, template_path)
+    """
+    # Validate ceremony name
+    valid_ceremonies = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
+    if ceremony not in valid_ceremonies:
+        logger.warning(f"Invalid ceremony: {ceremony}. Using 'wedding' as fallback.")
+        ceremony = 'wedding'
+    
+    # Path to Pinterest directory for this ceremony
+    template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
+    pinterest_dir = os.path.join(template_dir, 'pinterest', ceremony)
+    
+    # Ensure directory exists
+    if not os.path.exists(pinterest_dir):
+        logger.warning(f"Pinterest directory for {ceremony} not found: {pinterest_dir}")
+        os.makedirs(pinterest_dir, exist_ok=True)
+        
+        # If no directory exists, try to use a main pinterest file
+        main_pinterest_path = os.path.join(template_dir, f"{ceremony}_pinterest.jpg")
+        if os.path.exists(main_pinterest_path):
+            logger.info(f"Using main Pinterest template: {main_pinterest_path}")
+            template_img = cv2.imread(main_pinterest_path)
+            if template_img is not None:
+                return template_img, main_pinterest_path
+                
+        # If still not found, return None
+        logger.error(f"No Pinterest templates found for {ceremony}")
+        return None, None
+    
+    # Get all image files from the Pinterest directory
+    image_files = []
+    for file in os.listdir(pinterest_dir):
+        if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+            file_path = os.path.join(pinterest_dir, file)
+            if os.path.isfile(file_path):
+                image_files.append(file_path)
+    
+    # If no images found, return None
+    if not image_files:
+        logger.error(f"No images found in Pinterest directory for {ceremony}: {pinterest_dir}")
+        return None, None
+    
+    # Select a random image from the available ones
+    import random
+    selected_path = random.choice(image_files)
+    logger.info(f"Selected Pinterest template: {selected_path}")
+    
+    # Load the selected image
+    template_img = cv2.imread(selected_path)
+    if template_img is None:
+        logger.error(f"Failed to load selected Pinterest template: {selected_path}")
+        return None, None
+        
+    return template_img, selected_path
+
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if faceapp is None:
