@@ -600,10 +600,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const downloadBtn = document.getElementById('download-btn');
     const tryAgainBtn = document.getElementById('try-again-btn');
     const loadingContainer = document.getElementById('loading-container');
-    const errorContainer = document.getElementById('error-container');
-    const errorMessage = document.getElementById('error-message');
-    const modelStatusAlert = document.getElementById('model-status-alert');
-    const modelStatusMessage = document.getElementById('model-status-message');
+    // Error elements and model status elements have been removed
+    // Using console logging instead
     const templatePreviewContainer = document.getElementById('template-preview-container');
     const templatePreview = document.getElementById('template-preview');
     const templateUrlInput = document.getElementById('template-url');
@@ -847,25 +845,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showError(message) {
+        // Just log errors to console, no UI display
         console.error('Error:', message);
-        
-        // Get error elements
-        const errorContainer = document.getElementById('error-container');
-        const errorMessage = document.getElementById('error-message');
-        
-        // Update error message if element exists
-        if (errorMessage) errorMessage.textContent = message;
-        
-        // Show error container if it exists
-        if (errorContainer) errorContainer.classList.remove('d-none');
-        
-        // Scroll to error container if it exists
-        if (errorContainer) {
-            window.scrollTo({
-                top: errorContainer.offsetTop,
-                behavior: 'smooth'
-            });
-        }
     }
     
     // Multi-template selection functionality
