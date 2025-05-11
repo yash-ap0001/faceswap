@@ -917,6 +917,11 @@ def process_template():
         app.logger.error(f"Error processing template: {str(e)}")
         return jsonify({'success': False, 'error': str(e)})
 
+@app.route('/simple-bridal-swap', methods=['GET'])
+def simple_bridal_swap():
+    """Display the simplified bridal swap page with streamlined UI."""
+    return render_template('simple_bridal_swap.html')
+
 @app.route('/bridal-swap', methods=['GET', 'POST'])
 def bridal_swap():
     if request.method == 'GET':
