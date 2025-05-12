@@ -1170,12 +1170,14 @@ document.addEventListener('DOMContentLoaded', function() {
         sourceClearBtn.classList.add('d-none');
     });
     
-    // Generate all previews
-    generateBtn.addEventListener('click', function() {
-        if (!sourceInput.files.length) {
-            showError('Please upload your photo first');
-            return;
-        }
+    // Generate all previews - safely check if element exists
+    const generateBtn = document.getElementById('generate-btn');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', function() {
+            if (!sourceInput || !sourceInput.files || !sourceInput.files.length) {
+                showError('Please upload your photo first');
+                return;
+            }
         
         // Always use Pinterest templates
         const templateType = 'pinterest';
@@ -1332,23 +1334,36 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('/check-models')
             .then(response => response.json())
             .then(data => {
-                if (!data.face_detection || !data.face_swap) {
-                    modelStatusCard.classList.remove('d-none');
-                    let statusMessage = 'Some models are not loaded properly.';
+                console.log('Model status:', data);
+                
+                // Safely check if elements exist before using them
+                const statusCard = document.getElementById('model-status-card');
+                const statusMessage = document.getElementById('model-status-message');
+                
+                if (statusCard && statusMessage && (!data.face_detection || !data.face_swap)) {
+                    statusCard.classList.remove('d-none');
+                    let message = 'Some models are not loaded properly.';
                     
                     if (!data.face_detection) {
-                        statusMessage = 'Face detection model is not loaded.';
+                        message = 'Face detection model is not loaded.';
                     } else if (!data.face_swap) {
-                        statusMessage = 'Face swap model is not loaded.';
+                        message = 'Face swap model is not loaded.';
                     }
                     
-                    document.getElementById('model-status-message').textContent = statusMessage;
+                    statusMessage.textContent = message;
                 }
             })
             .catch(error => {
                 console.error('Error checking model status:', error);
-                modelStatusCard.classList.remove('d-none');
-                document.getElementById('model-status-message').textContent = 'Could not check model status.';
+                
+                // Safely check if elements exist
+                const statusCard = document.getElementById('model-status-card');
+                const statusMessage = document.getElementById('model-status-message');
+                
+                if (statusCard && statusMessage) {
+                    statusCard.classList.remove('d-none');
+                    statusMessage.textContent = 'Could not check model status.';
+                }
             });
     }
     
