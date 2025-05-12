@@ -23,6 +23,14 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "development_secret_key")
 
+# Test route for debugging JavaScript
+@app.route('/test')
+def test_page():
+    """
+    Render a simple test page to check JavaScript functionality.
+    """
+    return render_template('test.html')
+
 # Initialize the database
 from db import db
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
