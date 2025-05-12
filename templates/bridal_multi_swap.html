@@ -242,27 +242,13 @@
                         </div>
                     </div>
                     
-                    <!-- Ceremony Selector -->
-                    <div class="mb-4">
-                        <div class="card">
-                            <div class="card-header bg-dark">
-                                <h5 class="mb-0">Choose Ceremony Type</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="d-flex flex-wrap justify-content-center gap-3">
-                                    {% for ceremony in ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'] %}
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input ceremony-checkbox" type="checkbox" 
-                                               id="ceremony-{{ ceremony }}" value="{{ ceremony }}" 
-                                               {% if ceremony == 'wedding' %}checked{% endif %}>
-                                        <label class="form-check-label" for="ceremony-{{ ceremony }}">
-                                            {{ ceremony|title }}
-                                        </label>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Hidden Ceremony Selection -->
+                    <div class="d-none">
+                        {% for ceremony in ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'] %}
+                        <input class="ceremony-checkbox" type="checkbox" 
+                               id="ceremony-{{ ceremony }}" value="{{ ceremony }}" 
+                               {% if ceremony == 'wedding' %}checked{% endif %}>
+                        {% endfor %}
                     </div>
                     
                     <div id="templates-container">
@@ -513,8 +499,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <!-- Template badge removed - no need to show template type -->
                         </div>
                         <div class="template-info">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0">${capitalize(ceremony)} Template</h6>
+                            <div class="d-flex justify-content-end align-items-center">
                                 <div class="form-check">
                                     <input class="form-check-input template-checkbox" type="checkbox" 
                                            value="${template.id}" id="template-${template.id}"
