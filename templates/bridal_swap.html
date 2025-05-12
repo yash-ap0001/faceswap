@@ -744,6 +744,12 @@
 
 {% block scripts %}
 <script>
+// Global variables that need to be defined first to prevent reference errors
+let isSelectionMode = false;
+let selectedCount = null;
+let toggleSelectionModeBtn = null;
+let allProcessedResults = [];
+
 // Global variables for fullscreen image modal
 let currentResultIndex = 0;
 let resultImages = [];
@@ -1323,10 +1329,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Multi-template selection functionality
-    const toggleSelectionModeBtn = document.getElementById('toggleSelectionModeBtn');
-    const processSelectedBtn = document.getElementById('processSelectedBtn');
-    const selectedCount = document.getElementById('selectedCount');
-    let isSelectionMode = false;
+    toggleSelectionModeBtn = document.getElementById('toggle-selection-mode');
+    const processSelectedBtn = document.getElementById('process-selected-btn');
+    selectedCount = document.getElementById('selectedCount');
+    // isSelectionMode is already declared globally
     
     if (toggleSelectionModeBtn) {
         toggleSelectionModeBtn.addEventListener('click', function() {
@@ -1409,6 +1415,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const countBadge = document.getElementById('selectedCountBadge');
         if (countBadge) {
             countBadge.textContent = count;
+        }
+        
+        // Make sure selectedCount is initialized
+        if (selectedCount === null) {
+            selectedCount = document.getElementById('selectedCount');
         }
         
         // Update the counter text
