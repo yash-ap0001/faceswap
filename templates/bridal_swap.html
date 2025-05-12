@@ -265,8 +265,8 @@
         display: flex;
         flex-wrap: nowrap;
         overflow-x: auto;
-        gap: 15px;
-        padding: 15px 5px;
+        gap: 30px; /* Increased gap between cards */
+        padding: 20px 5px; /* More top/bottom padding */
         align-items: stretch;
         scrollbar-width: thin;
         scrollbar-color: rgba(255,255,255,0.3) rgba(0,0,0,0.2);
@@ -297,7 +297,7 @@
         min-width: 280px; /* Ensure minimum width */
         max-width: 280px; /* Maximum width */
         margin-bottom: 0; /* Remove bottom margin to keep in one row */
-        margin-right: 15px; /* Add right margin for spacing */
+        margin-right: 30px; /* Increased right margin for more spacing */
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     
@@ -477,14 +477,6 @@
                         </div>
                         <div class="">
                             <div class="multi-results-container d-flex flex-nowrap"></div>
-                            <div class="text-center mt-4">
-                                <button id="multi-try-again-btn" class="btn btn-outline-light">
-                                    <i class="fas fa-redo me-2"></i>Try Different Templates
-                                </button>
-                                <button id="select-more-btn" class="btn btn-primary ms-2">
-                                    <i class="fas fa-plus me-2"></i>Select More Templates
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1970,8 +1962,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                         
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="text-light">${displayCeremony} Look</h6>
+                        <div class="d-flex justify-content-end align-items-center">
                             <div class="btn-group">
                                 <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
                                     <i class="fas fa-trash"></i>
