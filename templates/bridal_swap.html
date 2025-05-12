@@ -26,18 +26,24 @@
     }
     
     /* Enhance card appearance for minimalist design */
-    .card {
+    .card, .card.shadow-sm, .card.mb-4 {
         border: none !important;
         background: transparent !important;
         box-shadow: none !important;
     }
     
     /* Make container background transparent */
-    .card > .card-body {
+    .card > .card-body, .card.shadow-sm > .card-body, .card.mb-4 > .card-body {
         background-color: transparent !important;
         border-radius: 0;
         padding: 15px;
         border: none !important;
+    }
+    
+    /* Completely remove borders and shadows from Available Templates section */
+    .card.shadow-sm.mb-4 {
+        box-shadow: none !important;
+        margin-bottom: 0 !important;
     }
     
     /* Remove all borders and backgrounds from inputs */
@@ -363,6 +369,16 @@
         white-space: nowrap;
         height: auto;
         min-height: 300px;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+    
+    /* Remove borders from all result-related containers */
+    #multi-results-container, #result-container {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
     }
     
     /* Style scrollbar for webkit browsers */
@@ -508,7 +524,7 @@
                 </form>
 
                 <!-- Single Template Result -->
-                <div id="result-container" class="mt-4 d-none">
+                <div id="result-container" class="mt-4 d-none" style="border: none !important; box-shadow: none !important; background: transparent !important;">
                     <h5 class="text-center mb-3 text-muted small">Result</h5>
                     <div class="text-center mb-3">
                         <img id="result-image" class="img-fluid result-image" alt="Bridal face swap result">
@@ -524,7 +540,7 @@
                 </div>
                 
                 <!-- Multi-Template Results -->
-                <div id="multi-results-container" class="mt-5 d-none">
+                <div id="multi-results-container" class="mt-5 d-none" style="border: none !important; box-shadow: none !important; background: transparent !important;">
                     <div class="mb-4">
                         <div class="mb-3">
                             <h5 class="text-center mb-3 text-muted small">Results <span id="results-count" class=""></span></h5>
@@ -558,7 +574,7 @@
         </div>
 
         <!-- Available Templates Section -->
-        <div class="card shadow-sm mb-4">
+        <div class="card shadow-sm mb-4" style="border: none !important; box-shadow: none !important; background: transparent !important;">
             <div class="card-header bg-dark d-flex justify-content-between align-items-center">
                 <h2 class="h4 mb-0">Available Templates</h2>
                 <div class="btn-group">
@@ -575,7 +591,7 @@
             </div>
             <div class="card-body">
                 <!-- Selected templates preview area -->
-                <div id="selectedTemplatesPreview" class="mb-3 d-none">
+                <div id="selectedTemplatesPreview" class="mb-3 d-none" style="border: none !important; box-shadow: none !important; background: transparent !important;">
                     <div class="mb-2">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="text-light mb-0"><i class="fas fa-check-circle me-2"></i>Selected Templates</h5>
