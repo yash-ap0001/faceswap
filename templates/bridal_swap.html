@@ -2025,12 +2025,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Add event listeners to buttons in the results section after page load
-    document.addEventListener('DOMContentLoaded', function() {
-        // Find the buttons
+    // We're removing the Try Again and Select More buttons as requested
+    // This event listener was causing errors because the buttons don't exist anymore
+    /*document.addEventListener('DOMContentLoaded', function() {
+        // These buttons have been removed
         const multiTryAgainBtn = document.getElementById('multi-try-again-btn');
-        const selectMoreBtn = document.getElementById('select-more-btn');
+        const selectMoreBtn = document.getElementById('select-more-btn');*/
         
+        /* Commenting out button code that's no longer needed
         if (multiTryAgainBtn) {
             multiTryAgainBtn.addEventListener('click', function() {
                 console.log('Try Again button clicked');
