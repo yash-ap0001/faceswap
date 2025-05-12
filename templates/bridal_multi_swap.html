@@ -422,35 +422,29 @@ document.addEventListener('DOMContentLoaded', function() {
             templatesContainer.innerHTML = `
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-triangle me-2"></i>
-                    Please select at least one ceremony type to see templates.
+                    Please select at least one style to see templates.
                 </div>
             `;
             return;
         }
         
-        // Create sections for each selected ceremony
+        // Create a single container for all templates
+        const templateGallery = document.createElement('div');
+        templateGallery.className = 'template-gallery';
+        templateGallery.id = 'all-templates';
+        templateGallery.innerHTML = `
+            <!-- Templates will be loaded here -->
+            <div class="loading-placeholder text-center py-5 w-100">
+                <div class="spinner-border text-secondary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading templates...</p>
+            </div>
+        `;
+        templatesContainer.appendChild(templateGallery);
+        
+        // Load templates for each selected ceremony
         for (const ceremony of selectedCeremonies) {
-            const ceremonySection = document.createElement('div');
-            ceremonySection.className = 'mb-5';
-            ceremonySection.innerHTML = `
-                <div class="ceremony-header d-flex align-items-center">
-                    <div class="ceremony-icon ceremony-${ceremony}">
-                        <i class="fas fa-${getCeremonyIcon(ceremony)}"></i>
-                    </div>
-                    <h3 class="mb-0">${capitalize(ceremony)} Ceremony</h3>
-                </div>
-                <div class="template-gallery" id="${ceremony}-templates">
-                    <!-- Templates will be loaded here -->
-                    <div class="loading-placeholder text-center py-5 w-100">
-                        <div class="spinner-border text-secondary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-2">Loading templates...</p>
-                    </div>
-                </div>
-            `;
-            templatesContainer.appendChild(ceremonySection);
-            
             // Load templates for this ceremony
             loadTemplates(ceremony);
         }
@@ -462,28 +456,17 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`/api/templates?ceremony=${ceremony}&_t=${timestamp}`)
             .then(response => response.json())
             .then(data => {
-                const galleryEl = document.getElementById(`${ceremony}-templates`);
+                const galleryEl = document.getElementById('all-templates');
                 
                 if (!data.templates || data.templates.length === 0) {
-                    galleryEl.innerHTML = `
-                        <div class="alert alert-info w-100">
-                            No templates available for ${capitalize(ceremony)} ceremony.
-                        </div>
-                    `;
+                    // Skip if no templates available
                     return;
                 }
                 
-                // Add template count information with timestamp
-                const countInfoEl = document.createElement('div');
-                countInfoEl.className = 'mb-3 small text-muted';
-                countInfoEl.innerHTML = `
-                    <i class="fas fa-info-circle me-1"></i>
-                    Found ${data.templates.length} templates for ${capitalize(ceremony)} ceremony.
-                    <span class="ms-2">Last updated: ${new Date().toLocaleTimeString()}</span>
-                `;
-                
-                galleryEl.innerHTML = '';
-                galleryEl.appendChild(countInfoEl);
+                // Clear the loading placeholder if it's the first template set
+                if (galleryEl.querySelector('.loading-placeholder')) {
+                    galleryEl.innerHTML = '';
+                }
                 
                 // Add templates to the gallery
                 data.templates.forEach(template => {
@@ -571,11 +554,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="loading-overlay">
                     <div class="spinner"></div>
                 </div>
-                <img class="result-img" alt="${capitalize(template.ceremony)} face swap">
+                <img class="result-img" alt="Your transformed look">
             </div>
             <div class="result-controls">
-                <span class="text-white">${capitalize(template.ceremony)} ${capitalize(template.type)}</span>
-                <button class="btn btn-sm btn-outline-light download-btn">
+                <button class="btn btn-sm btn-outline-light download-btn ms-auto">
                     <i class="fas fa-download"></i>
                 </button>
             </div>
