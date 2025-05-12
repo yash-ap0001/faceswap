@@ -7,12 +7,13 @@
         transition: all 0.3s ease;
         cursor: pointer;
         position: relative;
-        border: 2px solid transparent;
+        border: 1px solid transparent;
+        height: 280px; /* Same height as gallery images */
     }
     
     .template-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
     }
     
     .tab-content {
@@ -455,14 +456,15 @@
                     </div>
                 </div>
                 
-                <!-- Multi-Template Results -->
+                <!-- Multi-Template Results - Simplified without alerts, with better spacing -->
                 <div id="multi-results-container" class="mt-5 d-none">
                     <div class="mb-4">
                         <div class="mb-3">
                             <h5 class="mb-2"><i class="fas fa-images me-2"></i>Your Created Looks</h5>
                         </div>
                         <div class="">
-                            <div class="multi-results-container d-flex flex-nowrap"></div>
+                            <!-- Using gap-5 to ensure better spacing between items (50px) -->
+                            <div class="multi-results-container d-flex flex-nowrap gap-5"></div>
                         </div>
                     </div>
                 </div>
