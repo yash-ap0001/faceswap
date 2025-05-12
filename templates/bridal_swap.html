@@ -342,83 +342,33 @@
         box-shadow: 0 0 10px rgba(142, 68, 173, 0.6);
     }
     
-    /* Multi-results display */
+    /* Multi-results minimalist display */
     .multi-results-container {
         display: flex;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        gap: 15px;
-        padding: 15px 5px;
-        align-items: stretch;
-        scrollbar-width: thin;
-        scrollbar-color: rgba(255,255,255,0.3) rgba(0,0,0,0.2);
-        white-space: nowrap;
-        height: auto;
-        min-height: 300px;
-    }
-    
-    /* Style scrollbar for webkit browsers */
-    .multi-results-container::-webkit-scrollbar {
-        height: 8px;
-    }
-    
-    .multi-results-container::-webkit-scrollbar-track {
-        background: rgba(0,0,0,0.2);
-        border-radius: 4px;
-    }
-    
-    .multi-results-container::-webkit-scrollbar-thumb {
-        background-color: rgba(255,255,255,0.3);
-        border-radius: 4px;
+        flex-wrap: wrap;
+        gap: 24px;
+        padding: 15px 0;
+        justify-content: flex-start;
     }
     
     .multi-result-card {
-        overflow: hidden;
+        flex: 0 0 220px;
+        position: relative;
         transition: all 0.3s ease;
-        flex: 0 0 280px; /* Fixed width */
-        min-width: 280px; /* Ensure minimum width */
-        max-width: 280px; /* Maximum width */
-        margin-bottom: 0; /* Remove bottom margin to keep in one row */
-        margin-right: 15px; /* Add right margin for spacing */
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    
-    /* Force max height on card components */
-    .multi-result-card .card {
-        max-height: 280px !important;
-        overflow: hidden !important;
-    }
-    
-    .multi-result-card .card-img-top {
-        height: 230px !important;
-        max-height: 230px !important;
-        overflow: hidden !important;
-    }
-    
-    .multi-result-card .card-footer {
-        height: 50px !important;
-        max-height: 50px !important;
-        padding: 0.25rem 0.5rem !important;
-        overflow: hidden !important;
+        margin-bottom: 15px;
+        border: none;
+        background: transparent;
     }
     
     .multi-result-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        transform: translateY(-3px);
     }
     
     .multi-result-img {
         width: 100%;
-        height: 230px;
         object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-    
-    .multi-result-footer {
-        padding: 10px;
-        background-color: rgba(0, 0, 0, 0.7);
-        height: 50px;
-        overflow: hidden;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
     }
 </style>
 {% endblock %}
@@ -526,22 +476,17 @@
                     </div>
                 </div>
                 
-                <!-- Multi-Template Results -->
-                <div id="multi-results-container" class="mt-5 d-none">
-                    <div class="mb-4">
-                        <div class="mb-3">
-                            <h5 class="text-center mb-3 text-muted small">Results <span id="results-count" class=""></span></h5>
-                        </div>
-                        <div class="">
-                            <div class="multi-results-container d-flex flex-nowrap"></div>
-                            <div class="text-center mt-4">
-                                <button id="multi-try-again-btn" class="btn btn-outline-light">
-                                    <i class="fas fa-redo me-2"></i>Try Different Templates
-                                </button>
-                                <button id="select-more-btn" class="btn btn-primary ms-2">
-                                    <i class="fas fa-plus me-2"></i>Select More Templates
-                                </button>
-                            </div>
+                <!-- Multi-Template Results with cleaner layout -->
+                <div id="multi-results-container" class="mt-4 d-none">
+                    <div class="mb-3">
+                        <div class="multi-results-container d-flex flex-wrap gap-4"></div>
+                        <div class="text-center mt-4">
+                            <button id="multi-try-again-btn" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-redo me-1"></i>Try Again
+                            </button>
+                            <button id="select-more-btn" class="btn btn-primary btn-sm ms-2">
+                                <i class="fas fa-plus me-1"></i>Select More
+                            </button>
                         </div>
                     </div>
                 </div>
