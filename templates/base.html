@@ -527,24 +527,24 @@
         /* Sidebar edge toggle button - perfect semicircle shape */
         .sidebar-edge-toggle {
             position: absolute;
-            right: -20px;
+            right: -25px;
             top: 50%;
             transform: translateY(-50%);
-            width: 20px;
-            height: 40px;
+            width: 25px;
+            height: 50px;
             background: #DA70D6;
-            border-radius: 0 20px 20px 0;
-            border: 2px solid #8A2BE2;
+            border-radius: 0 25px 25px 0;
+            border: 3px solid #8A2BE2;
             border-left: none;
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding-right: 0;
-            padding-left: 0;
+            justify-content: flex-start;
+            padding-left: 4px;
             color: white;
             cursor: pointer;
             z-index: 1030;
             transition: all 0.3s ease;
+            box-shadow: 3px 0 8px rgba(0, 0, 0, 0.2);
         }
         
         .sidebar-edge-toggle:hover {
@@ -553,7 +553,8 @@
         }
         
         .sidebar.closed .sidebar-edge-toggle {
-            right: -20px;
+            right: -25px;
+            left: auto;
         }
         
         .sidebar.closed .sidebar-edge-toggle i {
@@ -561,9 +562,9 @@
         }
         
         .sidebar-edge-toggle i {
-            font-size: 0.8rem;
+            font-size: 1rem;
             transition: transform 0.3s ease;
-            margin-left: -2px;
+            margin-left: 0;
         }
     </style>
     {% block style %}{% endblock %}
