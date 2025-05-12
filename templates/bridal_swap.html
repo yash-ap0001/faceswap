@@ -1895,179 +1895,118 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log('Total processed results:', allProcessedResults.length);
         
-        // Clear previous results
+        // Show the container and clear previous results
+        multiResultsContainer.classList.remove('d-none');
         multiResultsGrid.innerHTML = '';
-        
-        // Debug information before creating cards
-        console.log('Current state before creating cards:', {
-            allProcessedResultsType: typeof allProcessedResults,
-            isArray: Array.isArray(allProcessedResults),
-            allProcessedResultsLength: allProcessedResults ? allProcessedResults.length : 'undefined',
-            firstItem: allProcessedResults && allProcessedResults.length > 0 ? allProcessedResults[0] : null
-        });
         
         // Only proceed if allProcessedResults is an array and has items
         if (!Array.isArray(allProcessedResults) || allProcessedResults.length === 0) {
             console.warn('No processed results to display, showing empty state message');
             const emptyMessage = document.createElement('div');
-            emptyMessage.className = 'col-12 text-center p-5';
+            emptyMessage.className = 'text-center text-muted w-100 py-5';
             emptyMessage.innerHTML = `
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    No results to display yet. Select templates and upload your photo to see results.
-                </div>
+                <i class="fas fa-images fa-3x mb-3"></i>
+                <p>No face swap results yet. Try uploading your photo and selecting some templates!</p>
             `;
             multiResultsGrid.appendChild(emptyMessage);
             return;
         }
         
-        // Create a card for each result in our global array (with error handling)
-        try {
-            if (!Array.isArray(allProcessedResults)) {
-                throw new Error('allProcessedResults is not an array: ' + typeof allProcessedResults);
-            }
-            
-            // If array is empty, show a message
-            if (allProcessedResults.length === 0) {
-                const emptyMessage = document.createElement('div');
-                emptyMessage.className = 'col-12 text-center p-5';
-                emptyMessage.innerHTML = `
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        No results available. Please select templates and upload your photo to see results.
-                    </div>
-                `;
-                multiResultsGrid.appendChild(emptyMessage);
-                return;
-            }
-            
-            // Now we can safely iterate through the array
-            allProcessedResults.forEach((item, index) => {
-                try {
-                    // Check if item is valid
-                    if (!item || typeof item !== 'object') {
-                        console.error(`Invalid item at index ${index}:`, item);
-                        return; // Skip this item
-                    }
-                    
-                    const result = item.result || {};
-                    const template = item.template || {}; // Use empty object as fallback
-                    
-                    // Log data for debugging before creating card
-                    console.log(`Building card ${index} with:`, {
-                        resultData: result,
-                        templateData: template,
-                        ceremonyFromResult: result.ceremony,
-                        ceremonyFromTemplate: template.ceremony
-                    });
-                    
-                    // Determine ceremony type with fallbacks
-                    const ceremonyType = result.ceremony || template.ceremony || 'wedding';
-                    const displayCeremony = ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1);
+        // Update the result count in the heading
+        const countElement = document.getElementById('results-count');
+        if (countElement) {
+            countElement.textContent = `(${allProcessedResults.length})`;
+        }
+        
+        // Create HTML for all result cards at once (more efficient)
+        let resultsHTML = '';
+        
+        // Now we can safely iterate through the array
+        allProcessedResults.forEach((item, index) => {
+            try {
+                // Check if item is valid
+                if (!item || typeof item !== 'object') {
+                    console.error(`Invalid item at index ${index}:`, item);
+                    return; // Skip this item
+                }
                 
-                    const resultCard = document.createElement('div');
-                    resultCard.className = 'multi-result-card';
-                    resultCard.setAttribute('data-result-index', index);
+                const result = item.result || {};
+                const template = item.template || {}; // Use empty object as fallback
                 
-                    // Add a "new" indicator if this result was just added (in last 10 seconds)
-                    // Ensure we have a path to display the image from
-                    // Server might return result_image (multi-template) or result_path (single template)
-                    const resultPath = result.result_path || result.result_image || '';
-                    
-                    // Full URL path for displaying the image
-                    // Check if the path already contains /uploads/ to avoid duplication
-                    const resultFullPath = resultPath 
-                        ? (resultPath.startsWith('/uploads/') ? resultPath : `/uploads/${resultPath}`)
-                        : '';
-                    
-                    console.log(`Processing result path: ${resultPath} -> ${resultFullPath}`);
-                    
-                    if (!resultPath) {
-                        console.warn('No result path found for card:', result);
-                    }
-                    
-                    // Show the timestamp in a subtle way
-                    const timestamp = new Date(item.timestamp || Date.now()).toLocaleTimeString();
-                    
-                    // Check if this is a new result (less than 30 seconds old)
-                    const isNew = item.timestamp ? (Date.now() - item.timestamp < 30000) : true;
-                    
-                    resultCard.innerHTML = `
-                        <div class="position-relative mb-3">
-                            <div class="position-relative overflow-hidden" style="height: 280px; cursor: pointer;" 
-                                onclick="openFullImage('${resultFullPath}', '${displayCeremony}', ${index})">
-                                <img src="${resultFullPath}" class="w-100 rounded multi-result-img" alt="Result for ${displayCeremony}" 
-                                    style="height: 100%; object-fit: cover;">
-                                
-                                ${isNew ? `<div class="position-absolute top-0 start-0 m-2">
-                                    <span class="badge bg-success">NEW</span>
-                                </div>` : ''}
-                                
-                                <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2 d-none d-md-block">
-                                    <span class="badge bg-dark bg-opacity-75 px-3 py-2">
-                                        <i class="fas fa-search-plus me-1"></i> Click to enlarge
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="text-light">${displayCeremony} Look</h6>
-                                <div class="btn-group">
-                                    <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    <a href="${resultFullPath}" class="btn btn-sm btn-success" download title="Download this image">
-                                        <i class="fas fa-download"></i>
-                                    </a>
-                                </div>
+                // Determine ceremony type with fallbacks
+                const ceremonyType = result.ceremony || template.ceremony || 'wedding';
+                const displayCeremony = ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1);
+            
+                // Ensure we have a path to display the image from
+                // Server might return result_image (multi-template) or result_path (single template)
+                const resultPath = result.result_path || result.result_image || '';
+                
+                // Full URL path for displaying the image
+                // Check if the path already contains /uploads/ to avoid duplication
+                const resultFullPath = resultPath 
+                    ? (resultPath.startsWith('/uploads/') ? resultPath : `/uploads/${resultPath}`)
+                    : '';
+                
+                if (!resultPath) {
+                    console.warn('No result path found for card:', result);
+                    return; // Skip this item
+                }
+                
+                // Check if this is a new result (less than 30 seconds old)
+                const isNew = item.timestamp ? (Date.now() - item.timestamp < 30000) : true;
+                
+                // Create HTML for this card in the exact format requested
+                resultsHTML += `<div class="multi-result-card" data-result-index="${index}" data-result-path="${resultFullPath}" data-ceremony-type="${ceremonyType}">
+                    <div class="position-relative mb-3">
+                        <div class="position-relative overflow-hidden mb-1" style="height: 280px; cursor: pointer;" onclick="openFullImage('${resultFullPath}', '${displayCeremony}', ${index})">
+                            <img src="${resultFullPath}" class="w-100 rounded multi-result-img" alt="Result for ${displayCeremony}" style="height: 100%; object-fit: cover;">
+                            ${isNew ? `<div class="position-absolute top-0 start-0 m-2">
+                                <span class="badge bg-success">NEW</span>
+                            </div>` : ''}
+                            <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2 d-none d-md-block">
+                                <span class="badge bg-dark bg-opacity-75 px-3 py-2">
+                                    <i class="fas fa-search-plus me-1"></i> Click to enlarge
+                                </span>
                             </div>
                         </div>
-                    `;
-                    
-                    // Store the result info in the card's dataset for modal navigation
-                    resultCard.dataset.resultPath = resultFullPath;
-                    resultCard.dataset.ceremonyType = displayCeremony;
-                    
-                    multiResultsGrid.appendChild(resultCard);
-                } catch (cardError) {
-                    console.error(`Error processing result item ${index}:`, cardError);
-                }
-            });
-            
-            try {
-                // Add event listeners to remove buttons (with nullcheck)
-                const removeButtons = document.querySelectorAll('.remove-result-btn');
-                console.log(`Found ${removeButtons.length} remove buttons to attach events to`);
-                
-                if (removeButtons && removeButtons.length > 0) {
-                    removeButtons.forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const index = parseInt(this.getAttribute('data-index'));
-                            removeProcessedResult(index);
-                        });
-                    });
-                }
-                
-                // Update header text with count
-                const headerText = multiResultsContainer.querySelector('h3');
-                if (headerText) {
-                    headerText.innerHTML = `<i class="fas fa-images me-2"></i>Your Multiple Bridal Looks (${allProcessedResults.length})`;
-                }
-                
-                // Show the results container
-                multiResultsContainer.classList.remove('d-none');
-                
-                // Scroll to results
-                window.scrollTo({
-                    top: multiResultsContainer.offsetTop,
-                    behavior: 'smooth'
-                });
-            } catch (finalError) {
-                console.error('Error in final stage of displayMultiResults:', finalError);
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="text-light">${displayCeremony} Look</h6>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <a href="${resultFullPath}" class="btn btn-sm btn-success" download title="Download this image">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            } catch (error) {
+                console.error(`Error creating result card ${index}:`, error);
             }
-        } catch (overallError) {
-            console.error('Critical error in displayMultiResults:', overallError);
-            showError('Error displaying results: ' + overallError.message);
+        });
+        
+        // Set the HTML for all results at once
+        multiResultsGrid.innerHTML = resultsHTML;
+        
+        // Add event listeners to the remove buttons
+        try {
+            const removeButtons = document.querySelectorAll('.remove-result-btn');
+            if (removeButtons && removeButtons.length > 0) {
+                removeButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        removeProcessedResult(index);
+                    });
+                });
+            }
+            
+            // Scroll to results container
+            multiResultsContainer.scrollIntoView({ behavior: 'smooth' });
+        } catch (error) {
+            console.error('Error adding event listeners:', error);
         }
     }
     
