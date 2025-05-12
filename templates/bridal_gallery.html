@@ -409,6 +409,12 @@
 </div>
 
 <div class="container-fluid py-4">
+    <!-- Model Status Alert -->
+    <div id="model-status-card" class="alert alert-warning d-none mb-4" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <span id="model-status-message">Checking model status...</span>
+    </div>
+    
     <!-- Multi-Selection Interface -->
     <div class="card mb-4 shadow d-none" id="multiSelectionInterface">
         <div class="card-header bg-dark d-flex justify-content-between align-items-center">
@@ -1219,24 +1225,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(() => {
                     if (loadingMessage) loadingMessage.textContent = `Processing ${category} template...`;
                     
-                processTemplate(card, templateType, style)
-                    .then(() => {
-                        processedCount++;
-                        updateProgressMessage(processedCount, totalTemplates);
-                        
-                        if (processedCount >= totalTemplates) {
-                            // All templates processed
-                            emptyResults.classList.add('d-none');
-                            resultGallery.classList.remove('d-none');
-                            loadingOverlay.classList.add('d-none');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error processing template:', error);
-                        processedCount++;
-                        updateProgressMessage(processedCount, totalTemplates);
-                    });
-            }, index * 200); // Stagger the requests
+                    processTemplate(card, templateType, style)
+                        .then(() => {
+                            processedCount++;
+                            updateProgressMessage(processedCount, totalTemplates);
+                            
+                            if (processedCount >= totalTemplates) {
+                                // All templates processed
+                                if (emptyResults) emptyResults.classList.add('d-none');
+                                if (resultGallery) resultGallery.classList.remove('d-none');
+                                if (loadingOverlay) loadingOverlay.classList.add('d-none');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error processing template:', error);
+                            processedCount++;
+                            updateProgressMessage(processedCount, totalTemplates);
+                        });
+                }, index * 200); // Stagger the requests
         });
     });
     
