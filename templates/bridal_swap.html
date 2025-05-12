@@ -618,123 +618,70 @@
     </div>
 </div>
 
-<!-- Full Image Modal -->
-<div class="modal fade" id="fullImageModal" tabindex="-1" aria-labelledby="fullImageModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen">
-        <div class="modal-content bg-dark text-light">
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title" id="fullImageModalLabel">
-                    <i class="fas fa-image me-2"></i>
-                    <span id="modal-ceremony-name">Bridal Look</span>
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body d-flex flex-column align-items-center justify-content-center p-0">
-                <div class="position-relative" style="height: 85vh; max-width: 100%;">
-                    <img id="full-size-image" src="" alt="Full size image" 
-                        class="img-fluid" style="max-height: 85vh; max-width: 100%;">
-                    
-                    <!-- Navigation Controls -->
-                    <button id="prev-image-btn" class="btn btn-dark position-absolute start-0 top-50 translate-middle-y ms-3 opacity-75">
-                        <i class="fas fa-chevron-left fa-2x"></i>
-                    </button>
-                    <button id="next-image-btn" class="btn btn-dark position-absolute end-0 top-50 translate-middle-y me-3 opacity-75">
-                        <i class="fas fa-chevron-right fa-2x"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="modal-footer border-secondary">
-                <div class="d-flex justify-content-between w-100">
-                    <div>
-                        <span id="image-counter">Image 1 of 5</span>
-                    </div>
-                    <div>
-                        <a id="download-full-image" href="#" download class="btn btn-success">
-                            <i class="fas fa-download me-2"></i>Download Image
-                        </a>
-                        <button type="button" class="btn btn-secondary ms-2" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-2"></i>Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <!-- Full Image Modal -->
 <div class="modal fade" id="fullImageModal" tabindex="-1" aria-labelledby="fullImageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content bg-dark bg-opacity-80 text-light border border-secondary border-opacity-40" 
+        <div class="modal-content bg-dark bg-opacity-80 text-light" 
              style="backdrop-filter: blur(8px); transition: all 0.3s ease;">
-            <div class="modal-header border-secondary border-opacity-25">
+            <div class="modal-header border-0">
                 <h5 class="modal-title d-flex align-items-center" id="fullImageModalLabel">
-                    <i class="fas fa-image me-2 text-primary"></i>
-                    <span id="modal-ceremony-name" class="text-gradient">Bridal Look</span>
-                    <span class="badge bg-dark bg-opacity-75 ms-2 py-1 px-2 rounded-pill" id="image-counter">Image 1 of 1</span>
+                    <span id="modal-ceremony-name">Bridal Look</span>
+                    <span class="badge ms-2 py-1 px-2" id="image-counter">Image 1 of 1</span>
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-0 position-relative overflow-hidden">
-                <div id="image-container" class="text-center position-relative" style="background-color: rgba(0,0,0,0.8); transition: transform 0.3s ease; min-height: 60vh;">
+                <div id="image-container" class="text-center position-relative" style="background-color: rgba(0,0,0,0.6); min-height: 70vh;">
                     <img id="full-size-image" class="img-fluid" src="" alt="Full size bridal image" 
                          style="max-height: 70vh; transform-origin: center; transition: transform 0.3s ease;">
                 </div>
                 
                 <!-- Zoom Controls -->
                 <div class="position-absolute top-0 end-0 p-2 d-flex gap-1">
-                    <button id="zoom-in-btn" class="btn btn-sm btn-dark bg-opacity-75 rounded-circle" title="Zoom In">
+                    <button id="zoom-in-btn" class="btn btn-sm btn-dark rounded-circle" title="Zoom In">
                         <i class="fas fa-search-plus"></i>
                     </button>
-                    <button id="zoom-out-btn" class="btn btn-sm btn-dark bg-opacity-75 rounded-circle" title="Zoom Out">
+                    <button id="zoom-out-btn" class="btn btn-sm btn-dark rounded-circle" title="Zoom Out">
                         <i class="fas fa-search-minus"></i>
                     </button>
-                    <button id="zoom-reset-btn" class="btn btn-sm btn-dark bg-opacity-75 rounded-circle" title="Reset Zoom">
+                    <button id="zoom-reset-btn" class="btn btn-sm btn-dark rounded-circle" title="Reset Zoom">
                         <i class="fas fa-expand"></i>
                     </button>
                 </div>
                 
                 <!-- Navigation Controls -->
-                <button id="prev-image-btn" class="btn btn-dark bg-opacity-50 position-absolute top-50 start-0 translate-middle-y rounded-circle p-2 ms-3"
-                        style="transition: all 0.2s ease; width: 46px; height: 46px;">
-                    <i class="fas fa-chevron-left fa-lg"></i>
+                <button id="prev-image-btn" class="btn btn-dark position-absolute top-50 start-0 translate-middle-y rounded-circle p-2 ms-3"
+                        style="width: 40px; height: 40px;">
+                    <i class="fas fa-chevron-left"></i>
                 </button>
-                <button id="next-image-btn" class="btn btn-dark bg-opacity-50 position-absolute top-50 end-0 translate-middle-y rounded-circle p-2 me-3" 
-                        style="transition: all 0.2s ease; width: 46px; height: 46px;">
-                    <i class="fas fa-chevron-right fa-lg"></i>
+                <button id="next-image-btn" class="btn btn-dark position-absolute top-50 end-0 translate-middle-y rounded-circle p-2 me-3" 
+                        style="width: 40px; height: 40px;">
+                    <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
-            <div class="modal-footer border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
-                <div class="text-muted small d-flex align-items-center">
-                    <i class="fas fa-keyboard me-1 text-secondary"></i>
-                    <span>Use arrow keys to navigate, +/- to zoom</span>
-                </div>
-                
+            <div class="modal-footer border-0 d-flex justify-content-between">
                 <!-- Bottom Right Zoom Controls -->
-                <div class="zoom-controls-bottom d-flex align-items-center me-auto ms-3">
+                <div class="zoom-controls-bottom d-flex align-items-center">
+                    <span id="zoom-level-text" class="text-muted small me-2">100%</span>
                     <div class="btn-group btn-group-sm">
-                        <button id="zoom-out-btn-bottom" class="btn btn-dark bg-opacity-75" title="Zoom Out">
+                        <button id="zoom-out-btn-bottom" class="btn btn-dark" title="Zoom Out">
                             <i class="fas fa-search-minus"></i>
                         </button>
-                        <span class="btn btn-dark bg-opacity-75 disabled zoom-level-display">
-                            <span id="zoom-level-text">100%</span>
-                        </span>
-                        <button id="zoom-in-btn-bottom" class="btn btn-dark bg-opacity-75" title="Zoom In">
+                        <button id="zoom-in-btn-bottom" class="btn btn-dark" title="Zoom In">
                             <i class="fas fa-search-plus"></i>
-                        </button>
-                        <button id="zoom-reset-btn-bottom" class="btn btn-dark bg-opacity-75" title="Reset Zoom">
-                            <i class="fas fa-expand"></i>
                         </button>
                     </div>
                 </div>
                 
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Close
-                    </button>
-                    <a id="download-full-image" href="" download class="btn btn-success">
+                    <a id="download-full-image" href="" download class="btn btn-link text-success">
                         <i class="fas fa-download"></i>
                     </a>
+                    <button type="button" class="btn btn-link text-light" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             </div>
         </div>
