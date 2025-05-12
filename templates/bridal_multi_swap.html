@@ -412,22 +412,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Helper Functions
-    function updateTemplateSections() {
+    function setupTemplateGallery() {
         templatesContainer.innerHTML = '';
-        
-        const selectedCeremonies = Array.from(ceremonyCheckboxes)
-            .filter(checkbox => checkbox.checked)
-            .map(checkbox => checkbox.value);
-            
-        if (selectedCeremonies.length === 0) {
-            templatesContainer.innerHTML = `
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    Please select at least one style to see templates.
-                </div>
-            `;
-            return;
-        }
         
         // Create a single container for all templates
         const templateGallery = document.createElement('div');
@@ -444,11 +430,14 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         templatesContainer.appendChild(templateGallery);
         
-        // Load templates for each selected ceremony
-        for (const ceremony of selectedCeremonies) {
-            // Load templates for this ceremony
-            loadTemplates(ceremony);
-        }
+        // Load all available templates
+        loadAllTemplates();
+    }
+    
+    // For backward compatibility
+    function updateTemplateSections() {
+        // Redirect to new template gallery setup
+        setupTemplateGallery();
     }
     
     function loadTemplates(ceremony) {
@@ -670,21 +659,40 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add debugging information to the console
             console.log('Refreshing templates after upload detected');
             
-            // Refresh all templates for all ceremonies
-            const ceremonyTypes = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'];
-            ceremonyTypes.forEach(ceremony => loadTemplates(ceremony));
+            // Refresh all templates
+            loadAllTemplates();
         }
     }
     
-    function getCeremonyIcon(ceremony) {
-        switch (ceremony) {
-            case 'haldi': return 'sun';
-            case 'mehendi': return 'paint-brush';
-            case 'sangeeth': return 'music';
-            case 'wedding': return 'heart';
-            case 'reception': return 'glass-cheers';
-            default: return 'circle';
+    function loadAllTemplates() {
+        // Add cache busting parameter
+        const timestamp = Date.now();
+        
+        // We'll sequentially load templates from all ceremony types to populate a single gallery
+        const ceremonyTypes = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'];
+        
+        // Clear the gallery first if it exists
+        const galleryEl = document.getElementById('all-templates');
+        if (galleryEl.querySelector('.loading-placeholder')) {
+            galleryEl.innerHTML = `
+                <div class="loading-placeholder text-center py-5 w-100">
+                    <div class="spinner-border text-secondary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading templates...</p>
+                </div>
+            `;
         }
+        
+        // Load all ceremony types one by one to populate the gallery
+        ceremonyTypes.forEach(ceremony => {
+            loadTemplates(ceremony);
+        });
+    }
+    
+    // Simplified for unified template display
+    function getCeremonyIcon(ceremony) {
+        return 'image'; // Just use a generic image icon for all templates
     }
 });
 </script>
