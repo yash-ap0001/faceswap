@@ -524,15 +524,15 @@
             letter-spacing: 1.5px;
         }
         
-        /* Sidebar edge toggle button - perfect semicircle shape */
+        /* Sidebar edge toggle button - exact position shown in screenshot */
         .sidebar-edge-toggle {
-            position: absolute;
-            left: 100%; /* Position it outside the sidebar */
-            top: 400px; /* Match the exact position shown in image */
-            width: 30px;
-            height: 60px;
+            position: fixed;
+            left: 263px; /* Position at exact point in screenshot */
+            top: 283px; /* Position at the red and blue lines in screenshot */
+            width: 25px;
+            height: 50px;
             background: #FF00FF; /* Bright magenta */
-            border-radius: 0 30px 30px 0;
+            border-radius: 0 25px 25px 0;
             border: 3px solid #8A2BE2;
             border-left: none;
             display: flex;
@@ -540,9 +540,9 @@
             justify-content: center;
             color: white;
             cursor: pointer;
-            z-index: 1050; /* Higher z-index */
+            z-index: 9999; /* Highest z-index to ensure visibility */
             transition: all 0.3s ease;
-            box-shadow: 0 0 10px #8A2BE2;
+            box-shadow: 0 0 15px #8A2BE2;
         }
         
         .sidebar-edge-toggle:hover {
@@ -550,7 +550,7 @@
         }
         
         .sidebar.closed .sidebar-edge-toggle {
-            left: 100%; /* Keep it at the right edge of sidebar */
+            left: 0; /* When sidebar is closed, position at the edge of screen */
         }
         
         .sidebar.closed .sidebar-edge-toggle i {
