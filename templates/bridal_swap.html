@@ -115,6 +115,13 @@
         margin: 0;
     }
     
+    /* Hide any standalone Multi-Select checkboxes */
+    input[type="checkbox"]#Multi-Select,
+    label:has(input[type="checkbox"]#Multi-Select),
+    .Multi-Select-checkbox {
+        display: none !important;
+    }
+    
     .template-card.selected,
     .template-card:has(.template-checkbox:checked) {
         border: 3px solid #8e44ad !important;
@@ -1112,6 +1119,34 @@ function handleModalKeyNavigation(event) {
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing bridal swap page');
+    
+    // Clean up any duplicate Multi-Select checkboxes
+    function removeExtraMultiSelectElements() {
+        // Remove any standalone checkboxes that might be injected
+        document.querySelectorAll('input[type="checkbox"]#Multi-Select, .Multi-Select-checkbox').forEach(el => {
+            console.log('Removing extra Multi-Select checkbox element', el);
+            el.remove();
+        });
+        
+        // Also remove any standalone Multi-Select labels
+        document.querySelectorAll('label').forEach(label => {
+            if (label.textContent.trim() === 'Multi-Select') {
+                console.log('Removing extra Multi-Select label', label);
+                label.remove();
+            }
+        });
+    }
+    
+    // Run cleanup immediately
+    removeExtraMultiSelectElements();
+    
+    // Set up a MutationObserver to detect and remove dynamically added elements
+    const observer = new MutationObserver(function(mutations) {
+        removeExtraMultiSelectElements();
+    });
+    
+    // Start observing the document with the configured parameters
+    observer.observe(document.body, { childList: true, subtree: true });
     
     // Inject CSS to hide all alert messages and template count notifications
     const style = document.createElement('style');
