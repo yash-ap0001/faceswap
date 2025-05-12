@@ -523,15 +523,47 @@
             font-size: 1.2rem;
             letter-spacing: 1.5px;
         }
+        
+        /* Sidebar edge toggle button */
+        .sidebar-edge-toggle {
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #8A2BE2, #663399);
+            border-radius: 0 8px 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            z-index: 1030;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-edge-toggle:hover {
+            background: linear-gradient(135deg, #DA70D6, #9370DB);
+            width: 45px;
+            right: -25px;
+        }
+        
+        .sidebar.closed .sidebar-edge-toggle i {
+            transform: rotate(180deg);
+        }
+        
+        .sidebar-edge-toggle i {
+            transition: transform 0.3s ease;
+        }
     </style>
     {% block style %}{% endblock %}
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <button type="button" class="btn btn-outline-light me-3" id="navSidebarToggle" aria-label="Open Menu">
-                <i class="fas fa-bars"></i>
-            </button>
+
             
             <a class="navbar-brand" href="/">
                 <span class="brand-name">VOWBRIDE</span>
@@ -555,6 +587,11 @@
     
     <!-- Transparent Sidebar -->
     <div class="sidebar" id="sidebar">
+        <!-- Sidebar Toggle Button -->
+        <div class="sidebar-edge-toggle" id="sidebarEdgeToggle">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        
         <div class="sidebar-header">
             <h5>Menu</h5>
             <button class="close-sidebar" aria-label="Close Menu">
@@ -731,11 +768,8 @@
             const sidebar = document.getElementById('sidebar');
             console.log("Sidebar element:", sidebar);
             
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            console.log("Sidebar toggle button:", sidebarToggle);
-            
-            const navSidebarToggle = document.getElementById('navSidebarToggle');
-            console.log("Nav sidebar toggle button:", navSidebarToggle);
+            const sidebarEdgeToggle = document.getElementById('sidebarEdgeToggle');
+            console.log("Sidebar edge toggle button:", sidebarEdgeToggle);
             
             const closeBtn = document.querySelector('.close-sidebar');
             console.log("Close button:", closeBtn);
@@ -770,27 +804,16 @@
                 }
             }
             
-            // Toggle sidebar from floating button
-            if (sidebarToggle) {
-                console.log("Adding event listener to sidebar toggle button");
-                sidebarToggle.addEventListener('click', function(e) {
-                    console.log("Sidebar toggle button clicked");
-                    e.preventDefault();
-                    toggleSidebar();
-                });
-            }
-            
-            // Toggle sidebar from navbar button
-            
-            if (navSidebarToggle) {
-                console.log("Adding event listener to nav sidebar toggle button");
-                navSidebarToggle.addEventListener('click', function(e) {
-                    console.log("Nav sidebar toggle button clicked");
+            // Toggle sidebar from edge button
+            if (sidebarEdgeToggle) {
+                console.log("Adding event listener to sidebar edge toggle button");
+                sidebarEdgeToggle.addEventListener('click', function(e) {
+                    console.log("Sidebar edge toggle button clicked");
                     e.preventDefault();
                     toggleSidebar();
                 });
             } else {
-                console.log("Nav sidebar toggle button not found, skipping event listener");
+                console.log("Sidebar edge toggle button not found, skipping event listener");
             }
             
             // Close sidebar
