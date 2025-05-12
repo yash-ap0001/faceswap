@@ -814,12 +814,15 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Load the dialog component scripts before using them -->
+<script src="{{ url_for('static', filename='js/dialog.js') }}"></script>
+<script src="{{ url_for('static', filename='js/image-viewer-dialog.js') }}"></script>
 <script>
 // Global variables for fullscreen image modal
 let currentResultIndex = 0;
 let resultImages = [];
 
-// Function to open the full image modal
+// Function to open the full image modal using our custom Dialog component
 function openFullImage(imagePath, ceremonyType, resultIndex) {
     // Get all result cards
     const resultCards = document.querySelectorAll('.multi-result-card');
@@ -845,53 +848,257 @@ function openFullImage(imagePath, ceremonyType, resultIndex) {
         currentResultIndex = 0;
     }
     
-    // Update modal content
-    updateModalContent();
+    // Check if Dialog class is available
+    if (typeof Dialog === 'undefined') {
+        console.error('Dialog component not found! Falling back to Bootstrap modal.');
+        // Fallback to Bootstrap modal
+        updateModalContent();
+        const modal = new bootstrap.Modal(document.getElementById('fullImageModal'));
+        modal.show();
+        return;
+    }
     
-    // Initialize event listeners for navigation buttons
-    document.getElementById('prev-image-btn').onclick = navigateToPrevImage;
-    document.getElementById('next-image-btn').onclick = navigateToNextImage;
+    // Create the image viewer dialog content
+    const currentImage = resultImages[currentResultIndex];
+    const dialogContent = `
+        <div class="image-viewer-container">
+            <img src="${currentImage.path}" class="image-viewer-img" id="image-viewer-img" 
+                alt="Full size ${currentImage.ceremony || 'bridal'} image" 
+                style="max-height: 70vh; transform-origin: center; transition: transform 0.3s ease;">
+            
+            <!-- Zoom Controls -->
+            <div class="position-absolute top-0 end-0 p-2 d-flex gap-1">
+                <button id="dialog-zoom-in-btn" class="btn btn-sm btn-dark bg-opacity-75 rounded-circle" title="Zoom In">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+                <button id="dialog-zoom-out-btn" class="btn btn-sm btn-dark bg-opacity-75 rounded-circle" title="Zoom Out">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+                <button id="dialog-zoom-reset-btn" class="btn btn-sm btn-dark bg-opacity-75 rounded-circle" title="Reset Zoom">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+            
+            <!-- Navigation Controls -->
+            <button id="dialog-prev-btn" class="btn btn-dark bg-opacity-50 position-absolute top-50 start-0 translate-middle-y rounded-circle p-2 ms-3"
+                style="transition: all 0.2s ease; width: 46px; height: 46px;" ${resultImages.length <= 1 ? 'disabled' : ''}>
+                <i class="fas fa-chevron-left fa-lg"></i>
+            </button>
+            <button id="dialog-next-btn" class="btn btn-dark bg-opacity-50 position-absolute top-50 end-0 translate-middle-y rounded-circle p-2 me-3" 
+                style="transition: all 0.2s ease; width: 46px; height: 46px;" ${resultImages.length <= 1 ? 'disabled' : ''}>
+                <i class="fas fa-chevron-right fa-lg"></i>
+            </button>
+        </div>
+        
+        <div class="mt-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <span class="badge bg-dark rounded-pill py-2 px-3">
+                    <i class="fas fa-image me-1"></i> Image <span id="dialog-image-counter">${currentResultIndex + 1}</span> of ${resultImages.length}
+                </span>
+                <span class="ms-3 badge bg-secondary rounded-pill py-2 px-3">
+                    <span id="dialog-zoom-level">100%</span>
+                </span>
+            </div>
+            <a id="dialog-download-btn" href="${currentImage.path}" download class="btn btn-success btn-sm">
+                <i class="fas fa-download me-1"></i> Download
+            </a>
+        </div>
+    `;
     
-    // Initialize zoom buttons (top controls)
-    document.getElementById('zoom-in-btn').onclick = zoomIn;
-    document.getElementById('zoom-out-btn').onclick = zoomOut;
-    document.getElementById('zoom-reset-btn').onclick = resetZoom;
-    
-    // Initialize zoom buttons (bottom controls)
-    document.getElementById('zoom-in-btn-bottom').onclick = zoomIn;
-    document.getElementById('zoom-out-btn-bottom').onclick = zoomOut;
-    document.getElementById('zoom-reset-btn-bottom').onclick = resetZoom;
-    
-    // Setup drag handlers for panning when zoomed
-    setupDragHandlers();
-    
-    // Handle mouse wheel zoom
-    const imageContainer = document.getElementById('image-container');
-    imageContainer.addEventListener('wheel', function(e) {
-        if (e.deltaY < 0) {
-            // Zoom in on wheel up
-            zoomIn();
-        } else {
-            // Zoom out on wheel down
-            zoomOut();
+    // Create the dialog
+    const imageDialog = new Dialog({
+        id: 'result-image-viewer',
+        title: `${currentImage.ceremony || 'Bridal'} Look Preview`,
+        description: null,
+        content: dialogContent,
+        size: 'lg',
+        footer: false,
+        closeOnEscapeKey: true,
+        onOpen: function() {
+            setupDialogImageViewer();
+        },
+        onClose: function() {
+            // Reset state
+            currentZoomLevel = 1;
+            isDragging = false;
+            document.removeEventListener('keydown', handleDialogKeyboardShortcuts);
         }
-        e.preventDefault();
     });
     
-    // Show the modal using Bootstrap's modal API
-    const modal = new bootstrap.Modal(document.getElementById('fullImageModal'));
-    modal.show();
+    // Open the dialog
+    imageDialog.open();
     
-    // Add keyboard navigation
-    document.addEventListener('keydown', handleModalKeyNavigation);
+    // Setup image viewer functionality
+    function setupDialogImageViewer() {
+        const container = document.querySelector('.image-viewer-container');
+        const img = document.getElementById('image-viewer-img');
+        const prevBtn = document.getElementById('dialog-prev-btn');
+        const nextBtn = document.getElementById('dialog-next-btn');
+        const zoomInBtn = document.getElementById('dialog-zoom-in-btn');
+        const zoomOutBtn = document.getElementById('dialog-zoom-out-btn');
+        const zoomResetBtn = document.getElementById('dialog-zoom-reset-btn');
+        const downloadBtn = document.getElementById('dialog-download-btn');
+        const zoomLevel = document.getElementById('dialog-zoom-level');
+        
+        // Add navigation button events
+        if (prevBtn) prevBtn.addEventListener('click', () => navigateDialogImage(-1));
+        if (nextBtn) nextBtn.addEventListener('click', () => navigateDialogImage(1));
+        
+        // Add zoom button events
+        if (zoomInBtn) zoomInBtn.addEventListener('click', dialogZoomIn);
+        if (zoomOutBtn) zoomOutBtn.addEventListener('click', dialogZoomOut);
+        if (zoomResetBtn) zoomResetBtn.addEventListener('click', dialogZoomReset);
+        
+        // Setup drag handlers for panning
+        if (container && img) {
+            container.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', dragImage);
+            document.addEventListener('mouseup', stopDrag);
+            container.addEventListener('wheel', function(e) {
+                if (e.deltaY < 0) {
+                    dialogZoomIn();
+                } else {
+                    dialogZoomOut();
+                }
+                e.preventDefault();
+            });
+        }
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', handleDialogKeyboardShortcuts);
+        
+        // Apply smooth fade-in animation
+        if (img) {
+            img.style.opacity = '0';
+            setTimeout(() => {
+                img.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease';
+                img.style.opacity = '1';
+            }, 100);
+        }
+        
+        // Update download link
+        if (downloadBtn) {
+            downloadBtn.href = resultImages[currentResultIndex].path;
+            downloadBtn.download = `${resultImages[currentResultIndex].ceremony || 'bridal'}_look_${currentResultIndex + 1}.jpg`;
+        }
+    }
     
-    // Apply subtle entrance animation to the image
-    const fullSizeImage = document.getElementById('full-size-image');
-    fullSizeImage.style.opacity = '0';
-    setTimeout(() => {
-        fullSizeImage.style.transition = 'opacity 0.3s ease-in-out';
-        fullSizeImage.style.opacity = '1';
-    }, 100);
+    // Dialog-specific image navigation
+    function navigateDialogImage(direction) {
+        const newIndex = (currentResultIndex + direction + resultImages.length) % resultImages.length;
+        currentResultIndex = newIndex;
+        updateDialogImage();
+    }
+    
+    // Update the image in the dialog
+    function updateDialogImage() {
+        const img = document.getElementById('image-viewer-img');
+        const counter = document.getElementById('dialog-image-counter');
+        const downloadBtn = document.getElementById('dialog-download-btn');
+        const currentImage = resultImages[currentResultIndex];
+        
+        // Reset zoom
+        dialogZoomReset();
+        
+        // Update image source
+        if (img) {
+            img.src = currentImage.path;
+            img.alt = `Full size ${currentImage.ceremony || 'bridal'} image`;
+        }
+        
+        // Update counter
+        if (counter) {
+            counter.textContent = currentResultIndex + 1;
+        }
+        
+        // Update title
+        imageDialog.setTitle(`${currentImage.ceremony || 'Bridal'} Look Preview`);
+        
+        // Update download link
+        if (downloadBtn) {
+            downloadBtn.href = currentImage.path;
+            downloadBtn.download = `${currentImage.ceremony || 'bridal'}_look_${currentResultIndex + 1}.jpg`;
+        }
+    }
+    
+    // Keyboard shortcuts handler
+    function handleDialogKeyboardShortcuts(e) {
+        if (e.key === 'ArrowLeft') {
+            navigateDialogImage(-1);
+            e.preventDefault();
+        } else if (e.key === 'ArrowRight') {
+            navigateDialogImage(1);
+            e.preventDefault();
+        } else if (e.key === '+' || e.key === '=') {
+            dialogZoomIn();
+            e.preventDefault();
+        } else if (e.key === '-' || e.key === '_') {
+            dialogZoomOut();
+            e.preventDefault();
+        } else if (e.key === '0') {
+            dialogZoomReset();
+            e.preventDefault();
+        }
+    }
+    
+    // Zoom functions for the dialog
+    function dialogZoomIn() {
+        currentZoomLevel = Math.min(currentZoomLevel + zoomStep, maxZoom);
+        applyDialogZoom();
+    }
+    
+    function dialogZoomOut() {
+        currentZoomLevel = Math.max(currentZoomLevel - zoomStep, minZoom);
+        applyDialogZoom();
+    }
+    
+    function dialogZoomReset() {
+        currentZoomLevel = 1;
+        dragStartTranslateX = 0;
+        dragStartTranslateY = 0;
+        applyDialogZoom();
+    }
+    
+    function applyDialogZoom() {
+        const img = document.getElementById('image-viewer-img');
+        const zoomLevel = document.getElementById('dialog-zoom-level');
+        
+        if (img) {
+            img.style.transform = `scale(${currentZoomLevel}) translate(${dragStartTranslateX}px, ${dragStartTranslateY}px)`;
+        }
+        
+        if (zoomLevel) {
+            zoomLevel.textContent = `${Math.round(currentZoomLevel * 100)}%`;
+        }
+    }
+    
+    // Drag functions for image panning
+    function startDrag(e) {
+        if (currentZoomLevel <= 1) return;
+        
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        e.preventDefault();
+    }
+    
+    function dragImage(e) {
+        if (!isDragging) return;
+        
+        const deltaX = e.clientX - dragStartX;
+        const deltaY = e.clientY - dragStartY;
+        
+        // Convert screen pixels to image space
+        dragStartTranslateX = deltaX / currentZoomLevel;
+        dragStartTranslateY = deltaY / currentZoomLevel;
+        
+        applyDialogZoom();
+        e.preventDefault();
+    }
+    
+    function stopDrag() {
+        isDragging = false;
+    }
 }
 
 // Zoom functionality variables
