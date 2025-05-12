@@ -23,13 +23,20 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "development_secret_key")
 
-# Test route for debugging JavaScript
+# Test routes for debugging JavaScript
 @app.route('/test')
 def test_page():
     """
     Render a simple test page to check JavaScript functionality.
     """
     return render_template('test.html')
+
+@app.route('/test-sidebar')
+def test_sidebar():
+    """
+    Render a test page with sidebar and dialog functionality.
+    """
+    return render_template('test_sidebar.html')
 
 # Initialize the database
 from db import db

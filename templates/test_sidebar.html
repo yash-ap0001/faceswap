@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Test Page</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-purple: #4a148c;
+            --secondary-purple: #6a1b9a;
+            --dark-purple: #38006b;
+            --light-purple: #9c4dcc;
+            --dark-surface: #121212;
+        }
+        
+        body {
+            min-height: 100vh;
+            background-color: var(--dark-surface);
+            color: #fff;
+            transition: padding-left 0.3s ease;
+        }
+        
+        body.sidebar-closed {
+            padding-left: 0;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 280px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--dark-purple));
+            color: white;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        .sidebar.closed {
+            transform: translateX(-100%);
+            box-shadow: none;
+        }
+        
+        .sidebar-header {
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .sidebar-logo i {
+            font-size: 1.5rem;
+        }
+        
+        .close-sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .close-sidebar:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .sidebar-content {
+            padding: 1rem;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 8px 15px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        /* Content Styles */
+        .content {
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .sidebar-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+            color: white;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 900;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .sidebar-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        .sidebar-toggle:active {
+            transform: translateY(1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Card Styles */
+        .card {
+            background: linear-gradient(135deg, rgba(74, 20, 140, 0.1), rgba(56, 0, 107, 0.1));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-img-top {
+            object-fit: cover;
+            height: 200px;
+        }
+        
+        /* Dialog component styles */
+        .dialog-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 1050;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease-out, visibility 0.25s ease-out;
+        }
+        
+        .dialog-backdrop.dialog-open {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .dialog {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            background: linear-gradient(135deg, rgba(40, 44, 52, 0.7), rgba(25, 28, 34, 0.85));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.4),
+                0 5px 15px rgba(0, 0, 0, 0.3),
+                inset 0 1px 1px rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+        }
+        
+        .dialog-backdrop.dialog-open .dialog {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .dialog-header {
+            padding: 1.25rem 1.5rem 0.75rem;
+            position: relative;
+        }
+        
+        .dialog-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .dialog-description {
+            margin-top: 0.35rem;
+            margin-bottom: 0;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+        }
+        
+        .dialog-content {
+            padding: 0.75rem 1.5rem;
+            position: relative;
+            overflow-y: auto;
+            max-height: calc(90vh - 200px);
+        }
+        
+        .dialog-footer {
+            display: flex;
+            justify-content: flex-end;
+            padding: 1rem 1.5rem;
+            gap: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dialog-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .dialog-btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .dialog-btn-submit {
+            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+            border: 1px solid var(--dark-purple);
+            color: white;
+        }
+        
+        .dialog-close {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.2rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.2, 0, 0.2, 1);
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="sidebar-logo">
+                <i class="fas fa-ring"></i>
+                <h5 class="mb-0">Indian Wedding</h5>
+            </a>
+            <button class="close-sidebar">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="#" onclick="return false;"><i class="fas fa-home me-2"></i>Home</a></li>
+                <li><a href="#" onclick="return false;"><i class="fas fa-female me-2"></i>Bridal Gallery</a></li>
+                <li><a href="#" onclick="return false;"><i class="fas fa-male me-2"></i>Groom Styling</a></li>
+                <li><a href="#" onclick="return false;"><i class="fas fa-building me-2"></i>Venues</a></li>
+                <li><a href="#" onclick="return false;"><i class="fas fa-calendar me-2"></i>Event Planning</a></li>
+                <li><a href="#" onclick="return false;"><i class="fas fa-cog me-2"></i>Settings</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="content">
+        <div class="container">
+            <h1>Sidebar and Dialog Test</h1>
+            <p>This page tests sidebar and dialog functionality.</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Sidebar Test</h5>
+                            <p class="card-text">Test opening and closing the sidebar.</p>
+                            <button id="toggle-sidebar-btn" class="btn btn-primary">Toggle Sidebar</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Dialog Test</h5>
+                            <p class="card-text">Test opening and closing the custom dialog.</p>
+                            <button id="open-dialog-btn" class="btn btn-success">Open Dialog</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Sidebar Events Log</h5>
+                            <pre id="sidebar-log" class="bg-dark p-3 rounded" style="max-height: 200px; overflow-y: auto;"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating Sidebar Toggle Button -->
+    <button id="sidebarToggle" class="sidebar-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Custom Dialog -->
+    <div class="dialog-backdrop" id="test-dialog-backdrop">
+        <div class="dialog">
+            <div class="dialog-header">
+                <h3 class="dialog-title">Test Dialog</h3>
+                <p class="dialog-description">This is a test dialog to verify functionality.</p>
+                <button class="dialog-close" id="dialog-close-btn">&times;</button>
+            </div>
+            <div class="dialog-content">
+                <p>This is a custom dialog with frosted glass effect. This dialog was created without using the Dialog class to test basic functionality.</p>
+                <p>Click the X button or the "Cancel" button to close this dialog.</p>
+            </div>
+            <div class="dialog-footer">
+                <button class="dialog-btn dialog-btn-cancel" id="dialog-cancel-btn">Cancel</button>
+                <button class="dialog-btn dialog-btn-submit" id="dialog-submit-btn">Submit</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Simple JavaScript (inline for simplicity) -->
+    <script>
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded in sidebar test page');
+            
+            // Get elements
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggleBtn = document.getElementById('sidebarToggle');
+            const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+            const closeSidebarBtn = document.querySelector('.close-sidebar');
+            const sidebarLog = document.getElementById('sidebar-log');
+            
+            // Dialog elements
+            const dialogBackdrop = document.getElementById('test-dialog-backdrop');
+            const openDialogBtn = document.getElementById('open-dialog-btn');
+            const closeDialogBtn = document.getElementById('dialog-close-btn');
+            const cancelDialogBtn = document.getElementById('dialog-cancel-btn');
+            const submitDialogBtn = document.getElementById('dialog-submit-btn');
+            
+            // Function to log events
+            function logEvent(message) {
+                const timestamp = new Date().toLocaleTimeString();
+                sidebarLog.innerHTML += `[${timestamp}] ${message}\n`;
+                sidebarLog.scrollTop = sidebarLog.scrollHeight;
+                console.log(message);
+            }
+            
+            // Initialize
+            logEvent('Page initialized');
+            
+            // Toggle sidebar function
+            function toggleSidebar() {
+                logEvent('Toggle sidebar called');
+                if (sidebar) {
+                    sidebar.classList.toggle('closed');
+                    document.body.classList.toggle('sidebar-closed');
+                    
+                    const isOpen = !sidebar.classList.contains('closed');
+                    logEvent(`Sidebar is now ${isOpen ? 'open' : 'closed'}`);
+                }
+            }
+            
+            // Event listeners for sidebar
+            if (sidebarToggleBtn) {
+                sidebarToggleBtn.addEventListener('click', function() {
+                    logEvent('Sidebar toggle button clicked');
+                    toggleSidebar();
+                });
+            }
+            
+            if (toggleSidebarBtn) {
+                toggleSidebarBtn.addEventListener('click', function() {
+                    logEvent('Toggle sidebar button in card clicked');
+                    toggleSidebar();
+                });
+            }
+            
+            if (closeSidebarBtn) {
+                closeSidebarBtn.addEventListener('click', function() {
+                    logEvent('Close sidebar button clicked');
+                    sidebar.classList.add('closed');
+                    document.body.classList.add('sidebar-closed');
+                });
+            }
+            
+            // Event listeners for dialog
+            if (openDialogBtn) {
+                openDialogBtn.addEventListener('click', function() {
+                    logEvent('Open dialog button clicked');
+                    dialogBackdrop.classList.add('dialog-open');
+                });
+            }
+            
+            if (closeDialogBtn) {
+                closeDialogBtn.addEventListener('click', function() {
+                    logEvent('Dialog close button clicked');
+                    dialogBackdrop.classList.remove('dialog-open');
+                });
+            }
+            
+            if (cancelDialogBtn) {
+                cancelDialogBtn.addEventListener('click', function() {
+                    logEvent('Dialog cancel button clicked');
+                    dialogBackdrop.classList.remove('dialog-open');
+                });
+            }
+            
+            if (submitDialogBtn) {
+                submitDialogBtn.addEventListener('click', function() {
+                    logEvent('Dialog submit button clicked');
+                    // Simulate processing
+                    submitDialogBtn.textContent = 'Processing...';
+                    submitDialogBtn.disabled = true;
+                    
+                    setTimeout(function() {
+                        logEvent('Dialog action completed');
+                        submitDialogBtn.textContent = 'Submit';
+                        submitDialogBtn.disabled = false;
+                        dialogBackdrop.classList.remove('dialog-open');
+                    }, 1500);
+                });
+            }
+            
+            // Close sidebar when clicking outside
+            document.addEventListener('click', function(event) {
+                if (sidebar) {
+                    const isClickInside = 
+                        sidebar.contains(event.target) || 
+                        (sidebarToggleBtn && sidebarToggleBtn.contains(event.target)) ||
+                        (toggleSidebarBtn && toggleSidebarBtn.contains(event.target));
+                    
+                    if (!isClickInside && !sidebar.classList.contains('closed')) {
+                        logEvent('Clicked outside sidebar, closing it');
+                        sidebar.classList.add('closed');
+                        document.body.classList.add('sidebar-closed');
+                    }
+                }
+            });
+            
+            logEvent('All event listeners registered');
+        });
+    </script>
+</body>
+</html>
