@@ -87,24 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Close button listener added");
     }
     
-    // Close sidebar when clicking outside
-    document.addEventListener('click', function(event) {
-        if (sidebar && !sidebar.classList.contains('closed')) {
-            const clickedElement = event.target;
-            
-            // Check if the click was inside the sidebar or on toggle buttons
-            const isClickInside = 
-                sidebar.contains(clickedElement) || 
-                (sidebarToggle && sidebarToggle.contains(clickedElement)) ||
-                (navSidebarToggle && navSidebarToggle.contains(clickedElement));
-            
-            if (!isClickInside) {
-                console.log("Sidebar.js: Clicked outside, closing sidebar");
-                sidebar.classList.add('closed');
-                document.body.classList.add('sidebar-closed');
-            }
-        }
-    });
+    // Removed click outside handler to fix opening issue
     
     console.log("Sidebar.js initialization complete");
 });
