@@ -233,8 +233,8 @@
     
     /* Selected template styling */
     .template-card.selected-template {
-        border: 3px solid #9c27b0 !important;
-        box-shadow: 0 0 15px rgba(156, 39, 176, 0.6);
+        border: 2px solid #9c27b0 !important;
+        box-shadow: 0 0 8px rgba(156, 39, 176, 0.4);
     }
     
     .selected-glow {
@@ -291,8 +291,6 @@
     }
     
     .multi-result-card {
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
         overflow: hidden;
         transition: all 0.3s ease;
         flex: 0 0 280px; /* Fixed width */
@@ -300,7 +298,7 @@
         max-width: 280px; /* Maximum width */
         margin-bottom: 0; /* Remove bottom margin to keep in one row */
         margin-right: 15px; /* Add right margin for spacing */
-        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     
     /* Force max height on card components */
@@ -2016,25 +2014,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     resultCard.innerHTML = `
                         <div class="position-relative mb-3">
-                            <div class="position-relative overflow-hidden mb-1" style="height: 280px; cursor: pointer;" 
+                            <div class="position-relative overflow-hidden" style="height: 280px; cursor: pointer;" 
                                 onclick="openFullImage('${resultFullPath}', '${displayCeremony}', ${index})">
                                 <img src="${resultFullPath}" class="w-100 rounded multi-result-img" alt="Result for ${displayCeremony}" 
                                     style="height: 100%; object-fit: cover;">
                                 ${newBadge}
-                                <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2 d-none d-md-block">
-                                    <span class="badge bg-dark bg-opacity-75 px-3 py-2">
-                                        <i class="fas fa-search-plus me-1"></i> Click to enlarge
-                                    </span>
-                                </div>
                             </div>
                             
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="text-light">${displayCeremony.charAt(0).toUpperCase() + displayCeremony.slice(1)} Look</h6>
-                                <div class="btn-group">
-                                    <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <h6 class="text-light mb-0">${displayCeremony}</h6>
+                                <div>
+                                    <button class="btn btn-sm btn-link text-danger p-1 remove-result-btn" data-index="${index}" title="Remove this result">
                                         <i class="fas fa-trash"></i>
                                     </button>
-                                    <a href="${resultFullPath}" class="btn btn-sm btn-success" download title="Download this image">
+                                    <a href="${resultFullPath}" class="btn btn-sm btn-link text-success p-1" download title="Download this image">
                                         <i class="fas fa-download"></i>
                                     </a>
                                 </div>
