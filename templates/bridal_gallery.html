@@ -557,15 +557,7 @@
     
     <!-- Template Carousel with Arrow Navigation -->
     <div class="template-carousel position-relative mb-4" id="{{ ceremony }}-carousel">
-        <!-- Left/Right Navigation Arrows -->
-        <div class="carousel-nav-buttons">
-            <button class="btn btn-dark carousel-nav-btn prev-btn" data-target="{{ ceremony }}-carousel">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="btn btn-dark carousel-nav-btn next-btn" data-target="{{ ceremony }}-carousel">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
+
         
         <!-- Delete Tools -->
         <div class="template-management-tools mb-2">
@@ -857,49 +849,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentDeleteCeremony = null;
     let currentBulkDeletePaths = [];
     
-    // Simplifying carousel navigation to work with our expand/collapse approach
-    document.querySelectorAll('.carousel-nav-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const carouselId = this.getAttribute('data-target');
-            console.log(`Carousel navigation button clicked for: ${carouselId}`);
-            
-            // Find the associated ceremony
-            const ceremony = carouselId.replace('-carousel', '');
-            
-            // Get the scroll container for this ceremony
-            const cardsContainer = document.getElementById(`${ceremony}-cards`);
-            
-            if (!cardsContainer) {
-                console.error(`Could not find cards container for ${ceremony}`);
-                return;
-            }
-            
-            // First make sure the row is expanded
-            const toggleButton = document.querySelector(`button.toggle-row-btn[data-target="${ceremony}-row"]`);
-            
-            if (toggleButton && !toggleButton.classList.contains('expanded')) {
-                toggleButton.click();
-            }
-            
-            // Calculate scroll amount (approximately 1 card width)
-            const cardWidth = 280; // Approximate width of a card plus margin
-            
-            // Get the scrollable parent
-            const scrollableParent = cardsContainer.closest('.template-row');
-            
-            if (!scrollableParent) {
-                console.error('Could not find scrollable parent');
-                return;
-            }
-            
-            // Determine scroll direction
-            if (this.classList.contains('prev-btn')) {
-                scrollableParent.scrollBy({ left: -cardWidth * 2, behavior: 'smooth' });
-            } else {
-                scrollableParent.scrollBy({ left: cardWidth * 2, behavior: 'smooth' });
-            }
-        });
-    });
+    // Carousel navigation removed
     
     // Initialization is now handled by initializeCarouselsCollapsed() function
     
