@@ -1585,7 +1585,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // We now have direct event listeners on each checkbox, but keep this for any dynamically added checkboxes
     document.addEventListener('click', function(e) {
-        if (isSelectionMode && e.target.closest('.template-card') && !e.target.classList.contains('template-checkbox') && !e.target.closest('.select-template-btn')) {
+        if (isSelectionMode && e.target.closest('.template-card') && !e.target.classList.contains('template-checkbox') && !e.target.closest('.template-checkbox-container')) {
             // When in selection mode, clicking on the card toggles the checkbox
             const card = e.target.closest('.template-card');
             const checkbox = card.querySelector('.template-checkbox');
@@ -2308,10 +2308,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     card.addEventListener('click', function(e) {
                         console.log('Card clicked, selection mode:', isSelectionMode);
                         
-                        // Don't trigger if clicking on a checkbox or the select button
+                        // Don't trigger if clicking on a checkbox or its container
                         if (e.target.classList.contains('template-checkbox') || 
-                            e.target.closest('.select-template-btn')) {
-                            console.log('Clicked on checkbox or button - ignoring');
+                            e.target.closest('.template-checkbox-container')) {
+                            console.log('Clicked on checkbox or its container - ignoring');
                             return;
                         }
                         
@@ -2361,10 +2361,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         // Also listen for clicks on the card when in selection mode
                         card.addEventListener('click', function(e) {
-                            // Only handle clicks in selection mode and not on the checkbox or button itself
+                            // Only handle clicks in selection mode and not on the checkbox or its container
                             if (isSelectionMode && 
                                 !e.target.classList.contains('template-checkbox') && 
-                                !e.target.closest('.select-template-btn')) {
+                                !e.target.closest('.template-checkbox-container')) {
                                 checkbox.checked = !checkbox.checked;
                                 this.classList.toggle('selected', checkbox.checked);
                                 console.log('Card clicked in selection mode, now selected:', this.classList.contains('selected'));
