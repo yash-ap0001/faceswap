@@ -254,7 +254,15 @@
                     </div>
                     
                     <div id="templates-container">
-                        <!-- Template sections will be populated here -->
+                        <!-- All templates will be shown in a single gallery -->
+                        <div id="all-templates" class="template-gallery">
+                            <div class="loading-placeholder text-center py-5 w-100">
+                                <div class="spinner-border text-secondary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading templates...</p>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="text-center mt-4">
@@ -500,12 +508,15 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error loading templates:', error);
-                const galleryEl = document.getElementById(`${ceremony}-templates`);
-                galleryEl.innerHTML = `
-                    <div class="alert alert-danger w-100">
-                        Error loading templates: ${error.message}
-                    </div>
-                `;
+                const galleryEl = document.getElementById('all-templates');
+                // Only display error if it's not already populated
+                if (galleryEl.children.length === 0) {
+                    galleryEl.innerHTML = `
+                        <div class="alert alert-danger w-100">
+                            Error loading templates: ${error.message}
+                        </div>
+                    `;
+                }
             });
     }
     
@@ -521,8 +532,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const checkboxes = document.querySelectorAll('.template-checkbox:checked');
         selectedTemplates = Array.from(checkboxes).map(checkbox => ({
             id: checkbox.value,
-            ceremony: checkbox.dataset.ceremony,
-            type: checkbox.dataset.type,
             element: checkbox.closest('.template-card')
         }));
         
@@ -557,8 +566,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const formData = new FormData();
             formData.append('source', uploadedFile);
-            formData.append('style', template.ceremony);
-            formData.append('template_type', template.type);
+            formData.append('template_path', template.element.dataset.path);
             
             const response = await fetch('/bridal-swap', {
                 method: 'POST',
