@@ -2150,25 +2150,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Check if this is a new result (less than 30 seconds old)
                 const isNew = item.timestamp ? (Date.now() - item.timestamp < 30000) : true;
                 
-                // Create HTML for this card in the exact format requested
+                // Create HTML for this card with minimalist styling
                 resultsHTML += `<div class="multi-result-card" data-result-index="${index}" data-result-path="${resultFullPath}" data-ceremony-type="${ceremonyType}">
                     <div class="position-relative mb-3">
-                        <div class="position-relative overflow-hidden mb-1" style="height: 280px; cursor: pointer;" onclick="openFullImage('${resultFullPath}', '${displayCeremony}', ${index})">
-                            <img src="${resultFullPath}" class="w-100 rounded multi-result-img" alt="Result for ${displayCeremony}" style="height: 100%; object-fit: cover;">
+                        <div class="position-relative overflow-hidden" style="cursor: pointer;" onclick="openFullImage('${resultFullPath}', '${displayCeremony}', ${index})">
+                            <img src="${resultFullPath}" class="rounded multi-result-img" alt="Result for ${displayCeremony}" style="width: 100%; object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
                             ${isNew ? `<div class="position-absolute top-0 start-0 m-2">
                                 <span class="badge bg-success">NEW</span>
                             </div>` : ''}
-                            <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2 d-none d-md-block">
-                                <span class="badge bg-dark bg-opacity-75 px-3 py-2">
-                                    <i class="fas fa-search-plus me-1"></i> Click to enlarge
-                                </span>
-                            </div>
                         </div>
                         
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="text-light">${displayCeremony} Look</h6>
+                        <div class="d-flex justify-content-end align-items-center mt-2">
                             <div class="btn-group">
-                                <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
+                                <button class="btn btn-sm btn-outline-secondary remove-result-btn" data-index="${index}" title="Remove this result">
                                     <i class="fas fa-trash"></i>
                                 </button>
                                 <a href="${resultFullPath}" class="btn btn-sm btn-success" download title="Download this image">
@@ -2394,10 +2388,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Display all templates
                 templates.forEach((template, index) => {
                     const col = document.createElement('div');
-                    col.className = 'col-md-3 col-sm-4 col-6 mb-3';
+                    col.className = 'col-md-3 col-sm-4 col-6 mb-4'; // Increased bottom margin for better spacing
                     
                     const card = document.createElement('div');
-                    card.className = 'position-relative template-card shadow-sm'; // More subtle styling
+                    card.className = 'position-relative template-card'; // Clean styling without shadows
                     card.dataset.templateUrl = template.url;
                     card.dataset.templateId = template.id || '';
                     card.dataset.templatePath = template.path || template.url;
@@ -2405,18 +2399,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     card.dataset.ceremony = ceremonyType;
                     
                     card.innerHTML = `
-                        <div class="position-relative overflow-hidden" style="height: 350px;">
-                            <img src="${template.url}" class="w-100 rounded template-img" 
-                                alt="${ceremonyType} template" style="height: 350px; object-fit: cover;">
+                        <div class="position-relative overflow-hidden" style="max-height: 260px;">
+                            <img src="${template.url}" class="rounded template-img" 
+                                alt="${ceremonyType} template" style="width: 100%; object-fit: cover;">
                             
-                            <div class="position-absolute top-0 end-0 m-2 template-checkbox-wrapper opacity-75">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input template-checkbox" 
-                                        id="template-check-${ceremonyType}-${index}">
-                                </div>
+                            <div class="position-absolute top-0 end-0 m-2 template-checkbox-wrapper">
+                                <input type="checkbox" class="form-check-input template-checkbox" 
+                                    id="template-check-${ceremonyType}-${index}">
                             </div>
                         </div>
-                        <small class="text-center text-light-emphasis d-block mt-1">${ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1)}</small>
                     `;
                     
                     templateContainer.appendChild(col);
