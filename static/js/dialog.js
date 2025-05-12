@@ -3,33 +3,37 @@
  * A reusable dialog/modal component based on shadcn/ui design principles
  */
 
+/**
+ * Dialog class for creating and managing dialog components
+ */
 class Dialog {
   constructor(options = {}) {
-    this.id = options.id || 'dialog-' + Math.random().toString(36).substr(2, 9);
-    this.title = options.title || 'Dialog';
-    this.description = options.description || '';
-    this.size = options.size || 'md'; // sm, md, lg, xl, full
-    this.content = options.content || '';
-    this.footer = options.footer || true;
-    this.closeButton = options.closeButton !== false;
-    this.backdropClose = options.backdropClose !== false;
-    this.submitText = options.submitText || 'Confirm';
-    this.cancelText = options.cancelText || 'Cancel';
-    this.showCancel = options.showCancel !== false;
-    this.onOpen = options.onOpen || (() => {});
-    this.onClose = options.onClose || (() => {});
-    this.onSubmit = options.onSubmit || (() => {});
-    this.preventBodyScroll = options.preventBodyScroll !== false;
+    // Default options
+    this.options = Object.assign({
+      id: `dialog-${Date.now()}`, // Unique ID
+      title: 'Dialog',
+      description: null,
+      content: '',
+      size: 'md', // xs, sm, md, lg, xl, full
+      closeOnBackdropClick: true,
+      closeOnEscapeKey: true,
+      showCloseButton: true,
+      submitText: 'Submit',
+      cancelText: 'Cancel',
+      footer: true,
+      onSubmit: null,
+      onCancel: null,
+      onOpen: null,
+      onClose: null
+    }, options);
     
-    this.element = null;
+    // State variables
     this.isOpen = false;
     this.isLoading = false;
+    this.elements = {}; // Will store references to DOM elements
     
-    // Create dialog element
+    // Create dialog DOM structure
     this._createDialog();
-    
-    // Add to DOM
-    document.body.appendChild(this.element);
     
     // Setup event listeners
     this._setupEventListeners();
@@ -39,126 +43,155 @@ class Dialog {
    * Create the dialog HTML structure
    */
   _createDialog() {
-    // Create overlay
-    this.element = document.createElement('div');
-    this.element.id = this.id + '-overlay';
-    this.element.className = 'dialog-overlay';
-    this.element.setAttribute('role', 'dialog');
-    this.element.setAttribute('aria-modal', 'true');
-    this.element.setAttribute('aria-labelledby', this.id + '-title');
+    // Create backdrop
+    this.elements.backdrop = document.createElement('div');
+    this.elements.backdrop.className = 'dialog-backdrop';
+    this.elements.backdrop.id = `${this.options.id}-backdrop`;
+    this.elements.backdrop.setAttribute('aria-hidden', 'true');
     
-    // Content wrapper
-    const content = document.createElement('div');
-    content.className = `dialog-content dialog-${this.size}`;
-    content.id = this.id + '-content';
+    // Create content container
+    this.elements.content = document.createElement('div');
+    this.elements.content.className = `dialog-content dialog-${this.options.size}`;
+    this.elements.content.setAttribute('role', 'dialog');
+    this.elements.content.setAttribute('aria-modal', 'true');
+    this.elements.content.setAttribute('aria-labelledby', `${this.options.id}-title`);
     
-    // Header
-    const header = document.createElement('div');
-    header.className = 'dialog-header';
-    
-    const titleWrapper = document.createElement('div');
-    
-    const title = document.createElement('h2');
-    title.id = this.id + '-title';
-    title.className = 'dialog-title';
-    title.textContent = this.title;
-    
-    titleWrapper.appendChild(title);
-    
-    if (this.description) {
-      const description = document.createElement('p');
-      description.id = this.id + '-description';
-      description.className = 'dialog-description';
-      description.textContent = this.description;
-      titleWrapper.appendChild(description);
+    if (this.options.description) {
+      this.elements.content.setAttribute('aria-describedby', `${this.options.id}-description`);
     }
     
-    header.appendChild(titleWrapper);
-    
-    // Close button
-    if (this.closeButton) {
-      const closeBtn = document.createElement('button');
-      closeBtn.type = 'button';
-      closeBtn.className = 'dialog-close';
-      closeBtn.setAttribute('aria-label', 'Close');
-      closeBtn.innerHTML = '<i class="fas fa-times"></i>';
-      closeBtn.addEventListener('click', () => this.close());
-      content.appendChild(closeBtn);
+    // Create close button
+    if (this.options.showCloseButton) {
+      this.elements.closeBtn = document.createElement('button');
+      this.elements.closeBtn.className = 'dialog-close';
+      this.elements.closeBtn.setAttribute('aria-label', 'Close dialog');
+      this.elements.closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+      this.elements.content.appendChild(this.elements.closeBtn);
     }
     
-    // Body
-    const body = document.createElement('div');
-    body.className = 'dialog-body';
+    // Create header
+    this.elements.header = document.createElement('div');
+    this.elements.header.className = 'dialog-header';
     
-    if (typeof this.content === 'string') {
-      body.innerHTML = this.content;
-    } else if (this.content instanceof HTMLElement) {
-      body.appendChild(this.content);
+    this.elements.title = document.createElement('h2');
+    this.elements.title.className = 'dialog-title';
+    this.elements.title.id = `${this.options.id}-title`;
+    this.elements.title.textContent = this.options.title;
+    this.elements.header.appendChild(this.elements.title);
+    
+    if (this.options.description) {
+      this.elements.description = document.createElement('p');
+      this.elements.description.className = 'dialog-description';
+      this.elements.description.id = `${this.options.id}-description`;
+      this.elements.description.textContent = this.options.description;
+      this.elements.header.appendChild(this.elements.description);
     }
     
-    // Progress info
-    const progressInfo = document.createElement('div');
-    progressInfo.id = this.id + '-progress';
-    progressInfo.className = 'dialog-progress d-none';
-    body.appendChild(progressInfo);
+    this.elements.content.appendChild(this.elements.header);
     
-    // Footer
-    if (this.footer) {
-      const footer = document.createElement('div');
-      footer.className = 'dialog-footer';
+    // Create body
+    this.elements.body = document.createElement('div');
+    this.elements.body.className = 'dialog-body';
+    this.elements.body.innerHTML = this.options.content;
+    this.elements.content.appendChild(this.elements.body);
+    
+    // Create footer
+    if (this.options.footer) {
+      this.elements.footer = document.createElement('div');
+      this.elements.footer.className = 'dialog-footer';
       
-      if (this.showCancel) {
-        const cancelBtn = document.createElement('button');
-        cancelBtn.type = 'button';
-        cancelBtn.className = 'btn btn-outline-secondary';
-        cancelBtn.textContent = this.cancelText;
-        cancelBtn.addEventListener('click', () => this.close());
-        footer.appendChild(cancelBtn);
-      }
+      // Cancel button
+      this.elements.cancelBtn = document.createElement('button');
+      this.elements.cancelBtn.className = 'btn btn-outline-secondary';
+      this.elements.cancelBtn.textContent = this.options.cancelText;
+      this.elements.footer.appendChild(this.elements.cancelBtn);
       
-      const submitBtn = document.createElement('button');
-      submitBtn.type = 'button';
-      submitBtn.id = this.id + '-submit';
-      submitBtn.className = 'btn btn-primary';
-      submitBtn.innerHTML = `
-        <span>${this.submitText}</span>
-        <span id="${this.id}-spinner" class="dialog-spinner d-none"></span>
-      `;
-      submitBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.onSubmit(e);
-      });
+      // Submit button
+      this.elements.submitBtn = document.createElement('button');
+      this.elements.submitBtn.className = 'btn btn-primary';
+      this.elements.submitBtn.textContent = this.options.submitText;
+      this.elements.footer.appendChild(this.elements.submitBtn);
       
-      footer.appendChild(submitBtn);
-      content.appendChild(footer);
+      this.elements.content.appendChild(this.elements.footer);
     }
     
-    // Assemble dialog
-    content.appendChild(header);
-    content.appendChild(body);
+    // Create loading overlay
+    this.elements.loadingOverlay = document.createElement('div');
+    this.elements.loadingOverlay.className = 'dialog-loading-overlay';
     
-    this.element.appendChild(content);
+    this.elements.loadingSpinner = document.createElement('div');
+    this.elements.loadingSpinner.className = 'dialog-loading-spinner spinner-border text-primary';
+    this.elements.loadingSpinner.setAttribute('role', 'status');
+    
+    this.elements.loadingText = document.createElement('div');
+    this.elements.loadingText.className = 'dialog-loading-text';
+    this.elements.loadingText.textContent = 'Loading...';
+    
+    this.elements.loadingOverlay.appendChild(this.elements.loadingSpinner);
+    this.elements.loadingOverlay.appendChild(this.elements.loadingText);
+    
+    this.elements.content.appendChild(this.elements.loadingOverlay);
+    
+    // Add content to backdrop
+    this.elements.backdrop.appendChild(this.elements.content);
+    
+    // Add to document body
+    document.body.appendChild(this.elements.backdrop);
   }
   
   /**
    * Setup event listeners
    */
   _setupEventListeners() {
+    // Close button click
+    if (this.elements.closeBtn) {
+      this.elements.closeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.close();
+      });
+    }
+    
+    // Cancel button click
+    if (this.elements.cancelBtn) {
+      this.elements.cancelBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (typeof this.options.onCancel === 'function') {
+          this.options.onCancel.call(this, e);
+        } else {
+          this.close();
+        }
+      });
+    }
+    
+    // Submit button click
+    if (this.elements.submitBtn) {
+      this.elements.submitBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (typeof this.options.onSubmit === 'function') {
+          this.options.onSubmit.call(this, e);
+        } else {
+          this.close();
+        }
+      });
+    }
+    
     // Close on backdrop click
-    if (this.backdropClose) {
-      this.element.addEventListener('click', (e) => {
-        if (e.target === this.element) {
+    if (this.options.closeOnBackdropClick) {
+      this.elements.backdrop.addEventListener('click', (e) => {
+        if (e.target === this.elements.backdrop) {
           this.close();
         }
       });
     }
     
     // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.isOpen && !this.isLoading) {
-        this.close();
-      }
-    });
+    if (this.options.closeOnEscapeKey) {
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.isOpen) {
+          this.close();
+        }
+      });
+    }
   }
   
   /**
@@ -167,52 +200,49 @@ class Dialog {
   open() {
     if (this.isOpen) return;
     
+    // Set aria-hidden to false
+    this.elements.backdrop.setAttribute('aria-hidden', 'false');
+    
+    // Add open class
+    this.elements.backdrop.classList.add('open');
+    
+    // Set focus to the dialog
+    this.elements.content.focus();
+    
+    // Set isOpen to true
     this.isOpen = true;
-    this.element.classList.add('dialog-active');
     
     // Prevent body scrolling
-    if (this.preventBodyScroll) {
-      document.body.classList.add('dialog-visible');
-    }
-    
-    // Focus the dialog for accessibility
-    setTimeout(() => {
-      const firstInput = this.element.querySelector('input, button:not(.dialog-close)');
-      if (firstInput) {
-        firstInput.focus();
-      }
-    }, 100);
+    document.body.style.overflow = 'hidden';
     
     // Call onOpen callback
-    this.onOpen();
-    
-    // Custom event
-    this.element.dispatchEvent(new CustomEvent('dialog:opened'));
-    
-    return this;
+    if (typeof this.options.onOpen === 'function') {
+      this.options.onOpen.call(this);
+    }
   }
   
   /**
    * Close the dialog
    */
   close() {
-    if (!this.isOpen || this.isLoading) return;
+    if (!this.isOpen) return;
     
+    // Set aria-hidden to true
+    this.elements.backdrop.setAttribute('aria-hidden', 'true');
+    
+    // Remove open class
+    this.elements.backdrop.classList.remove('open');
+    
+    // Set isOpen to false
     this.isOpen = false;
-    this.element.classList.remove('dialog-active');
     
-    // Re-enable body scrolling
-    if (this.preventBodyScroll) {
-      document.body.classList.remove('dialog-visible');
-    }
+    // Allow body scrolling
+    document.body.style.overflow = '';
     
     // Call onClose callback
-    this.onClose();
-    
-    // Custom event
-    this.element.dispatchEvent(new CustomEvent('dialog:closed'));
-    
-    return this;
+    if (typeof this.options.onClose === 'function') {
+      this.options.onClose.call(this);
+    }
   }
   
   /**
@@ -221,107 +251,92 @@ class Dialog {
   setLoading(isLoading, loadingText = null) {
     this.isLoading = isLoading;
     
-    const submitBtn = document.getElementById(this.id + '-submit');
-    const spinner = document.getElementById(this.id + '-spinner');
-    
-    if (!submitBtn || !spinner) return this;
-    
     if (isLoading) {
-      submitBtn.disabled = true;
-      spinner.classList.remove('d-none');
-      
+      this.elements.loadingOverlay.classList.add('active');
       if (loadingText) {
-        submitBtn.querySelector('span:first-child').textContent = loadingText;
+        this.elements.loadingText.textContent = loadingText;
       }
     } else {
-      submitBtn.disabled = false;
-      spinner.classList.add('d-none');
-      submitBtn.querySelector('span:first-child').textContent = this.submitText;
+      this.elements.loadingOverlay.classList.remove('active');
     }
     
-    return this;
+    // Disable/enable form elements and buttons
+    const interactiveElements = this.elements.content.querySelectorAll('button, input, select, textarea');
+    interactiveElements.forEach(el => {
+      el.disabled = isLoading;
+    });
   }
   
   /**
    * Set progress info
    */
   setProgress(text) {
-    const progressEl = document.getElementById(this.id + '-progress');
-    
-    if (!progressEl) return this;
-    
-    if (text) {
-      progressEl.textContent = text;
-      progressEl.classList.remove('d-none');
-    } else {
-      progressEl.classList.add('d-none');
+    if (!this.elements.loadingProgress) {
+      this.elements.loadingProgress = document.createElement('div');
+      this.elements.loadingProgress.className = 'dialog-progress';
+      this.elements.loadingOverlay.appendChild(this.elements.loadingProgress);
     }
     
-    return this;
+    this.elements.loadingProgress.textContent = text;
+    this.elements.loadingProgress.style.display = text ? 'block' : 'none';
   }
   
   /**
    * Update dialog content
    */
   setContent(content) {
-    const bodyEl = this.element.querySelector('.dialog-body');
-    
-    if (!bodyEl) return this;
-    
-    // Remove progress info element
-    const progressEl = document.getElementById(this.id + '-progress');
-    
-    // Clear existing content
-    bodyEl.innerHTML = '';
-    
-    // Add new content
-    if (typeof content === 'string') {
-      bodyEl.innerHTML = content;
-    } else if (content instanceof HTMLElement) {
-      bodyEl.appendChild(content);
-    }
-    
-    // Add back progress info
-    if (progressEl) {
-      bodyEl.appendChild(progressEl);
-    }
-    
-    return this;
+    this.elements.body.innerHTML = content;
   }
   
   /**
    * Update dialog title
    */
   setTitle(title) {
-    const titleEl = document.getElementById(this.id + '-title');
-    
-    if (titleEl) {
-      titleEl.textContent = title;
-    }
-    
-    return this;
+    this.options.title = title;
+    this.elements.title.textContent = title;
   }
   
   /**
    * Update dialog size
    */
   setSize(size) {
-    const contentEl = document.getElementById(this.id + '-content');
-    
-    if (contentEl) {
-      contentEl.className = contentEl.className.replace(/dialog-(sm|md|lg|xl|full)/, '');
-      contentEl.classList.add(`dialog-${size}`);
+    const validSizes = ['xs', 'sm', 'md', 'lg', 'xl', 'full'];
+    if (!validSizes.includes(size)) {
+      console.warn(`Invalid dialog size: ${size}. Using 'md' instead.`);
+      size = 'md';
     }
     
-    return this;
+    // Remove existing size class
+    validSizes.forEach(s => {
+      this.elements.content.classList.remove(`dialog-${s}`);
+    });
+    
+    // Add new size class
+    this.elements.content.classList.add(`dialog-${size}`);
+    
+    this.options.size = size;
   }
   
   /**
    * Destroy the dialog
    */
   destroy() {
-    if (this.element) {
-      document.body.removeChild(this.element);
+    // Remove event listeners
+    if (this.elements.closeBtn) {
+      this.elements.closeBtn.removeEventListener('click', this.close);
+    }
+    
+    if (this.elements.cancelBtn) {
+      this.elements.cancelBtn.removeEventListener('click', this.close);
+    }
+    
+    if (this.elements.submitBtn && this.options.onSubmit) {
+      this.elements.submitBtn.removeEventListener('click', this.options.onSubmit);
+    }
+    
+    // Remove from DOM
+    if (this.elements.backdrop && this.elements.backdrop.parentNode) {
+      this.elements.backdrop.parentNode.removeChild(this.elements.backdrop);
     }
   }
 }
@@ -330,22 +345,35 @@ class Dialog {
  * Create a dialog hook for ease of use (similar to React hooks)
  */
 function useDialog(options = {}) {
-  const dialog = new Dialog(options);
-  
-  return {
-    dialog,
-    isOpen: () => dialog.isOpen,
-    open: () => dialog.open(),
-    close: () => dialog.close(),
-    setLoading: (loading, text) => dialog.setLoading(loading, text),
-    setProgress: (text) => dialog.setProgress(text),
-    setContent: (content) => dialog.setContent(content),
-    setTitle: (title) => dialog.setTitle(title),
-    setSize: (size) => dialog.setSize(size),
-    destroy: () => dialog.destroy()
-  };
+  return new Dialog(options);
 }
 
-// For using directly in HTML templates
-window.Dialog = Dialog;
-window.useDialog = useDialog;
+/**
+ * Initialize dialog triggers in the DOM
+ */
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize dialog triggers
+  const dialogTriggers = document.querySelectorAll('[data-open-dialog]');
+  dialogTriggers.forEach(trigger => {
+    trigger.addEventListener('click', function(e) {
+      e.preventDefault();
+      const dialogId = this.getAttribute('data-open-dialog');
+      const dialog = document.getElementById(dialogId);
+      
+      if (!dialog) {
+        console.warn(`Dialog with id "${dialogId}" not found.`);
+        return;
+      }
+      
+      // Show the modal using Bootstrap if available
+      if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const modal = new bootstrap.Modal(dialog);
+        modal.show();
+      } else {
+        // Fallback to basic functionality
+        dialog.style.display = 'block';
+        dialog.classList.add('show');
+      }
+    });
+  });
+});

@@ -208,13 +208,12 @@ myDialog.setProgress('Step 2 of 3 completed');</code></pre>
                 title: 'Custom Dialog',
                 description: 'This dialog was created dynamically',
                 size: 'md',
-                content: `
-                    <div class="text-center py-4">
-                        <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
-                        <h4>Success!</h4>
-                        <p class="mb-0">Your custom dialog was created successfully.</p>
-                    </div>
-                `,
+                content: 
+                    '<div class="text-center py-4">' +
+                    '<i class="fas fa-check-circle text-success fa-4x mb-3"></i>' +
+                    '<h4>Success!</h4>' +
+                    '<p class="mb-0">Your custom dialog was created successfully.</p>' +
+                    '</div>',
                 submitText: 'Awesome',
                 onSubmit: function() {
                     this.close();
@@ -231,14 +230,13 @@ myDialog.setProgress('Step 2 of 3 completed');</code></pre>
                 title: 'API Integration',
                 description: 'Fetching data from API',
                 size: 'md',
-                content: `
-                    <div class="text-center py-3" id="api-dialog-content">
-                        <div class="spinner-border text-primary mb-3" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p>Loading data from API...</p>
-                    </div>
-                `,
+                content: 
+                    '<div class="text-center py-3" id="api-dialog-content">' +
+                    '<div class="spinner-border text-primary mb-3" role="status">' +
+                    '<span class="visually-hidden">Loading...</span>' +
+                    '</div>' +
+                    '<p>Loading data from API...</p>' +
+                    '</div>',
                 footer: false
             });
             
@@ -246,20 +244,20 @@ myDialog.setProgress('Step 2 of 3 completed');</code></pre>
             
             // Simulate API call
             setTimeout(function() {
-                apiDialog.setContent(`
-                    <div class="py-3">
-                        <h5 class="mb-3">Data Loaded Successfully</h5>
-                        <div class="card bg-dark mb-3">
-                            <div class="card-body">
-                                <h6 class="card-title">User Data</h6>
-                                <p class="card-text mb-1"><strong>Name:</strong> John Doe</p>
-                                <p class="card-text mb-1"><strong>Email:</strong> john@example.com</p>
-                                <p class="card-text mb-0"><strong>Role:</strong> Administrator</p>
-                            </div>
-                        </div>
-                        <button id="api-dialog-close" class="btn btn-primary w-100">Close</button>
-                    </div>
-                `);
+                apiDialog.setContent(
+                    '<div class="py-3">' +
+                    '<h5 class="mb-3">Data Loaded Successfully</h5>' +
+                    '<div class="card bg-dark mb-3">' +
+                    '<div class="card-body">' +
+                    '<h6 class="card-title">User Data</h6>' +
+                    '<p class="card-text mb-1"><strong>Name:</strong> John Doe</p>' +
+                    '<p class="card-text mb-1"><strong>Email:</strong> john@example.com</p>' +
+                    '<p class="card-text mb-0"><strong>Role:</strong> Administrator</p>' +
+                    '</div>' +
+                    '</div>' +
+                    '<button id="api-dialog-close" class="btn btn-primary w-100">Close</button>' +
+                    '</div>'
+                );
                 
                 // Add event listener to the close button
                 document.getElementById('api-dialog-close').addEventListener('click', function() {
@@ -268,21 +266,16 @@ myDialog.setProgress('Step 2 of 3 completed');</code></pre>
             }, 2000);
         });
         
-        // Initialize mock gallery images for the image viewer demo
-        const galleryImages = [
-            "{{ url_for('static', filename='img/demo_image_1.jpg') }}",
-            "{{ url_for('static', filename='img/demo_image_2.jpg') }}"
-        ];
-        
-        // Replace non-existent images with placeholder images from attachedの_assets or similar directories
-        document.querySelectorAll('.demo-image').forEach(function(img, index) {
+        // Initialize images for the image viewer demo
+        document.querySelectorAll('.demo-image').forEach(function(img) {
+            // Handle image load errors
             img.onerror = function() {
                 // Try to use existing photos from the wedding app
-                this.src = "{{ url_for('static', filename='img/placeholder_1.jpg') }}".replace('placeholder_1', 'placeholder_' + (index + 1));
+                this.src = "{{ url_for('static', filename='img/placeholder_1.jpg') }}";
                 
                 // If those fail too, use a generic placeholder
                 this.onerror = function() {
-                    this.src = "https://via.placeholder.com/400x300/6c757d/ffffff?text=Demo+Image+" + (index + 1);
+                    this.src = "https://via.placeholder.com/400x300/6c757d/ffffff?text=Demo+Image";
                     this.onerror = null;
                 };
             };
