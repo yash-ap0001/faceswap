@@ -1465,13 +1465,23 @@ document.addEventListener('DOMContentLoaded', function() {
             // Create thumbnails for each selected template
             selectedCheckboxes.forEach((checkbox, index) => {
                 const card = checkbox.closest('.template-card');
-                if (!card) return;
+                if (!card) {
+                    console.error('Could not find parent card for checkbox', checkbox);
+                    return;
+                }
                 
-                // Get template details from the card
-                const templatePath = card.dataset.templatePath || card.dataset.url || '';
+                // Get template details from the card - try multiple attribute options
+                const templatePath = card.dataset.templateUrl || card.dataset.templatePath || '';
                 const ceremonyType = card.dataset.ceremony || 'template';
                 const img = card.querySelector('img');
                 const imageUrl = img ? img.src : '';
+                
+                console.log('Adding selected template:', {
+                    templatePath,
+                    ceremonyType,
+                    imageUrl,
+                    card
+                });
                 
                 // Create template card for the horizontal scrolling display
                 const cardDiv = document.createElement('div');
