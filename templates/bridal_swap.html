@@ -265,8 +265,8 @@
         display: flex;
         flex-wrap: nowrap;
         overflow-x: auto;
-        gap: 30px; /* Increased gap between cards */
-        padding: 20px 5px; /* More top/bottom padding */
+        gap: 15px;
+        padding: 15px 5px;
         align-items: stretch;
         scrollbar-width: thin;
         scrollbar-color: rgba(255,255,255,0.3) rgba(0,0,0,0.2);
@@ -297,7 +297,7 @@
         min-width: 280px; /* Ensure minimum width */
         max-width: 280px; /* Maximum width */
         margin-bottom: 0; /* Remove bottom margin to keep in one row */
-        margin-right: 30px; /* Increased right margin for more spacing */
+        margin-right: 15px; /* Add right margin for spacing */
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     
@@ -351,7 +351,10 @@
                 </h1>
             </div>
             <div class="card-body">
-
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Upload your photo to see yourself in traditional Indian bridal attire for different ceremonies.
+                </div>
                 
                 <div id="model-status-alert" class="alert alert-warning d-none" role="alert">
                     <i class="fas fa-exclamation-triangle me-2"></i>
@@ -468,12 +471,21 @@
                 
                 <!-- Multi-Template Results -->
                 <div id="multi-results-container" class="mt-5 d-none">
-                    <div class="mb-4">
-                        <div class="mb-3">
-                            <h5 class="mb-2"><i class="fas fa-images me-2"></i>Your Multiple Bridal Looks <span id="results-count" class="text-muted"></span></h5>
+                    <div class="card bg-dark shadow-lg border-0 mb-4">
+                        <div class="card-header bg-primary bg-gradient text-white">
+                            <h3 class="mb-0"><i class="fas fa-images me-2"></i>Your Multiple Bridal Looks</h3>
+
                         </div>
-                        <div class="">
+                        <div class="card-body bg-dark pt-4">
                             <div class="multi-results-container d-flex flex-nowrap"></div>
+                            <div class="text-center mt-4 pt-3 border-top border-secondary">
+                                <button id="multi-try-again-btn" class="btn btn-lg btn-outline-light">
+                                    <i class="fas fa-redo me-2"></i>Try Different Templates
+                                </button>
+                                <button id="select-more-btn" class="btn btn-lg btn-primary ms-2">
+                                    <i class="fas fa-plus me-2"></i>Select More Templates
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -612,77 +624,66 @@
 
 <!-- Full Image Modal -->
 <div class="modal fade" id="fullImageModal" tabindex="-1" aria-labelledby="fullImageModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen">
-        <div class="modal-content bg-transparent text-white" 
-             style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: all 0.3s ease;">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content bg-dark bg-opacity-80 text-light" 
+             style="backdrop-filter: blur(8px); transition: all 0.3s ease;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title d-flex align-items-center" id="fullImageModalLabel">
+                    <span id="modal-ceremony-name">Bridal Look</span>
+                    <span class="badge ms-2 py-1 px-2" id="image-counter">Image 1 of 1</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
             <div class="modal-body p-0 position-relative overflow-hidden">
-                <!-- Close button in top right -->
-                <button type="button" class="position-absolute top-0 end-0 m-4 btn btn-sm text-white opacity-75 z-3" 
-                        style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 36px; height: 36px; padding: 0;" 
-                        data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times"></i>
-                </button>
-                
-                <!-- Image counter in top left -->
-                <div class="position-absolute top-0 start-0 m-4 d-flex align-items-center z-3">
-                    <h6 class="m-0" id="modal-ceremony-name" style="text-shadow: 0 0 10px rgba(0,0,0,0.8);">Bridal Look</h6>
-                    <span class="ms-2 small opacity-75" id="image-counter" style="text-shadow: 0 0 10px rgba(0,0,0,0.8);">Image 1 of 1</span>
-                </div>
-                
-                <div id="image-container" class="d-flex align-items-center justify-content-center" 
-                     style="min-height: 100vh; background: rgba(0,0,0,0.7);">
+                <div id="image-container" class="text-center position-relative" style="background-color: rgba(0,0,0,0.6); min-height: 70vh;">
                     <img id="full-size-image" class="img-fluid" src="" alt="Full size bridal image" 
-                         style="max-height: 90vh; transform-origin: center; transition: transform 0.3s ease; position: relative; z-index: 2;">
+                         style="max-height: 70vh; transform-origin: center; transition: transform 0.3s ease;">
                 </div>
                 
-                <!-- Navigation Controls -->
-                <button id="prev-image-btn" class="position-absolute top-50 start-0 translate-middle-y btn p-2 ms-4 z-3" 
-                        style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 50px; height: 50px; opacity: 0.7; transition: all 0.2s ease;">
-                    <i class="fas fa-chevron-left fa-lg"></i>
-                </button>
-                <button id="next-image-btn" class="position-absolute top-50 end-0 translate-middle-y btn p-2 me-4 z-3" 
-                        style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 50px; height: 50px; opacity: 0.7; transition: all 0.2s ease;">
-                    <i class="fas fa-chevron-right fa-lg"></i>
-                </button>
-                
-                <!-- Top Right Zoom Controls -->
-                <div class="position-absolute top-0 end-0 mt-5 pt-4 me-4 zoom-controls d-flex z-3">
-                    <button id="zoom-in-btn" class="btn btn-sm me-2" 
-                            style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 36px; height: 36px;">
+                <!-- Zoom Controls -->
+                <div class="position-absolute top-0 end-0 p-2 d-flex gap-1">
+                    <button id="zoom-in-btn" class="btn btn-sm btn-dark rounded-circle" title="Zoom In">
                         <i class="fas fa-search-plus"></i>
                     </button>
-                    <button id="zoom-out-btn" class="btn btn-sm me-2" 
-                            style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 36px; height: 36px;">
+                    <button id="zoom-out-btn" class="btn btn-sm btn-dark rounded-circle" title="Zoom Out">
                         <i class="fas fa-search-minus"></i>
                     </button>
-                    <button id="zoom-reset-btn" class="btn btn-sm" 
-                            style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 36px; height: 36px;">
+                    <button id="zoom-reset-btn" class="btn btn-sm btn-dark rounded-circle" title="Reset Zoom">
                         <i class="fas fa-expand"></i>
                     </button>
                 </div>
                 
-                <!-- Bottom Controls -->
-                <div class="position-absolute bottom-0 w-100 d-flex justify-content-between align-items-center p-4 z-3">
-                    <!-- Download button -->
-                    <a id="download-full-image" href="" download class="btn text-white opacity-75" 
-                       style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 36px; height: 36px; padding: 6px 0 0 0;">
+                <!-- Navigation Controls -->
+                <button id="prev-image-btn" class="btn btn-dark position-absolute top-50 start-0 translate-middle-y rounded-circle p-2 ms-3"
+                        style="width: 40px; height: 40px;">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button id="next-image-btn" class="btn btn-dark position-absolute top-50 end-0 translate-middle-y rounded-circle p-2 me-3" 
+                        style="width: 40px; height: 40px;">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="modal-footer border-0 d-flex justify-content-between">
+                <!-- Bottom Right Zoom Controls -->
+                <div class="zoom-controls-bottom d-flex align-items-center">
+                    <span id="zoom-level-text" class="text-muted small me-2">100%</span>
+                    <div class="btn-group btn-group-sm">
+                        <button id="zoom-out-btn-bottom" class="btn btn-dark" title="Zoom Out">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button id="zoom-in-btn-bottom" class="btn btn-dark" title="Zoom In">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <a id="download-full-image" href="" download class="btn btn-link text-success">
                         <i class="fas fa-download"></i>
                     </a>
-                    
-                    <!-- Bottom Zoom Controls -->
-                    <div class="zoom-controls-bottom d-flex align-items-center">
-                        <span id="zoom-level-text" class="small opacity-75 me-2" style="text-shadow: 0 0 10px rgba(0,0,0,0.8);">100%</span>
-                        <div class="d-flex">
-                            <button id="zoom-out-btn-bottom" class="btn btn-sm me-1" 
-                                    style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">
-                                <i class="fas fa-search-minus"></i>
-                            </button>
-                            <button id="zoom-in-btn-bottom" class="btn btn-sm" 
-                                    style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">
-                                <i class="fas fa-search-plus"></i>
-                            </button>
-                        </div>
-                    </div>
+                    <button type="button" class="btn btn-link text-light" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1388,7 +1389,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Helper function to show a temporary message
     function showMessage(message) {
         const messageContainer = document.createElement('div');
-        messageContainer.className = 'alert alert-secondary alert-dismissible fade show template-message';
+        messageContainer.className = 'alert alert-info alert-dismissible fade show template-message';
         messageContainer.innerHTML = `
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -1884,117 +1885,168 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log('Total processed results:', allProcessedResults.length);
         
-        // Show the container and clear previous results
-        multiResultsContainer.classList.remove('d-none');
+        // Clear previous results
         multiResultsGrid.innerHTML = '';
+        
+        // Debug information before creating cards
+        console.log('Current state before creating cards:', {
+            allProcessedResultsType: typeof allProcessedResults,
+            isArray: Array.isArray(allProcessedResults),
+            allProcessedResultsLength: allProcessedResults ? allProcessedResults.length : 'undefined',
+            firstItem: allProcessedResults && allProcessedResults.length > 0 ? allProcessedResults[0] : null
+        });
         
         // Only proceed if allProcessedResults is an array and has items
         if (!Array.isArray(allProcessedResults) || allProcessedResults.length === 0) {
             console.warn('No processed results to display, showing empty state message');
             const emptyMessage = document.createElement('div');
-            emptyMessage.className = 'text-center text-muted w-100 py-5';
+            emptyMessage.className = 'col-12 text-center p-5';
             emptyMessage.innerHTML = `
-                <i class="fas fa-images fa-3x mb-3"></i>
-                <p>No face swap results yet. Try uploading your photo and selecting some templates!</p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No results to display yet. Select templates and upload your photo to see results.
+                </div>
             `;
             multiResultsGrid.appendChild(emptyMessage);
             return;
         }
         
-        // Update the result count in the heading
-        const countElement = document.getElementById('results-count');
-        if (countElement) {
-            countElement.textContent = `(${allProcessedResults.length})`;
-        }
-        
-        // Create HTML for all result cards at once (more efficient)
-        let resultsHTML = '';
-        
-        // Now we can safely iterate through the array
-        allProcessedResults.forEach((item, index) => {
-            try {
-                // Check if item is valid
-                if (!item || typeof item !== 'object') {
-                    console.error(`Invalid item at index ${index}:`, item);
-                    return; // Skip this item
-                }
-                
-                const result = item.result || {};
-                const template = item.template || {}; // Use empty object as fallback
-                
-                // Determine ceremony type with fallbacks
-                const ceremonyType = result.ceremony || template.ceremony || 'wedding';
-                const displayCeremony = ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1);
-            
-                // Ensure we have a path to display the image from
-                // Server might return result_image (multi-template) or result_path (single template)
-                const resultPath = result.result_path || result.result_image || '';
-                
-                // Full URL path for displaying the image
-                // Check if the path already contains /uploads/ to avoid duplication
-                const resultFullPath = resultPath 
-                    ? (resultPath.startsWith('/uploads/') ? resultPath : `/uploads/${resultPath}`)
-                    : '';
-                
-                if (!resultPath) {
-                    console.warn('No result path found for card:', result);
-                    return; // Skip this item
-                }
-                
-                // Check if this is a new result (less than 30 seconds old)
-                const isNew = item.timestamp ? (Date.now() - item.timestamp < 30000) : true;
-                
-                // Create HTML for this card in the exact format requested
-                resultsHTML += `<div class="multi-result-card" data-result-index="${index}" data-result-path="${resultFullPath}" data-ceremony-type="${ceremonyType}">
-                    <div class="position-relative mb-3">
-                        <div class="position-relative overflow-hidden mb-1" style="height: 280px; cursor: pointer;" onclick="openFullImage('${resultFullPath}', '${displayCeremony}', ${index})">
-                            <img src="${resultFullPath}" class="w-100 rounded multi-result-img" alt="Result for ${displayCeremony}" style="height: 100%; object-fit: cover;">
-                            ${isNew ? `<div class="position-absolute top-0 start-0 m-2">
-                                <span class="badge bg-success">NEW</span>
-                            </div>` : ''}
-                            <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2 d-none d-md-block">
-                                <span class="badge bg-dark bg-opacity-75 px-3 py-2">
-                                    <i class="fas fa-search-plus me-1"></i> Click to enlarge
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex justify-content-end align-items-center">
-                            <div class="btn-group">
-                                <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                <a href="${resultFullPath}" class="btn btn-sm btn-success" download title="Download this image">
-                                    <i class="fas fa-download"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            } catch (error) {
-                console.error(`Error creating result card ${index}:`, error);
-            }
-        });
-        
-        // Set the HTML for all results at once
-        multiResultsGrid.innerHTML = resultsHTML;
-        
-        // Add event listeners to the remove buttons
+        // Create a card for each result in our global array (with error handling)
         try {
-            const removeButtons = document.querySelectorAll('.remove-result-btn');
-            if (removeButtons && removeButtons.length > 0) {
-                removeButtons.forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const index = parseInt(this.getAttribute('data-index'));
-                        removeProcessedResult(index);
-                    });
-                });
+            if (!Array.isArray(allProcessedResults)) {
+                throw new Error('allProcessedResults is not an array: ' + typeof allProcessedResults);
             }
             
-            // Scroll to results container
-            multiResultsContainer.scrollIntoView({ behavior: 'smooth' });
-        } catch (error) {
-            console.error('Error adding event listeners:', error);
+            // If array is empty, show a message
+            if (allProcessedResults.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.className = 'col-12 text-center p-5';
+                emptyMessage.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No results available. Please select templates and upload your photo to see results.
+                    </div>
+                `;
+                multiResultsGrid.appendChild(emptyMessage);
+                return;
+            }
+            
+            // Now we can safely iterate through the array
+            allProcessedResults.forEach((item, index) => {
+                try {
+                    // Check if item is valid
+                    if (!item || typeof item !== 'object') {
+                        console.error(`Invalid item at index ${index}:`, item);
+                        return; // Skip this item
+                    }
+                    
+                    const result = item.result || {};
+                    const template = item.template || {}; // Use empty object as fallback
+                    
+                    // Log data for debugging before creating card
+                    console.log(`Building card ${index} with:`, {
+                        resultData: result,
+                        templateData: template,
+                        ceremonyFromResult: result.ceremony,
+                        ceremonyFromTemplate: template.ceremony
+                    });
+                    
+                    // Determine ceremony type with fallbacks
+                    const ceremonyType = result.ceremony || template.ceremony || 'wedding';
+                    const displayCeremony = ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1);
+                
+                    const resultCard = document.createElement('div');
+                    resultCard.className = 'multi-result-card';
+                    resultCard.setAttribute('data-result-index', index);
+                
+                    // Add a "new" indicator if this result was just added (in last 10 seconds)
+                    // Ensure we have a path to display the image from
+                    // Server might return result_image (multi-template) or result_path (single template)
+                    const resultPath = result.result_path || result.result_image || '';
+                    
+                    // Full URL path for displaying the image
+                    // Check if the path already contains /uploads/ to avoid duplication
+                    const resultFullPath = resultPath 
+                        ? (resultPath.startsWith('/uploads/') ? resultPath : `/uploads/${resultPath}`)
+                        : '';
+                    
+                    console.log(`Processing result path: ${resultPath} -> ${resultFullPath}`);
+                    
+                    if (!resultPath) {
+                        console.warn('No result path found for card:', result);
+                    }
+                    
+                    // Show the timestamp in a subtle way
+                    const timestamp = new Date(item.timestamp || Date.now()).toLocaleTimeString();
+                    
+                    resultCard.innerHTML = `
+                        <div class="position-relative shadow-sm rounded overflow-hidden mb-3">
+                            <div class="position-relative overflow-hidden" style="height: 280px; cursor: pointer;" 
+                                onclick="openFullImage('${resultFullPath}', '${displayCeremony}', ${index})">
+                                <img src="${resultFullPath}" class="w-100 multi-result-img" alt="Result for ${displayCeremony}" 
+                                    style="height: 100%; object-fit: cover;">
+                                
+                                <!-- Semi-transparent footer with info -->
+                                <div class="position-absolute bottom-0 w-100 p-2 d-flex justify-content-between align-items-center" 
+                                     style="background: rgba(0,0,0,0.5);">
+                                    <small class="text-white-50">${displayCeremony}</small>
+                                    <div>
+                                        <a href="${resultFullPath}" class="btn btn-sm btn-link text-white-50 opacity-75 p-0 me-2" download title="Download">
+                                            <i class="fas fa-download fa-sm"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-link text-white-50 opacity-75 p-0 remove-result-btn" data-index="${index}" title="Remove">
+                                            <i class="fas fa-trash fa-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Store the result info in the card's dataset for modal navigation
+                    resultCard.dataset.resultPath = resultFullPath;
+                    resultCard.dataset.ceremonyType = displayCeremony;
+                    
+                    multiResultsGrid.appendChild(resultCard);
+                } catch (cardError) {
+                    console.error(`Error processing result item ${index}:`, cardError);
+                }
+            });
+            
+            try {
+                // Add event listeners to remove buttons (with nullcheck)
+                const removeButtons = document.querySelectorAll('.remove-result-btn');
+                console.log(`Found ${removeButtons.length} remove buttons to attach events to`);
+                
+                if (removeButtons && removeButtons.length > 0) {
+                    removeButtons.forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const index = parseInt(this.getAttribute('data-index'));
+                            removeProcessedResult(index);
+                        });
+                    });
+                }
+                
+                // Update header text with count
+                const headerText = multiResultsContainer.querySelector('h3');
+                if (headerText) {
+                    headerText.innerHTML = `<i class="fas fa-images me-2"></i>Your Multiple Bridal Looks (${allProcessedResults.length})`;
+                }
+                
+                // Show the results container
+                multiResultsContainer.classList.remove('d-none');
+                
+                // Scroll to results
+                window.scrollTo({
+                    top: multiResultsContainer.offsetTop,
+                    behavior: 'smooth'
+                });
+            } catch (finalError) {
+                console.error('Error in final stage of displayMultiResults:', finalError);
+            }
+        } catch (overallError) {
+            console.error('Critical error in displayMultiResults:', overallError);
+            showError('Error displaying results: ' + overallError.message);
         }
     }
     
@@ -2160,8 +2212,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Use templates from the response
                 const templates = data.templates;
                 
-                // Remove template count info display
-                templateContainer.innerHTML = ``;
+                // Show template count info
+                templateContainer.innerHTML = `
+                    <div class="col-12 mb-3">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Found ${templates.length} templates for ${ceremonyType} ceremony.
+                            <span class="small text-muted ms-2">Last updated: ${new Date().toLocaleTimeString()}</span>
+                        </div>
+                    </div>
+                `;
                 
                 // Display all templates
                 templates.forEach((template, index) => {
