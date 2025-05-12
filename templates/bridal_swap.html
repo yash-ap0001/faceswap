@@ -2450,8 +2450,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     templateContainer.appendChild(col);
                     col.appendChild(card);
                     
-                    // Add click event to the card
-                    // Add click events based on mode
+                    // Add click event to the card with unified logic for both modes
                     card.addEventListener('click', function(e) {
                         console.log('Card clicked, selection mode:', isSelectionMode);
                         
@@ -2471,24 +2470,15 @@ document.addEventListener('DOMContentLoaded', function() {
                                 this.classList.toggle('selected', checkbox.checked);
                                 console.log('Toggled checkbox to:', checkbox.checked);
                                 updateSelectedCount();
+                                
+                                // Update selected templates preview
+                                if (typeof updateSelectedTemplatesPreview === 'function') {
+                                    updateSelectedTemplatesPreview();
+                                }
                             }
-                            return;
-                        }
-                        
-                        console.log('Using template in single mode');
-                        useTemplate(this);
-                    });
-                    
-                    // Since we removed the select button, make the card itself clickable in single selection mode
-                    card.addEventListener('click', function(e) {
-                        // Skip if clicked on checkbox
-                        if (e.target.classList.contains('template-checkbox') || 
-                            e.target.closest('.template-checkbox-container')) {
-                            return;
-                        }
-                        
-                        // In single selection mode, use this template
-                        if (!isSelectionMode) {
+                        } else {
+                            // Single swap mode: immediately use this template
+                            console.log('Using template in single swap mode');
                             useTemplate(this);
                         }
                     });
