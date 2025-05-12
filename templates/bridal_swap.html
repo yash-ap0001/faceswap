@@ -1474,21 +1474,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Create template card for the horizontal scrolling display
                 const cardDiv = document.createElement('div');
-                cardDiv.className = 'selected-template-card animate__animated animate__fadeIn';
+                cardDiv.className = 'selected-template-card animate__animated animate__fadeIn rounded shadow-sm overflow-hidden';
                 cardDiv.setAttribute('data-template-path', templatePath);
-                cardDiv.setAttribute('data-ceremony', ceremonyType); // Set ceremony type attribute
+                cardDiv.setAttribute('data-ceremony', ceremonyType);
                 cardDiv.style.width = '180px';
                 cardDiv.style.height = '240px';
                 cardDiv.style.flexShrink = '0';
                 cardDiv.style.flexGrow = '0';
+                cardDiv.style.position = 'relative';
                 
                 // Fill the card with content
                 cardDiv.innerHTML = `
-                    <span class="badge bg-primary selected-template-badge">${ceremonyType}</span>
-                    <button class="selected-template-remove" aria-label="Remove template">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <div class="position-absolute top-0 end-0 p-1">
+                        <button class="btn btn-sm btn-link text-white opacity-75 selected-template-remove" 
+                                style="background: rgba(0,0,0,0.3); border-radius: 50%; width: 24px; height: 24px; padding: 0;"
+                                aria-label="Remove template">
+                            <i class="fas fa-times fa-xs"></i>
+                        </button>
+                    </div>
                     <img src="${imageUrl}" class="selected-template-img" alt="${ceremonyType} template" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="position-absolute bottom-0 w-100 text-center p-1" style="background: rgba(0,0,0,0.5);">
+                        <small class="text-white-50">${ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1)}</small>
+                    </div>
                 `;
                 
                 // Add click listener to remove button
@@ -2210,33 +2217,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     col.className = 'col-md-3 col-sm-4 col-6 mb-3';
                     
                     const card = document.createElement('div');
-                    card.className = 'position-relative template-card'; // Removed card class, bg-dark
+                    card.className = 'position-relative template-card shadow-sm'; // More subtle styling
                     card.dataset.templateUrl = template.url;
                     card.dataset.templateId = template.id || '';
                     card.dataset.templatePath = template.path || template.url;
                     card.dataset.templateType = 'pinterest';
                     card.dataset.ceremony = ceremonyType;
                     
-                    // Debug the card dataset attributes
-                    console.log(`Card created for ${ceremonyType}:`, {
-                        url: card.dataset.templateUrl,
-                        path: card.dataset.templatePath,
-                        ceremony: card.dataset.ceremony
-                    });
-                    
                     card.innerHTML = `
-                        <div class="position-relative overflow-hidden mb-1" style="height: 350px;">
+                        <div class="position-relative overflow-hidden" style="height: 350px;">
                             <img src="${template.url}" class="w-100 rounded template-img" 
                                 alt="${ceremonyType} template" style="height: 350px; object-fit: cover;">
                             
-                            <div class="position-absolute top-0 end-0 m-2 template-checkbox-wrapper">
+                            <div class="position-absolute top-0 end-0 m-2 template-checkbox-wrapper opacity-75">
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input template-checkbox" 
                                         id="template-check-${ceremonyType}-${index}">
                                 </div>
                             </div>
                         </div>
-                        <h6 class="text-center text-light mb-3">${ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1)} Template</h6>
+                        <small class="text-center text-light-emphasis d-block mt-1">${ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1)}</small>
                     `;
                     
                     templateContainer.appendChild(col);
