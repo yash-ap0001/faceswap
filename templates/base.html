@@ -524,25 +524,40 @@
             letter-spacing: 1.5px;
         }
         
-        /* Sidebar edge toggle button - exact position shown in screenshot */
+        /* Sidebar edge toggle button - with animation and image background */
         .sidebar-edge-toggle {
-            position: fixed;
-            left: 263px; /* Position at exact point in screenshot */
-            top: 283px; /* Position at the red and blue lines in screenshot */
-            width: 25px;
-            height: 50px;
-            background: #FF00FF; /* Bright magenta */
-            border-radius: 0 25px 25px 0;
-            border: 3px solid #8A2BE2;
+            position: absolute;
+            left: 100%;
+            top: 270px;
+            transform: translateY(0);
+            width: 40px;
+            height: 80px;
+            background-color: #FF00FF;
+            background-image: linear-gradient(to right, #DA70D6, #8A2BE2);
+            border-radius: 0 40px 40px 0;
+            border: 3px solid #FFF;
             border-left: none;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             cursor: pointer;
-            z-index: 9999; /* Highest z-index to ensure visibility */
+            z-index: 9999;
             transition: all 0.3s ease;
-            box-shadow: 0 0 15px #8A2BE2;
+            box-shadow: 0 0 20px #FF00FF;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 255, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(255, 0, 255, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 255, 0);
+            }
         }
         
         .sidebar-edge-toggle:hover {
@@ -594,11 +609,6 @@
     
     <!-- Transparent Sidebar -->
     <div class="sidebar" id="sidebar">
-        <!-- Sidebar Toggle Button -->
-        <div class="sidebar-edge-toggle" id="sidebarEdgeToggle">
-            <i class="fas fa-chevron-left"></i>
-        </div>
-        
         <div class="sidebar-header">
             <h5>Menu</h5>
             <button class="close-sidebar" aria-label="Close Menu">
@@ -742,6 +752,11 @@
             </div>
         </div>
         </div>
+    </div>
+    
+    <!-- Sidebar Toggle Button (Outside Sidebar) -->
+    <div class="sidebar-edge-toggle" id="sidebarEdgeToggle">
+        <i class="fas fa-chevron-left"></i>
     </div>
 
     <main class="my-4">
