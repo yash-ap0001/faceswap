@@ -1199,7 +1199,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Use MutationObserver to catch any dynamically added template count messages
-    const observer = new MutationObserver(mutations => {
+    const templateObserver = new MutationObserver(mutations => {
         mutations.forEach(mutation => {
             if (mutation.addedNodes && mutation.addedNodes.length > 0) {
                 mutation.addedNodes.forEach(node => {
@@ -1245,7 +1245,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Observe the entire document for changes
-    observer.observe(document.body, { 
+    templateObserver.observe(document.body, { 
         childList: true, 
         subtree: true,
         characterData: true
