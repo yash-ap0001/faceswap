@@ -471,18 +471,17 @@
                 
                 <!-- Multi-Template Results -->
                 <div id="multi-results-container" class="mt-5 d-none">
-                    <div class="card bg-dark shadow-lg border-0 mb-4">
-                        <div class="card-header bg-primary bg-gradient text-white">
-                            <h3 class="mb-0"><i class="fas fa-images me-2"></i>Your Multiple Bridal Looks</h3>
-
+                    <div class="mb-4">
+                        <div class="mb-3">
+                            <h5 class="mb-2"><i class="fas fa-images me-2"></i>Your Multiple Bridal Looks <span id="results-count" class="text-muted"></span></h5>
                         </div>
-                        <div class="card-body bg-dark pt-4">
+                        <div class="">
                             <div class="multi-results-container d-flex flex-nowrap"></div>
-                            <div class="text-center mt-4 pt-3 border-top border-secondary">
-                                <button id="multi-try-again-btn" class="btn btn-lg btn-outline-light">
+                            <div class="text-center mt-4">
+                                <button id="multi-try-again-btn" class="btn btn-outline-light">
                                     <i class="fas fa-redo me-2"></i>Try Different Templates
                                 </button>
-                                <button id="select-more-btn" class="btn btn-lg btn-primary ms-2">
+                                <button id="select-more-btn" class="btn btn-primary ms-2">
                                     <i class="fas fa-plus me-2"></i>Select More Templates
                                 </button>
                             </div>
@@ -1990,25 +1989,36 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Show the timestamp in a subtle way
                     const timestamp = new Date(item.timestamp || Date.now()).toLocaleTimeString();
                     
+                    // Check if this is a new result (less than 30 seconds old)
+                    const isNew = item.timestamp ? (Date.now() - item.timestamp < 30000) : true;
+                    
                     resultCard.innerHTML = `
-                        <div class="position-relative shadow-sm rounded overflow-hidden mb-3">
+                        <div class="position-relative mb-3">
                             <div class="position-relative overflow-hidden" style="height: 280px; cursor: pointer;" 
                                 onclick="openFullImage('${resultFullPath}', '${displayCeremony}', ${index})">
-                                <img src="${resultFullPath}" class="w-100 multi-result-img" alt="Result for ${displayCeremony}" 
+                                <img src="${resultFullPath}" class="w-100 rounded multi-result-img" alt="Result for ${displayCeremony}" 
                                     style="height: 100%; object-fit: cover;">
                                 
-                                <!-- Semi-transparent footer with info -->
-                                <div class="position-absolute bottom-0 w-100 p-2 d-flex justify-content-between align-items-center" 
-                                     style="background: rgba(0,0,0,0.5);">
-                                    <small class="text-white-50">${displayCeremony}</small>
-                                    <div>
-                                        <a href="${resultFullPath}" class="btn btn-sm btn-link text-white-50 opacity-75 p-0 me-2" download title="Download">
-                                            <i class="fas fa-download fa-sm"></i>
-                                        </a>
-                                        <button class="btn btn-sm btn-link text-white-50 opacity-75 p-0 remove-result-btn" data-index="${index}" title="Remove">
-                                            <i class="fas fa-trash fa-sm"></i>
-                                        </button>
-                                    </div>
+                                ${isNew ? `<div class="position-absolute top-0 start-0 m-2">
+                                    <span class="badge bg-success">NEW</span>
+                                </div>` : ''}
+                                
+                                <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2 d-none d-md-block">
+                                    <span class="badge bg-dark bg-opacity-75 px-3 py-2">
+                                        <i class="fas fa-search-plus me-1"></i> Click to enlarge
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="text-light">${displayCeremony} Look</h6>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <a href="${resultFullPath}" class="btn btn-sm btn-success" download title="Download this image">
+                                        <i class="fas fa-download"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
