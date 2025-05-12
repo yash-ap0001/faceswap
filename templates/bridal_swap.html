@@ -20,6 +20,25 @@
         display: none !important;
     }
     
+    /* Hide all card headers */
+    .card-header {
+        display: none !important;
+    }
+    
+    /* Enhance card appearance for minimalist design */
+    .card {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    
+    /* Make container background transparent */
+    .card > .card-body {
+        background-color: rgba(0, 0, 0, 0.2) !important;
+        border-radius: 8px;
+        padding: 15px;
+    }
+    
     .template-card {
         transition: all 0.3s ease;
         cursor: pointer;
@@ -381,12 +400,11 @@
                                     <!-- Header removed as requested -->
                                 </div>
                                 <div class="card-body d-flex flex-column">
-                                    <p class="text-muted small">Upload a clear photo of your face looking directly at the camera</p>
                                     <div class="image-preview-container mb-3 flex-grow-1 d-flex align-items-center justify-content-center">
                                         <img id="source-preview" class="img-preview d-none" alt="Your photo preview">
                                         <div id="source-placeholder" class="placeholder-container">
                                             <i class="fas fa-user fa-4x text-muted"></i>
-                                            <p class="text-muted mt-2">Your photo will appear here</p>
+                                            <p class="text-muted small mt-2">Select photo</p>
                                         </div>
                                     </div>
                                     <div class="input-group">
@@ -410,14 +428,9 @@
                                     
                                     <!-- Template preview container -->
                                     <div id="template-preview-container" class="mt-3 d-none">
-                                        <div class="card bg-dark">
-                                            <div class="card-header py-1">
-                                                <h6 class="mb-0 small">Selected Template</h6>
-                                            </div>
-                                            <div class="card-body p-2 text-center">
-                                                <img id="template-preview" class="img-fluid" style="max-height: 150px;" alt="Selected template">
-                                                <input type="hidden" id="template-url" name="template_url">
-                                            </div>
+                                        <div class="text-center p-2">
+                                            <img id="template-preview" class="img-fluid" style="max-height: 150px; border-radius: 8px;" alt="Selected template">
+                                            <input type="hidden" id="template-url" name="template_url">
                                         </div>
                                     </div>
                                 </div>
