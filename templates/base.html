@@ -470,21 +470,58 @@
         
         /* Sidebar toggle button is now the primary navigation element */
         
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
         .brand-name {
-            color: white;
+            background: linear-gradient(45deg, #8A2BE2, #663399, #DA70D6, #9370DB);
+            background-size: 300% 300%;
+            animation: shimmer 8s ease infinite;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             font-weight: 900;
             font-style: italic;
             text-transform: uppercase;
             letter-spacing: 2px;
             font-family: 'Poppins', sans-serif;
             font-size: 1.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow: 0px 0px 8px rgba(138, 43, 226, 0.3);
             transition: all 0.3s ease;
+            position: relative;
         }
         
         .brand-name:hover {
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            animation: shimmer 3s ease infinite;
+            text-shadow: 0px 0px 15px rgba(138, 43, 226, 0.7);
             transform: scale(1.05);
+        }
+        
+        .brand-name::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            bottom: -5px;
+            left: 0;
+            background: linear-gradient(90deg, transparent, #DA70D6, #8A2BE2, transparent);
+            transform: scaleX(0.7);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .brand-name:hover::after {
+            transform: scaleX(1);
+            opacity: 1;
+        }
+        
+        /* Footer brand styling */
+        .footer-brand {
+            font-size: 1.2rem;
+            letter-spacing: 1.5px;
         }
     </style>
     {% block style %}{% endblock %}
@@ -670,7 +707,7 @@
     <footer class="py-3 mt-5">
         <div class="container text-center">
             <p class="text-light mb-0">
-                <span class="brand-name">VOWBRIDE</span> - Indian Bridal Face Swap App | 
+                <span class="brand-name footer-brand">VOWBRIDE</span> - Indian Bridal Face Swap App | 
                 <span class="text-light">Powered by </span>
                 <a href="https://github.com/deepinsight/insightface" target="_blank" rel="noopener" class="text-light">
                     <i class="fab fa-github me-1"></i>InsightFace 0.7.3
