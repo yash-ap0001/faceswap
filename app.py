@@ -937,7 +937,13 @@ def bridal_swap():
     selected_style = request.form.get('style', 'haldi')
     template_url = request.form.get('template_url')  # Get the user-selected template URL
     
-    logger.info(f"Received face swap request with style: {selected_style}, template URL: {template_url}")
+    # Check if this is a multi-template request by looking for "multi" parameter or additional templates
+    is_multi_request = request.form.get('multi') == 'true' or request.form.getlist('templates[]')
+    
+    # For multi-template support
+    template_paths = request.form.getlist('templates[]')
+    
+    logger.info(f"Received face swap request with style: {selected_style}, template URL: {template_url}, multi_request: {is_multi_request}")
     
     if source_file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
@@ -962,43 +968,127 @@ def bridal_swap():
         if not source_faces:
             return jsonify({'error': 'No face detected in your photo. Please upload a clear photo with your face visible.'}), 400
         
-        # Use the user-selected template if provided, otherwise fall back to a random one
-        if template_url and os.path.exists(template_url):
-            logger.info(f"Using user-selected template: {template_url}")
-            target_img = cv2.imread(template_url)
-            target_path = template_url
+        # For multi-template processing
+        if is_multi_request and template_paths:
+            logger.info(f"Processing {len(template_paths)} templates for multi-template request")
+            results = []
+            ceremonies = []
+            
+            for i, template_path in enumerate(template_paths):
+                ceremony = request.form.get(f'ceremony_{i}', selected_style)
+                ceremonies.append(ceremony)
+                logger.info(f"Processing template {i+1}/{len(template_paths)}: {ceremony}, path: {template_path}")
+                
+                if not os.path.exists(template_path):
+                    logger.warning(f"Template path does not exist: {template_path}, skipping")
+                    continue
+                
+                try:
+                    # Process the template
+                    template_img = cv2.imread(template_path)
+                    if template_img is None:
+                        logger.warning(f"Failed to read template image: {template_path}, skipping")
+                        continue
+                    
+                    # Detect faces in the template
+                    target_faces = faceapp.get(template_img)
+                    if not target_faces:
+                        logger.warning(f"No face detected in template: {template_path}, skipping")
+                        continue
+                    
+                    # Perform face swap with direct approach
+                    logger.info(f"Performing face swap for template {i+1}")
+                    source_face = source_faces[0]
+                    target_face = target_faces[0]
+                    
+                    # Direct face swap
+                    source_face_box = source_face['bbox'].astype(int)
+                    source_face_landmarks = source_face['kps']
+                    target_face_box = target_face['bbox'].astype(int)
+                    target_face_landmarks = target_face['kps']
+                    
+                    # Log detection results
+                    logger.info(f"Source face: box={source_face_box.tolist()}, landmarks shape={source_face_landmarks.shape}")
+                    logger.info(f"Target face: box={target_face_box.tolist()}, landmarks shape={target_face_landmarks.shape}")
+                    
+                    # Perform the swap - be explicit with paste_back=True
+                    # The error shows that there's an issue with paste_back parameter when automatic conversion happens
+                    result_img = swapper.get(template_img, target_face, source_face, paste_back=True)
+                    
+                    # Save result
+                    timestamp = int(time.time())
+                    output_filename = f'bridal_{ceremony}_{timestamp}_{i}_{secure_filename(source_file.filename)}'
+                    output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
+                    cv2.imwrite(output_path, result_img)
+                    
+                    # Add to results
+                    results.append({
+                        'result_image': output_filename,
+                        'ceremony': ceremony,
+                        'index': i
+                    })
+                    
+                except Exception as swap_error:
+                    logger.error(f"Error processing template {i+1}: {str(swap_error)}")
+                    logger.error(traceback.format_exc())
+            
+            # Clean up source file
+            os.remove(source_path)
+            
+            return jsonify({
+                'success': True,
+                'multi': True,
+                'results': results,
+                'ceremonies': ceremonies
+            })
+        
+        # Single template processing (original behavior)
         else:
-            logger.info(f"User-selected template not found or not provided, using random template for ceremony: {selected_style}")
-            # Get the template image directly from Pinterest based on ceremony type
-            target_img, target_path = get_pinterest_template_for_ceremony(selected_style)
-        
-        if target_img is None:
-            return jsonify({'error': 'Failed to load bridal template image'}), 500
-        
-        # Detect face in the template image
-        target_faces = faceapp.get(target_img)
-        
-        if not target_faces:
-            return jsonify({'error': 'No face detected in template image. Please try a different style.'}), 400
-        
-        # Perform face swap
-        logger.info(f"Performing face swap with style: {selected_style}, using Pinterest template")
-        result_img = swapper.get(target_img, target_faces[0], source_faces[0])
-        
-        # Save result
-        timestamp = int(time.time())
-        output_filename = f'bridal_{selected_style}_{timestamp}_{secure_filename(source_file.filename)}'
-        output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
-        cv2.imwrite(output_path, result_img)
-        
-        # Clean up the source file
-        os.remove(source_path)
-        
-        return jsonify({
-            'success': True,
-            'result_image': output_filename,
-            'style': selected_style
-        })
+            # Use the user-selected template if provided, otherwise fall back to a random one
+            if template_url and os.path.exists(template_url):
+                logger.info(f"Using user-selected template: {template_url}")
+                target_img = cv2.imread(template_url)
+                target_path = template_url
+            else:
+                logger.info(f"User-selected template not found or not provided, using random template for ceremony: {selected_style}")
+                # Get the template image directly from Pinterest based on ceremony type
+                target_img, target_path = get_pinterest_template_for_ceremony(selected_style)
+            
+            if target_img is None:
+                return jsonify({'error': 'Failed to load bridal template image'}), 500
+            
+            # Detect face in the template image
+            target_faces = faceapp.get(target_img)
+            
+            if not target_faces:
+                return jsonify({'error': 'No face detected in template image. Please try a different style.'}), 400
+            
+            # Perform face swap
+            logger.info(f"Performing face swap with style: {selected_style}, using Pinterest template")
+            result_img = swapper.get(target_img, target_faces[0], source_faces[0], paste_back=True)
+            
+            # Save result
+            timestamp = int(time.time())
+            output_filename = f'bridal_{selected_style}_{timestamp}_{secure_filename(source_file.filename)}'
+            output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
+            cv2.imwrite(output_path, result_img)
+            
+            # Clean up the source file
+            os.remove(source_path)
+            
+            # For consistency with the multi-template format, also return a results array
+            # This helps the frontend handle both single and multi-template responses in the same way
+            return jsonify({
+                'success': True,
+                'multi': False,
+                'result_image': output_filename,  # Keep for backward compatibility
+                'style': selected_style,          # Keep for backward compatibility
+                'results': [{
+                    'result_image': output_filename,
+                    'ceremony': selected_style,
+                    'index': 0
+                }]
+            })
         
     except Exception as e:
         logger.error(f"Error in bridal_swap: {str(e)}")
@@ -1124,7 +1214,8 @@ def bridal_swap_multi():
                         
                         # Direct approach with swapper
                         # This is the same approach used in bridal_swap that works
-                        result_img = swapper.get(template_img, target_face, source_face, source_img)
+                        # Fixed to use explicit paste_back=True parameter
+                        result_img = swapper.get(template_img, target_face, source_face, paste_back=True)
                         logger.info(f"Face swap successful")
                     except Exception as inner_error:
                         logger.error(f"Face swap operation failed: {inner_error}")
@@ -1536,7 +1627,8 @@ def upload_file():
         else:
             # Perform actual face swap with the model
             logger.info("Performing face swap with the model")
-            result_img = swapper.get(target_img, target_faces[0], source_faces[0])
+            # Fixed to use explicit paste_back=True parameter
+            result_img = swapper.get(target_img, target_faces[0], source_faces[0], paste_back=True)
         
         # Save result
         output_filename = 'result_' + secure_filename(target_file.filename)

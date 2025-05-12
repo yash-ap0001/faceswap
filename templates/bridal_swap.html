@@ -90,36 +90,7 @@
         z-index: 10;
     }
     
-    /* Multi-result styles */
-    .multi-results-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-top: 2rem;
-    }
-    
-    .multi-result-card {
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    .multi-result-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 20px rgba(0,0,0,0.3);
-    }
-    
-    .multi-result-img {
-        width: 100%;
-        height: 350px;
-        object-fit: cover;
-        transition: transform 0.5s ease;
-    }
-    
-    .multi-result-card:hover .multi-result-img {
-        transform: scale(1.03);
-    }
+    /* Multi-result styles - see consolidated styles at bottom */
     
     /* Badge styling for ceremony type */
     .ceremony-badge {
@@ -291,9 +262,32 @@
     
     /* Multi-results display */
     .multi-results-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px;
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 15px;
+        padding: 15px 5px;
+        align-items: stretch;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.3) rgba(0,0,0,0.2);
+        white-space: nowrap;
+        height: auto;
+        min-height: 300px;
+    }
+    
+    /* Style scrollbar for webkit browsers */
+    .multi-results-container::-webkit-scrollbar {
+        height: 8px;
+    }
+    
+    .multi-results-container::-webkit-scrollbar-track {
+        background: rgba(0,0,0,0.2);
+        border-radius: 4px;
+    }
+    
+    .multi-results-container::-webkit-scrollbar-thumb {
+        background-color: rgba(255,255,255,0.3);
+        border-radius: 4px;
     }
     
     .multi-result-card {
@@ -301,6 +295,31 @@
         border-radius: 8px;
         overflow: hidden;
         transition: all 0.3s ease;
+        flex: 0 0 280px; /* Fixed width */
+        min-width: 280px; /* Ensure minimum width */
+        max-width: 280px; /* Maximum width */
+        margin-bottom: 0; /* Remove bottom margin to keep in one row */
+        margin-right: 15px; /* Add right margin for spacing */
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+    
+    /* Force max height on card components */
+    .multi-result-card .card {
+        max-height: 280px !important;
+        overflow: hidden !important;
+    }
+    
+    .multi-result-card .card-img-top {
+        height: 230px !important;
+        max-height: 230px !important;
+        overflow: hidden !important;
+    }
+    
+    .multi-result-card .card-footer {
+        height: 50px !important;
+        max-height: 50px !important;
+        padding: 0.25rem 0.5rem !important;
+        overflow: hidden !important;
     }
     
     .multi-result-card:hover {
@@ -310,13 +329,16 @@
     
     .multi-result-img {
         width: 100%;
-        height: 350px;
+        height: 230px;
         object-fit: cover;
+        transition: transform 0.3s ease;
     }
     
     .multi-result-footer {
         padding: 10px;
         background-color: rgba(0, 0, 0, 0.7);
+        height: 50px;
+        overflow: hidden;
     }
 </style>
 {% endblock %}
@@ -457,7 +479,7 @@
                             <p class="text-light mt-2 mb-0">Here are your bridal looks for different ceremonies</p>
                         </div>
                         <div class="card-body bg-dark pt-4">
-                            <div class="multi-results-container"></div>
+                            <div class="multi-results-container d-flex flex-nowrap"></div>
                             <div class="text-center mt-4 pt-3 border-top border-secondary">
                                 <button id="multi-try-again-btn" class="btn btn-lg btn-outline-light">
                                     <i class="fas fa-redo me-2"></i>Try Different Templates
@@ -1229,28 +1251,59 @@ document.addEventListener('DOMContentLoaded', function() {
         // Debug selected templates before sending
         console.log('Templates to be sent in formData:', selectedTemplates);
         
+        // Ensure selectedTemplates is an array before proceeding
+        if (!selectedTemplates || !Array.isArray(selectedTemplates)) {
+            console.error('selectedTemplates is not an array:', selectedTemplates);
+            showError('Error: No templates selected or invalid template data');
+            return; // Exit function early 
+        }
+        
+        if (selectedTemplates.length === 0) {
+            console.error('No templates selected (empty array)');
+            showError('Error: Please select at least one template');
+            return; // Exit function early
+        }
+        
         // Add template count first
         formData.append('template_count', selectedTemplates.length);
         console.log(`Added template_count: ${selectedTemplates.length}`);
         
-        // Add all selected template paths with better error handling
-        selectedTemplates.forEach((template, index) => {
-            if (!template.path) {
-                console.error(`Template ${index} missing path:`, template);
-                return;
-            }
-            
-            // Always include a ceremony value (fallback to 'wedding' if not set)
-            const ceremonyType = template.ceremony || 'wedding';
-            
-            formData.append(`template_${index}`, template.path);
-            formData.append(`ceremony_${index}`, ceremonyType);
-            
-            console.log(`Added template ${index}: path=${template.path}, ceremony=${ceremonyType}`);
-        });
+        try {
+            // Add all selected template paths with better error handling
+            selectedTemplates.forEach((template, index) => {
+                if (!template || typeof template !== 'object') {
+                    console.error(`Template ${index} is not a valid object:`, template);
+                    return;
+                }
+                
+                if (!template.path) {
+                    console.error(`Template ${index} missing path:`, template);
+                    return;
+                }
+                
+                // Always include a ceremony value (fallback to 'wedding' if not set)
+                const ceremonyType = template.ceremony || 'wedding';
+                
+                // Use both the indexed version for the server to handle individual templates
+                formData.append(`template_${index}`, template.path);
+                formData.append(`ceremony_${index}`, ceremonyType);
+                
+                // Also append to templates[] array for compatibility with the server's getlist('templates[]') method
+                formData.append('templates[]', template.path);
+                
+                console.log(`Added template ${index}: path=${template.path}, ceremony=${ceremonyType}`);
+            });
+        } catch (error) {
+            console.error('Error while processing template data:', error);
+            showError('An error occurred while processing template data. Please try again.');
+            if (loadingContainer) loadingContainer.classList.add('d-none');
+            return;
+        }
         
-        // Send AJAX request
-        fetch('/bridal-swap-multi', {
+        // Send AJAX request - use the Create Bride Look endpoint with multi=true flag
+        formData.append('multi', 'true'); // Add flag to tell the endpoint this is a multi-template request
+        
+        fetch('/bridal-swap', {
             method: 'POST',
             body: formData
         })
@@ -1265,9 +1318,69 @@ document.addEventListener('DOMContentLoaded', function() {
             if (loadingContainer) loadingContainer.classList.add('d-none');
             
             if (data.success) {
-                // Display all results
-                displayMultiResults(data.results, selectedTemplates);
-                console.log('Successfully displayed results');
+                try {
+                    console.log('Server indicated success, full response data:', data);
+                    
+                    // Make sure results exists and is an array
+                    if (!data.results) {
+                        console.warn('No results array found in response, creating empty array');
+                        data.results = [];
+                    }
+                    
+                    // The server now consistently returns a results array for both single and multi-template requests
+                    // But keeping this for backward compatibility with older server versions
+                    if (data.multi === false && data.result_image && (!data.results || data.results.length === 0)) {
+                        console.log('Converting legacy single result to multi-result format');
+                        // Create a synthetic results array with the single result
+                        const singleResult = {
+                            result_image: data.result_image,
+                            ceremony: data.style || selectedTemplates[0]?.ceremony || 'unknown',
+                            index: 0
+                        };
+                        
+                        // Use an array with the single result
+                        data.results = [singleResult];
+                    }
+                    
+                    console.log('Data results after processing:', data.results);
+                    
+                    // Make one final check that results is an array before passing to display function
+                    if (!Array.isArray(data.results)) {
+                        console.warn('Results is not an array after processing, converting to array');
+                        // If it's an object with numbered keys (like { "0": {...}, "1": {...} })
+                        if (typeof data.results === 'object' && data.results !== null) {
+                            const resultsArray = [];
+                            Object.keys(data.results).forEach(key => {
+                                resultsArray.push(data.results[key]);
+                            });
+                            data.results = resultsArray;
+                        } else {
+                            // If it's something else entirely, create empty array
+                            data.results = [];
+                        }
+                    }
+                    
+                    // Print out the final data we're passing to display function
+                    console.log('Final data being passed to displayMultiResults:', {
+                        resultsArray: data.results,
+                        resultsLength: data.results.length,
+                        selectedTemplatesLength: selectedTemplates.length
+                    });
+                    
+                    // Display results with proper checks
+                    displayMultiResults(data.results, selectedTemplates);
+                    console.log('Successfully displayed results');
+                    
+                    // Show the multi-results container explicitly
+                    const multiResultsContainer = document.getElementById('multi-results-container');
+                    if (multiResultsContainer) {
+                        multiResultsContainer.classList.remove('d-none');
+                        multiResultsContainer.scrollIntoView({ behavior: 'smooth' });
+                    }
+                } catch (displayError) {
+                    console.error('Error displaying results:', displayError);
+                    showError('Error displaying results: ' + displayError.message);
+                }
             } else {
                 showError(data.error || 'An unknown error occurred.');
                 console.error('Error from server:', data.error);
@@ -1291,6 +1404,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayMultiResults(results, selectedTemplates) {
         console.log('Display multi results called with:', results?.length || 0, 'results');
         
+        // Ensure results is an array
+        if (!results) {
+            console.warn('Results array is undefined or null, using empty array');
+            results = [];
+        }
+        
+        // Ensure selectedTemplates is an array
+        if (!selectedTemplates) {
+            console.warn('Selected templates array is undefined or null, using empty array');
+            selectedTemplates = [];
+        }
+        
         const multiResultsContainer = document.getElementById('multi-results-container');
         
         // Make sure the container exists
@@ -1311,97 +1436,185 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log('Found multi-results containers, processing results...');
         
-        // Add new results to our global array
-        results.forEach((result, index) => {
-            const template = selectedTemplates[index];
-            allProcessedResults.push({
-                result: result,
-                template: template,
-                timestamp: new Date().getTime()
+        // Add new results to our global array with careful validation
+        if (Array.isArray(results) && results.length > 0) {
+            results.forEach((result, index) => {
+                // Ensure we have a valid template object
+                const template = (index < selectedTemplates.length) ? selectedTemplates[index] : null;
+                
+                allProcessedResults.push({
+                    result: result,
+                    template: template,
+                    timestamp: new Date().getTime()
+                });
             });
-        });
+        } else {
+            console.warn('No results to process');
+        }
         
         console.log('Total processed results:', allProcessedResults.length);
         
         // Clear previous results
         multiResultsGrid.innerHTML = '';
         
-        // Create a card for each result in our global array
-        allProcessedResults.forEach((item, index) => {
-            const result = item.result;
-            const template = item.template || {}; // Use empty object as fallback
-            
-            // Log data for debugging before creating card
-            console.log(`Building card ${index} with:`, {
-                resultData: result,
-                templateData: template,
-                ceremonyFromResult: result.ceremony,
-                ceremonyFromTemplate: template.ceremony
-            });
-            
-            // Determine ceremony type with fallbacks
-            const ceremonyType = result.ceremony || template.ceremony || 'wedding';
-            const displayCeremony = ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1);
-            
-            const resultCard = document.createElement('div');
-            resultCard.className = 'multi-result-card';
-            resultCard.setAttribute('data-result-index', index);
-            
-            // Add a "new" indicator if this result was just added (in last 10 seconds)
-            const isNew = (new Date().getTime() - item.timestamp) < 10000;
-            const newBadge = isNew ? `<div class="position-absolute top-0 start-0 m-2">
-                <span class="badge bg-success">NEW</span>
-            </div>` : '';
-            
-            resultCard.innerHTML = `
-                <div class="card h-100 bg-dark border-0 shadow position-relative">
-                    <div class="card-img-top position-relative overflow-hidden" style="height: 350px;">
-                        <img src="${result.result_path}" class="multi-result-img" alt="Result for ${displayCeremony}" 
-                            style="width: 100%; height: 100%; object-fit: cover;">
-                        <div class="position-absolute top-0 end-0 m-2">
-                            <span class="badge bg-primary">${displayCeremony}</span>
-                        </div>
-                        ${newBadge}
-                    </div>
-                    <div class="card-footer d-flex justify-content-between align-items-center bg-dark text-light">
-                        <span class="ceremony-badge"><i class="fas fa-check-circle text-success me-1"></i> ${displayCeremony}</span>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <a href="${result.result_path}" class="btn btn-sm btn-success" download title="Download this image">
-                                <i class="fas fa-download"></i> Save
-                            </a>
-                        </div>
-                    </div>
+        // Debug information before creating cards
+        console.log('Current state before creating cards:', {
+            allProcessedResultsType: typeof allProcessedResults,
+            isArray: Array.isArray(allProcessedResults),
+            allProcessedResultsLength: allProcessedResults ? allProcessedResults.length : 'undefined',
+            firstItem: allProcessedResults && allProcessedResults.length > 0 ? allProcessedResults[0] : null
+        });
+        
+        // Only proceed if allProcessedResults is an array and has items
+        if (!Array.isArray(allProcessedResults) || allProcessedResults.length === 0) {
+            console.warn('No processed results to display, showing empty state message');
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'col-12 text-center p-5';
+            emptyMessage.innerHTML = `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No results to display yet. Select templates and upload your photo to see results.
                 </div>
             `;
-            
-            multiResultsGrid.appendChild(resultCard);
-        });
-        
-        // Add event listeners to remove buttons
-        document.querySelectorAll('.remove-result-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const index = parseInt(this.getAttribute('data-index'));
-                removeProcessedResult(index);
-            });
-        });
-        
-        // Update header text with count
-        const headerText = multiResultsContainer.querySelector('h3');
-        if (headerText) {
-            headerText.innerHTML = `<i class="fas fa-images me-2"></i>Your Multiple Bridal Looks (${allProcessedResults.length})`;
+            multiResultsGrid.appendChild(emptyMessage);
+            return;
         }
         
-        // Show the results container
-        multiResultsContainer.classList.remove('d-none');
-        
-        // Scroll to results
-        window.scrollTo({
-            top: multiResultsContainer.offsetTop,
-            behavior: 'smooth'
-        });
+        // Create a card for each result in our global array (with error handling)
+        try {
+            if (!Array.isArray(allProcessedResults)) {
+                throw new Error('allProcessedResults is not an array: ' + typeof allProcessedResults);
+            }
+            
+            // If array is empty, show a message
+            if (allProcessedResults.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.className = 'col-12 text-center p-5';
+                emptyMessage.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No results available. Please select templates and upload your photo to see results.
+                    </div>
+                `;
+                multiResultsGrid.appendChild(emptyMessage);
+                return;
+            }
+            
+            // Now we can safely iterate through the array
+            allProcessedResults.forEach((item, index) => {
+                try {
+                    // Check if item is valid
+                    if (!item || typeof item !== 'object') {
+                        console.error(`Invalid item at index ${index}:`, item);
+                        return; // Skip this item
+                    }
+                    
+                    const result = item.result || {};
+                    const template = item.template || {}; // Use empty object as fallback
+                    
+                    // Log data for debugging before creating card
+                    console.log(`Building card ${index} with:`, {
+                        resultData: result,
+                        templateData: template,
+                        ceremonyFromResult: result.ceremony,
+                        ceremonyFromTemplate: template.ceremony
+                    });
+                    
+                    // Determine ceremony type with fallbacks
+                    const ceremonyType = result.ceremony || template.ceremony || 'wedding';
+                    const displayCeremony = ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1);
+                
+                    const resultCard = document.createElement('div');
+                    resultCard.className = 'multi-result-card';
+                    resultCard.setAttribute('data-result-index', index);
+                
+                    // Add a "new" indicator if this result was just added (in last 10 seconds)
+                    const isNew = (new Date().getTime() - item.timestamp) < 10000;
+                    const newBadge = isNew ? `<div class="position-absolute top-0 start-0 m-2">
+                        <span class="badge bg-success">NEW</span>
+                    </div>` : '';
+                    
+                    // Ensure we have a path to display the image from
+                    // Server might return result_image (multi-template) or result_path (single template)
+                    const resultPath = result.result_path || result.result_image || '';
+                    
+                    // Full URL path for displaying the image
+                    // Check if the path already contains /uploads/ to avoid duplication
+                    const resultFullPath = resultPath 
+                        ? (resultPath.startsWith('/uploads/') ? resultPath : `/uploads/${resultPath}`)
+                        : '';
+                    
+                    console.log(`Processing result path: ${resultPath} -> ${resultFullPath}`);
+                    
+                    if (!resultPath) {
+                        console.warn('No result path found for card:', result);
+                    }
+                    
+                    resultCard.innerHTML = `
+                        <div class="card bg-dark border-0 shadow position-relative" style="height: 280px; max-height: 280px; min-height: 280px;">
+                            <div class="card-img-top position-relative overflow-hidden" style="height: 230px; max-height: 230px; min-height: 230px;">
+                                <img src="${resultFullPath}" class="multi-result-img" alt="Result for ${displayCeremony}" 
+                                    style="width: 100%; height: 100%; object-fit: cover;">
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <span class="badge bg-primary">${displayCeremony}</span>
+                                </div>
+                                ${newBadge}
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center bg-dark text-light p-1" style="height: 50px; max-height: 50px; min-height: 50px;">
+                                <span class="ceremony-badge small"><i class="fas fa-check-circle text-success me-1"></i> ${displayCeremony}</span>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <a href="${resultFullPath}" class="btn btn-sm btn-success" download title="Download this image">
+                                        <i class="fas fa-download"></i> Save
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    multiResultsGrid.appendChild(resultCard);
+                } catch (cardError) {
+                    console.error(`Error processing result item ${index}:`, cardError);
+                }
+            });
+            
+            try {
+                // Add event listeners to remove buttons (with nullcheck)
+                const removeButtons = document.querySelectorAll('.remove-result-btn');
+                console.log(`Found ${removeButtons.length} remove buttons to attach events to`);
+                
+                if (removeButtons && removeButtons.length > 0) {
+                    removeButtons.forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const index = parseInt(this.getAttribute('data-index'));
+                            removeProcessedResult(index);
+                        });
+                    });
+                }
+                
+                // Update header text with count
+                const headerText = multiResultsContainer.querySelector('h3');
+                if (headerText) {
+                    headerText.innerHTML = `<i class="fas fa-images me-2"></i>Your Multiple Bridal Looks (${allProcessedResults.length})`;
+                }
+                
+                // Show the results container
+                multiResultsContainer.classList.remove('d-none');
+                
+                // Scroll to results
+                window.scrollTo({
+                    top: multiResultsContainer.offsetTop,
+                    behavior: 'smooth'
+                });
+            } catch (finalError) {
+                console.error('Error in final stage of displayMultiResults:', finalError);
+            }
+        } catch (overallError) {
+            console.error('Critical error in displayMultiResults:', overallError);
+            showError('Error displaying results: ' + overallError.message);
+        }
     }
     
     // Function to remove a processed result
