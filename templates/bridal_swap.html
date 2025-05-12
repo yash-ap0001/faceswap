@@ -790,18 +790,31 @@ function openFullImage(imagePath, ceremonyType, resultIndex) {
     updateModalContent();
     
     // Initialize event listeners for navigation buttons
-    document.getElementById('prev-image-btn').onclick = navigateToPrevImage;
-    document.getElementById('next-image-btn').onclick = navigateToNextImage;
+    const prevBtn = document.getElementById('prev-image-btn');
+    if (prevBtn) prevBtn.onclick = navigateToPrevImage;
+    
+    const nextBtn = document.getElementById('next-image-btn');
+    if (nextBtn) nextBtn.onclick = navigateToNextImage;
     
     // Initialize zoom buttons (top controls)
-    document.getElementById('zoom-in-btn').onclick = zoomIn;
-    document.getElementById('zoom-out-btn').onclick = zoomOut;
-    document.getElementById('zoom-reset-btn').onclick = resetZoom;
+    const zoomInBtn = document.getElementById('zoom-in-btn');
+    if (zoomInBtn) zoomInBtn.onclick = zoomIn;
+    
+    const zoomOutBtn = document.getElementById('zoom-out-btn');
+    if (zoomOutBtn) zoomOutBtn.onclick = zoomOut;
+    
+    const zoomResetBtn = document.getElementById('zoom-reset-btn');
+    if (zoomResetBtn) zoomResetBtn.onclick = resetZoom;
     
     // Initialize zoom buttons (bottom controls)
-    document.getElementById('zoom-in-btn-bottom').onclick = zoomIn;
-    document.getElementById('zoom-out-btn-bottom').onclick = zoomOut;
-    document.getElementById('zoom-reset-btn-bottom').onclick = resetZoom;
+    const zoomInBtnBottom = document.getElementById('zoom-in-btn-bottom');
+    if (zoomInBtnBottom) zoomInBtnBottom.onclick = zoomIn;
+    
+    const zoomOutBtnBottom = document.getElementById('zoom-out-btn-bottom');
+    if (zoomOutBtnBottom) zoomOutBtnBottom.onclick = zoomOut;
+    
+    const zoomResetBtnBottom = document.getElementById('zoom-reset-btn-bottom');
+    if (zoomResetBtnBottom) zoomResetBtnBottom.onclick = resetZoom;
     
     // Setup drag handlers for panning when zoomed
     setupDragHandlers();
@@ -1947,11 +1960,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     resultCard.setAttribute('data-result-index', index);
                 
                     // Add a "new" indicator if this result was just added (in last 10 seconds)
-                    const isNew = (new Date().getTime() - item.timestamp) < 10000;
-                    const newBadge = isNew ? `<div class="position-absolute top-0 start-0 m-2">
-                        <span class="badge bg-success">NEW</span>
-                    </div>` : '';
-                    
                     // Ensure we have a path to display the image from
                     // Server might return result_image (multi-template) or result_path (single template)
                     const resultPath = result.result_path || result.result_image || '';
@@ -1968,24 +1976,28 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.warn('No result path found for card:', result);
                     }
                     
+                    // Show the timestamp in a subtle way
+                    const timestamp = new Date(item.timestamp || Date.now()).toLocaleTimeString();
+                    
                     resultCard.innerHTML = `
-                        <div class="position-relative mb-3">
+                        <div class="position-relative shadow-sm rounded overflow-hidden mb-3">
                             <div class="position-relative overflow-hidden" style="height: 280px; cursor: pointer;" 
                                 onclick="openFullImage('${resultFullPath}', '${displayCeremony}', ${index})">
-                                <img src="${resultFullPath}" class="w-100 rounded multi-result-img" alt="Result for ${displayCeremony}" 
+                                <img src="${resultFullPath}" class="w-100 multi-result-img" alt="Result for ${displayCeremony}" 
                                     style="height: 100%; object-fit: cover;">
-                                ${newBadge}
-                            </div>
-                            
-                            <div class="d-flex justify-content-between align-items-center mt-2">
-                                <h6 class="text-light mb-0">${displayCeremony}</h6>
-                                <div>
-                                    <button class="btn btn-sm btn-link text-danger p-1 remove-result-btn" data-index="${index}" title="Remove this result">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    <a href="${resultFullPath}" class="btn btn-sm btn-link text-success p-1" download title="Download this image">
-                                        <i class="fas fa-download"></i>
-                                    </a>
+                                
+                                <!-- Semi-transparent footer with info -->
+                                <div class="position-absolute bottom-0 w-100 p-2 d-flex justify-content-between align-items-center" 
+                                     style="background: rgba(0,0,0,0.5);">
+                                    <small class="text-white-50">${displayCeremony}</small>
+                                    <div>
+                                        <a href="${resultFullPath}" class="btn btn-sm btn-link text-white-50 opacity-75 p-0 me-2" download title="Download">
+                                            <i class="fas fa-download fa-sm"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-link text-white-50 opacity-75 p-0 remove-result-btn" data-index="${index}" title="Remove">
+                                            <i class="fas fa-trash fa-sm"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
