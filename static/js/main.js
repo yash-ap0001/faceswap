@@ -221,9 +221,16 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('/check-models')
             .then(response => response.json())
             .then(data => {
+                // Safely get elements, which might not exist on all pages
+                const modelStatusAlert = document.getElementById('model-status-alert');
+                const modelStatusMessage = document.getElementById('model-status-message');
+                const modelStatusCard = document.getElementById('model-status-card');
                 const modelUploadContainer = document.getElementById('model-upload-container');
                 
-                // Only proceed if the status elements exist
+                // Log model status to console for debugging
+                console.log('Model status:', data);
+                
+                // Only proceed with DOM updates if the status elements exist
                 if (modelStatusAlert && modelStatusMessage) {
                     if (!data.face_detection) {
                         modelStatusAlert.classList.remove('d-none');
@@ -251,13 +258,27 @@ document.addEventListener('DOMContentLoaded', function() {
                             modelUploadContainer.classList.add('d-none');
                         }
                     }
-                } else {
-                    // Log model status even if we can't show it in the UI
-                    console.log('Model status:', data);
+                    
+                    // Update the model status card if it exists (for bridal gallery page)
+                    if (modelStatusCard) {
+                        if (data.face_detection && data.face_swap) {
+                            modelStatusCard.classList.add('bg-success');
+                            modelStatusCard.classList.remove('bg-warning', 'bg-danger');
+                        } else if (data.face_detection) {
+                            modelStatusCard.classList.add('bg-warning');
+                            modelStatusCard.classList.remove('bg-success', 'bg-danger');
+                        } else {
+                            modelStatusCard.classList.add('bg-danger');
+                            modelStatusCard.classList.remove('bg-success', 'bg-warning');
+                        }
+                    }
                 }
             })
             .catch(error => {
                 console.error('Error checking model status:', error);
+                const modelStatusAlert = document.getElementById('model-status-alert');
+                const modelStatusMessage = document.getElementById('model-status-message');
+                
                 if (modelStatusAlert && modelStatusMessage) {
                     modelStatusAlert.classList.remove('d-none');
                     modelStatusMessage.textContent = 'Could not check model status. There might be connection issues.';
