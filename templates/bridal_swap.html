@@ -1026,6 +1026,43 @@ function handleModalKeyNavigation(event) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing bridal swap page');
     
+    // Hide intro alert and any "Event Type" sections
+    // Find and hide any intro alerts
+    const introAlerts = document.querySelectorAll('.card-body > .alert-info');
+    introAlerts.forEach(alert => {
+        if (alert) {
+            alert.style.display = 'none';
+            alert.classList.add('d-none');
+        }
+    });
+    
+    // Force hide the event type section (in case it wasn't hidden via server-side rendering)
+    const eventTypeSections = document.querySelectorAll('.card-body label.form-label');
+    eventTypeSections.forEach(section => {
+        if (section && section.textContent.includes('Event Type')) {
+            const parent = section.closest('div');
+            if (parent) {
+                parent.style.display = 'none';
+                parent.classList.add('d-none');
+            }
+        }
+    });
+    
+    // Hide all "All templates are curated from..." messages
+    const templateInfos = document.querySelectorAll('.card-body p.text-info');
+    templateInfos.forEach(info => {
+        if (info && info.textContent.includes('templates are curated')) {
+            info.style.display = 'none';
+            info.classList.add('d-none');
+            // Also hide the parent container if it exists
+            const parent = info.closest('div');
+            if (parent) {
+                parent.style.display = 'none';
+                parent.classList.add('d-none');
+            }
+        }
+    });
+    
     // DOM Elements
     const uploadForm = document.getElementById('upload-form');
     const sourceInput = document.getElementById('source-input');
