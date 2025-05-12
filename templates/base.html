@@ -656,9 +656,6 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h5>Menu</h5>
-            <button class="close-sidebar" aria-label="Close Menu">
-                <i class="fas fa-times"></i>
-            </button>
         </div>
         <div class="sidebar-content">
             <!-- Bootstrap Accordion -->
@@ -832,11 +829,9 @@
             const sidebar = document.getElementById('sidebar');
             console.log("Sidebar element:", sidebar);
             
-            const sidebarEdgeToggle = document.getElementById('sidebarEdgeToggle');
-            console.log("Sidebar edge toggle button:", sidebarEdgeToggle);
-            
-            const closeBtn = document.querySelector('.close-sidebar');
-            console.log("Close button:", closeBtn);
+            // Only using the menu toggle button
+            const menuToggleBtn = document.getElementById('menuToggleBtn');
+            console.log("Menu toggle button:", menuToggleBtn);
             
             const themeSwitch = document.getElementById('themeSwitch');
             
@@ -897,34 +892,7 @@
                 console.log("Menu toggle button not found");
             }
             
-            // Legacy toggle sidebar from edge button (if it exists)
-            if (sidebarEdgeToggle) {
-                console.log("Adding event listener to sidebar edge toggle button");
-                sidebarEdgeToggle.addEventListener('click', function(e) {
-                    console.log("Sidebar edge toggle button clicked");
-                    e.preventDefault();
-                    e.stopPropagation();
-                    toggleSidebar();
-                });
-            } else {
-                console.log("Sidebar edge toggle button not found, skipping event listener");
-            }
-            
-            // Close sidebar
-            if (closeBtn) {
-                console.log("Adding event listener to close button");
-                closeBtn.addEventListener('click', function(e) {
-                    console.log("Close button clicked");
-                    e.preventDefault();
-                    if (sidebar) {
-                        // Use the toggleSidebar function to ensure consistent behavior
-                        const isClosed = sidebar.classList.contains('closed');
-                        if (!isClosed) {
-                            toggleSidebar();
-                        }
-                    }
-                });
-            }
+            // Only using the menu toggle button for sidebar controls
             
             // Close sidebar when clicking outside
             document.addEventListener('click', function(event) {
@@ -932,8 +900,7 @@
                     const menuToggleBtn = document.getElementById('menuToggleBtn');
                     const isClickInside = 
                         sidebar.contains(event.target) || 
-                        (menuToggleBtn && menuToggleBtn.contains(event.target)) ||
-                        (sidebarEdgeToggle && sidebarEdgeToggle.contains(event.target));
+                        (menuToggleBtn && menuToggleBtn.contains(event.target));
                     
                     if (!isClickInside && !sidebar.classList.contains('closed')) {
                         // Use the toggleSidebar function for consistency
