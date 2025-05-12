@@ -1612,9 +1612,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 processSelectedBtn.classList.remove('d-none');
                 if (selectionCountWrapper) selectionCountWrapper.classList.remove('d-none');
                 
-                // Make sure checkboxes are visible
+                // Make sure checkboxes are visible - directly override the inline style
                 document.querySelectorAll('.template-checkbox-wrapper').forEach(wrapper => {
-                    wrapper.style.display = 'block';
+                    wrapper.style.setProperty('display', 'block', 'important');
+                    wrapper.style.setProperty('opacity', '1', 'important');
+                    console.log('Making checkbox wrapper visible:', wrapper);
                 });
                 
                 // Start with no templates selected by default when entering selection mode
@@ -1643,6 +1645,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (selectedTemplatesPreview) {
                     selectedTemplatesPreview.classList.add('d-none');
                 }
+                
+                // Hide all checkboxes when exiting multi-select mode
+                document.querySelectorAll('.template-checkbox-wrapper').forEach(wrapper => {
+                    wrapper.style.setProperty('display', 'none', 'important');
+                    console.log('Hiding checkbox wrapper:', wrapper);
+                });
             }
         });
     }
