@@ -422,42 +422,19 @@ def index():
 
 @app.route('/bridal-gallery')
 def bridal_gallery():
-    # Get all template images organized by ceremony type
-    template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
-    
-    # Define ceremony types
-    ceremony_types = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
+    """Show the bridal gallery page with templates."""
+    return render_template('bridal_gallery.html')
     
 @app.route('/ar-filters')
 def ar_filters():
     """Show the AR filters page with real-time preview."""
     return render_template('ar_filters.html')
-    
-    # Structure to store all templates
-    all_templates = {}
-    
-    for ceremony in ceremony_types:
-        # Set up structure for this ceremony
-        all_templates[ceremony] = []
-        
-        # Get all Pinterest templates for this ceremony
-        pinterest_dir = os.path.join(template_dir, 'pinterest', ceremony)
-        if os.path.exists(pinterest_dir):
-            for file in os.listdir(pinterest_dir):
-                if file.lower().endswith(('.jpg', '.jpeg', '.png')):
-                    all_templates[ceremony].append({
-                        'url': f"/uploads/templates/pinterest/{ceremony}/{file}",
-                        'title': f"{ceremony.title()} Style",
-                        'description': "Traditional ceremony template"
-                    })
-    
-    return render_template(
-        'bridal_gallery.html',
-        all_templates=all_templates,
-        ceremony_types=ceremony_types
-    )
 
-# Bride section routes
+
+
+
+
+
 @app.route('/bridal-outfits')
 def bridal_outfits():
     return render_template('bride/outfits.html')
