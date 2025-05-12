@@ -330,12 +330,7 @@
 {% endblock %}
 
 {% block content %}
-<!-- Upload Photo Button (top-right) -->
-<div class="position-fixed top-0 end-0 p-4" style="z-index: 1050; margin-top: 60px; margin-right: 20px;">
-    <button type="button" class="btn btn-primary rounded-circle shadow-lg" data-bs-toggle="modal" data-bs-target="#uploadPhotoModal" style="width: 60px; height: 60px;">
-        <i class="fas fa-upload"></i>
-    </button>
-</div>
+
 
 <!-- Upload Photo Modal Dialog -->
 <div class="modal fade" id="uploadPhotoModal" tabindex="-1" aria-labelledby="uploadPhotoModalLabel" aria-hidden="true">
@@ -440,6 +435,10 @@
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" id="cat-mehendi" value="mehendi" checked>
                             <label class="form-check-label" for="cat-mehendi">Mehendi</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="cat-sangeeth" value="sangeeth" checked>
+                            <label class="form-check-label" for="cat-sangeeth">Sangeeth</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" id="cat-wedding" value="wedding" checked>
