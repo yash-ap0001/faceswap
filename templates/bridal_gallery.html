@@ -1794,6 +1794,37 @@ document.addEventListener('DOMContentLoaded', function() {
             showError('An error occurred: ' + error.message);
         });
     }
+    
+    // Setup category filter checkboxes
+    function updateCeremonyVisibility() {
+        // Get all the checked ceremony checkboxes
+        const checkedCeremonies = Array.from(document.querySelectorAll('input[id^="cat-"]:checked'))
+                                .map(checkbox => checkbox.value);
+        
+        console.log('Checked ceremonies:', checkedCeremonies);
+        
+        // Get all ceremony sections
+        const ceremonySections = document.querySelectorAll('.template-container');
+        
+        // Hide/show based on selection
+        ceremonySections.forEach(section => {
+            const ceremonyId = section.id.replace('-carousel', '');
+            if (checkedCeremonies.includes(ceremonyId)) {
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        });
+    }
+    
+    // Add event listeners to ceremony checkboxes
+    const ceremonyCheckboxes = document.querySelectorAll('input[id^="cat-"]');
+    ceremonyCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateCeremonyVisibility);
+    });
+    
+    // Initialize visibility based on checked boxes
+    updateCeremonyVisibility();
 });
 </script>
 
