@@ -546,7 +546,7 @@
                 <h2 class="h4 mb-0">Available Templates</h2>
                 <div class="btn-group">
                     <button id="multiSelectBtn" class="btn btn-outline-light btn-sm me-2">
-                        <i class="fas fa-magic"></i> Single Swap
+                        <i class="fas fa-check-square"></i> Multi-Select Mode
                     </button>
                     <button id="multiSwapBtn" class="btn btn-primary btn-sm me-2 d-none">
                         <i class="fas fa-magic"></i> Multi Swap (<span id="selectedCountDisplay">0</span>)
@@ -1607,7 +1607,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // Exiting selection mode (returning to Single Swap)
                 console.log('Exiting template selection mode, returning to Single Swap');
-                toggleSelectionModeBtn.innerHTML = '<i class="fas fa-magic"></i> Single Swap';
+                toggleSelectionModeBtn.innerHTML = '<i class="fas fa-check-square"></i> Multi-Select Mode';
                 toggleSelectionModeBtn.classList.add('btn-outline-light');
                 toggleSelectionModeBtn.classList.remove('btn-outline-danger');
                 processSelectedBtn.classList.add('d-none');
