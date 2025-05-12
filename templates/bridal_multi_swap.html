@@ -479,12 +479,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 const galleryEl = document.getElementById(`${ceremony}-templates`);
                 
                 if (!data.templates || data.templates.length === 0) {
-                    galleryEl.innerHTML = '';
+                    galleryEl.innerHTML = `
+                        <div class="alert alert-info w-100">
+                            No templates available for ${capitalize(ceremony)} ceremony.
+                        </div>
+                    `;
                     return;
                 }
                 
-                // Clear the gallery content
+                // Add template count information with timestamp
+                const countInfoEl = document.createElement('div');
+                countInfoEl.className = 'mb-3 small text-muted';
+                countInfoEl.innerHTML = `
+                    <i class="fas fa-info-circle me-1"></i>
+                    Found ${data.templates.length} templates for ${capitalize(ceremony)} ceremony.
+                    <span class="ms-2">Last updated: ${new Date().toLocaleTimeString()}</span>
+                `;
+                
                 galleryEl.innerHTML = '';
+                galleryEl.appendChild(countInfoEl);
                 
                 // Add templates to the gallery
                 data.templates.forEach(template => {
