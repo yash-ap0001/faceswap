@@ -174,6 +174,12 @@
         padding: 5px !important;
     }
     
+    /* Add additional selectors to ensure checkboxes appear */
+    .template-selection-mode .template-checkbox {
+        visibility: visible !important;
+        display: block !important;
+    }
+    
     /* Multi-result styles - see consolidated styles at bottom */
     
     /* Badge styling for ceremony type */
@@ -1594,6 +1600,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const selectionCountWrapper = document.getElementById('selectionCountWrapper');
             
+            // Log the current selection mode state
+            console.log('Selection mode toggled to:', isSelectionMode);
+            
             if (isSelectionMode) {
                 // Entering Multi-Select mode
                 console.log('Entering multi-select mode');
@@ -1602,6 +1611,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 toggleSelectionModeBtn.classList.add('btn-outline-danger');
                 processSelectedBtn.classList.remove('d-none');
                 if (selectionCountWrapper) selectionCountWrapper.classList.remove('d-none');
+                
+                // Make sure checkboxes are visible
+                document.querySelectorAll('.template-checkbox-wrapper').forEach(wrapper => {
+                    wrapper.style.display = 'block';
+                });
                 
                 // Start with no templates selected by default when entering selection mode
                 document.querySelectorAll('.template-checkbox').forEach(checkbox => {
