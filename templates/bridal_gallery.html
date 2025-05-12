@@ -210,43 +210,10 @@
         100% { transform: rotate(360deg); }
     }
     
-    /* Carousel and navigation styles */
-    .template-carousel {
+    /* Template container styles */
+    .template-container {
         position: relative;
         margin-bottom: 40px;
-    }
-    
-    .carousel-nav-buttons {
-        position: absolute;
-        top: 50%;
-        width: 100%;
-        transform: translateY(-50%);
-        z-index: 10;
-        display: flex;
-        justify-content: space-between;
-        pointer-events: none;
-    }
-    
-    .carousel-nav-btn {
-        height: 40px;
-        width: 40px;
-        border-radius: 50%;
-        background-color: rgba(126, 87, 194, 0.8);  /* Purple color */
-        border: none;
-        box-shadow: 0 0 10px rgba(0,0,0,0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0.8;
-        transition: all 0.3s ease;
-        pointer-events: auto;
-        color: white;
-    }
-    
-    .carousel-nav-btn:hover {
-        opacity: 1;
-        background-color: rgba(126, 87, 194, 1);
-        transform: scale(1.1);
     }
     
     .template-card {
@@ -555,8 +522,8 @@
         </div>
     </div>
     
-    <!-- Template Carousel with Arrow Navigation -->
-    <div class="template-carousel position-relative mb-4" id="{{ ceremony }}-carousel">
+    <!-- Template Container -->
+    <div class="template-container position-relative mb-4" id="{{ ceremony }}-carousel">
 
         
         <!-- Delete Tools -->
