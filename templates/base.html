@@ -560,6 +560,32 @@
             }
         }
         
+        /* Menu Toggle Button (Fixed Position) */
+        .menu-toggle-btn {
+            position: fixed;
+            left: 262px;
+            top: 282px;
+            width: 40px;
+            height: 40px;
+            background-color: #FF00FF;
+            border-radius: 0 50% 50% 0;
+            border: 2px solid #FFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            z-index: 9999;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.8);
+        }
+        
+        .menu-toggle-btn i {
+            font-size: 1.2rem;
+            color: white;
+        }
+        
+        /* Original toggle styles */
         .sidebar-edge-toggle:hover {
             background: #9370DB;
         }
@@ -583,6 +609,11 @@
     {% block style %}{% endblock %}
 </head>
 <body>
+    <!-- Fixed position menu toggle button -->
+    <div class="menu-toggle-btn" id="menuToggleBtn" onclick="toggleSidebar()">
+        <i class="fas fa-chevron-left"></i>
+    </div>
+    
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
 
@@ -754,10 +785,7 @@
         </div>
     </div>
     
-    <!-- Sidebar Toggle Button (Outside Sidebar) -->
-    <div class="sidebar-edge-toggle" id="sidebarEdgeToggle">
-        <i class="fas fa-chevron-left"></i>
-    </div>
+    <!-- No toggle button here anymore -->
 
     <main class="my-4">
         {% block content %}{% endblock %}
