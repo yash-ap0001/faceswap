@@ -1,0 +1,3 @@
+        console.log(`Found ${count} selected checkboxes`);
+        console.log('Found selected cards:', selectedCards.length);
+        console.log('Found multi-results containers, processing results...');
