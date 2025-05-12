@@ -344,7 +344,16 @@
         cursor: pointer;
     }
     
-    /* Delete button styles removed as requested */
+    .delete-template-btn {
+        visibility: hidden;
+        opacity: 0;
+        transition: visibility 0s, opacity 0.3s;
+    }
+    
+    .bridal-card:hover .delete-template-btn {
+        visibility: visible;
+        opacity: 1;
+    }
     
     /* View more button styles */
     /* Removed view-more button styles */
@@ -403,21 +412,12 @@
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="confirmUpload">
                     <i class="fas fa-check me-1"></i> Confirm Photo
                 </button>
-                <button type="button" class="btn btn-success d-none" id="generate-btn">
-                    <i class="fas fa-magic me-1"></i> Generate Previews
-                </button>
             </div>
         </div>
     </div>
 </div>
 
 <div class="container-fluid py-4">
-    <!-- Model Status Alert -->
-    <div id="model-status-card" class="alert alert-warning d-none mb-4" role="alert">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        <span id="model-status-message">Checking model status...</span>
-    </div>
-    
     <!-- Multi-Selection Interface -->
     <div class="card mb-4 shadow d-none" id="multiSelectionInterface">
         <div class="card-header bg-dark d-flex justify-content-between align-items-center">
@@ -568,7 +568,19 @@
         </div>
         
         <!-- Delete Tools -->
-        <!-- Template management tools removed as requested -->
+        <div class="template-management-tools mb-2">
+            <div class="bulk-actions d-none" id="{{ ceremony }}-bulk-actions">
+                <button class="btn btn-sm btn-danger delete-selected-btn" data-ceremony="{{ ceremony }}">
+                    <i class="fas fa-trash-alt me-1"></i> Delete Selected
+                </button>
+                <button class="btn btn-sm btn-danger delete-all-btn" data-ceremony="{{ ceremony }}">
+                    <i class="fas fa-times-circle me-1"></i> Delete All {{ ceremony|title }}
+                </button>
+                <button class="btn btn-sm btn-secondary cancel-select-btn" data-ceremony="{{ ceremony }}">
+                    <i class="fas fa-times me-1"></i> Cancel
+                </button>
+            </div>
+        </div>
         
         <!-- Cards Row - Showing Only a Few at a Time -->
         <div class="template-row">
@@ -593,7 +605,11 @@
                                 </div>
                                 
                                 <!-- Multi-selection button (always visible for quick selection) -->
-                                <!-- Plus button removed as requested -->
+                                <button class="btn btn-sm btn-primary position-absolute top-0 end-0 m-2 template-select-btn"
+                                        data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" title="Add to selection"
+                                        onclick="toggleTemplateSelection(event, '{{ template.url }}', '{{ ceremony }}')">
+                                    <i class="fas fa-plus"></i>
+                                </button>
                                 
                                 <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" style="cursor: pointer;" onclick="showFullsizePreview('{{ template.url }}', '{{ ceremony }}')">
                                 
@@ -604,7 +620,11 @@
                                     </span>
                                 </div>
                                 
-                                <!-- Delete button removed as requested -->
+                                <!-- Individual delete button (visible on hover) -->
+                                <button class="btn btn-sm btn-outline-danger delete-template-btn position-absolute bottom-0 end-0 m-2" 
+                                        data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
                             </div>
                         </div>
                     {% endfor %}
@@ -895,7 +915,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // View More buttons
     // Removed view-more button event handlers (no longer needed)
     
-    // Delete buttons functionality removed as requested
+    // Delete buttons
+    document.querySelectorAll('.delete-template-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            currentDeletePath = this.getAttribute('data-template-path');
+            currentDeleteCeremony = this.getAttribute('data-ceremony');
+            document.getElementById('delete-confirm-message').textContent = 
+                `Are you sure you want to delete this ${currentDeleteCeremony} template? This action cannot be undone.`;
+            deleteConfirmModal.show();
+        });
+    });
     
     // Simple expand/collapse functionality
     document.querySelectorAll('.toggle-row-btn').forEach(button => {
@@ -1179,73 +1209,71 @@ document.addEventListener('DOMContentLoaded', function() {
         sourceClearBtn.classList.add('d-none');
     });
     
-    // Generate all previews - safely check if element exists
-    const generateBtn = document.getElementById('generate-btn');
-    if (generateBtn) {
-        generateBtn.addEventListener('click', function() {
-            if (!sourceInput || !sourceInput.files || !sourceInput.files.length) {
-                showError('Please upload your photo first');
-                return;
-            }
-            
-            // Always use Pinterest templates
-            const templateType = 'pinterest';
-            
-            // Get selected categories
-            const selectedCategories = [];
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
-                selectedCategories.push(checkbox.value);
-            });
-            
-            if (selectedCategories.length === 0) {
-                showError('Please select at least one category');
-                return;
-            }
+    // Generate all previews
+    generateBtn.addEventListener('click', function() {
+        if (!sourceInput.files.length) {
+            showError('Please upload your photo first');
+            return;
+        }
         
-            // Show loading overlay
-            if (loadingOverlay) loadingOverlay.classList.remove('d-none');
-            if (loadingMessage) loadingMessage.textContent = 'Preparing to generate previews...';
+        // Always use Pinterest templates
+        const templateType = 'pinterest';
+        
+        // Get selected categories
+        const selectedCategories = [];
+        document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+            selectedCategories.push(checkbox.value);
+        });
+        
+        if (selectedCategories.length === 0) {
+            showError('Please select at least one category');
+            return;
+        }
+        
+        // Show loading overlay
+        loadingOverlay.classList.remove('d-none');
+        loadingMessage.textContent = 'Preparing to generate previews...';
+        
+        // Clear previous results
+        resultGallery.innerHTML = '';
+        
+        // Count for tracking progress
+        let processedCount = 0;
+        let totalTemplates = templateCards.length;
+        
+        // Process each template
+        templateCards.forEach((card, index) => {
+            const style = card.dataset.style;
+            const category = style.charAt(0).toUpperCase() + style.slice(1); // Capitalize first letter
             
-            // Clear previous results
-            if (resultGallery) resultGallery.innerHTML = '';
+            // Skip if category not selected
+            if (!selectedCategories.includes(style)) {
+                processedCount++;
+                updateProgressMessage(processedCount, totalTemplates);
+                return;
+            }
             
-            // Count for tracking progress
-            let processedCount = 0;
-            let totalTemplates = templateCards.length;
-            
-            // Process each template
-            templateCards.forEach((card, index) => {
-                const style = card.dataset.style;
-                const category = style.charAt(0).toUpperCase() + style.slice(1); // Capitalize first letter
+            setTimeout(() => {
+                loadingMessage.textContent = `Processing ${category} template...`;
                 
-                // Skip if category not selected
-                if (!selectedCategories.includes(style)) {
-                    processedCount++;
-                    updateProgressMessage(processedCount, totalTemplates);
-                    return;
-                }
-                
-                setTimeout(() => {
-                    if (loadingMessage) loadingMessage.textContent = `Processing ${category} template...`;
-                    
-                    processTemplate(card, templateType, style)
-                        .then(() => {
-                            processedCount++;
-                            updateProgressMessage(processedCount, totalTemplates);
-                            
-                            if (processedCount >= totalTemplates) {
-                                // All templates processed
-                                if (emptyResults) emptyResults.classList.add('d-none');
-                                if (resultGallery) resultGallery.classList.remove('d-none');
-                                if (loadingOverlay) loadingOverlay.classList.add('d-none');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error processing template:', error);
-                            processedCount++;
-                            updateProgressMessage(processedCount, totalTemplates);
-                        });
-                }, index * 200); // Stagger the requests
+                processTemplate(card, templateType, style)
+                    .then(() => {
+                        processedCount++;
+                        updateProgressMessage(processedCount, totalTemplates);
+                        
+                        if (processedCount >= totalTemplates) {
+                            // All templates processed
+                            emptyResults.classList.add('d-none');
+                            resultGallery.classList.remove('d-none');
+                            loadingOverlay.classList.add('d-none');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error processing template:', error);
+                        processedCount++;
+                        updateProgressMessage(processedCount, totalTemplates);
+                    });
+            }, index * 200); // Stagger the requests
         });
     });
     
@@ -1343,55 +1371,23 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('/check-models')
             .then(response => response.json())
             .then(data => {
-                console.log('Model status:', data);
-                
-                // Safely check if elements exist before using them
-                const statusCard = document.getElementById('model-status-card');
-                const statusMessage = document.getElementById('model-status-message');
-                
-                if (statusCard && statusMessage) {
-                    if (data.face_detection && data.face_swap) {
-                        // Both models are loaded successfully
-                        statusCard.classList.remove('alert-warning');
-                        statusCard.classList.add('alert-success');
-                        statusCard.classList.remove('d-none');
-                        statusMessage.textContent = 'All models loaded successfully! You can now use the face swap feature.';
-                        
-                        // Enable any buttons that may need the models
-                        const generateBtn = document.getElementById('generate-btn');
-                        if (generateBtn) {
-                            generateBtn.classList.remove('d-none');
-                        }
-                    } else if (!data.face_detection || !data.face_swap) {
-                        // Some models are not loaded
-                        statusCard.classList.remove('alert-success');
-                        statusCard.classList.add('alert-warning');
-                        statusCard.classList.remove('d-none');
-                        let message = 'Some models are not loaded properly.';
-                        
-                        if (!data.face_detection) {
-                            message = 'Face detection model is not loaded.';
-                        } else if (!data.face_swap) {
-                            message = 'Face swap model is not loaded.';
-                        }
-                        
-                        statusMessage.textContent = message;
+                if (!data.face_detection || !data.face_swap) {
+                    modelStatusCard.classList.remove('d-none');
+                    let statusMessage = 'Some models are not loaded properly.';
+                    
+                    if (!data.face_detection) {
+                        statusMessage = 'Face detection model is not loaded.';
+                    } else if (!data.face_swap) {
+                        statusMessage = 'Face swap model is not loaded.';
                     }
+                    
+                    document.getElementById('model-status-message').textContent = statusMessage;
                 }
             })
             .catch(error => {
                 console.error('Error checking model status:', error);
-                
-                // Safely check if elements exist
-                const statusCard = document.getElementById('model-status-card');
-                const statusMessage = document.getElementById('model-status-message');
-                
-                if (statusCard && statusMessage) {
-                    statusCard.classList.remove('alert-success');
-                    statusCard.classList.add('alert-warning');
-                    statusCard.classList.remove('d-none');
-                    statusMessage.textContent = 'Could not check model status.';
-                }
+                modelStatusCard.classList.remove('d-none');
+                document.getElementById('model-status-message').textContent = 'Could not check model status.';
             });
     }
     
@@ -1806,9 +1802,50 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Toggle template selection
-    // Template selection function removed as requested
+    function toggleTemplateSelection(event, templatePath, ceremonyType) {
+        // Prevent the click from triggering the parent's click event (image preview)
+        event.stopPropagation();
+        
+        const template = {
+            path: templatePath,
+            ceremony: ceremonyType
+        };
+        
+        if (isTemplateSelected(templatePath)) {
+            // Already selected, remove it
+            removeTemplateFromSelection(templatePath);
+        } else {
+            // Not selected, add it
+            addTemplateToSelection(template);
+        }
+    }
     
-    // Template selection clearing function removed as requested
+    // Clear all selected templates
+    function clearTemplateSelection() {
+        // Remove selected class from all cards
+        document.querySelectorAll('.bridal-card.selected').forEach(card => {
+            card.classList.remove('selected');
+            
+            // Hide selection badge
+            const badge = card.querySelector('.select-badge');
+            if (badge) badge.classList.add('d-none');
+            
+            // Reset selection button if it exists
+            const selectBtn = card.querySelector('.template-select-btn');
+            if (selectBtn) {
+                selectBtn.classList.remove('btn-success');
+                selectBtn.classList.add('btn-primary');
+                selectBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                selectBtn.title = "Add to selection";
+            }
+        });
+        
+        // Clear the array
+        selectedTemplates.length = 0;
+        
+        // Update the interface
+        updateSelectionInterface();
+    }
     
     // Process multiple templates with the same source face
     function processMultipleTemplates() {

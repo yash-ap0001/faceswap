@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM Elements - use defensive programming to check if elements exist before using them
+    // DOM Elements
     const uploadForm = document.getElementById('upload-form');
     const sourceInput = document.getElementById('source-input');
     const targetInput = document.getElementById('target-input');
@@ -20,159 +20,127 @@ document.addEventListener('DOMContentLoaded', function() {
     const modelStatusAlert = document.getElementById('model-status-alert');
     const modelStatusMessage = document.getElementById('model-status-message');
 
-    // Check if models are loaded - safe to call on any page
+    // Check if models are loaded
     checkModels();
 
-    // File input change handlers - only add if the elements exist
-    if (sourceInput) {
-        sourceInput.addEventListener('change', function() {
-            handleFileInputChange(this, sourcePreview, sourcePlaceholder);
-        });
-    }
+    // File input change handlers
+    sourceInput.addEventListener('change', function() {
+        handleFileInputChange(this, sourcePreview, sourcePlaceholder);
+    });
 
-    if (targetInput) {
-        targetInput.addEventListener('change', function() {
-            handleFileInputChange(this, targetPreview, targetPlaceholder);
-        });
-    }
+    targetInput.addEventListener('change', function() {
+        handleFileInputChange(this, targetPreview, targetPlaceholder);
+    });
 
-    // Clear button handlers - only add if the elements exist
-    if (sourceClearBtn) {
-        sourceClearBtn.addEventListener('click', function() {
-            clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
-        });
-    }
+    // Clear button handlers
+    sourceClearBtn.addEventListener('click', function() {
+        clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
+    });
 
-    if (targetClearBtn) {
-        targetClearBtn.addEventListener('click', function() {
-            clearFileInput(targetInput, targetPreview, targetPlaceholder);
-        });
-    }
+    targetClearBtn.addEventListener('click', function() {
+        clearFileInput(targetInput, targetPreview, targetPlaceholder);
+    });
 
-    // Try again button handler - only add if the element exists
-    if (tryAgainBtn) {
-        tryAgainBtn.addEventListener('click', function() {
-            if (resultContainer) resultContainer.classList.add('d-none');
-            if (uploadForm) uploadForm.reset();
-            if (sourceInput && sourcePreview && sourcePlaceholder) {
-                clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
-            }
-            if (targetInput && targetPreview && targetPlaceholder) {
-                clearFileInput(targetInput, targetPreview, targetPlaceholder);
-            }
-            if (errorContainer) errorContainer.classList.add('d-none');
-        });
-    }
+    // Try again button handler
+    tryAgainBtn.addEventListener('click', function() {
+        resultContainer.classList.add('d-none');
+        uploadForm.reset();
+        clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
+        clearFileInput(targetInput, targetPreview, targetPlaceholder);
+        errorContainer.classList.add('d-none');
+    });
 
-    // Form submission - only add if the form exists
-    if (uploadForm) {
-        uploadForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Ensure sourceInput and targetInput exist and have files
-            if (!sourceInput || !sourceInput.files || !sourceInput.files.length || 
-                !targetInput || !targetInput.files || !targetInput.files.length) {
-                showError('Please select both source and target images.');
-                return;
-            }
+    // Form submission
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!sourceInput.files.length || !targetInput.files.length) {
+            showError('Please select both source and target images.');
+            return;
+        }
 
-            // Check file sizes
-            const maxSize = 16 * 1024 * 1024; // 16MB
-            if (sourceInput.files[0].size > maxSize || targetInput.files[0].size > maxSize) {
-                showError('File size exceeds the maximum limit of 16MB.');
-                return;
-            }
+        // Check file sizes
+        const maxSize = 16 * 1024 * 1024; // 16MB
+        if (sourceInput.files[0].size > maxSize || targetInput.files[0].size > maxSize) {
+            showError('File size exceeds the maximum limit of 16MB.');
+            return;
+        }
 
-            // Check file types
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-            if (!allowedTypes.includes(sourceInput.files[0].type) || 
-                !allowedTypes.includes(targetInput.files[0].type)) {
-                showError('Only JPG, JPEG and PNG files are allowed.');
-                return;
-            }
+        // Check file types
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (!allowedTypes.includes(sourceInput.files[0].type) || 
+            !allowedTypes.includes(targetInput.files[0].type)) {
+            showError('Only JPG, JPEG and PNG files are allowed.');
+            return;
+        }
 
-            // Show loading indicators if they exist
-            if (loadingContainer) loadingContainer.classList.remove('d-none');
-            if (errorContainer) errorContainer.classList.add('d-none');
-            if (resultContainer) resultContainer.classList.add('d-none');
-            if (swapBtn) swapBtn.disabled = true;
+        // Show loading
+        loadingContainer.classList.remove('d-none');
+        errorContainer.classList.add('d-none');
+        resultContainer.classList.add('d-none');
+        swapBtn.disabled = true;
 
-            // Create form data
-            const formData = new FormData();
-            formData.append('source', sourceInput.files[0]);
-            formData.append('target', targetInput.files[0]);
+        // Create form data
+        const formData = new FormData();
+        formData.append('source', sourceInput.files[0]);
+        formData.append('target', targetInput.files[0]);
 
-            // Send AJAX request
-            fetch('/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (loadingContainer) loadingContainer.classList.add('d-none');
-                if (swapBtn) swapBtn.disabled = false;
+        // Send AJAX request
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingContainer.classList.add('d-none');
+            swapBtn.disabled = false;
 
-                if (data.success) {
-                    if (resultImage && data.result_image) {
-                        resultImage.src = `/uploads/${data.result_image}`;
-                    }
-                    
-                    if (downloadBtn && data.result_image) {
-                        downloadBtn.href = `/uploads/${data.result_image}`;
-                        downloadBtn.download = data.result_image;
-                    }
-                    
-                    // Show result container if it exists
-                    if (resultContainer) {
-                        resultContainer.classList.remove('d-none');
-                    }
-                    
-                    // If in demo mode, display an additional message
-                    if (data.demo_mode && resultContainer) {
-                        // Check if we already have a demo mode alert
-                        let demoAlert = document.getElementById('demo-result-alert');
-                        if (!demoAlert) {
-                            // Create a new alert element
-                            demoAlert = document.createElement('div');
-                            demoAlert.id = 'demo-result-alert';
-                            demoAlert.className = 'alert alert-info mt-3';
-                            demoAlert.textContent = data.message || 'Running in demonstration mode. The image shows detected faces instead of actual face swapping.';
-                            
-                            // Insert it before the result image if possible
-                            if (resultImage && resultImage.parentNode) {
-                                resultContainer.insertBefore(demoAlert, resultImage.parentNode);
-                            } else {
-                                resultContainer.appendChild(demoAlert);
-                            }
-                        } else {
-                            // Update existing alert
-                            demoAlert.textContent = data.message || 'Running in demonstration mode. The image shows detected faces instead of actual face swapping.';
-                            demoAlert.classList.remove('d-none');
-                        }
+            if (data.success) {
+                resultImage.src = `/uploads/${data.result_image}`;
+                downloadBtn.href = `/uploads/${data.result_image}`;
+                downloadBtn.download = data.result_image;
+                
+                // Show result container
+                resultContainer.classList.remove('d-none');
+                
+                // If in demo mode, display an additional message
+                if (data.demo_mode) {
+                    // Check if we already have a demo mode alert
+                    let demoAlert = document.getElementById('demo-result-alert');
+                    if (!demoAlert) {
+                        // Create a new alert element
+                        demoAlert = document.createElement('div');
+                        demoAlert.id = 'demo-result-alert';
+                        demoAlert.className = 'alert alert-info mt-3';
+                        demoAlert.textContent = data.message || 'Running in demonstration mode. The image shows detected faces instead of actual face swapping.';
+                        
+                        // Insert it before the result image
+                        resultContainer.insertBefore(demoAlert, resultImage.parentNode);
                     } else {
-                        // Hide the demo alert if it exists
-                        const existingAlert = document.getElementById('demo-result-alert');
-                        if (existingAlert) {
-                            existingAlert.classList.add('d-none');
-                        }
-                    }
-                    
-                    // Scroll to result if it exists
-                    if (resultContainer) {
-                        window.scrollTo({
-                            top: resultContainer.offsetTop,
-                            behavior: 'smooth'
-                        });
+                        // Update existing alert
+                        demoAlert.textContent = data.message || 'Running in demonstration mode. The image shows detected faces instead of actual face swapping.';
+                        demoAlert.classList.remove('d-none');
                     }
                 } else {
-                    showError(data.error || 'An unknown error occurred.');
+                    // Hide the demo alert if it exists
+                    const existingAlert = document.getElementById('demo-result-alert');
+                    if (existingAlert) {
+                        existingAlert.classList.add('d-none');
+                    }
                 }
-            })
-            .catch(error => {
-                if (loadingContainer) loadingContainer.classList.add('d-none');
-                if (swapBtn) swapBtn.disabled = false;
-                showError('Network error: ' + error.message);
-            });
+                
+                window.scrollTo({
+                    top: resultContainer.offsetTop,
+                    behavior: 'smooth'
+                });
+            } else {
+                showError(data.error || 'An unknown error occurred.');
+            }
+        })
+        .catch(error => {
+            loadingContainer.classList.add('d-none');
+            swapBtn.disabled = false;
+            showError('Network error: ' + error.message);
         });
     });
 
@@ -198,91 +166,50 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showError(message) {
-        // Check if the error elements exist before using them
-        if (errorMessage) {
-            errorMessage.textContent = message;
-        } else {
-            console.error('Error:', message);
-        }
-        
-        if (errorContainer) {
-            errorContainer.classList.remove('d-none');
-            window.scrollTo({
-                top: errorContainer.offsetTop,
-                behavior: 'smooth'
-            });
-        } else {
-            // If no error container exists, at least log the error to console
-            console.error('Error container not found. Error message:', message);
-        }
+        errorMessage.textContent = message;
+        errorContainer.classList.remove('d-none');
+        window.scrollTo({
+            top: errorContainer.offsetTop,
+            behavior: 'smooth'
+        });
     }
 
     function checkModels() {
         fetch('/check-models')
             .then(response => response.json())
             .then(data => {
-                // Safely get elements, which might not exist on all pages
-                const modelStatusAlert = document.getElementById('model-status-alert');
-                const modelStatusMessage = document.getElementById('model-status-message');
-                const modelStatusCard = document.getElementById('model-status-card');
                 const modelUploadContainer = document.getElementById('model-upload-container');
                 
-                // Log model status to console for debugging
-                console.log('Model status:', data);
-                
-                // Only proceed with DOM updates if the status elements exist
-                if (modelStatusAlert && modelStatusMessage) {
-                    if (!data.face_detection) {
-                        modelStatusAlert.classList.remove('d-none');
-                        modelStatusMessage.textContent = 'Face detection model is not loaded. The application cannot work properly.';
-                    } else if (data.demo_mode || !data.face_swap) {
-                        modelStatusAlert.classList.remove('d-none');
-                        
-                        if (data.demo_mode) {
-                            modelStatusAlert.classList.remove('alert-warning');
-                            modelStatusAlert.classList.add('alert-info');
-                            modelStatusMessage.textContent = 'Running in demonstration mode. Face detection works, but face swapping will show visual indicators instead of actual face swaps.';
-                        } else {
-                            modelStatusMessage.textContent = 'Face swap model is not loaded. The application will only detect faces but cannot swap them.';
-                        }
-                        
-                        // Show the model upload button when in demo mode or face swap model is missing
-                        if (modelUploadContainer) {
-                            modelUploadContainer.classList.remove('d-none');
-                        }
+                if (!data.face_detection) {
+                    modelStatusAlert.classList.remove('d-none');
+                    modelStatusMessage.textContent = 'Face detection model is not loaded. The application cannot work properly.';
+                } else if (data.demo_mode || !data.face_swap) {
+                    modelStatusAlert.classList.remove('d-none');
+                    
+                    if (data.demo_mode) {
+                        modelStatusAlert.classList.remove('alert-warning');
+                        modelStatusAlert.classList.add('alert-info');
+                        modelStatusMessage.textContent = 'Running in demonstration mode. Face detection works, but face swapping will show visual indicators instead of actual face swaps.';
                     } else {
-                        modelStatusAlert.classList.add('d-none');
-                        
-                        // Hide the model upload container when everything is working
-                        if (modelUploadContainer) {
-                            modelUploadContainer.classList.add('d-none');
-                        }
+                        modelStatusMessage.textContent = 'Face swap model is not loaded. The application will only detect faces but cannot swap them.';
                     }
                     
-                    // Update the model status card if it exists (for bridal gallery page)
-                    if (modelStatusCard) {
-                        if (data.face_detection && data.face_swap) {
-                            modelStatusCard.classList.add('bg-success');
-                            modelStatusCard.classList.remove('bg-warning', 'bg-danger');
-                        } else if (data.face_detection) {
-                            modelStatusCard.classList.add('bg-warning');
-                            modelStatusCard.classList.remove('bg-success', 'bg-danger');
-                        } else {
-                            modelStatusCard.classList.add('bg-danger');
-                            modelStatusCard.classList.remove('bg-success', 'bg-warning');
-                        }
+                    // Show the model upload button when in demo mode or face swap model is missing
+                    if (modelUploadContainer) {
+                        modelUploadContainer.classList.remove('d-none');
+                    }
+                } else {
+                    modelStatusAlert.classList.add('d-none');
+                    
+                    // Hide the model upload container when everything is working
+                    if (modelUploadContainer) {
+                        modelUploadContainer.classList.add('d-none');
                     }
                 }
             })
             .catch(error => {
-                console.error('Error checking model status:', error);
-                const modelStatusAlert = document.getElementById('model-status-alert');
-                const modelStatusMessage = document.getElementById('model-status-message');
-                
-                if (modelStatusAlert && modelStatusMessage) {
-                    modelStatusAlert.classList.remove('d-none');
-                    modelStatusMessage.textContent = 'Could not check model status. There might be connection issues.';
-                }
+                modelStatusAlert.classList.remove('d-none');
+                modelStatusMessage.textContent = 'Could not check model status. There might be connection issues.';
             });
     }
 });
