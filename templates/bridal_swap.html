@@ -2019,11 +2019,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     resultCard.innerHTML = `
-                        <div class="card bg-dark border-0 shadow position-relative" style="height: 280px; max-height: 280px; min-height: 280px;">
-                            <div class="card-img-top position-relative overflow-hidden" style="height: 230px; max-height: 230px; min-height: 230px; cursor: pointer;" 
+                        <div class="position-relative mb-3">
+                            <div class="position-relative overflow-hidden mb-1" style="height: 280px; cursor: pointer;" 
                                 onclick="openFullImage('${resultFullPath}', '${displayCeremony}', ${index})">
-                                <img src="${resultFullPath}" class="multi-result-img" alt="Result for ${displayCeremony}" 
-                                    style="width: 100%; height: 100%; object-fit: cover;">
+                                <img src="${resultFullPath}" class="w-100 rounded multi-result-img" alt="Result for ${displayCeremony}" 
+                                    style="height: 100%; object-fit: cover;">
                                 ${newBadge}
                                 <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2 d-none d-md-block">
                                     <span class="badge bg-dark bg-opacity-75 px-3 py-2">
@@ -2031,7 +2031,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </span>
                                 </div>
                             </div>
-                            <div class="card-footer d-flex justify-content-end align-items-center bg-dark text-light p-1" style="height: 50px; max-height: 50px; min-height: 50px;">
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="text-light">${displayCeremony.charAt(0).toUpperCase() + displayCeremony.slice(1)} Look</h6>
                                 <div class="btn-group">
                                     <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
                                         <i class="fas fa-trash"></i>
@@ -2270,7 +2272,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     col.className = 'col-md-3 col-sm-4 col-6 mb-3';
                     
                     const card = document.createElement('div');
-                    card.className = 'card h-100 bg-dark template-card';
+                    card.className = 'position-relative template-card'; // Removed card class, bg-dark
                     card.dataset.templateUrl = template.url;
                     card.dataset.templateId = template.id || '';
                     card.dataset.templatePath = template.path || template.url;
@@ -2285,8 +2287,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     
                     card.innerHTML = `
-                        <div class="position-relative overflow-hidden" style="height: 350px;">
-                            <img src="${template.url}" class="card-img-top template-img" 
+                        <div class="position-relative overflow-hidden mb-1" style="height: 350px;">
+                            <img src="${template.url}" class="w-100 rounded template-img" 
                                 alt="${ceremonyType} template" style="height: 350px; object-fit: cover;">
                             
                             <div class="position-absolute top-0 end-0 m-2 template-checkbox-wrapper">
@@ -2295,9 +2297,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                         id="template-check-${ceremonyType}-${index}">
                                 </div>
                             </div>
-                            
-
                         </div>
+                        <h6 class="text-center text-light mb-3">${ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1)} Template</h6>
                     `;
                     
                     templateContainer.appendChild(col);
