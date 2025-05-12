@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
       e.preventDefault();
       
       // Create bulk order dialog
-      const bulkOrderDialog = new Dialog({
+      const bulkOrderDialog = new window.Dialog({
         id: 'bulk-order-dialog',
         title: 'Bulk Upload',
         description: 'Upload multiple templates for different ceremonies',

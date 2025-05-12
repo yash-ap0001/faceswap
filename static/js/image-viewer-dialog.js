@@ -4,6 +4,12 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+  // Check if Dialog class is available
+  if (typeof window.Dialog === 'undefined') {
+    console.error('Dialog component not available! Image viewer functionality will be limited.');
+    return;
+  }
+
   // Track gallery collections
   const galleries = {};
   
@@ -18,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let isDragging = false;
   
   // Create the base dialog
-  const imageViewerDialog = new Dialog({
+  const imageViewerDialog = new window.Dialog({
     id: 'image-viewer-dialog',
     title: 'Image Viewer',
     description: null,
@@ -71,7 +77,9 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   // Add special class to dialog content
-  imageViewerDialog.elements.content.classList.add('dialog-image-viewer');
+  if (imageViewerDialog && imageViewerDialog.elements && imageViewerDialog.elements.content) {
+    imageViewerDialog.elements.content.classList.add('dialog-image-viewer');
+  }
   
   // Initialize gallery images
   function setupImageViewer() {
@@ -165,7 +173,9 @@ document.addEventListener('DOMContentLoaded', function() {
   function stopDrag() {
     const container = imageViewerDialog.elements.content.querySelector('.image-viewer-container');
     isDragging = false;
-    container.classList.remove('dragging');
+    if (container) {
+      container.classList.remove('dragging');
+    }
   }
   
   function handleKeyboardShortcuts(e) {
@@ -214,8 +224,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const img = imageViewerDialog.elements.content.querySelector('.image-viewer-img');
     const zoomDisplay = imageViewerDialog.elements.content.querySelector('.image-zoom-percentage');
     
-    img.style.transform = `scale(${imageScale}) translate(${imageOffsetX / imageScale}px, ${imageOffsetY / imageScale}px)`;
-    zoomDisplay.textContent = `${Math.round(imageScale * 100)}%`;
+    if (img && zoomDisplay) {
+      img.style.transform = `scale(${imageScale}) translate(${imageOffsetX / imageScale}px, ${imageOffsetY / imageScale}px)`;
+      zoomDisplay.textContent = `${Math.round(imageScale * 100)}%`;
+    }
   }
   
   function navigateToPrevImage() {
@@ -248,15 +260,21 @@ document.addEventListener('DOMContentLoaded', function() {
     resetZoom();
     
     // Update image source and alt text
-    img.src = currentImage.src;
-    img.alt = currentImage.alt || `Image ${currentImageIndex + 1}`;
+    if (img && currentImage) {
+      img.src = currentImage.src;
+      img.alt = currentImage.alt || `Image ${currentImageIndex + 1}`;
+    }
     
     // Update caption
-    caption.textContent = `${currentImageIndex + 1} / ${gallery.length}`;
+    if (caption) {
+      caption.textContent = `${currentImageIndex + 1} / ${gallery.length}`;
+    }
     
     // Update navigation button states
-    prevBtn.disabled = gallery.length <= 1;
-    nextBtn.disabled = gallery.length <= 1;
+    if (prevBtn && nextBtn) {
+      prevBtn.disabled = gallery.length <= 1;
+      nextBtn.disabled = gallery.length <= 1;
+    }
   }
   
   function downloadCurrentImage() {
@@ -310,4 +328,36 @@ document.addEventListener('DOMContentLoaded', function() {
       imageViewerDialog.open();
     });
   });
+
+  // Expose gallery registration function
+  window.registerImageViewer = function(selector, galleryId = 'default') {
+    document.querySelectorAll(selector).forEach(img => {
+      // Initialize gallery if needed
+      if (!galleries[galleryId]) {
+        galleries[galleryId] = [];
+      }
+      
+      // Add image to gallery collection
+      if (!galleries[galleryId].includes(img)) {
+        galleries[galleryId].push(img);
+      }
+      
+      // Add click event listener if not already set
+      if (!img.hasAttribute('data-image-viewer')) {
+        img.setAttribute('data-image-viewer', 'true');
+        img.setAttribute('data-gallery-id', galleryId);
+        
+        img.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Set current gallery and index
+          currentGallery = galleryId;
+          currentImageIndex = galleries[galleryId].indexOf(img);
+          
+          // Open the viewer
+          imageViewerDialog.open();
+        });
+      }
+    });
+  };
 });
