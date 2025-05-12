@@ -61,15 +61,14 @@
     }
     
     .image-preview-container {
-        height: 160px;
-        border-radius: 8px;
+        height: 200px;
+        border: 2px dashed #7e57c2;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
         margin-bottom: 20px;
-        background-color: rgba(33, 37, 41, 0.2);
         overflow: hidden;
-        transition: all 0.2s ease;
     }
     
     .preview-img {
@@ -202,13 +201,14 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-dark">
                     <h1 class="h3 mb-0">
-                        <i class="fas fa-magic me-2"></i>Create Your Look
+                        <i class="fas fa-magic me-2"></i>Bridal Face Swap Studio
                     </h1>
                 </div>
                 <div class="card-body">
-                    <p class="lead mb-4">
-                        Upload your photo once and see how you look in multiple templates.
-                    </p>
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Upload your photo once and see how you look in multiple bridal templates from different ceremonies.
+                    </div>
                     
                     <div id="model-status-alert" class="alert alert-warning d-none" role="alert">
                         <i class="fas fa-exclamation-triangle me-2"></i>
@@ -223,46 +223,36 @@
                                     <h5 class="mb-0">Upload Your Photo</h5>
                                 </div>
                                 <div class="card-body">
-                                    <div class="row g-2">
-                                        <div class="col-md-7">
-                                            <div class="image-preview-container d-flex align-items-center justify-content-center">
-                                                <img id="source-preview" class="img-fluid h-100 w-100 object-fit-cover d-none" alt="Your photo">
-                                                <div id="source-placeholder" class="placeholder-container text-center">
-                                                    <i class="fas fa-user fa-3x text-muted"></i>
-                                                    <p class="text-muted small mb-0">Select your photo</p>
-                                                </div>
-                                            </div>
+                                    <div class="image-preview-container mb-3">
+                                        <img id="source-preview" class="preview-img d-none" alt="Your photo preview">
+                                        <div id="source-placeholder" class="text-center">
+                                            <i class="fas fa-user-circle mb-2" style="font-size: 4rem; opacity: 0.5;"></i>
+                                            <p class="text-muted">No photo selected yet<br>Please upload a clear frontal photo</p>
                                         </div>
-                                        <div class="col-md-5 d-flex flex-column justify-content-center">
-                                            <div class="input-group mb-2">
-                                                <input type="file" class="form-control form-control-sm" id="source-input" accept=".jpg,.jpeg,.png" required>
-                                                <button class="btn btn-sm btn-outline-secondary" type="button" id="source-clear-btn">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
-                                            <p class="text-muted small mb-0">Upload a clear frontal face photo</p>
-                                        </div>
+                                    </div>
+                                    
+                                    <div class="input-group">
+                                        <input type="file" class="form-control" id="source-input" accept=".jpg,.jpeg,.png" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="source-clear-btn">
+                                            <i class="fas fa-times"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Template container with no ceremony categories -->
+                    <!-- Hidden Ceremony Selection -->
                     <div class="d-none">
-                        <input type="hidden" id="template-category" value="all">
+                        {% for ceremony in ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'] %}
+                        <input class="ceremony-checkbox" type="checkbox" 
+                               id="ceremony-{{ ceremony }}" value="{{ ceremony }}" 
+                               {% if ceremony == 'wedding' %}checked{% endif %}>
+                        {% endfor %}
                     </div>
                     
                     <div id="templates-container">
-                        <!-- All templates will be shown in a single gallery -->
-                        <div id="all-templates" class="template-gallery">
-                            <div class="loading-placeholder text-center py-5 w-100">
-                                <div class="spinner-border text-secondary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                                <p class="mt-2">Loading templates...</p>
-                            </div>
-                        </div>
+                        <!-- Template sections will be populated here -->
                     </div>
                     
                     <div class="text-center mt-4">
@@ -321,6 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const modelStatusAlert = document.getElementById('model-status-alert');
     const modelStatusMessage = document.getElementById('model-status-message');
     const templatesContainer = document.getElementById('templates-container');
+    const ceremonyCheckboxes = document.querySelectorAll('.ceremony-checkbox');
     
     // State variables
     let uploadedFile = null;
@@ -330,8 +321,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if models are loaded
     checkModelsStatus();
     
-    // Initialize all templates 
-    setupTemplateGallery();
+    // Initialize template sections based on selected ceremonies
+    updateTemplateSections();
     
     // Check for template updates from bulk upload page
     checkForTemplateUpdates();
@@ -420,16 +411,49 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Helper Functions
-    function setupTemplateGallery() {
-        // The template gallery is already defined in the HTML,
-        // so we just need to load all available templates
-        loadAllTemplates();
-    }
-    
-    // For backward compatibility
     function updateTemplateSections() {
-        // Redirect to new template gallery setup
-        setupTemplateGallery();
+        templatesContainer.innerHTML = '';
+        
+        const selectedCeremonies = Array.from(ceremonyCheckboxes)
+            .filter(checkbox => checkbox.checked)
+            .map(checkbox => checkbox.value);
+            
+        if (selectedCeremonies.length === 0) {
+            templatesContainer.innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Please select at least one ceremony type to see templates.
+                </div>
+            `;
+            return;
+        }
+        
+        // Create sections for each selected ceremony
+        for (const ceremony of selectedCeremonies) {
+            const ceremonySection = document.createElement('div');
+            ceremonySection.className = 'mb-5';
+            ceremonySection.innerHTML = `
+                <div class="ceremony-header d-flex align-items-center">
+                    <div class="ceremony-icon ceremony-${ceremony}">
+                        <i class="fas fa-${getCeremonyIcon(ceremony)}"></i>
+                    </div>
+                    <h3 class="mb-0">${capitalize(ceremony)} Ceremony</h3>
+                </div>
+                <div class="template-gallery" id="${ceremony}-templates">
+                    <!-- Templates will be loaded here -->
+                    <div class="loading-placeholder text-center py-5 w-100">
+                        <div class="spinner-border text-secondary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading templates...</p>
+                    </div>
+                </div>
+            `;
+            templatesContainer.appendChild(ceremonySection);
+            
+            // Load templates for this ceremony
+            loadTemplates(ceremony);
+        }
     }
     
     function loadTemplates(ceremony) {
@@ -438,35 +462,48 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`/api/templates?ceremony=${ceremony}&_t=${timestamp}`)
             .then(response => response.json())
             .then(data => {
-                const galleryEl = document.getElementById('all-templates');
+                const galleryEl = document.getElementById(`${ceremony}-templates`);
                 
                 if (!data.templates || data.templates.length === 0) {
-                    // Skip if no templates available
+                    galleryEl.innerHTML = `
+                        <div class="alert alert-info w-100">
+                            No templates available for ${capitalize(ceremony)} ceremony.
+                        </div>
+                    `;
                     return;
                 }
                 
-                // Clear the loading placeholder if it's the first template set
-                if (galleryEl.querySelector('.loading-placeholder')) {
-                    galleryEl.innerHTML = '';
-                }
+                // Add template count information with timestamp
+                const countInfoEl = document.createElement('div');
+                countInfoEl.className = 'mb-3 small text-muted';
+                countInfoEl.innerHTML = `
+                    <i class="fas fa-info-circle me-1"></i>
+                    Found ${data.templates.length} templates for ${capitalize(ceremony)} ceremony.
+                    <span class="ms-2">Last updated: ${new Date().toLocaleTimeString()}</span>
+                `;
+                
+                galleryEl.innerHTML = '';
+                galleryEl.appendChild(countInfoEl);
                 
                 // Add templates to the gallery
                 data.templates.forEach(template => {
                     const templateCard = document.createElement('div');
                     templateCard.className = 'template-card';
-                    // No longer need ceremony type for unified template display
+                    templateCard.dataset.ceremony = ceremony;
                     // No longer tracking template type since we only use Pinterest templates
                     templateCard.dataset.path = template.path;
                     
                     templateCard.innerHTML = `
                         <div class="template-img-container">
-                            <img src="${template.url}" class="template-img" alt="Template">
+                            <img src="${template.url}" class="template-img" alt="${capitalize(ceremony)} Template">
+                            <!-- Template badge removed - no need to show template type -->
                         </div>
                         <div class="template-info">
                             <div class="d-flex justify-content-end align-items-center">
                                 <div class="form-check">
                                     <input class="form-check-input template-checkbox" type="checkbox" 
-                                           value="${template.id}" id="template-${template.id}">
+                                           value="${template.id}" id="template-${template.id}"
+                                           data-ceremony="${ceremony}">
                                 </div>
                             </div>
                         </div>
@@ -492,15 +529,12 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error loading templates:', error);
-                const galleryEl = document.getElementById('all-templates');
-                // Only display error if it's not already populated
-                if (galleryEl.children.length === 0) {
-                    galleryEl.innerHTML = `
-                        <div class="alert alert-danger w-100">
-                            Error loading templates: ${error.message}
-                        </div>
-                    `;
-                }
+                const galleryEl = document.getElementById(`${ceremony}-templates`);
+                galleryEl.innerHTML = `
+                    <div class="alert alert-danger w-100">
+                        Error loading templates: ${error.message}
+                    </div>
+                `;
             });
     }
     
@@ -516,6 +550,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const checkboxes = document.querySelectorAll('.template-checkbox:checked');
         selectedTemplates = Array.from(checkboxes).map(checkbox => ({
             id: checkbox.value,
+            ceremony: checkbox.dataset.ceremony,
+            type: checkbox.dataset.type,
             element: checkbox.closest('.template-card')
         }));
         
@@ -535,10 +571,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="loading-overlay">
                     <div class="spinner"></div>
                 </div>
-                <img class="result-img" alt="Your transformed look">
+                <img class="result-img" alt="${capitalize(template.ceremony)} face swap">
             </div>
             <div class="result-controls">
-                <button class="btn btn-sm btn-outline-light download-btn ms-auto">
+                <span class="text-white">${capitalize(template.ceremony)} ${capitalize(template.type)}</span>
+                <button class="btn btn-sm btn-outline-light download-btn">
                     <i class="fas fa-download"></i>
                 </button>
             </div>
@@ -550,7 +587,8 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const formData = new FormData();
             formData.append('source', uploadedFile);
-            formData.append('template_path', template.element.dataset.path);
+            formData.append('style', template.ceremony);
+            formData.append('template_type', template.type);
             
             const response = await fetch('/bridal-swap', {
                 method: 'POST',
@@ -649,40 +687,21 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add debugging information to the console
             console.log('Refreshing templates after upload detected');
             
-            // Refresh all templates
-            loadAllTemplates();
+            // Refresh all templates for all ceremonies
+            const ceremonyTypes = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'];
+            ceremonyTypes.forEach(ceremony => loadTemplates(ceremony));
         }
     }
     
-    function loadAllTemplates() {
-        // Add cache busting parameter
-        const timestamp = Date.now();
-        
-        // We'll sequentially load templates from all ceremony types to populate a single gallery
-        const ceremonyTypes = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'];
-        
-        // Clear the gallery first if it exists
-        const galleryEl = document.getElementById('all-templates');
-        if (galleryEl.querySelector('.loading-placeholder')) {
-            galleryEl.innerHTML = `
-                <div class="loading-placeholder text-center py-5 w-100">
-                    <div class="spinner-border text-secondary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-2">Loading templates...</p>
-                </div>
-            `;
-        }
-        
-        // Load all ceremony types one by one to populate the gallery
-        ceremonyTypes.forEach(ceremony => {
-            loadTemplates(ceremony);
-        });
-    }
-    
-    // Simplified for unified template display
     function getCeremonyIcon(ceremony) {
-        return 'image'; // Just use a generic image icon for all templates
+        switch (ceremony) {
+            case 'haldi': return 'sun';
+            case 'mehendi': return 'paint-brush';
+            case 'sangeeth': return 'music';
+            case 'wedding': return 'heart';
+            case 'reception': return 'glass-cheers';
+            default: return 'circle';
+        }
     }
 });
 </script>
