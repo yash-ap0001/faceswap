@@ -1615,6 +1615,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 processSelectedBtn.classList.remove('d-none');
                 if (selectionCountWrapper) selectionCountWrapper.classList.remove('d-none');
                 
+                // Hide single swap related elements
+                const singleSelectedContainer = document.getElementById('selected-preview-container');
+                if (singleSelectedContainer) {
+                    singleSelectedContainer.classList.add('d-none');
+                }
+                
                 // Make sure checkboxes are visible - directly override the inline style
                 document.querySelectorAll('.template-checkbox-wrapper').forEach(wrapper => {
                     wrapper.style.setProperty('display', 'block', 'important');
@@ -1642,6 +1648,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 toggleSelectionModeBtn.classList.remove('btn-outline-danger');
                 processSelectedBtn.classList.add('d-none');
                 if (selectionCountWrapper) selectionCountWrapper.classList.add('d-none');
+                
+                // Show single swap related elements
+                const singleSelectedContainer = document.getElementById('selected-preview-container');
+                if (singleSelectedContainer) {
+                    singleSelectedContainer.classList.remove('d-none');
+                }
                 
                 // Hide the thumbnails preview when exiting selection mode
                 const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
