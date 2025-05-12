@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dialog.css') }}">
     <style>
         :root {
             --primary-purple: #4a148c;
@@ -778,10 +777,94 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/accordion.js') }}"></script>
     
-    <!-- Interactive Components -->
     <script>
+        // Sidebar functionality
         document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM content loaded");
+            
+            // Try to get sidebar elements
+            const sidebar = document.getElementById('sidebar');
+            console.log("Sidebar element:", sidebar);
+            
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            console.log("Sidebar toggle button:", sidebarToggle);
+            
+            const navSidebarToggle = document.getElementById('navSidebarToggle');
+            console.log("Nav sidebar toggle button:", navSidebarToggle);
+            
+            const closeBtn = document.querySelector('.close-sidebar');
+            console.log("Close button:", closeBtn);
+            
             const themeSwitch = document.getElementById('themeSwitch');
+            
+            // Initialize sidebar in open state by default
+            if (sidebar) {
+                console.log("Initializing sidebar in open state");
+                sidebar.classList.remove('closed');
+                document.body.classList.remove('sidebar-closed');
+            }
+            
+            // Function to toggle sidebar
+            function toggleSidebar() {
+                console.log("Toggle sidebar called");
+                if (sidebar) {
+                    console.log("Toggling sidebar class");
+                    sidebar.classList.toggle('closed');
+                    document.body.classList.toggle('sidebar-closed');
+                } else {
+                    console.error("Sidebar element not found");
+                }
+            }
+            
+            // Toggle sidebar from floating button
+            if (sidebarToggle) {
+                console.log("Adding event listener to sidebar toggle button");
+                sidebarToggle.addEventListener('click', function(e) {
+                    console.log("Sidebar toggle button clicked");
+                    e.preventDefault();
+                    toggleSidebar();
+                });
+            }
+            
+            // Toggle sidebar from navbar button (skip if element doesn't exist)
+            if (navSidebarToggle) {
+                console.log("Adding event listener to nav sidebar toggle button");
+                navSidebarToggle.addEventListener('click', function(e) {
+                    console.log("Nav sidebar toggle button clicked");
+                    e.preventDefault();
+                    toggleSidebar();
+                });
+            } else {
+                console.log("Nav sidebar toggle button not found, skipping event listener");
+            }
+            
+            // Close sidebar
+            if (closeBtn) {
+                console.log("Adding event listener to close button");
+                closeBtn.addEventListener('click', function(e) {
+                    console.log("Close button clicked");
+                    e.preventDefault();
+                    if (sidebar) {
+                        sidebar.classList.add('closed');
+                        document.body.classList.add('sidebar-closed');
+                    }
+                });
+            }
+            
+            // Close sidebar when clicking outside
+            document.addEventListener('click', function(event) {
+                if (sidebar) {
+                    const isClickInside = 
+                        sidebar.contains(event.target) || 
+                        (sidebarToggle && sidebarToggle.contains(event.target)) ||
+                        (navSidebarToggle && navSidebarToggle.contains(event.target));
+                    
+                    if (!isClickInside && !sidebar.classList.contains('closed')) {
+                        sidebar.classList.add('closed');
+                        document.body.classList.add('sidebar-closed');
+                    }
+                }
+            });
             
             // Theme switcher - already using dark purple theme
             if (themeSwitch) {
@@ -803,6 +886,7 @@
                     }
                 });
             }
+            // Accordion functionality moved to separate accordion.js file
             
             // Layout buttons
             const layoutBtns = document.querySelectorAll('[data-layout]');
@@ -848,9 +932,7 @@
                 
                 // Open sidebar on notification click
                 notification.querySelector('.notification-content').addEventListener('click', function() {
-                    if (typeof window.toggleSidebar === 'function') {
-                        window.toggleSidebar();
-                    }
+                    toggleSidebar();
                     notification.classList.remove('show');
                     setTimeout(() => notification.remove(), 300);
                 });
@@ -865,15 +947,6 @@
             }, 1500);
         });
     </script>
-    
-    <!-- Core Component Scripts -->
-    <script src="{{ url_for('static', filename='js/dialog.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/direct-sidebar.js') }}"></script>
-    
-    <!-- UI Component Scripts -->
-    <script src="{{ url_for('static', filename='js/image-viewer-dialog.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bulk-order-dialog.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/file-input-fix.js') }}"></script>
     
     {% block scripts %}{% endblock %}
 </body>
