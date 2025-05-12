@@ -1,0 +1,265 @@
+<!-- 
+  Reusable Modal Component
+  
+  This component implements a shadcn/ui-style Dialog modal with a frosted glass effect.
+  It can be included in any page and customized with different content.
+  
+  Usage:
+  1. Include this file in your template
+  2. Use the modal-trigger class on any element that should open the modal
+  3. Customize modal content by overriding the blocks
+  
+  Available blocks:
+  - modal_id: The ID of the modal (default: "reusable-modal")
+  - modal_title: The title displayed in the header
+  - modal_description: Optional description text below the title
+  - modal_body: The main content area of the modal
+  - modal_footer: The footer area with action buttons
+-->
+
+{% macro modal(id="reusable-modal", title="Dialog", description="", size="md") %}
+<!-- Modal Backdrop -->
+<div id="{{ id }}-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center transition-opacity duration-300 opacity-0">
+  
+  <!-- Modal Container -->
+  <div id="{{ id }}-container" 
+       class="bg-background/80 backdrop-blur-md border border-border/40 shadow-lg rounded-lg overflow-hidden transition-all duration-300 transform scale-95 opacity-0
+              {{ 'w-full max-w-full h-full' if size == 'full' else 
+                 'w-full max-w-md mx-4' if size == 'sm' else
+                 'w-full max-w-lg mx-4' if size == 'md' else
+                 'w-full max-w-xl mx-4' if size == 'lg' else
+                 'w-full max-w-4xl mx-4' if size == 'xl' else
+                 'w-full max-w-lg mx-4' }}">
+    
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between p-4 border-b border-border/40">
+      <div>
+        <h2 class="text-xl font-semibold text-foreground">{{ title }}</h2>
+        {% if description %}
+        <p class="text-sm text-muted-foreground mt-1">{{ description }}</p>
+        {% endif %}
+      </div>
+      <button type="button" class="modal-close-btn text-muted-foreground hover:text-foreground transition-colors rounded-full p-1 hover:bg-accent/50" data-modal-id="{{ id }}">
+        <i class="fas fa-times"></i>
+        <span class="sr-only">Close</span>
+      </button>
+    </div>
+    
+    <!-- Modal Body -->
+    <div class="p-4 max-h-[calc(80vh-8rem)] overflow-y-auto">
+      <div id="{{ id }}-content">
+        {{ caller() }}
+      </div>
+    </div>
+    
+    <!-- Modal Footer -->
+    <div id="{{ id }}-footer" class="flex justify-end gap-2 p-4 border-t border-border/40">
+      <button type="button" class="modal-close-btn btn btn-outline-secondary" data-modal-id="{{ id }}">
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-primary" id="{{ id }}-submit-btn">
+        <span id="{{ id }}-submit-text">Confirm</span>
+        <span id="{{ id }}-loading" class="spinner-border spinner-border-sm ms-1 d-none" role="status"></span>
+      </button>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+<!-- JavaScript for Modal Functionality -->
+{% macro modal_js() %}
+<script>
+  (function() {
+    // Modal functionality
+    function initModals() {
+      // Find all modal triggers
+      document.querySelectorAll('.modal-trigger').forEach(trigger => {
+        trigger.addEventListener('click', function(e) {
+          e.preventDefault();
+          const modalId = this.getAttribute('data-modal-id');
+          openModal(modalId);
+        });
+      });
+
+      // Close modal buttons
+      document.querySelectorAll('.modal-close-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const modalId = this.getAttribute('data-modal-id');
+          closeModal(modalId);
+        });
+      });
+
+      // Close on backdrop click
+      document.querySelectorAll('[id$="-backdrop"]').forEach(backdrop => {
+        backdrop.addEventListener('click', function(e) {
+          // Only close if clicking directly on the backdrop
+          if (e.target === this) {
+            const modalId = this.id.replace('-backdrop', '');
+            closeModal(modalId);
+          }
+        });
+      });
+
+      // Close on Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          // Find visible modals
+          document.querySelectorAll('[id$="-backdrop"]:not(.hidden)').forEach(backdrop => {
+            const modalId = backdrop.id.replace('-backdrop', '');
+            closeModal(modalId);
+          });
+        }
+      });
+    }
+
+    // Open modal function
+    window.openModal = function(modalId) {
+      const backdrop = document.getElementById(`${modalId}-backdrop`);
+      const container = document.getElementById(`${modalId}-container`);
+      
+      if (backdrop && container) {
+        // Make backdrop visible first
+        backdrop.classList.remove('hidden');
+        
+        // Force a reflow to ensure the transition works
+        void backdrop.offsetWidth;
+        
+        // Apply transitions
+        backdrop.classList.add('opacity-100');
+        container.classList.remove('scale-95', 'opacity-0');
+        container.classList.add('scale-100', 'opacity-100');
+        
+        // Prevent body scroll
+        document.body.classList.add('overflow-hidden');
+        
+        // Dispatch event
+        backdrop.dispatchEvent(new CustomEvent('modal:opened', { 
+          detail: { modalId } 
+        }));
+      }
+    }
+
+    // Close modal function
+    window.closeModal = function(modalId) {
+      const backdrop = document.getElementById(`${modalId}-backdrop`);
+      const container = document.getElementById(`${modalId}-container`);
+      
+      if (backdrop && container) {
+        // Apply out transitions
+        backdrop.classList.remove('opacity-100');
+        container.classList.remove('scale-100', 'opacity-100');
+        container.classList.add('scale-95', 'opacity-0');
+        
+        // Allow time for animations
+        setTimeout(() => {
+          backdrop.classList.add('hidden');
+          
+          // Re-enable body scroll
+          document.body.classList.remove('overflow-hidden');
+          
+          // Dispatch event
+          backdrop.dispatchEvent(new CustomEvent('modal:closed', { 
+            detail: { modalId } 
+          }));
+        }, 300); // Match the transition duration
+      }
+    }
+
+    // Set loading state
+    window.setModalLoading = function(modalId, isLoading, loadingText) {
+      const submitBtn = document.getElementById(`${modalId}-submit-btn`);
+      const submitText = document.getElementById(`${modalId}-submit-text`);
+      const loadingSpinner = document.getElementById(`${modalId}-loading`);
+      
+      if (submitBtn && loadingSpinner) {
+        if (isLoading) {
+          submitBtn.disabled = true;
+          loadingSpinner.classList.remove('d-none');
+          if (loadingText && submitText) {
+            submitText.innerText = loadingText;
+          }
+        } else {
+          submitBtn.disabled = false;
+          loadingSpinner.classList.add('d-none');
+          if (submitText) {
+            submitText.innerText = submitBtn.getAttribute('data-original-text') || 'Confirm';
+          }
+        }
+      }
+    }
+
+    // Set progress info
+    window.setModalProgress = function(modalId, progressText) {
+      const progressInfo = document.getElementById(`${modalId}-progress-info`);
+      if (progressInfo && progressText) {
+        progressInfo.innerText = progressText;
+        progressInfo.classList.remove('d-none');
+      }
+    }
+
+    // Initialize modals on page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initModals);
+    } else {
+      initModals();
+    }
+  })();
+</script>
+
+<style>
+  /* Additional modal styling */
+  [id$="-backdrop"] {
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  [id$="-container"] {
+    transition: transform 0.3s ease-out, opacity 0.3s ease-in-out;
+  }
+  
+  @media (max-width: 640px) {
+    [id$="-container"]:not(.max-w-full) {
+      width: 100%;
+      max-width: 100%;
+      height: 100%;
+      margin: 0;
+      border-radius: 0;
+    }
+  }
+  
+  /* Loading spinner animation */
+  .spinner-border {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 0.2em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+  }
+  
+  @keyframes spinner-border {
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Define a frosted glass variant */
+  .backdrop-blur-md {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  
+  /* Subtle animations for buttons */
+  .btn {
+    transition: all 0.2s ease;
+  }
+  
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+</style>
+{% endmacro %}

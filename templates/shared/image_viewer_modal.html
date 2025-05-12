@@ -1,0 +1,421 @@
+{% from 'shared/modal.html' import modal, modal_js %}
+
+<!-- Image Viewer Modal Implementation -->
+{% call modal(id="image-viewer-modal", title="Image Viewer", size="full") %}
+  <div class="image-viewer-container position-relative h-full w-full flex items-center justify-center">
+    <!-- Top-right zoom controls -->
+    <div class="zoom-controls absolute top-4 right-4 z-10 flex gap-2">
+      <button id="zoom-out-btn" class="btn btn-dark bg-opacity-75 d-flex align-items-center justify-content-center rounded-full p-2" title="Zoom Out">
+        <i class="fas fa-search-minus"></i>
+      </button>
+      <button id="zoom-reset-btn" class="btn btn-dark bg-opacity-75 d-flex align-items-center justify-content-center rounded-full p-2" title="Reset Zoom">
+        <i class="fas fa-expand"></i>
+      </button>
+      <button id="zoom-in-btn" class="btn btn-dark bg-opacity-75 d-flex align-items-center justify-content-center rounded-full p-2" title="Zoom In">
+        <i class="fas fa-search-plus"></i>
+      </button>
+    </div>
+    
+    <!-- Previous/Next navigation buttons -->
+    <button id="prev-image-btn" class="nav-btn btn btn-dark bg-opacity-50 position-absolute start-4 top-50 translate-middle-y rounded-circle d-flex align-items-center justify-content-center" 
+            style="width: 46px; height: 46px;">
+      <i class="fas fa-chevron-left fa-lg"></i>
+    </button>
+    
+    <button id="next-image-btn" class="nav-btn btn btn-dark bg-opacity-50 position-absolute end-4 top-50 translate-middle-y rounded-circle d-flex align-items-center justify-content-center" 
+            style="width: 46px; height: 46px;">
+      <i class="fas fa-chevron-right fa-lg"></i>
+    </button>
+    
+    <!-- Main image container -->
+    <div class="image-container overflow-hidden w-full h-full d-flex align-items-center justify-content-center">
+      <img id="full-size-image" class="max-h-[80vh] max-w-[95%] transition-transform duration-200 ease-out" 
+           src="" alt="Enlarged Image">
+    </div>
+  </div>
+{% endcall %}
+
+<!-- Include the modal JS -->
+{{ modal_js() }}
+
+<!-- Specific JS for Image Viewer modal -->
+<script>
+  // Global variables
+  let currentZoomLevel = 1;
+  let currentResultIndex = 0;
+  let resultImages = [];
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let translateX = 0;
+  let translateY = 0;
+  
+  // Initialize the image viewer modal
+  function initImageViewer() {
+    // Setup zoom buttons
+    document.getElementById('zoom-in-btn').addEventListener('click', zoomIn);
+    document.getElementById('zoom-out-btn').addEventListener('click', zoomOut);
+    document.getElementById('zoom-reset-btn').addEventListener('click', resetZoom);
+    
+    // Setup navigation buttons
+    document.getElementById('prev-image-btn').addEventListener('click', navigateToPrevImage);
+    document.getElementById('next-image-btn').addEventListener('click', navigateToNextImage);
+    
+    // Add bottom zone controls to footer
+    const modalFooter = document.getElementById('image-viewer-modal-footer');
+    if (modalFooter) {
+      // Create bottom toolbar
+      const bottomToolbar = document.createElement('div');
+      bottomToolbar.className = 'zoom-controls-bottom d-flex align-items-center me-auto ms-3';
+      bottomToolbar.innerHTML = `
+        <div class="btn-group btn-group-sm">
+          <button id="zoom-out-btn-bottom" class="btn btn-dark bg-opacity-75" title="Zoom Out">
+            <i class="fas fa-search-minus"></i>
+          </button>
+          <span class="btn btn-dark bg-opacity-75 disabled zoom-level-display">
+            <span id="zoom-level-text">100%</span>
+          </span>
+          <button id="zoom-in-btn-bottom" class="btn btn-dark bg-opacity-75" title="Zoom In">
+            <i class="fas fa-search-plus"></i>
+          </button>
+          <button id="zoom-reset-btn-bottom" class="btn btn-dark bg-opacity-75" title="Reset Zoom">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
+      `;
+      
+      // Insert at the beginning of the footer
+      modalFooter.insertBefore(bottomToolbar, modalFooter.firstChild);
+      
+      // Setup bottom zoom buttons
+      document.getElementById('zoom-in-btn-bottom').addEventListener('click', zoomIn);
+      document.getElementById('zoom-out-btn-bottom').addEventListener('click', zoomOut);
+      document.getElementById('zoom-reset-btn-bottom').addEventListener('click', resetZoom);
+    }
+    
+    // Setup download button
+    const submitBtn = document.getElementById('image-viewer-modal-submit-btn');
+    if (submitBtn) {
+      submitBtn.innerHTML = '<i class="fas fa-download me-1"></i> Download';
+      submitBtn.setAttribute('data-original-text', 'Download');
+      
+      submitBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        downloadCurrentImage();
+      });
+    }
+    
+    // Setup drag handlers for panning
+    setupDragHandlers();
+    
+    // Setup keyboard shortcuts
+    document.addEventListener('keydown', handleKeyboardShortcuts);
+    
+    // Handle modal events
+    const modalBackdrop = document.getElementById('image-viewer-modal-backdrop');
+    if (modalBackdrop) {
+      modalBackdrop.addEventListener('modal:closed', function() {
+        // Reset state when modal is closed
+        resetZoom();
+        resultImages = [];
+        currentResultIndex = 0;
+      });
+    }
+  }
+  
+  // Setup drag handlers for panning when zoomed
+  function setupDragHandlers() {
+    const fullSizeImage = document.getElementById('full-size-image');
+    
+    fullSizeImage.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', dragImage);
+    document.addEventListener('mouseup', stopDrag);
+    
+    // Touch support
+    fullSizeImage.addEventListener('touchstart', startDragTouch);
+    document.addEventListener('touchmove', dragImageTouch);
+    document.addEventListener('touchend', stopDrag);
+  }
+  
+  // Start dragging
+  function startDrag(e) {
+    if (currentZoomLevel > 1) {
+      isDragging = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      
+      // Prevent default behavior
+      e.preventDefault();
+    }
+  }
+  
+  // Touch version of startDrag
+  function startDragTouch(e) {
+    if (currentZoomLevel > 1 && e.touches.length === 1) {
+      isDragging = true;
+      dragStartX = e.touches[0].clientX;
+      dragStartY = e.touches[0].clientY;
+    }
+  }
+  
+  // Drag the image
+  function dragImage(e) {
+    if (!isDragging) return;
+    
+    const fullSizeImage = document.getElementById('full-size-image');
+    
+    // Calculate the new position
+    const deltaX = e.clientX - dragStartX;
+    const deltaY = e.clientY - dragStartY;
+    
+    translateX += deltaX;
+    translateY += deltaY;
+    
+    // Update the image position
+    fullSizeImage.style.transform = `scale(${currentZoomLevel}) translate(${translateX / currentZoomLevel}px, ${translateY / currentZoomLevel}px)`;
+    
+    // Update drag start position
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+  }
+  
+  // Touch version of dragImage
+  function dragImageTouch(e) {
+    if (!isDragging || e.touches.length !== 1) return;
+    
+    const fullSizeImage = document.getElementById('full-size-image');
+    
+    // Calculate the new position
+    const deltaX = e.touches[0].clientX - dragStartX;
+    const deltaY = e.touches[0].clientY - dragStartY;
+    
+    translateX += deltaX;
+    translateY += deltaY;
+    
+    // Update the image position
+    fullSizeImage.style.transform = `scale(${currentZoomLevel}) translate(${translateX / currentZoomLevel}px, ${translateY / currentZoomLevel}px)`;
+    
+    // Update drag start position
+    dragStartX = e.touches[0].clientX;
+    dragStartY = e.touches[0].clientY;
+    
+    // Prevent scrolling
+    e.preventDefault();
+  }
+  
+  // Stop dragging
+  function stopDrag() {
+    isDragging = false;
+  }
+  
+  // Handle keyboard shortcuts
+  function handleKeyboardShortcuts(e) {
+    const modalBackdrop = document.getElementById('image-viewer-modal-backdrop');
+    if (modalBackdrop.classList.contains('hidden')) return;
+    
+    switch (e.key) {
+      case '+':
+      case '=':
+        zoomIn();
+        e.preventDefault();
+        break;
+      case '-':
+      case '_':
+        zoomOut();
+        e.preventDefault();
+        break;
+      case '0':
+        resetZoom();
+        e.preventDefault();
+        break;
+      case 'ArrowLeft':
+        navigateToPrevImage();
+        e.preventDefault();
+        break;
+      case 'ArrowRight':
+        navigateToNextImage();
+        e.preventDefault();
+        break;
+      case 'Escape':
+        // Handled by the modal component
+        break;
+    }
+  }
+  
+  // Zoom in
+  function zoomIn() {
+    if (currentZoomLevel < 3) {
+      currentZoomLevel += 0.25;
+      applyZoom();
+    }
+  }
+  
+  // Zoom out
+  function zoomOut() {
+    if (currentZoomLevel > 0.5) {
+      currentZoomLevel -= 0.25;
+      applyZoom();
+    }
+  }
+  
+  // Reset zoom
+  function resetZoom() {
+    currentZoomLevel = 1;
+    translateX = 0;
+    translateY = 0;
+    applyZoom();
+  }
+  
+  // Apply zoom level
+  function applyZoom() {
+    const fullSizeImage = document.getElementById('full-size-image');
+    const zoomLevelText = document.getElementById('zoom-level-text');
+    
+    // Apply transform
+    fullSizeImage.style.transform = `scale(${currentZoomLevel}) translate(${translateX / currentZoomLevel}px, ${translateY / currentZoomLevel}px)`;
+    
+    // Update zoom percentage text
+    if (zoomLevelText) {
+      zoomLevelText.textContent = `${Math.round(currentZoomLevel * 100)}%`;
+    }
+    
+    // Enable dragging if zoomed in
+    if (currentZoomLevel > 1) {
+      fullSizeImage.style.cursor = 'move';
+    } else {
+      fullSizeImage.style.cursor = 'default';
+    }
+  }
+  
+  // Navigate to previous image
+  function navigateToPrevImage() {
+    if (resultImages.length > 1 && currentResultIndex > 0) {
+      currentResultIndex--;
+      showCurrentImage();
+    }
+  }
+  
+  // Navigate to next image
+  function navigateToNextImage() {
+    if (resultImages.length > 1 && currentResultIndex < resultImages.length - 1) {
+      currentResultIndex++;
+      showCurrentImage();
+    }
+  }
+  
+  // Show current image
+  function showCurrentImage() {
+    if (resultImages.length === 0) return;
+    
+    const fullSizeImage = document.getElementById('full-size-image');
+    const submitBtn = document.getElementById('image-viewer-modal-submit-btn');
+    const prevBtn = document.getElementById('prev-image-btn');
+    const nextBtn = document.getElementById('next-image-btn');
+    
+    // Set the image source
+    fullSizeImage.src = resultImages[currentResultIndex];
+    
+    // Update download link
+    if (submitBtn) {
+      const downloadUrl = resultImages[currentResultIndex];
+      submitBtn.setAttribute('data-download-url', downloadUrl);
+    }
+    
+    // Update navigation buttons state
+    if (prevBtn) {
+      prevBtn.disabled = currentResultIndex === 0;
+      prevBtn.classList.toggle('opacity-50', currentResultIndex === 0);
+    }
+    
+    if (nextBtn) {
+      nextBtn.disabled = currentResultIndex === resultImages.length - 1;
+      nextBtn.classList.toggle('opacity-50', currentResultIndex === resultImages.length - 1);
+    }
+    
+    // Reset zoom
+    resetZoom();
+  }
+  
+  // Download current image
+  function downloadCurrentImage() {
+    const submitBtn = document.getElementById('image-viewer-modal-submit-btn');
+    const downloadUrl = submitBtn.getAttribute('data-download-url');
+    
+    if (downloadUrl) {
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = downloadUrl.split('/').pop();
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
+  
+  // Open full image
+  window.openFullImage = function(imageUrl, allImages = []) {
+    // Set result images array
+    resultImages = allImages.length > 0 ? allImages : [imageUrl];
+    
+    // Find index of current image
+    currentResultIndex = resultImages.indexOf(imageUrl);
+    if (currentResultIndex === -1) {
+      currentResultIndex = 0;
+      resultImages[0] = imageUrl;
+    }
+    
+    // Show the modal
+    openModal('image-viewer-modal');
+    
+    // Show the current image
+    showCurrentImage();
+  };
+  
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initImageViewer);
+</script>
+
+<style>
+  /* Image viewer specific styling */
+  .nav-btn {
+    opacity: 0.7;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  
+  .nav-btn:hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1);
+  }
+  
+  #zoom-in-btn:hover, #zoom-out-btn:hover, #zoom-reset-btn:hover,
+  #zoom-in-btn-bottom:hover, #zoom-out-btn-bottom:hover, #zoom-reset-btn-bottom:hover {
+    background-color: rgba(81, 45, 168, 0.7) !important;
+    transform: scale(1.1);
+    box-shadow: 0 0 8px rgba(155, 89, 182, 0.5);
+  }
+  
+  .zoom-level-display {
+    font-family: monospace;
+    min-width: 60px;
+    text-align: center;
+  }
+  
+  .zoom-controls-bottom .btn-group .btn {
+    transition: all 0.2s ease;
+    padding: 0.375rem 0.65rem;
+  }
+  
+  /* Full-size image transitions */
+  #full-size-image {
+    user-select: none;
+    will-change: transform;
+  }
+  
+  /* Mobile adjustments */
+  @media (max-width: 640px) {
+    .zoom-controls {
+      top: auto;
+      bottom: 16px;
+      right: 16px;
+    }
+  }
+</style>

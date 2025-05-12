@@ -1,0 +1,144 @@
+{% from 'shared/modal.html' import modal, modal_js %}
+
+<!-- Example Bulk Order Modal Implementation -->
+{% call modal(id="bulk-order-modal", title="Create Bulk Orders", description="Generate multiple orders at once", size="md") %}
+  <form id="bulk-order-form" class="space-y-4">
+    <!-- Number of orders -->
+    <div class="form-group">
+      <label for="order-count" class="form-label fw-bold">Number of Orders</label>
+      <div class="d-flex align-items-center gap-2">
+        <input type="range" class="form-range" min="10" max="100" value="50" step="5" id="order-count">
+        <span id="order-count-value" class="badge bg-secondary">50</span>
+      </div>
+    </div>
+    
+    <!-- Customer Type -->
+    <div class="form-group">
+      <label for="customer-type" class="form-label fw-bold">Customer Type</label>
+      <select id="customer-type" class="form-select">
+        <option value="regular">Regular</option>
+        <option value="premium">Premium</option>
+        <option value="new">New Customer</option>
+      </select>
+    </div>
+    
+    <!-- Order Source -->
+    <div class="form-group">
+      <label for="order-source" class="form-label fw-bold">Order Source</label>
+      <select id="order-source" class="form-select">
+        <option value="manual">Manual Entry</option>
+        <option value="system">System Generated</option>
+        <option value="ai">AI Recommended</option>
+      </select>
+    </div>
+    
+    <!-- Include Specific Items -->
+    <div class="form-group">
+      <label class="form-label fw-bold">Include Specific Items</label>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="include-bridal-items" checked>
+        <label class="form-check-label" for="include-bridal-items">
+          Bridal Items
+        </label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="include-groom-items">
+        <label class="form-check-label" for="include-groom-items">
+          Groom Items
+        </label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="include-decoration-items">
+        <label class="form-check-label" for="include-decoration-items">
+          Decoration Items
+        </label>
+      </div>
+    </div>
+    
+    <!-- Special Instructions -->
+    <div class="form-group">
+      <label for="special-instructions" class="form-label fw-bold">Special Instructions</label>
+      <textarea id="special-instructions" class="form-control" rows="3" placeholder="Enter any special instructions or notes"></textarea>
+    </div>
+    
+    <!-- Progress Info (hidden initially) -->
+    <div id="bulk-order-modal-progress-info" class="alert alert-info d-none">
+      Creating order 0 of 50...
+    </div>
+  </form>
+{% endcall %}
+
+<!-- Include the modal JS -->
+{{ modal_js() }}
+
+<!-- Specific JS for this Bulk Order modal -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Update the order count value when slider changes
+    const orderCountSlider = document.getElementById('order-count');
+    const orderCountValue = document.getElementById('order-count-value');
+    
+    if (orderCountSlider && orderCountValue) {
+      orderCountSlider.addEventListener('input', function() {
+        orderCountValue.textContent = this.value;
+      });
+    }
+    
+    // Setup the submit button
+    const submitBtn = document.getElementById('bulk-order-modal-submit-btn');
+    if (submitBtn) {
+      // Store original text
+      submitBtn.setAttribute('data-original-text', 'Create Orders');
+      submitBtn.innerText = 'Create Orders';
+      
+      submitBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        createBulkOrders();
+      });
+    }
+    
+    // Bulk order creation function
+    async function createBulkOrders() {
+      // Get form values
+      const orderCount = parseInt(document.getElementById('order-count').value);
+      const customerType = document.getElementById('customer-type').value;
+      const orderSource = document.getElementById('order-source').value;
+      const includeBridal = document.getElementById('include-bridal-items').checked;
+      const includeGroom = document.getElementById('include-groom-items').checked;
+      const includeDecoration = document.getElementById('include-decoration-items').checked;
+      const specialInstructions = document.getElementById('special-instructions').value;
+      
+      // Set loading state
+      setModalLoading('bulk-order-modal', true, 'Processing...');
+      
+      // Simulate order creation with progress updates
+      for (let i = 1; i <= orderCount; i++) {
+        // Update progress
+        setModalProgress('bulk-order-modal', `Creating order ${i} of ${orderCount}...`);
+        
+        // Simulate API request
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
+      // Complete
+      setModalLoading('bulk-order-modal', false);
+      setModalProgress('bulk-order-modal', `Successfully created ${orderCount} orders!`);
+      
+      // Close after delay
+      setTimeout(() => {
+        closeModal('bulk-order-modal');
+      }, 2000);
+    }
+    
+    // Listen for modal events
+    const modalBackdrop = document.getElementById('bulk-order-modal-backdrop');
+    if (modalBackdrop) {
+      modalBackdrop.addEventListener('modal:closed', function() {
+        // Reset form when modal is closed
+        document.getElementById('bulk-order-form').reset();
+        document.getElementById('order-count-value').textContent = '50';
+        document.getElementById('bulk-order-modal-progress-info').classList.add('d-none');
+      });
+    }
+  });
+</script>
