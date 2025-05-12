@@ -468,11 +468,8 @@
                 <form id="upload-form" enctype="multipart/form-data">
                     <div class="row mb-4">
                         <div class="col-md-6 mb-3 mb-md-0">
-                            <div class="card h-100 border-0">
-                                <div class="card-header bg-dark d-none">
-                                    <!-- Header removed as requested -->
-                                </div>
-                                <div class="card-body p-0 d-flex flex-column">
+                            <!-- Direct image preview without card structure -->
+                            <div class="h-100 d-flex flex-column">
                                     <div class="position-relative">
                                         <div class="image-preview-container mb-2 flex-grow-1 d-flex align-items-center justify-content-center">
                                             <img id="source-preview" class="img-preview d-none" alt="Your photo preview">
@@ -498,22 +495,16 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="card h-100 border-0">
-                                <div class="card-header bg-dark d-none">
-                                    <!-- Header removed as requested -->
-                                </div>
-                                <div class="card-body">
-                                    <div class="d-none">
-                                        <input class="form-check-input" type="radio" name="bridalStyle" id="haldi" value="haldi" checked>
-                                    </div>
-                                    
-                                    <!-- Template preview container -->
-                                    <div id="template-preview-container" class="mt-3 d-none">
-                                        <div class="text-center p-2">
-                                            <img id="template-preview" class="img-fluid" style="max-height: 150px; border-radius: 8px;" alt="Selected template">
-                                            <input type="hidden" id="template-url" name="template_url">
-                                        </div>
-                                    </div>
+                            <!-- Hidden input for style selection -->
+                            <div class="d-none">
+                                <input class="form-check-input" type="radio" name="bridalStyle" id="haldi" value="haldi" checked>
+                            </div>
+                            
+                            <!-- Direct template preview container without card structure -->
+                            <div id="template-preview-container" class="h-100 d-flex align-items-center justify-content-center d-none">
+                                <div class="text-center">
+                                    <img id="template-preview" class="img-fluid" style="max-height: 300px; border-radius: 8px;" alt="Selected template">
+                                    <input type="hidden" id="template-url" name="template_url">
                                 </div>
                             </div>
                         </div>
