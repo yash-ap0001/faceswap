@@ -1970,6 +1970,122 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             });
     }
+    
+    // Global variables for fullscreen image modal
+    let currentResultIndex = 0;
+    let resultImages = [];
+    
+    // Function to open the full image modal
+    function openFullImage(imagePath, ceremonyType, resultIndex) {
+        // Get all result cards
+        const resultCards = document.querySelectorAll('.multi-result-card');
+        resultImages = [];
+        
+        // Collect image paths and ceremony types
+        resultCards.forEach((card, index) => {
+            resultImages.push({
+                path: card.dataset.resultPath,
+                ceremony: card.dataset.ceremonyType,
+                index: index
+            });
+        });
+        
+        if (resultImages.length === 0) {
+            console.error('No result images found');
+            return;
+        }
+        
+        // Set current index
+        currentResultIndex = resultIndex || 0;
+        if (currentResultIndex >= resultImages.length) {
+            currentResultIndex = 0;
+        }
+        
+        // Update modal content
+        updateModalContent();
+        
+        // Initialize event listeners for navigation buttons
+        document.getElementById('prev-image-btn').onclick = navigateToPrevImage;
+        document.getElementById('next-image-btn').onclick = navigateToNextImage;
+        
+        // Show the modal using Bootstrap's modal API
+        const modal = new bootstrap.Modal(document.getElementById('fullImageModal'));
+        modal.show();
+        
+        // Add keyboard navigation
+        document.addEventListener('keydown', handleModalKeyNavigation);
+    }
+    
+    // Update modal content based on current index
+    function updateModalContent() {
+        if (resultImages.length === 0 || currentResultIndex < 0 || currentResultIndex >= resultImages.length) {
+            return;
+        }
+        
+        const currentImage = resultImages[currentResultIndex];
+        const fullSizeImage = document.getElementById('full-size-image');
+        const modalCeremonyName = document.getElementById('modal-ceremony-name');
+        const imageCounter = document.getElementById('image-counter');
+        const downloadBtn = document.getElementById('download-full-image');
+        
+        // Update image source and alt text
+        fullSizeImage.src = currentImage.path;
+        fullSizeImage.alt = `Full size ${currentImage.ceremony} image`;
+        
+        // Update ceremony name in title
+        modalCeremonyName.textContent = currentImage.ceremony || 'Bridal Look';
+        
+        // Update counter
+        imageCounter.textContent = `Image ${currentResultIndex + 1} of ${resultImages.length}`;
+        
+        // Update download link
+        downloadBtn.href = currentImage.path;
+        downloadBtn.download = `bridal-${currentImage.ceremony.toLowerCase()}-look.jpg`;
+    }
+    
+    // Navigate to previous image
+    function navigateToPrevImage() {
+        currentResultIndex--;
+        if (currentResultIndex < 0) {
+            currentResultIndex = resultImages.length - 1;
+        }
+        updateModalContent();
+    }
+    
+    // Navigate to next image
+    function navigateToNextImage() {
+        currentResultIndex++;
+        if (currentResultIndex >= resultImages.length) {
+            currentResultIndex = 0;
+        }
+        updateModalContent();
+    }
+    
+    // Handle keyboard navigation in modal
+    function handleModalKeyNavigation(event) {
+        // Only handle events when modal is visible
+        const modal = document.getElementById('fullImageModal');
+        if (!modal.classList.contains('show')) {
+            return;
+        }
+        
+        switch (event.key) {
+            case 'ArrowLeft':
+                navigateToPrevImage();
+                break;
+            case 'ArrowRight':
+                navigateToNextImage();
+                break;
+            case 'Escape':
+                document.removeEventListener('keydown', handleModalKeyNavigation);
+                break;
+        }
+    }
+    
+    // Clean up event listeners when modal is closed
+    document.getElementById('fullImageModal').addEventListener('hidden.bs.modal', function() {
+        document.removeEventListener('keydown', handleModalKeyNavigation);
+    });
 });
 </script>
 {% endblock %}
