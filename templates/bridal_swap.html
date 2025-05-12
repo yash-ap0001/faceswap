@@ -1329,8 +1329,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Multi-template selection functionality
-    toggleSelectionModeBtn = document.getElementById('toggle-selection-mode');
-    const processSelectedBtn = document.getElementById('process-selected-btn');
+    toggleSelectionModeBtn = document.getElementById('toggleSelectionModeBtn');
+    const processSelectedBtn = document.getElementById('processSelectedBtn');
     selectedCount = document.getElementById('selectedCount');
     // isSelectionMode is already declared globally
     
@@ -2067,7 +2067,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Keep the existing results visible
                 // Turn on selection mode if it's not already on
-                if (toggleSelectionModeBtn && !isSelectionModeActive) {
+                if (toggleSelectionModeBtn && !isSelectionMode) {
                     toggleSelectionModeBtn.click(); // This will turn on selection mode
                 }
                 
