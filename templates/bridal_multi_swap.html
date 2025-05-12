@@ -61,14 +61,15 @@
     }
     
     .image-preview-container {
-        height: 200px;
-        border: 2px dashed #7e57c2;
-        border-radius: 10px;
+        height: 160px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
         margin-bottom: 20px;
+        background-color: rgba(33, 37, 41, 0.2);
         overflow: hidden;
+        transition: all 0.2s ease;
     }
     
     .preview-img {
@@ -223,19 +224,25 @@
                                     <h5 class="mb-0">Upload Your Photo</h5>
                                 </div>
                                 <div class="card-body">
-                                    <div class="image-preview-container mb-3">
-                                        <img id="source-preview" class="preview-img d-none" alt="Your photo preview">
-                                        <div id="source-placeholder" class="text-center">
-                                            <i class="fas fa-user-circle mb-2" style="font-size: 4rem; opacity: 0.5;"></i>
-                                            <p class="text-muted">No photo selected yet<br>Please upload a clear frontal photo</p>
+                                    <div class="row g-2">
+                                        <div class="col-md-7">
+                                            <div class="image-preview-container d-flex align-items-center justify-content-center">
+                                                <img id="source-preview" class="img-fluid h-100 w-100 object-fit-cover d-none" alt="Your photo">
+                                                <div id="source-placeholder" class="placeholder-container text-center">
+                                                    <i class="fas fa-user fa-3x text-muted"></i>
+                                                    <p class="text-muted small mb-0">Select your photo</p>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="input-group">
-                                        <input type="file" class="form-control" id="source-input" accept=".jpg,.jpeg,.png" required>
-                                        <button class="btn btn-outline-secondary" type="button" id="source-clear-btn">
-                                            <i class="fas fa-times"></i>
-                                        </button>
+                                        <div class="col-md-5 d-flex flex-column justify-content-center">
+                                            <div class="input-group mb-2">
+                                                <input type="file" class="form-control form-control-sm" id="source-input" accept=".jpg,.jpeg,.png" required>
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" id="source-clear-btn">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                            <p class="text-muted small mb-0">Upload a clear frontal face photo</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
