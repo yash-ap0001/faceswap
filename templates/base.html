@@ -878,8 +878,7 @@
                 }
             };
             
-            // New menu toggle button
-            const menuToggleBtn = document.getElementById('menuToggleBtn');
+            // Add click event to menu toggle button
             if (menuToggleBtn) {
                 console.log("Adding event listener to menu toggle button");
                 menuToggleBtn.addEventListener('click', function(e) {
@@ -897,7 +896,6 @@
             // Close sidebar when clicking outside
             document.addEventListener('click', function(event) {
                 if (sidebar) {
-                    const menuToggleBtn = document.getElementById('menuToggleBtn');
                     const isClickInside = 
                         sidebar.contains(event.target) || 
                         (menuToggleBtn && menuToggleBtn.contains(event.target));
