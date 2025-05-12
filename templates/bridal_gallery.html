@@ -1178,47 +1178,47 @@ document.addEventListener('DOMContentLoaded', function() {
                 showError('Please upload your photo first');
                 return;
             }
-        
-        // Always use Pinterest templates
-        const templateType = 'pinterest';
-        
-        // Get selected categories
-        const selectedCategories = [];
-        document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
-            selectedCategories.push(checkbox.value);
-        });
-        
-        if (selectedCategories.length === 0) {
-            showError('Please select at least one category');
-            return;
-        }
-        
-        // Show loading overlay
-        loadingOverlay.classList.remove('d-none');
-        loadingMessage.textContent = 'Preparing to generate previews...';
-        
-        // Clear previous results
-        resultGallery.innerHTML = '';
-        
-        // Count for tracking progress
-        let processedCount = 0;
-        let totalTemplates = templateCards.length;
-        
-        // Process each template
-        templateCards.forEach((card, index) => {
-            const style = card.dataset.style;
-            const category = style.charAt(0).toUpperCase() + style.slice(1); // Capitalize first letter
             
-            // Skip if category not selected
-            if (!selectedCategories.includes(style)) {
-                processedCount++;
-                updateProgressMessage(processedCount, totalTemplates);
+            // Always use Pinterest templates
+            const templateType = 'pinterest';
+            
+            // Get selected categories
+            const selectedCategories = [];
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                selectedCategories.push(checkbox.value);
+            });
+            
+            if (selectedCategories.length === 0) {
+                showError('Please select at least one category');
                 return;
             }
+        
+            // Show loading overlay
+            if (loadingOverlay) loadingOverlay.classList.remove('d-none');
+            if (loadingMessage) loadingMessage.textContent = 'Preparing to generate previews...';
             
-            setTimeout(() => {
-                loadingMessage.textContent = `Processing ${category} template...`;
+            // Clear previous results
+            if (resultGallery) resultGallery.innerHTML = '';
+            
+            // Count for tracking progress
+            let processedCount = 0;
+            let totalTemplates = templateCards.length;
+            
+            // Process each template
+            templateCards.forEach((card, index) => {
+                const style = card.dataset.style;
+                const category = style.charAt(0).toUpperCase() + style.slice(1); // Capitalize first letter
                 
+                // Skip if category not selected
+                if (!selectedCategories.includes(style)) {
+                    processedCount++;
+                    updateProgressMessage(processedCount, totalTemplates);
+                    return;
+                }
+                
+                setTimeout(() => {
+                    if (loadingMessage) loadingMessage.textContent = `Processing ${category} template...`;
+                    
                 processTemplate(card, templateType, style)
                     .then(() => {
                         processedCount++;
