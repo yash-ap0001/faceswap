@@ -604,12 +604,7 @@
                                     </span>
                                 </div>
                                 
-                                <!-- Multi-selection button (always visible for quick selection) -->
-                                <button class="btn btn-sm btn-primary position-absolute top-0 end-0 m-2 template-select-btn"
-                                        data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" title="Add to selection"
-                                        onclick="toggleTemplateSelection(event, '{{ template.url }}', '{{ ceremony }}')">
-                                    <i class="fas fa-plus"></i>
-                                </button>
+
                                 
                                 <img src="{{ template.url }}" class="card-img-top preview-image" alt="{{ ceremony|title }} Template" loading="lazy" data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}" style="cursor: pointer;" onclick="showFullsizePreview('{{ template.url }}', '{{ ceremony }}')">
                                 
@@ -620,11 +615,7 @@
                                     </span>
                                 </div>
                                 
-                                <!-- Individual delete button (visible on hover) -->
-                                <button class="btn btn-sm btn-outline-danger delete-template-btn position-absolute bottom-0 end-0 m-2" 
-                                        data-template-path="{{ template.url }}" data-ceremony="{{ ceremony }}">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+
                             </div>
                         </div>
                     {% endfor %}
