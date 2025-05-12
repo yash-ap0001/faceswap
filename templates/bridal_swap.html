@@ -386,12 +386,35 @@
                         <div class="col-md-6">
                             <div class="card h-100">
                                 <div class="card-header bg-dark">
-                                    <h5 class="mb-0">Create Your Look</h5>
+                                    <h5 class="mb-0">Choose Bridal Style</h5>
                                 </div>
                                 <div class="card-body">
-                                    <!-- Ceremony selection handled via dropdown instead of radio buttons -->
-                                    <div class="mb-3 d-none">
-                                        <input type="hidden" name="bridalStyle" id="haldi" value="haldi" checked>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Ceremony Type</label>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="haldi" value="haldi" checked>
+                                            <label class="form-check-label" for="haldi">
+                                                <strong>Haldi Ceremony</strong>
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="mehendi" value="mehendi">
+                                            <label class="form-check-label" for="mehendi">
+                                                <strong>Mehendi Function</strong>
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="wedding" value="wedding">
+                                            <label class="form-check-label" for="wedding">
+                                                <strong>Wedding Ceremony</strong>
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="reception" value="reception">
+                                            <label class="form-check-label" for="reception">
+                                                <strong>Reception</strong>
+                                            </label>
+                                        </div>
                                     </div>
                                     
                                     <!-- Template preview container -->
