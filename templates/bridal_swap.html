@@ -1043,21 +1043,107 @@ function handleModalKeyNavigation(event) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing bridal swap page');
     
+    // Inject CSS to hide all alert messages and template count notifications
+    const style = document.createElement('style');
+    style.textContent = `
+        /* Hide all alerts and template messages */
+        .alert, .alert-info, .alert-warning, .alert-success, .template-message, 
+        div[class*="template-count"], div[class*="count-message"],
+        [id*="template-count"], [id*="count-message"],
+        .card-body > .alert-info {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            opacity: 0 !important;
+            overflow: hidden !important;
+        }
+        
+        /* Hide anything that says "Found X templates" */
+        .template-container::before {
+            display: none !important;
+            content: none !important;
+        }
+    `;
+    document.head.appendChild(style);
+    
     // Hide ALL alerts and template count messages
     const allAlerts = document.querySelectorAll('.alert, .alert-info, .alert-warning, .alert-success, .template-message');
     allAlerts.forEach(alert => {
         if (alert) {
-            alert.style.display = 'none !important';
+            alert.style.display = 'none';
             alert.classList.add('d-none');
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
         }
     });
     
     // Hide any text containing "Found X templates" messages
     document.querySelectorAll('*').forEach(el => {
         if (el.textContent && el.textContent.match(/Found \d+ templates/)) {
+            console.log('Found template count message:', el.textContent);
             el.style.display = 'none';
             el.classList.add('d-none');
+            // Try to remove it completely
+            if (el.parentNode) {
+                el.parentNode.removeChild(el);
+            }
         }
+    });
+    
+    // Use MutationObserver to catch any dynamically added template count messages
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                mutation.addedNodes.forEach(node => {
+                    // Check if it's an element node (not text node)
+                    if (node.nodeType === 1) {
+                        // Check if it's an alert
+                        if (node.classList && 
+                            (node.classList.contains('alert') || 
+                             node.classList.contains('template-message'))) {
+                            console.log('Removing dynamically added alert:', node);
+                            node.style.display = 'none';
+                            node.classList.add('d-none');
+                            if (node.parentNode) {
+                                node.parentNode.removeChild(node);
+                            }
+                        }
+                        
+                        // Check for text content about templates
+                        if (node.textContent && node.textContent.match(/Found \d+ templates/)) {
+                            console.log('Removing dynamically added template count:', node.textContent);
+                            node.style.display = 'none';
+                            node.classList.add('d-none');
+                            if (node.parentNode) {
+                                node.parentNode.removeChild(node);
+                            }
+                        }
+                        
+                        // Check child nodes recursively
+                        node.querySelectorAll('*').forEach(child => {
+                            if (child.textContent && child.textContent.match(/Found \d+ templates/)) {
+                                console.log('Removing nested template count:', child.textContent);
+                                child.style.display = 'none';
+                                child.classList.add('d-none');
+                                if (child.parentNode) {
+                                    child.parentNode.removeChild(child);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    });
+    
+    // Observe the entire document for changes
+    observer.observe(document.body, { 
+        childList: true, 
+        subtree: true,
+        characterData: true
     });
     
     // Find and hide any intro alerts
@@ -1066,6 +1152,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (alert) {
             alert.style.display = 'none';
             alert.classList.add('d-none');
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
         }
     });
     
@@ -2199,6 +2288,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Use templates from the response
                 const templates = data.templates;
+                
+                // Ensure we don't show template count message - never append to container parent
+                // Remove any existing template count messages
+                const tabPane = templateContainer.closest('.tab-pane');
+                if (tabPane) {
+                    // Remove any alerts in the tab pane
+                    tabPane.querySelectorAll('.alert, .template-message').forEach(alert => {
+                        if (alert && alert.parentNode) {
+                            alert.parentNode.removeChild(alert);
+                        }
+                    });
+                    
+                    // Also check for text nodes containing "Found X templates"
+                    tabPane.childNodes.forEach(node => {
+                        if (node.nodeType === 3 && node.textContent && node.textContent.match(/Found \d+ templates/)) {
+                            if (node.parentNode) {
+                                node.parentNode.removeChild(node);
+                            }
+                        }
+                    });
+                }
                 
                 // Clear the container - no alerts or template count message
                 templateContainer.innerHTML = ``;
