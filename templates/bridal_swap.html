@@ -1632,6 +1632,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     singleSelectedContainer.classList.add('d-none');
                 }
                 
+                // Update the selected templates preview
+                updateSelectedCount();
+                
                 // Make sure checkboxes are visible - directly override the inline style
                 document.querySelectorAll('.template-checkbox-wrapper').forEach(wrapper => {
                     wrapper.style.setProperty('display', 'block', 'important');
@@ -1666,11 +1669,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     singleSelectedContainer.classList.remove('d-none');
                 }
                 
-                // Hide the thumbnails preview when exiting selection mode
+                // Always hide the thumbnails preview when exiting selection mode
                 const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
                 if (selectedTemplatesPreview) {
                     selectedTemplatesPreview.classList.add('d-none');
                 }
+                
+                // Clear all selected templates when exiting selection mode
+                selectedTemplates = [];
                 
                 // Hide all checkboxes when exiting multi-select mode
                 document.querySelectorAll('.template-checkbox-wrapper').forEach(wrapper => {
@@ -1758,8 +1764,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const fadingCards = thumbnailsContainer.querySelectorAll('.animate__fadeOut');
         fadingCards.forEach(card => card.remove());
         
-        // Show/hide the preview section based on selection count
-        if (count > 0) {
+        // Show/hide the preview section based on selection count AND selection mode
+        if (count > 0 && isSelectionMode) {
             selectedTemplatesPreview.classList.remove('d-none');
             
             // Empty the entire container and rebuild it
@@ -1832,8 +1838,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             `;
             
-            // Show the section but with empty message
-            selectedTemplatesPreview.classList.remove('d-none');
+            // Show the section with empty message ONLY if in selection mode
+            if (isSelectionMode) {
+                selectedTemplatesPreview.classList.remove('d-none');
+            }
         }
     }
     
