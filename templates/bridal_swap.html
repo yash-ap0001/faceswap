@@ -265,8 +265,8 @@
         display: flex;
         flex-wrap: nowrap;
         overflow-x: auto;
-        gap: 30px; /* Increased gap between cards */
-        padding: 20px 5px; /* More top/bottom padding */
+        gap: 50px; /* Significantly increased gap between cards */
+        padding: 30px 5px; /* More top/bottom padding */
         align-items: stretch;
         scrollbar-width: thin;
         scrollbar-color: rgba(255,255,255,0.3) rgba(0,0,0,0.2);
@@ -297,27 +297,25 @@
         min-width: 280px; /* Ensure minimum width */
         max-width: 280px; /* Maximum width */
         margin-bottom: 0; /* Remove bottom margin to keep in one row */
-        margin-right: 30px; /* Increased right margin for more spacing */
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        margin-right: 0; /* No margin needed as gap property handles spacing */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow */
     }
     
     /* Force max height on card components */
     .multi-result-card .card {
         max-height: 280px !important;
+        height: 280px !important;
         overflow: hidden !important;
     }
     
     .multi-result-card .card-img-top {
-        height: 230px !important;
-        max-height: 230px !important;
+        height: 280px !important;
+        max-height: 280px !important;
         overflow: hidden !important;
     }
     
     .multi-result-card .card-footer {
-        height: 50px !important;
-        max-height: 50px !important;
-        padding: 0.25rem 0.5rem !important;
-        overflow: hidden !important;
+        display: none !important; /* Hide the card footer containing ceremony labels */
     }
     
     .multi-result-card:hover {
@@ -327,7 +325,7 @@
     
     .multi-result-img {
         width: 100%;
-        height: 230px;
+        height: 280px;
         object-fit: cover;
         transition: transform 0.3s ease;
     }
@@ -461,7 +459,7 @@
                 <div id="multi-results-container" class="mt-5 d-none">
                     <div class="mb-4">
                         <div class="mb-3">
-                            <h5 class="mb-2"><i class="fas fa-images me-2"></i>Your Multiple Bridal Looks <span id="results-count" class="text-muted"></span></h5>
+                            <h5 class="mb-2"><i class="fas fa-images me-2"></i>Your Created Looks</h5>
                         </div>
                         <div class="">
                             <div class="multi-results-container d-flex flex-nowrap"></div>
