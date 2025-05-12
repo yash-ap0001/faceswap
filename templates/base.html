@@ -530,49 +530,13 @@
             color: white;
         }
         
-        /* Wedding Categories Button */
-        .wedding-categories-btn {
-            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 8px 15px;
-            font-weight: 500;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        
-        .wedding-categories-btn::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-        
-        .wedding-categories-btn:hover {
-            color: white;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
-            transform: translateY(-2px);
-        }
-        
-        .wedding-categories-btn:hover::before {
-            left: 100%;
-        }
+        /* Sidebar toggle button is now the primary navigation element */
     </style>
     {% block style %}{% endblock %}
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <button type="button" class="btn me-3 wedding-categories-btn" id="navSidebarToggle">
-                <i class="fas fa-th-large me-2"></i>Wedding Categories
-            </button>
             
             <a class="navbar-brand" href="/">
                 <span class="brand-gradient">Bridal Vision</span>
@@ -594,17 +558,17 @@
     </nav>
     
     <!-- Stylish Sidebar Toggle -->
-    <div class="sidebar-toggle" id="sidebarToggle">
-        <button class="toggle-btn">
-            <i class="fas fa-th-large"></i>
+    <div class="sidebar-toggle">
+        <button class="toggle-btn" id="sidebarToggle" aria-label="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
         </button>
     </div>
     
     <!-- Transparent Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h5>Wedding Categories</h5>
-            <button class="close-sidebar">
+            <h5>Menu</h5>
+            <button class="close-sidebar" aria-label="Close Menu">
                 <i class="fas fa-times"></i>
             </button>
         </div>
