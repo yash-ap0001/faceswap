@@ -115,7 +115,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <div class="form-group mb-3">
               <label for="bulk-images" class="form-label">Upload Images (up to 10)</label>
-              <input type="file" class="form-control" id="bulk-images" name="files[]" multiple accept="image/*" required>
+              <input type="file" class="form-control" id="bulk-images" name="files[]" multiple accept="image/*" required
+                     data-preview-container="bulk-preview" data-preview-images="bulk-preview-images">
               <div class="form-text text-muted">
                 Select multiple image files to upload as templates.
               </div>
