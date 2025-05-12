@@ -1,0 +1,3052 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Bridal Face Swap - Wedding Magic</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css for animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        :root {
+            --primary-purple: #4a148c;
+            --secondary-purple: #6a1b9a;
+            --dark-purple: #38006b;
+            --light-purple: #9c4dcc;
+            --dark-surface: #121212;
+            --card-surface: #1e1e1e;
+            --border-color: #333333;
+            --text-primary: #f5f5f5;
+            --text-secondary: #bdbdbd;
+            --glass-bg: rgba(18, 18, 18, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            background-color: var(--dark-surface);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            padding-left: 250px; /* Initial padding for sidebar */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        body.sidebar-closed {
+            padding-left: 0;
+        }
+        
+        .navbar {
+            background-color: rgba(56, 0, 107, 0.95) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .card {
+            background-color: var(--card-surface);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+        }
+        
+        .card-header {
+            background-color: rgba(0,0,0,0.2);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 20px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-purple);
+            border-color: var(--primary-purple);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 6px;
+            padding: 8px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-purple);
+            border-color: var(--secondary-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        
+        .brand-gradient {
+            background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: bold;
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+        
+        footer {
+            background-color: rgba(69, 39, 160, 0.9) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 -2px 15px rgba(0,0,0,0.1);
+            border-top: 1px solid var(--glass-border);
+        }
+        
+        .text-accent {
+            color: var(--light-purple);
+        }
+        
+        .btn-outline-accent {
+            color: var(--light-purple);
+            border-color: var(--light-purple);
+            background-color: rgba(126, 87, 194, 0.1);
+            border-radius: 6px;
+            padding: 8px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-accent:hover {
+            background-color: var(--primary-purple);
+            border-color: var(--primary-purple);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* Stylish File Upload */
+        .upload-container {
+            position: relative;
+            padding: 2rem;
+            border-radius: 8px;
+            background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+            box-shadow: 10px 10px 20px #151515, -10px -10px 20px #252525;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-container:hover {
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 5px 15px rgba(126, 87, 194, 0.3);
+        }
+        
+        .upload-icon i {
+            font-size: 2rem;
+            color: white;
+        }
+        
+        .upload-input {
+            position: relative;
+            margin-top: 1.5rem;
+        }
+        
+        .upload-input input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+        
+        .upload-btn {
+            display: block;
+            padding: 12px 20px;
+            background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
+            color: white;
+            border-radius: 30px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(126, 87, 194, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .upload-btn:hover {
+            box-shadow: 0 8px 20px rgba(126, 87, 194, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        /* Transparent Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background-color: rgba(30, 30, 30, 0.92);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-right: 2px solid var(--primary-purple);
+            z-index: 1050;
+            padding: 20px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
+            overflow-y: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar.closed {
+            left: -350px;
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .sidebar-header h5 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            font-weight: 600;
+            background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .close-sidebar {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .close-sidebar:hover {
+            color: var(--text-primary);
+        }
+        
+        .sidebar-section {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .category-title {
+            font-size: 1.1rem;
+            margin-bottom: 0;
+            color: var(--light-purple);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 10px 10px 10px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .category-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary-purple), var(--secondary-purple));
+            border-radius: 3px;
+        }
+        
+        .category-title:hover {
+            color: var(--primary-purple);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .category-title .chevron-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        /* Custom accordion styling */
+        .accordion-button {
+            font-size: 1.1rem;
+            color: var(--light-purple) !important;
+            font-weight: 600;
+            padding: 10px;
+            border-radius: 0.35rem;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+        
+        .accordion-button:not(.collapsed) {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+        }
+        
+        .accordion-button:focus {
+            box-shadow: none;
+            border-color: transparent;
+        }
+        
+        .accordion-button::after {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%239c4dcc'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        }
+        
+        .accordion-button:not(.collapsed)::after {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 0 10px;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-menu li:hover {
+            transform: translateX(5px);
+        }
+        
+        .sidebar-menu a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: block;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+        
+        .sidebar-menu a:hover {
+            color: var(--text-primary);
+            background-color: rgba(126, 87, 194, 0.15);
+        }
+        
+        .setting-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .theme-switcher {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--card-surface);
+            transition: .4s;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-purple);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .slider.round {
+            border-radius: 34px;
+        }
+        
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        
+        .sidebar-toggle {
+            position: fixed;
+            left: 20px;
+            top: 100px;
+            z-index: 999;
+        }
+        
+        .toggle-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .toggle-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .toggle-btn:hover::before {
+            left: 100%;
+        }
+        
+        .toggle-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .toggle-btn::after {
+            content: "Menu";
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: var(--light-purple);
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease, bottom 0.3s ease;
+        }
+        
+        .toggle-btn:hover::after {
+            opacity: 1;
+            bottom: -30px;
+        }
+        
+        /* Sidebar notification */
+        .sidebar-notification {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            z-index: 1040;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            max-width: 300px;
+        }
+        
+        .sidebar-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .notification-content {
+            flex-grow: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-content i {
+            font-size: 1.2rem;
+            margin-right: 10px;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .notification-close:hover {
+            color: white;
+        }
+        
+        /* Wedding Categories Button */
+        .wedding-categories-btn {
+            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .wedding-categories-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .wedding-categories-btn:hover {
+            color: white;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .wedding-categories-btn:hover::before {
+            left: 100%;
+        }
+    </style>
+    
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <button type="button" class="btn me-3 wedding-categories-btn" id="navSidebarToggle">
+                <i class="fas fa-th-large me-2"></i>Wedding Categories
+            </button>
+            
+            <a class="navbar-brand" href="/">
+                <span class="brand-gradient">Bridal Vision</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/" title="Home">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/bridal-swap" title="Indian Bridal Swap">
+                            <i class="fas fa-female me-1"></i> Simple Bridal Swap
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/bridal-gallery" title="Bridal Gallery">
+                            <i class="fas fa-images me-1"></i> Bridal Gallery
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Stylish Sidebar Toggle -->
+    <div class="sidebar-toggle" id="sidebarToggle">
+        <button class="toggle-btn">
+            <i class="fas fa-th-large"></i>
+        </button>
+    </div>
+    
+    <!-- Transparent Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h5>Wedding Categories</h5>
+            <button class="close-sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="sidebar-content">
+            <!-- Bootstrap Accordion -->
+            <div class="accordion" id="sidebarAccordion">
+                <!-- Bride Section -->
+                <div class="accordion-item bg-transparent border-0 mb-2">
+                    <h6 class="accordion-header" id="headingBride">
+                        <button class="accordion-button bg-transparent text-white shadow-none" 
+                                type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#collapseBride" aria-expanded="true" 
+                                aria-controls="collapseBride">
+                            <i class="fas fa-female me-2"></i>Bride
+                        </button>
+                    </h6>
+                    <div id="collapseBride" class="accordion-collapse collapse show" 
+                         aria-labelledby="headingBride" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0 pt-2">
+                            <ul class="sidebar-menu">
+                                <li><a href="/bridal-gallery"><i class="fas fa-angle-right me-2"></i>Bridal Face Swap</a></li>
+                                <li><a href="/bulk-upload"><i class="fas fa-upload me-2"></i>Bulk Template Upload</a></li>
+                                <li><a href="/bridal-outfits"><i class="fas fa-angle-right me-2"></i>Bridal Outfits</a></li>
+                                <li><a href="/jewelry-collections"><i class="fas fa-angle-right me-2"></i>Jewelry Collections</a></li>
+                                <li><a href="/makeup-styles"><i class="fas fa-angle-right me-2"></i>Makeup Styles</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Groom Section -->
+                <div class="accordion-item bg-transparent border-0 mb-2">
+                    <h6 class="accordion-header" id="headingGroom">
+                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
+                                type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#collapseGroom" aria-expanded="false" 
+                                aria-controls="collapseGroom">
+                            <i class="fas fa-male me-2"></i>Groom
+                        </button>
+                    </h6>
+                    <div id="collapseGroom" class="accordion-collapse collapse" 
+                         aria-labelledby="headingGroom" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0 pt-2">
+                            <ul class="sidebar-menu">
+                                <li><a href="/groom-face-swap"><i class="fas fa-angle-right me-2"></i>Groom Face Swap</a></li>
+                                <li><a href="/traditional-wear"><i class="fas fa-angle-right me-2"></i>Traditional Wear</a></li>
+                                <li><a href="/modern-suits"><i class="fas fa-angle-right me-2"></i>Modern Suits</a></li>
+                                <li><a href="/groom-accessories"><i class="fas fa-angle-right me-2"></i>Accessories</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Event Manager Section -->
+                <div class="accordion-item bg-transparent border-0 mb-2">
+                    <h6 class="accordion-header" id="headingEventManager">
+                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
+                                type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#collapseEventManager" aria-expanded="false" 
+                                aria-controls="collapseEventManager">
+                            <i class="fas fa-user-tie me-2"></i>Event Manager
+                        </button>
+                    </h6>
+                    <div id="collapseEventManager" class="accordion-collapse collapse" 
+                         aria-labelledby="headingEventManager" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0 pt-2">
+                            <ul class="sidebar-menu">
+                                <li><a href="/event-managers"><i class="fas fa-angle-right me-2"></i>Event Managers</a></li>
+                                <li><a href="#" onclick="alert('Guest Management - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Guest Management</a></li>
+                                <li><a href="#" onclick="alert('Timeline Creator - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Timeline Creator</a></li>
+                                <li><a href="#" onclick="alert('Budget Calculator - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Budget Calculator</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Convention Halls Section -->
+                <div class="accordion-item bg-transparent border-0 mb-2">
+                    <h6 class="accordion-header" id="headingConventionHalls">
+                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
+                                type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#collapseConventionHalls" aria-expanded="false" 
+                                aria-controls="collapseConventionHalls">
+                            <i class="fas fa-building me-2"></i>Convention Halls
+                        </button>
+                    </h6>
+                    <div id="collapseConventionHalls" class="accordion-collapse collapse" 
+                         aria-labelledby="headingConventionHalls" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0 pt-2">
+                            <ul class="sidebar-menu">
+                                <li><a href="/venue-search"><i class="fas fa-angle-right me-2"></i>Venue Search</a></li>
+                                <li><a href="/hall-comparison"><i class="fas fa-angle-right me-2"></i>Hall Comparison</a></li>
+                                <li><a href="/virtual-tours"><i class="fas fa-angle-right me-2"></i>Virtual Tours</a></li>
+                                <li><a href="/booking-management"><i class="fas fa-angle-right me-2"></i>Booking Management</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Section -->
+                <div class="accordion-item bg-transparent border-0 mb-2">
+                    <h6 class="accordion-header" id="headingSettings">
+                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
+                                type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#collapseSettings" aria-expanded="false" 
+                                aria-controls="collapseSettings">
+                            <i class="fas fa-cog me-2"></i>Settings
+                        </button>
+                    </h6>
+                    <div id="collapseSettings" class="accordion-collapse collapse" 
+                         aria-labelledby="headingSettings" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0 pt-2">
+                            <div class="setting-item mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Theme</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="themeSwitch">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-secondary">Light Purple</small>
+                                    <small class="text-secondary">Deep Purple</small>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="mb-2">Layout Style</div>
+                                <div class="btn-group w-100">
+                                    <button class="btn btn-sm btn-outline-light active" data-layout="grid">Grid</button>
+                                    <button class="btn btn-sm btn-outline-light" data-layout="list">List</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <main class="my-4">
+        
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark">
+                <h1 class="h3 mb-0 text-center">
+                    <i class="fas fa-user-bride me-2"></i>Indian Bridal Face Swap
+                </h1>
+            </div>
+            <div class="card-body">
+                <div id="model-status-alert" class="alert alert-warning d-none" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="model-status-message">Checking model status...</span>
+                </div>
+
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="card h-100">
+                                <div class="card-header bg-dark d-none">
+                                    <!-- Header removed as requested -->
+                                </div>
+                                <div class="card-body p-0 d-flex flex-column">
+                                    <div class="position-relative">
+                                        <div class="image-preview-container mb-2 flex-grow-1 d-flex align-items-center justify-content-center">
+                                            <img id="source-preview" class="img-preview d-none" alt="Your photo preview">
+                                            <div id="source-placeholder" class="placeholder-container">
+                                                <i class="fas fa-camera fa-4x text-muted"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Floating file input that appears on hover -->
+                                        <div class="position-absolute bottom-0 start-0 end-0 p-2" style="background: rgba(0,0,0,0.4); border-radius: 0 0 8px 8px;">
+                                            <div class="d-flex">
+                                                <label for="source-input" class="flex-grow-1 btn btn-sm btn-dark opacity-75 text-start">
+                                                    <i class="fas fa-upload me-2"></i>Upload Photo
+                                                </label>
+                                                <button class="btn btn-sm btn-dark opacity-75 ms-2" type="button" id="source-clear-btn">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                            <input type="file" class="d-none" id="source-input" name="source" accept=".jpg,.jpeg,.png" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header bg-dark d-none">
+                                    <!-- Header removed as requested -->
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-none">
+                                        <input class="form-check-input" type="radio" name="bridalStyle" id="haldi" value="haldi" checked>
+                                    </div>
+                                    
+                                    <!-- Template preview container -->
+                                    <div id="template-preview-container" class="mt-3 d-none">
+                                        <div class="text-center p-2">
+                                            <img id="template-preview" class="img-fluid" style="max-height: 150px; border-radius: 8px;" alt="Selected template">
+                                            <input type="hidden" id="template-url" name="template_url">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" id="swap-btn" class="btn btn-primary">
+                            <i class="fas fa-magic me-2"></i>Single Swap
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Single Template Result -->
+                <div id="result-container" class="mt-4 d-none">
+                    <h5 class="text-center mb-3 text-muted small">Result</h5>
+                    <div class="text-center mb-3">
+                        <img id="result-image" class="img-fluid result-image" alt="Bridal face swap result">
+                    </div>
+                    <div class="text-center">
+                        <a id="download-btn" class="btn btn-success me-2" download>
+                            <i class="fas fa-download me-2"></i>Download
+                        </a>
+                        <button id="try-again-btn" class="btn btn-secondary">
+                            <i class="fas fa-redo me-2"></i>Try Another Style
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Multi-Template Results -->
+                <div id="multi-results-container" class="mt-5 d-none">
+                    <div class="mb-4">
+                        <div class="mb-3">
+                            <h5 class="text-center mb-3 text-muted small">Results <span id="results-count" class=""></span></h5>
+                        </div>
+                        <div class="">
+                            <div class="multi-results-container d-flex flex-nowrap overflow-auto py-2" style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: thin;"></div>
+                            <div class="text-center mt-4">
+                                <button id="multi-try-again-btn" class="btn btn-outline-light">
+                                    <i class="fas fa-redo me-2"></i>Try Different Templates
+                                </button>
+                                <button id="select-more-btn" class="btn btn-primary ms-2">
+                                    <i class="fas fa-plus me-2"></i>Select More Templates
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="loading-container" class="text-center my-4 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 small">Processing...</p>
+                </div>
+
+                <div id="error-container" class="alert alert-danger mt-4 d-none" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="error-message"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Templates Section -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark d-flex justify-content-between align-items-center">
+                <h2 class="h4 mb-0">Available Templates</h2>
+                <div class="btn-group">
+                    <button id="toggleSelectionModeBtn" class="btn btn-outline-light btn-sm me-2">
+                        <i class="fas fa-check-square"></i> Multi-Select
+                    </button>
+                    <button id="processSelectedBtn" class="btn btn-primary btn-sm me-2 d-none">
+                        <i class="fas fa-magic"></i> Multi Swap (<span id="selectedCount">0</span>)
+                    </button>
+                    <button id="refreshTemplatesBtn" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Selected templates preview area -->
+                <div id="selectedTemplatesPreview" class="mb-3 d-none">
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="text-light mb-0"><i class="fas fa-check-circle me-2"></i>Selected Templates</h5>
+                            <span class="badge bg-light text-dark rounded-pill" id="selectedCountBadge">0</span>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-nowrap overflow-auto" style="gap: 15px; min-height: 240px;" id="selectedTemplatesThumbnails">
+                        <!-- Selected template thumbnails will be added here dynamically -->
+                        <div class="empty-message text-muted w-100 text-center d-flex align-items-center justify-content-center">
+                            <p>Selected templates will appear here</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Process Button -->
+                    <div class="mt-3 text-center">
+                        <button id="processSelectedTemplatesBtn" class="btn btn-primary btn-lg" disabled>
+                            <i class="fas fa-wand-magic-sparkles me-2"></i> Process Selected Templates
+                        </button>
+                        <div class="text-muted mt-2 small">Select at least 1 template and upload your photo to process</div>
+                    </div>
+                </div>
+                
+                <ul class="nav nav-tabs" id="templateTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="haldi-tab" data-bs-toggle="tab" data-bs-target="#haldi-templates" type="button" role="tab">Haldi</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="mehendi-tab" data-bs-toggle="tab" data-bs-target="#mehendi-templates" type="button" role="tab">Mehendi</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="wedding-tab" data-bs-toggle="tab" data-bs-target="#wedding-templates" type="button" role="tab">Wedding</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reception-tab" data-bs-toggle="tab" data-bs-target="#reception-templates" type="button" role="tab">Reception</button>
+                    </li>
+                </ul>
+                
+                <!-- Multi-selection controls -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <button id="toggleSelectionModeBtn" type="button" class="btn btn-link text-light px-0">
+                        <i class="fas fa-check-square"></i> Multi-Select
+                    </button>
+                    <div class="d-flex align-items-center">
+                        <div id="selectionCountWrapper" class="d-none me-2">
+                            <span class="text-light">
+                                <span id="selectedCount">0</span> selected
+                            </span>
+                        </div>
+                        <button id="processSelectedBtn" type="button" class="btn btn-link text-success d-none" disabled>
+                            <i class="fas fa-magic"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="tab-content pt-4" id="templateTabContent">
+                    <div class="tab-pane fade show active" id="haldi-templates" role="tabpanel">
+                        <div class="template-container row g-3">
+                            <div class="col-12 text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="mehendi-templates" role="tabpanel">
+                        <div class="template-container row g-3">
+                            <div class="col-12 text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="wedding-templates" role="tabpanel">
+                        <div class="template-container row g-3">
+                            <div class="col-12 text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="reception-templates" role="tabpanel">
+                        <div class="template-container row g-3">
+                            <div class="col-12 text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Full Image Modal -->
+<div class="modal fade" id="fullImageModal" tabindex="-1" aria-labelledby="fullImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content bg-transparent text-white" 
+             style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: all 0.3s ease;">
+            <div class="modal-body p-0 position-relative overflow-hidden">
+                <!-- Close button in top right -->
+                <button type="button" class="position-absolute top-0 end-0 m-4 btn btn-sm text-white opacity-75 z-3" 
+                        style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 36px; height: 36px; padding: 0;" 
+                        data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <!-- Image counter in top left -->
+                <div class="position-absolute top-0 start-0 m-4 d-flex align-items-center z-3">
+                    <h6 class="m-0" id="modal-ceremony-name" style="text-shadow: 0 0 10px rgba(0,0,0,0.8);">Bridal Look</h6>
+                    <span class="ms-2 small opacity-75" id="image-counter" style="text-shadow: 0 0 10px rgba(0,0,0,0.8);">Image 1 of 1</span>
+                </div>
+                
+                <div id="image-container" class="d-flex align-items-center justify-content-center" 
+                     style="min-height: 100vh; background: rgba(0,0,0,0.7);">
+                    <img id="full-size-image" class="img-fluid" src="" alt="Full size bridal image" 
+                         style="max-height: 90vh; transform-origin: center; transition: transform 0.3s ease; position: relative; z-index: 2;">
+                </div>
+                
+                <!-- Navigation Controls -->
+                <button id="prev-image-btn" class="position-absolute top-50 start-0 translate-middle-y btn p-2 ms-4 z-3" 
+                        style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 50px; height: 50px; opacity: 0.7; transition: all 0.2s ease;">
+                    <i class="fas fa-chevron-left fa-lg"></i>
+                </button>
+                <button id="next-image-btn" class="position-absolute top-50 end-0 translate-middle-y btn p-2 me-4 z-3" 
+                        style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 50px; height: 50px; opacity: 0.7; transition: all 0.2s ease;">
+                    <i class="fas fa-chevron-right fa-lg"></i>
+                </button>
+                
+                <!-- Top Right Zoom Controls -->
+                <div class="position-absolute top-0 end-0 mt-5 pt-4 me-4 zoom-controls d-flex z-3">
+                    <button id="zoom-in-btn" class="btn btn-sm me-2" 
+                            style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 36px; height: 36px;">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button id="zoom-out-btn" class="btn btn-sm me-2" 
+                            style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 36px; height: 36px;">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                    <button id="zoom-reset-btn" class="btn btn-sm" 
+                            style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 36px; height: 36px;">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+                
+                <!-- Bottom Controls -->
+                <div class="position-absolute bottom-0 w-100 d-flex justify-content-between align-items-center p-4 z-3">
+                    <!-- Download button -->
+                    <a id="download-full-image" href="" download class="btn text-white opacity-75" 
+                       style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 36px; height: 36px; padding: 6px 0 0 0;">
+                        <i class="fas fa-download"></i>
+                    </a>
+                    
+                    <!-- Bottom Zoom Controls -->
+                    <div class="zoom-controls-bottom d-flex align-items-center">
+                        <span id="zoom-level-text" class="small opacity-75 me-2" style="text-shadow: 0 0 10px rgba(0,0,0,0.8);">100%</span>
+                        <div class="d-flex">
+                            <button id="zoom-out-btn-bottom" class="btn btn-sm me-1" 
+                                    style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">
+                                <i class="fas fa-search-minus"></i>
+                            </button>
+                            <button id="zoom-in-btn-bottom" class="btn btn-sm" 
+                                    style="background: rgba(0,0,0,0.4); border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add CSS for the frosted glass and zoom effects -->
+<style>
+.text-gradient {
+    background: linear-gradient(90deg, #9b59b6, #3498db);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+
+/* Styling for the multi-result cards */
+.multi-result-card {
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.multi-result-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.multi-result-card img {
+    transition: transform 0.3s ease-in-out;
+}
+
+.multi-result-card:hover img {
+    transform: scale(1.05);
+}
+
+.modal.fade .modal-dialog {
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1);
+    opacity: 1;
+}
+
+#prev-image-btn:hover, #next-image-btn:hover {
+    background-color: rgba(81, 45, 168, 0.7) !important;
+    transform: translateY(-50%) scale(1.1);
+}
+
+#zoom-in-btn:hover, #zoom-out-btn:hover, #zoom-reset-btn:hover,
+#zoom-in-btn-bottom:hover, #zoom-out-btn-bottom:hover, #zoom-reset-btn-bottom:hover {
+    background-color: rgba(81, 45, 168, 0.7) !important;
+    transform: scale(1.1);
+    box-shadow: 0 0 8px rgba(155, 89, 182, 0.5);
+}
+
+.zoom-level-display {
+    font-family: monospace;
+    min-width: 60px;
+    text-align: center;
+}
+
+.zoom-controls-bottom .btn-group .btn {
+    transition: all 0.2s ease;
+    padding: 0.375rem 0.65rem;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+    .modal-dialog {
+        margin: 0;
+        max-width: 100%;
+        height: 100%;
+    }
+    
+    .modal-content {
+        height: 100%;
+        border-radius: 0;
+    }
+    
+    #full-size-image {
+        max-height: calc(100vh - 120px);
+    }
+}
+</style>
+
+    </main>
+
+    <footer class="py-3 mt-5">
+        <div class="container text-center">
+            <p class="text-light mb-0">
+                <span class="brand-gradient">Wedding Magic</span> - Indian Bridal Face Swap App | 
+                <span class="text-light">Powered by </span>
+                <a href="https://github.com/deepinsight/insightface" target="_blank" rel="noopener" class="text-light">
+                    <i class="fab fa-github me-1"></i>InsightFace 0.7.3
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/accordion.js"></script>
+    
+    <script>
+        // Sidebar functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM content loaded");
+            
+            // Try to get sidebar elements
+            const sidebar = document.getElementById('sidebar');
+            console.log("Sidebar element:", sidebar);
+            
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            console.log("Sidebar toggle button:", sidebarToggle);
+            
+            const navSidebarToggle = document.getElementById('navSidebarToggle');
+            console.log("Nav sidebar toggle button:", navSidebarToggle);
+            
+            const closeBtn = document.querySelector('.close-sidebar');
+            console.log("Close button:", closeBtn);
+            
+            const themeSwitch = document.getElementById('themeSwitch');
+            
+            // Initialize sidebar in open state by default
+            if (sidebar) {
+                console.log("Initializing sidebar in open state");
+                sidebar.classList.remove('closed');
+                document.body.classList.remove('sidebar-closed');
+            }
+            
+            // Function to toggle sidebar
+            function toggleSidebar() {
+                console.log("Toggle sidebar called");
+                if (sidebar) {
+                    console.log("Toggling sidebar class");
+                    sidebar.classList.toggle('closed');
+                    document.body.classList.toggle('sidebar-closed');
+                } else {
+                    console.error("Sidebar element not found");
+                }
+            }
+            
+            // Toggle sidebar from floating button
+            if (sidebarToggle) {
+                console.log("Adding event listener to sidebar toggle button");
+                sidebarToggle.addEventListener('click', function(e) {
+                    console.log("Sidebar toggle button clicked");
+                    e.preventDefault();
+                    toggleSidebar();
+                });
+            }
+            
+            // Toggle sidebar from navbar button (skip if element doesn't exist)
+            if (navSidebarToggle) {
+                console.log("Adding event listener to nav sidebar toggle button");
+                navSidebarToggle.addEventListener('click', function(e) {
+                    console.log("Nav sidebar toggle button clicked");
+                    e.preventDefault();
+                    toggleSidebar();
+                });
+            } else {
+                console.log("Nav sidebar toggle button not found, skipping event listener");
+            }
+            
+            // Close sidebar
+            if (closeBtn) {
+                console.log("Adding event listener to close button");
+                closeBtn.addEventListener('click', function(e) {
+                    console.log("Close button clicked");
+                    e.preventDefault();
+                    if (sidebar) {
+                        sidebar.classList.add('closed');
+                        document.body.classList.add('sidebar-closed');
+                    }
+                });
+            }
+            
+            // Close sidebar when clicking outside
+            document.addEventListener('click', function(event) {
+                if (sidebar) {
+                    const isClickInside = 
+                        sidebar.contains(event.target) || 
+                        (sidebarToggle && sidebarToggle.contains(event.target)) ||
+                        (navSidebarToggle && navSidebarToggle.contains(event.target));
+                    
+                    if (!isClickInside && !sidebar.classList.contains('closed')) {
+                        sidebar.classList.add('closed');
+                        document.body.classList.add('sidebar-closed');
+                    }
+                }
+            });
+            
+            // Theme switcher - already using dark purple theme
+            if (themeSwitch) {
+                themeSwitch.addEventListener('change', function() {
+                    if (this.checked) {
+                        // Even darker purple theme
+                        document.documentElement.style.setProperty('--primary-purple', '#3b0077');
+                        document.documentElement.style.setProperty('--secondary-purple', '#5c007a');
+                        document.documentElement.style.setProperty('--dark-purple', '#28005c');
+                        document.documentElement.style.setProperty('--light-purple', '#8e24aa');
+                        document.documentElement.style.setProperty('--dark-surface', '#0a0a0a');
+                    } else {
+                        // Default dark purple theme
+                        document.documentElement.style.setProperty('--primary-purple', '#4a148c');
+                        document.documentElement.style.setProperty('--secondary-purple', '#6a1b9a');
+                        document.documentElement.style.setProperty('--dark-purple', '#38006b');
+                        document.documentElement.style.setProperty('--light-purple', '#9c4dcc');
+                        document.documentElement.style.setProperty('--dark-surface', '#121212');
+                    }
+                });
+            }
+            // Accordion functionality moved to separate accordion.js file
+            
+            // Layout buttons
+            const layoutBtns = document.querySelectorAll('[data-layout]');
+            layoutBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    layoutBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const layout = this.getAttribute('data-layout');
+                    const resultGallery = document.getElementById('result-gallery');
+                    if (resultGallery) {
+                        if (layout === 'list') {
+                            resultGallery.classList.add('list-view');
+                            resultGallery.classList.remove('grid-view');
+                        } else {
+                            resultGallery.classList.add('grid-view');
+                            resultGallery.classList.remove('list-view');
+                        }
+                    }
+                });
+            });
+            
+            // Show sidebar hint notification
+            setTimeout(function() {
+                const notification = document.createElement('div');
+                notification.className = 'sidebar-notification';
+                notification.innerHTML = `
+                    <div class="notification-content">
+                        <i class="fas fa-th-large me-2"></i>
+                        <span>Check out our wedding categories!</span>
+                    </div>
+                    <button class="notification-close">×</button>
+                `;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => notification.classList.add('show'), 100);
+                
+                // Close notification
+                notification.querySelector('.notification-close').addEventListener('click', function() {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                });
+                
+                // Open sidebar on notification click
+                notification.querySelector('.notification-content').addEventListener('click', function() {
+                    toggleSidebar();
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                });
+                
+                // Auto hide after 6 seconds
+                setTimeout(function() {
+                    if (document.body.contains(notification)) {
+                        notification.classList.remove('show');
+                        setTimeout(() => notification.remove(), 300);
+                    }
+                }, 6000);
+            }, 1500);
+        });
+    </script>
+    
+    
+<script>
+// Global variables for fullscreen image modal
+let currentResultIndex = 0;
+let resultImages = [];
+
+// Function to open the full image modal
+function openFullImage(imagePath, ceremonyType, resultIndex) {
+    // Get all result cards
+    const resultCards = document.querySelectorAll('.multi-result-card');
+    resultImages = [];
+    
+    // Collect image paths and ceremony types
+    resultCards.forEach((card, index) => {
+        resultImages.push({
+            path: card.dataset.resultPath,
+            ceremony: card.dataset.ceremonyType,
+            index: index
+        });
+    });
+    
+    if (resultImages.length === 0) {
+        console.error('No result images found');
+        return;
+    }
+    
+    // Set current index
+    currentResultIndex = resultIndex || 0;
+    if (currentResultIndex >= resultImages.length) {
+        currentResultIndex = 0;
+    }
+    
+    // Update modal content
+    updateModalContent();
+    
+    // Initialize event listeners for navigation buttons
+    const prevBtn = document.getElementById('prev-image-btn');
+    if (prevBtn) prevBtn.onclick = navigateToPrevImage;
+    
+    const nextBtn = document.getElementById('next-image-btn');
+    if (nextBtn) nextBtn.onclick = navigateToNextImage;
+    
+    // Initialize zoom buttons (top controls)
+    const zoomInBtn = document.getElementById('zoom-in-btn');
+    if (zoomInBtn) zoomInBtn.onclick = zoomIn;
+    
+    const zoomOutBtn = document.getElementById('zoom-out-btn');
+    if (zoomOutBtn) zoomOutBtn.onclick = zoomOut;
+    
+    const zoomResetBtn = document.getElementById('zoom-reset-btn');
+    if (zoomResetBtn) zoomResetBtn.onclick = resetZoom;
+    
+    // Initialize zoom buttons (bottom controls)
+    const zoomInBtnBottom = document.getElementById('zoom-in-btn-bottom');
+    if (zoomInBtnBottom) zoomInBtnBottom.onclick = zoomIn;
+    
+    const zoomOutBtnBottom = document.getElementById('zoom-out-btn-bottom');
+    if (zoomOutBtnBottom) zoomOutBtnBottom.onclick = zoomOut;
+    
+    const zoomResetBtnBottom = document.getElementById('zoom-reset-btn-bottom');
+    if (zoomResetBtnBottom) zoomResetBtnBottom.onclick = resetZoom;
+    
+    // Setup drag handlers for panning when zoomed
+    setupDragHandlers();
+    
+    // Handle mouse wheel zoom
+    const imageContainer = document.getElementById('image-container');
+    imageContainer.addEventListener('wheel', function(e) {
+        if (e.deltaY < 0) {
+            // Zoom in on wheel up
+            zoomIn();
+        } else {
+            // Zoom out on wheel down
+            zoomOut();
+        }
+        e.preventDefault();
+    });
+    
+    // Show the modal using Bootstrap's modal API
+    const modal = new bootstrap.Modal(document.getElementById('fullImageModal'));
+    modal.show();
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', handleModalKeyNavigation);
+    
+    // Apply subtle entrance animation to the image
+    const fullSizeImage = document.getElementById('full-size-image');
+    fullSizeImage.style.opacity = '0';
+    setTimeout(() => {
+        fullSizeImage.style.transition = 'opacity 0.3s ease-in-out';
+        fullSizeImage.style.opacity = '1';
+    }, 100);
+}
+
+// Zoom functionality variables
+let currentZoomLevel = 1;
+const zoomStep = 0.25;
+const maxZoom = 3;
+const minZoom = 0.5;
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let dragStartTranslateX = 0;
+let dragStartTranslateY = 0;
+
+// Update modal content based on current index
+function updateModalContent() {
+    if (resultImages.length === 0 || currentResultIndex < 0 || currentResultIndex >= resultImages.length) {
+        return;
+    }
+    
+    const currentImage = resultImages[currentResultIndex];
+    const fullSizeImage = document.getElementById('full-size-image');
+    const modalCeremonyName = document.getElementById('modal-ceremony-name');
+    const imageCounter = document.getElementById('image-counter');
+    const downloadBtn = document.getElementById('download-full-image');
+    
+    // Reset zoom level and transform
+    resetZoom();
+    
+    // Update image source and alt text
+    fullSizeImage.src = currentImage.path;
+    fullSizeImage.alt = `Full size ${currentImage.ceremony} image`;
+    
+    // Update ceremony name in title
+    modalCeremonyName.textContent = currentImage.ceremony || 'Bridal Look';
+    
+    // Update counter
+    imageCounter.textContent = `Image ${currentResultIndex + 1} of ${resultImages.length}`;
+    
+    // Update download link
+    downloadBtn.href = currentImage.path;
+    downloadBtn.download = `bridal-${currentImage.ceremony.toLowerCase()}-look.jpg`;
+}
+
+// Zoom in function
+function zoomIn() {
+    if (currentZoomLevel < maxZoom) {
+        currentZoomLevel += zoomStep;
+        applyZoom();
+    }
+}
+
+// Zoom out function
+function zoomOut() {
+    if (currentZoomLevel > minZoom) {
+        currentZoomLevel -= zoomStep;
+        applyZoom();
+    }
+}
+
+// Reset zoom function
+function resetZoom() {
+    currentZoomLevel = 1;
+    const fullSizeImage = document.getElementById('full-size-image');
+    fullSizeImage.style.transform = 'scale(1) translate(0, 0)';
+    fullSizeImage.style.cursor = 'default';
+    isDragging = false;
+}
+
+// Apply zoom level
+function applyZoom() {
+    const fullSizeImage = document.getElementById('full-size-image');
+    const zoomLevelText = document.getElementById('zoom-level-text');
+    
+    // Get current translate values if they exist
+    let translateX = 0;
+    let translateY = 0;
+    
+    const currentTransform = fullSizeImage.style.transform;
+    if (currentTransform.includes('translate')) {
+        const translateMatch = currentTransform.match(/translate\((.+?)px, (.+?)px\)/);
+        if (translateMatch && translateMatch.length >= 3) {
+            translateX = parseFloat(translateMatch[1]) || 0;
+            translateY = parseFloat(translateMatch[2]) || 0;
+        }
+    }
+    
+    // Apply transform
+    fullSizeImage.style.transform = `scale(${currentZoomLevel}) translate(${translateX}px, ${translateY}px)`;
+    
+    // Update zoom percentage text
+    if (zoomLevelText) {
+        zoomLevelText.textContent = `${Math.round(currentZoomLevel * 100)}%`;
+    }
+    
+    // Enable dragging if zoomed in
+    if (currentZoomLevel > 1) {
+        fullSizeImage.style.cursor = 'move';
+    } else {
+        fullSizeImage.style.cursor = 'default';
+    }
+}
+
+// Navigate to previous image
+function navigateToPrevImage() {
+    currentResultIndex--;
+    if (currentResultIndex < 0) {
+        currentResultIndex = resultImages.length - 1;
+    }
+    updateModalContent();
+}
+
+// Navigate to next image
+function navigateToNextImage() {
+    currentResultIndex++;
+    if (currentResultIndex >= resultImages.length) {
+        currentResultIndex = 0;
+    }
+    updateModalContent();
+}
+
+// Handle mouse dragging for panning zoomed images
+function setupDragHandlers() {
+    const fullSizeImage = document.getElementById('full-size-image');
+    const imageContainer = document.getElementById('image-container');
+    
+    // Mouse down event to start dragging
+    fullSizeImage.addEventListener('mousedown', function(e) {
+        if (currentZoomLevel <= 1) return; // Only enable dragging when zoomed in
+        
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        
+        // Get current transform values
+        const currentTransform = fullSizeImage.style.transform;
+        const translateMatch = currentTransform.match(/translate\((.+?)px, (.+?)px\)/);
+        if (translateMatch && translateMatch.length >= 3) {
+            dragStartTranslateX = parseFloat(translateMatch[1]) || 0;
+            dragStartTranslateY = parseFloat(translateMatch[2]) || 0;
+        } else {
+            dragStartTranslateX = 0;
+            dragStartTranslateY = 0;
+        }
+        
+        e.preventDefault();
+    });
+    
+    // Mouse move event for dragging
+    document.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        
+        const deltaX = (e.clientX - dragStartX) / currentZoomLevel;
+        const deltaY = (e.clientY - dragStartY) / currentZoomLevel;
+        
+        const newTranslateX = dragStartTranslateX + deltaX;
+        const newTranslateY = dragStartTranslateY + deltaY;
+        
+        fullSizeImage.style.transform = `scale(${currentZoomLevel}) translate(${newTranslateX}px, ${newTranslateY}px)`;
+        
+        e.preventDefault();
+    });
+    
+    // Mouse up event to stop dragging
+    document.addEventListener('mouseup', function() {
+        isDragging = false;
+    });
+    
+    // Mouse leave event to stop dragging if mouse leaves the container
+    imageContainer.addEventListener('mouseleave', function() {
+        isDragging = false;
+    });
+}
+
+// Handle keyboard navigation in modal
+function handleModalKeyNavigation(event) {
+    // Only handle events when modal is visible
+    const modal = document.getElementById('fullImageModal');
+    if (!modal.classList.contains('show')) {
+        return;
+    }
+    
+    switch (event.key) {
+        case 'ArrowLeft':
+            navigateToPrevImage();
+            break;
+        case 'ArrowRight':
+            navigateToNextImage();
+            break;
+        case '+':
+        case '=':
+            zoomIn();
+            break;
+        case '-':
+        case '_':
+            zoomOut();
+            break;
+        case '0':
+            resetZoom();
+            break;
+        case 'Escape':
+            document.removeEventListener('keydown', handleModalKeyNavigation);
+            break;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Initializing bridal swap page');
+    
+    // Inject CSS to hide all alert messages and template count notifications
+    const style = document.createElement('style');
+    style.textContent = `
+        /* Hide all alerts and template messages */
+        .alert, .alert-info, .alert-warning, .alert-success, .template-message, 
+        div[class*="template-count"], div[class*="count-message"],
+        [id*="template-count"], [id*="count-message"],
+        .card-body > .alert-info {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            opacity: 0 !important;
+            overflow: hidden !important;
+        }
+        
+        /* Hide anything that says "Found X templates" */
+        .template-container::before {
+            display: none !important;
+            content: none !important;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Hide ALL alerts and template count messages
+    const allAlerts = document.querySelectorAll('.alert, .alert-info, .alert-warning, .alert-success, .template-message');
+    allAlerts.forEach(alert => {
+        if (alert) {
+            alert.style.display = 'none';
+            alert.classList.add('d-none');
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
+        }
+    });
+    
+    // Hide any text containing "Found X templates" messages
+    document.querySelectorAll('*').forEach(el => {
+        if (el.textContent && el.textContent.match(/Found \d+ templates/)) {
+            console.log('Found template count message:', el.textContent);
+            el.style.display = 'none';
+            el.classList.add('d-none');
+            // Try to remove it completely
+            if (el.parentNode) {
+                el.parentNode.removeChild(el);
+            }
+        }
+    });
+    
+    // Use MutationObserver to catch any dynamically added template count messages
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                mutation.addedNodes.forEach(node => {
+                    // Check if it's an element node (not text node)
+                    if (node.nodeType === 1) {
+                        // Check if it's an alert
+                        if (node.classList && 
+                            (node.classList.contains('alert') || 
+                             node.classList.contains('template-message'))) {
+                            console.log('Removing dynamically added alert:', node);
+                            node.style.display = 'none';
+                            node.classList.add('d-none');
+                            if (node.parentNode) {
+                                node.parentNode.removeChild(node);
+                            }
+                        }
+                        
+                        // Check for text content about templates
+                        if (node.textContent && node.textContent.match(/Found \d+ templates/)) {
+                            console.log('Removing dynamically added template count:', node.textContent);
+                            node.style.display = 'none';
+                            node.classList.add('d-none');
+                            if (node.parentNode) {
+                                node.parentNode.removeChild(node);
+                            }
+                        }
+                        
+                        // Check child nodes recursively
+                        node.querySelectorAll('*').forEach(child => {
+                            if (child.textContent && child.textContent.match(/Found \d+ templates/)) {
+                                console.log('Removing nested template count:', child.textContent);
+                                child.style.display = 'none';
+                                child.classList.add('d-none');
+                                if (child.parentNode) {
+                                    child.parentNode.removeChild(child);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    });
+    
+    // Observe the entire document for changes
+    observer.observe(document.body, { 
+        childList: true, 
+        subtree: true,
+        characterData: true
+    });
+    
+    // Find and hide any intro alerts
+    const introAlerts = document.querySelectorAll('.card-body > .alert-info');
+    introAlerts.forEach(alert => {
+        if (alert) {
+            alert.style.display = 'none';
+            alert.classList.add('d-none');
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
+        }
+    });
+    
+    // Force hide the event type section (in case it wasn't hidden via server-side rendering)
+    const eventTypeSections = document.querySelectorAll('.card-body label.form-label');
+    eventTypeSections.forEach(section => {
+        if (section && section.textContent.includes('Event Type')) {
+            const parent = section.closest('div');
+            if (parent) {
+                parent.style.display = 'none';
+                parent.classList.add('d-none');
+            }
+        }
+    });
+    
+    // Hide all "All templates are curated from..." messages
+    const templateInfos = document.querySelectorAll('.card-body p.text-info');
+    templateInfos.forEach(info => {
+        if (info && info.textContent.includes('templates are curated')) {
+            info.style.display = 'none';
+            info.classList.add('d-none');
+            // Also hide the parent container if it exists
+            const parent = info.closest('div');
+            if (parent) {
+                parent.style.display = 'none';
+                parent.classList.add('d-none');
+            }
+        }
+    });
+    
+    // DOM Elements
+    const uploadForm = document.getElementById('upload-form');
+    const sourceInput = document.getElementById('source-input');
+    const sourcePreview = document.getElementById('source-preview');
+    const sourcePlaceholder = document.getElementById('source-placeholder');
+    const sourceClearBtn = document.getElementById('source-clear-btn');
+    const swapBtn = document.getElementById('swap-btn');
+    const resultContainer = document.getElementById('result-container');
+    const resultImage = document.getElementById('result-image');
+    const downloadBtn = document.getElementById('download-btn');
+    const tryAgainBtn = document.getElementById('try-again-btn');
+    const loadingContainer = document.getElementById('loading-container');
+    const errorContainer = document.getElementById('error-container');
+    const errorMessage = document.getElementById('error-message');
+    const modelStatusAlert = document.getElementById('model-status-alert');
+    const modelStatusMessage = document.getElementById('model-status-message');
+    const templatePreviewContainer = document.getElementById('template-preview-container');
+    const templatePreview = document.getElementById('template-preview');
+    const templateUrlInput = document.getElementById('template-url');
+    // Additional elements for multi-template processing
+    const processSelectedTemplatesBtn = document.getElementById('processSelectedTemplatesBtn');
+    
+    // Function to use a template (called when a template is selected)
+    function useTemplate(templateCard) {
+        if (!templateCard) {
+            console.error('No template card provided');
+            return;
+        }
+        
+        console.log('Using template:', templateCard.dataset);
+        
+        // Extract template info
+        const templatePath = templateCard.dataset.templatePath;
+        const ceremonyType = templateCard.dataset.ceremony;
+        
+        if (!templatePath) {
+            console.error('Template path is missing');
+            return;
+        }
+        
+        // Apply visual selection to this template
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.classList.remove('selected-template');
+        });
+        templateCard.classList.add('selected-template');
+        
+        // Show a subtle highlight on the selected template
+        const templateImg = templateCard.querySelector('img');
+        if (templateImg) {
+            document.querySelectorAll('.template-img').forEach(img => {
+                img.classList.remove('selected-glow');
+            });
+            templateImg.classList.add('selected-glow');
+        }
+        
+        // Visual feedback in the upload form
+        if (templatePreviewContainer) {
+            templatePreviewContainer.classList.remove('d-none');
+            if (templatePreview) {
+                templatePreview.src = templatePath;
+                templatePreview.alt = `Selected ${ceremonyType} template`;
+                
+                // Add ceremony type as a data attribute
+                templatePreview.dataset.ceremony = ceremonyType;
+            }
+        }
+        
+        // Update hidden form field
+        if (templateUrlInput) {
+            templateUrlInput.value = templatePath;
+        }
+        
+        // Enable the swap button if both source and template are selected
+        if (sourceInput && sourceInput.files.length > 0) {
+            if (swapBtn) {
+                swapBtn.disabled = false;
+            }
+        }
+    }
+    
+    // Initialize template features
+    const refreshTemplatesBtn = document.getElementById('refreshTemplatesBtn');
+    if (refreshTemplatesBtn) {
+        console.log('Adding click listener to refresh templates button');
+        refreshTemplatesBtn.addEventListener('click', loadAllTemplates);
+    }
+    
+    // Set up bridal style radio buttons
+    document.querySelectorAll('input[name="bridalStyle"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const selectedStyle = this.value;
+            // Show the corresponding tab
+            const tab = document.getElementById(`${selectedStyle}-tab`);
+            if (tab) {
+                console.log(`Showing tab for ${selectedStyle}`);
+                new bootstrap.Tab(tab).show();
+            }
+        });
+    });
+    
+    // Function to initialize the page
+    function initializePage() {
+        console.log('Initializing bridal swap page components');
+        
+        // Set up ceremony tab navigation
+        setupCeremonyTabs();
+        
+        // Load templates for all ceremonies
+        loadAllTemplates();
+        
+        // Check for model status
+        checkModels();
+        
+        console.log('Page initialization complete');
+    }
+    
+    // Initialize the page by setting up everything
+    initializePage();
+    
+    // Setup ceremony tabs with event listeners
+    function setupCeremonyTabs() {
+        const tabs = document.querySelectorAll('.nav-link[data-bs-toggle="tab"]');
+        console.log('Setting up', tabs.length, 'ceremony tabs');
+        
+        tabs.forEach(tab => {
+            // Extract ceremony type from tab href
+            const href = tab.getAttribute('data-bs-target');
+            const ceremonyType = href ? href.replace('#', '').replace('-templates', '') : null;
+            
+            if (ceremonyType) {
+                console.log(`Setting up tab for ${ceremonyType} ceremony`);
+                
+                // Add click handler to ensure templates are loaded when tab is clicked
+                tab.addEventListener('click', function() {
+                    console.log(`${ceremonyType} tab clicked`);
+                    // Force reload templates for this ceremony
+                    loadTemplates(ceremonyType);
+                });
+            }
+        });
+    }
+    
+    // File input change handlers
+    sourceInput.addEventListener('change', function() {
+        handleFileInputChange(this, sourcePreview, sourcePlaceholder);
+        
+        // Update the process button state when source image changes
+        updateSelectedCount();
+    });
+
+    // Clear button handlers
+    sourceClearBtn.addEventListener('click', function() {
+        clearFileInput(sourceInput, sourcePreview, sourcePlaceholder);
+        
+        // Update the process button state when source image is cleared
+        updateSelectedCount();
+    });
+
+    // Try again button handler
+    tryAgainBtn.addEventListener('click', function() {
+        resultContainer.classList.add('d-none');
+        errorContainer.classList.add('d-none');
+    });
+
+    // Form submission
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!sourceInput.files.length) {
+            showError('Please select your photo.');
+            return;
+        }
+        
+        if (!templateUrlInput.value) {
+            showError('Please select a template from the available templates section.');
+            return;
+        }
+
+        // Get selected bridal style
+        const selectedStyle = document.querySelector('input[name="bridalStyle"]:checked').value;
+
+        // Check file sizes
+        const maxSize = 16 * 1024 * 1024; // 16MB
+        if (sourceInput.files[0].size > maxSize) {
+            showError('File size exceeds the maximum limit of 16MB.');
+            return;
+        }
+
+        // Check file types
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (!allowedTypes.includes(sourceInput.files[0].type)) {
+            showError('Only JPG, JPEG and PNG files are allowed.');
+            return;
+        }
+
+        // Show loading
+        loadingContainer.classList.remove('d-none');
+        errorContainer.classList.add('d-none');
+        resultContainer.classList.add('d-none');
+        swapBtn.disabled = true;
+
+        // Create form data
+        const formData = new FormData();
+        formData.append('source', sourceInput.files[0]);
+        formData.append('style', selectedStyle);
+        formData.append('template_url', templateUrlInput.value);
+
+        // Send AJAX request
+        fetch('/bridal-swap', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingContainer.classList.add('d-none');
+            swapBtn.disabled = false;
+
+            if (data.success) {
+                resultImage.src = `/uploads/${data.result_image}`;
+                downloadBtn.href = `/uploads/${data.result_image}`;
+                downloadBtn.download = data.result_image;
+                resultContainer.classList.remove('d-none');
+                window.scrollTo({
+                    top: resultContainer.offsetTop,
+                    behavior: 'smooth'
+                });
+            } else {
+                showError(data.error || 'An unknown error occurred.');
+            }
+        })
+        .catch(error => {
+            loadingContainer.classList.add('d-none');
+            swapBtn.disabled = false;
+            showError('Network error: ' + error.message);
+        });
+    });
+
+    // Helper functions
+    function handleFileInputChange(input, preview, placeholder) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+                placeholder.classList.add('d-none');
+            };
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function clearFileInput(input, preview, placeholder) {
+        input.value = '';
+        preview.classList.add('d-none');
+        placeholder.classList.remove('d-none');
+    }
+
+    function showError(message) {
+        console.error('Error:', message);
+        
+        // Get error elements
+        const errorContainer = document.getElementById('error-container');
+        const errorMessage = document.getElementById('error-message');
+        
+        // Update error message if element exists
+        if (errorMessage) errorMessage.textContent = message;
+        
+        // Show error container if it exists
+        if (errorContainer) errorContainer.classList.remove('d-none');
+        
+        // Scroll to error container if it exists
+        if (errorContainer) {
+            window.scrollTo({
+                top: errorContainer.offsetTop,
+                behavior: 'smooth'
+            });
+        }
+    }
+    
+    // Multi-template selection functionality
+    const toggleSelectionModeBtn = document.getElementById('toggleSelectionModeBtn');
+    const processSelectedBtn = document.getElementById('processSelectedBtn');
+    const selectedCount = document.getElementById('selectedCount');
+    let isSelectionMode = false;
+    
+    if (toggleSelectionModeBtn) {
+        toggleSelectionModeBtn.addEventListener('click', function() {
+            isSelectionMode = !isSelectionMode;
+            document.body.classList.toggle('template-selection-mode', isSelectionMode);
+            
+            const selectionCountWrapper = document.getElementById('selectionCountWrapper');
+            
+            if (isSelectionMode) {
+                // Entering selection mode
+                console.log('Entering template selection mode');
+                toggleSelectionModeBtn.innerHTML = '<i class="fas fa-times"></i> Cancel Selection';
+                toggleSelectionModeBtn.classList.remove('btn-outline-light');
+                toggleSelectionModeBtn.classList.add('btn-outline-danger');
+                processSelectedBtn.classList.remove('d-none');
+                if (selectionCountWrapper) selectionCountWrapper.classList.remove('d-none');
+                
+                // Start with no templates selected by default when entering selection mode
+                document.querySelectorAll('.template-checkbox').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                document.querySelectorAll('.template-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                console.log('Reset all selections on entering selection mode');
+                updateSelectedCount();
+                
+                // Show a message to guide the user
+                showMessage('Select up to 5 templates from any ceremony and click "Process Selected Templates"');
+            } else {
+                // Exiting selection mode
+                console.log('Exiting template selection mode');
+                toggleSelectionModeBtn.innerHTML = '<i class="fas fa-check-square"></i> Multi-Select';
+                toggleSelectionModeBtn.classList.add('btn-outline-light');
+                toggleSelectionModeBtn.classList.remove('btn-outline-danger');
+                processSelectedBtn.classList.add('d-none');
+                if (selectionCountWrapper) selectionCountWrapper.classList.add('d-none');
+                
+                // Hide the thumbnails preview when exiting selection mode
+                const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
+                if (selectedTemplatesPreview) {
+                    selectedTemplatesPreview.classList.add('d-none');
+                }
+            }
+        });
+    }
+    
+    // Helper function to show a temporary message - now suppressed
+    function showMessage(message) {
+        // Do nothing - suppress all messages
+        console.log("Message suppressed:", message);
+        return;
+        
+        // Original code is kept but unreachable for reference
+        const messageContainer = document.createElement('div');
+        messageContainer.className = 'alert alert-info alert-dismissible fade show template-message d-none';
+        messageContainer.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        // Never insert the message
+        return;
+    }
+    
+    // Function to update selected templates and count
+    function updateSelectedCount() {
+        console.log('Updating selected templates preview...');
+        
+        // Get all selected checkboxes
+        const selectedCheckboxes = document.querySelectorAll('.template-checkbox:checked');
+        const count = selectedCheckboxes.length;
+        console.log(`Found ${count} selected checkboxes`);
+        
+        // Update the counter in the badge
+        const countBadge = document.getElementById('selectedCountBadge');
+        if (countBadge) {
+            countBadge.textContent = count;
+        }
+        
+        // Update the counter text
+        if (selectedCount) {
+            selectedCount.textContent = count;
+        }
+        
+        // Enable/disable the process buttons based on selection count
+        if (processSelectedBtn) {
+            processSelectedBtn.disabled = (count === 0 || count > 5);
+            
+            if (count > 5) {
+                processSelectedBtn.title = 'Please select a maximum of 5 templates';
+            } else {
+                processSelectedBtn.title = '';
+            }
+        }
+        
+        // Also update the new process button in the selected templates preview
+        if (processSelectedTemplatesBtn) {
+            const hasSourceImage = sourceInput && sourceInput.files.length > 0;
+            
+            processSelectedTemplatesBtn.disabled = (count === 0 || count > 5 || !hasSourceImage);
+            
+            if (count > 5) {
+                processSelectedTemplatesBtn.title = 'Please select a maximum of 5 templates';
+            } else if (!hasSourceImage) {
+                processSelectedTemplatesBtn.title = 'Please upload your photo first';
+            } else {
+                processSelectedTemplatesBtn.title = '';
+            }
+        }
+        
+        // Get the preview containers
+        const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
+        const thumbnailsContainer = document.getElementById('selectedTemplatesThumbnails');
+        
+        if (!selectedTemplatesPreview || !thumbnailsContainer) {
+            console.error('Could not find preview containers');
+            return;
+        }
+        
+        // Remove any elements with fadeOut animation
+        const fadingCards = thumbnailsContainer.querySelectorAll('.animate__fadeOut');
+        fadingCards.forEach(card => card.remove());
+        
+        // Show/hide the preview section based on selection count
+        if (count > 0) {
+            selectedTemplatesPreview.classList.remove('d-none');
+            
+            // Empty the entire container and rebuild it
+            thumbnailsContainer.innerHTML = '';
+            
+            // Create thumbnails for each selected template
+            selectedCheckboxes.forEach((checkbox, index) => {
+                const card = checkbox.closest('.template-card');
+                if (!card) return;
+                
+                // Get template details from the card
+                const templatePath = card.dataset.templatePath || card.dataset.url || '';
+                const ceremonyType = card.dataset.ceremony || 'template';
+                const img = card.querySelector('img');
+                const imageUrl = img ? img.src : '';
+                
+                // Create template card for the horizontal scrolling display
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'selected-template-card animate__animated animate__fadeIn rounded shadow-sm overflow-hidden';
+                cardDiv.setAttribute('data-template-path', templatePath);
+                cardDiv.setAttribute('data-ceremony', ceremonyType);
+                cardDiv.style.width = '180px';
+                cardDiv.style.height = '240px';
+                cardDiv.style.flexShrink = '0';
+                cardDiv.style.flexGrow = '0';
+                cardDiv.style.position = 'relative';
+                
+                // Fill the card with content
+                cardDiv.innerHTML = `
+                    <div class="position-absolute top-0 end-0 p-1">
+                        <button class="btn btn-sm btn-link text-white opacity-75 selected-template-remove" 
+                                style="background: rgba(0,0,0,0.3); border-radius: 50%; width: 24px; height: 24px; padding: 0;"
+                                aria-label="Remove template">
+                            <i class="fas fa-times fa-xs"></i>
+                        </button>
+                    </div>
+                    <img src="${imageUrl}" class="selected-template-img" alt="${ceremonyType} template" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div class="position-absolute bottom-0 w-100 text-center p-1" style="background: rgba(0,0,0,0.5);">
+                        <small class="text-white-50">${ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1)}</small>
+                    </div>
+                `;
+                
+                // Add click listener to remove button
+                const removeBtn = cardDiv.querySelector('.selected-template-remove');
+                removeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Uncheck the checkbox
+                    checkbox.checked = false;
+                    card.classList.remove('selected');
+                    
+                    // Add fade-out animation then remove
+                    cardDiv.classList.add('animate__fadeOut');
+                    setTimeout(() => {
+                        cardDiv.remove();
+                        updateSelectedCount();
+                    }, 300);
+                });
+                
+                // Add the card to the container
+                thumbnailsContainer.appendChild(cardDiv);
+            });
+            
+        } else {
+            // Show empty state with message
+            thumbnailsContainer.innerHTML = `
+                <div class="empty-message text-muted w-100 text-center d-flex align-items-center justify-content-center">
+                    <p>Selected templates will appear here</p>
+                </div>
+            `;
+            
+            // Show the section but with empty message
+            selectedTemplatesPreview.classList.remove('d-none');
+        }
+    }
+    
+    // We now have direct event listeners on each checkbox, but keep this for any dynamically added checkboxes
+    document.addEventListener('click', function(e) {
+        if (isSelectionMode && e.target.closest('.template-card') && !e.target.classList.contains('template-checkbox') && !e.target.closest('.template-checkbox-container')) {
+            // When in selection mode, clicking on the card toggles the checkbox
+            const card = e.target.closest('.template-card');
+            const checkbox = card.querySelector('.template-checkbox');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                card.classList.toggle('selected', checkbox.checked);
+                
+                // Debug info
+                console.log('Card selected: ', card.classList.contains('selected'));
+                console.log('Card classes: ', card.className);
+                console.log('Checkbox checked: ', checkbox.checked);
+                
+                updateSelectedCount();
+            }
+        }
+    });
+    
+    // Add event listener to the process selected button
+    if (processSelectedBtn) {
+        processSelectedBtn.addEventListener('click', function() {
+            processSelectedTemplates();
+        });
+    }
+    
+    // Add event listener to the new process selected templates button in the preview section
+    if (processSelectedTemplatesBtn) {
+        processSelectedTemplatesBtn.addEventListener('click', function() {
+            processSelectedTemplates();
+        });
+    }
+    
+    // Function to process selected templates
+    function processSelectedTemplates() {
+        console.log('Process Selected Templates function called');
+        
+        // Get the source input element
+        const sourceInput = document.getElementById('source-input');
+        
+        // Check if source image is selected
+        if (!sourceInput || !sourceInput.files.length) {
+            showError('Please upload your photo first.');
+            console.error('Source input not found or no file selected');
+            return;
+        }
+        
+        console.log('Source file found:', sourceInput.files[0].name);
+        
+        // Select both cards with .selected class and those with checked checkboxes
+        const selectedCards = Array.from(document.querySelectorAll('.template-card.selected, .template-card:has(.template-checkbox:checked)'));
+        console.log('Found selected cards:', selectedCards.length);
+        
+        // Debug card data attributes
+        selectedCards.forEach((card, i) => {
+            console.log(`Card ${i+1} dataset:`, {
+                path: card.dataset.templatePath || card.dataset.path,
+                ceremony: card.dataset.ceremony,
+                url: card.dataset.templateUrl || card.dataset.url,
+                allAttributes: Object.keys(card.dataset)
+            });
+            
+            // Check if we have the necessary attributes
+            if (!card.dataset.templatePath && !card.dataset.path) {
+                console.warn(`Card ${i+1} is missing path attribute`);
+            }
+            if (!card.dataset.ceremony) {
+                console.warn(`Card ${i+1} is missing ceremony attribute`);
+            }
+        });
+        
+        // Remove duplicates (in case a card has both .selected class and checked checkbox)
+        const uniqueCards = [];
+        const uniquePaths = new Set();
+        
+        selectedCards.forEach(card => {
+            const path = card.dataset.templatePath || card.dataset.path;
+            if (path && !uniquePaths.has(path)) {
+                uniquePaths.add(path);
+                uniqueCards.push(card);
+            } else if (!path) {
+                console.error('Card is missing path attribute:', card);
+            }
+        });
+        
+        console.log('After removing duplicates, unique cards:', uniqueCards.length);
+        
+        const selectedTemplates = uniqueCards.map(card => {
+            console.log('Processing card with dataset:', card.dataset);
+            const templatePath = card.dataset.templatePath || card.dataset.path;
+            
+            // Use a default ceremony value if not set (helps with backward compatibility)
+            const ceremony = card.dataset.ceremony || 'wedding';
+            
+            console.log(`Template: ${templatePath}, Ceremony: ${ceremony}`);
+            
+            return {
+                path: templatePath,
+                ceremony: ceremony,
+                url: card.dataset.templateUrl || card.dataset.url,
+            };
+        });
+        
+        if (selectedTemplates.length === 0) {
+            showError('Please select at least one template.');
+            return;
+        }
+        
+        if (selectedTemplates.length > 5) {
+            showError('Please select a maximum of 5 templates.');
+            return;
+        }
+        
+        console.log('Selected templates data:', JSON.stringify(selectedTemplates));
+        
+        // Show loading state
+        const loadingContainer = document.getElementById('loading-container');
+        const resultContainer = document.getElementById('result-container');
+        const errorContainer = document.getElementById('error-container');
+        const multiResultsContainer = document.getElementById('multi-results-container');
+        
+        if (loadingContainer) loadingContainer.classList.remove('d-none');
+        if (resultContainer) resultContainer.classList.add('d-none');
+        if (multiResultsContainer) multiResultsContainer.classList.add('d-none');
+        if (errorContainer) errorContainer.classList.add('d-none');
+        
+        console.log('Loading state shown, preparing form data');
+        
+        // Create form data with source image and selected templates
+        const formData = new FormData();
+        formData.append('source', sourceInput.files[0]);
+        
+        // Debug selected templates before sending
+        console.log('Templates to be sent in formData:', selectedTemplates);
+        
+        // Ensure selectedTemplates is an array before proceeding
+        if (!selectedTemplates || !Array.isArray(selectedTemplates)) {
+            console.error('selectedTemplates is not an array:', selectedTemplates);
+            showError('Error: No templates selected or invalid template data');
+            return; // Exit function early 
+        }
+        
+        if (selectedTemplates.length === 0) {
+            console.error('No templates selected (empty array)');
+            showError('Error: Please select at least one template');
+            return; // Exit function early
+        }
+        
+        // Add template count first
+        formData.append('template_count', selectedTemplates.length);
+        console.log(`Added template_count: ${selectedTemplates.length}`);
+        
+        try {
+            // Add all selected template paths with better error handling
+            selectedTemplates.forEach((template, index) => {
+                if (!template || typeof template !== 'object') {
+                    console.error(`Template ${index} is not a valid object:`, template);
+                    return;
+                }
+                
+                if (!template.path) {
+                    console.error(`Template ${index} missing path:`, template);
+                    return;
+                }
+                
+                // Always include a ceremony value (fallback to 'wedding' if not set)
+                const ceremonyType = template.ceremony || 'wedding';
+                
+                // Use both the indexed version for the server to handle individual templates
+                formData.append(`template_${index}`, template.path);
+                formData.append(`ceremony_${index}`, ceremonyType);
+                
+                // Also append to templates[] array for compatibility with the server's getlist('templates[]') method
+                formData.append('templates[]', template.path);
+                
+                console.log(`Added template ${index}: path=${template.path}, ceremony=${ceremonyType}`);
+            });
+        } catch (error) {
+            console.error('Error while processing template data:', error);
+            showError('An error occurred while processing template data. Please try again.');
+            if (loadingContainer) loadingContainer.classList.add('d-none');
+            return;
+        }
+        
+        // Send AJAX request - use the Create Bride Look endpoint with multi=true flag
+        formData.append('multi', 'true'); // Add flag to tell the endpoint this is a multi-template request
+        
+        fetch('/bridal-swap', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log('Received response:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Received data:', data);
+            
+            // Hide loading indicator
+            if (loadingContainer) loadingContainer.classList.add('d-none');
+            
+            if (data.success) {
+                try {
+                    console.log('Server indicated success, full response data:', data);
+                    
+                    // Make sure results exists and is an array
+                    if (!data.results) {
+                        console.warn('No results array found in response, creating empty array');
+                        data.results = [];
+                    }
+                    
+                    // The server now consistently returns a results array for both single and multi-template requests
+                    // But keeping this for backward compatibility with older server versions
+                    if (data.multi === false && data.result_image && (!data.results || data.results.length === 0)) {
+                        console.log('Converting legacy single result to multi-result format');
+                        // Create a synthetic results array with the single result
+                        const singleResult = {
+                            result_image: data.result_image,
+                            ceremony: data.style || selectedTemplates[0]?.ceremony || 'unknown',
+                            index: 0
+                        };
+                        
+                        // Use an array with the single result
+                        data.results = [singleResult];
+                    }
+                    
+                    console.log('Data results after processing:', data.results);
+                    
+                    // Make one final check that results is an array before passing to display function
+                    if (!Array.isArray(data.results)) {
+                        console.warn('Results is not an array after processing, converting to array');
+                        // If it's an object with numbered keys (like { "0": {...}, "1": {...} })
+                        if (typeof data.results === 'object' && data.results !== null) {
+                            const resultsArray = [];
+                            Object.keys(data.results).forEach(key => {
+                                resultsArray.push(data.results[key]);
+                            });
+                            data.results = resultsArray;
+                        } else {
+                            // If it's something else entirely, create empty array
+                            data.results = [];
+                        }
+                    }
+                    
+                    // Print out the final data we're passing to display function
+                    console.log('Final data being passed to displayMultiResults:', {
+                        resultsArray: data.results,
+                        resultsLength: data.results.length,
+                        selectedTemplatesLength: selectedTemplates.length
+                    });
+                    
+                    // Display results with proper checks
+                    displayMultiResults(data.results, selectedTemplates);
+                    console.log('Successfully displayed results');
+                    
+                    // Show the multi-results container explicitly
+                    const multiResultsContainer = document.getElementById('multi-results-container');
+                    if (multiResultsContainer) {
+                        multiResultsContainer.classList.remove('d-none');
+                        multiResultsContainer.scrollIntoView({ behavior: 'smooth' });
+                    }
+                } catch (displayError) {
+                    console.error('Error displaying results:', displayError);
+                    showError('Error displaying results: ' + displayError.message);
+                }
+            } else {
+                showError(data.error || 'An unknown error occurred.');
+                console.error('Error from server:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            
+            // Hide loading indicator
+            if (loadingContainer) loadingContainer.classList.add('d-none');
+            
+            // Show error
+            showError('Network error: ' + error.message);
+        });
+    }
+    
+    // Global variable to store all processed results
+    let allProcessedResults = [];
+    
+    // Function to display multiple results
+    function displayMultiResults(results, selectedTemplates) {
+        console.log('Display multi results called with:', results?.length || 0, 'results');
+        
+        // Ensure results is an array
+        if (!results) {
+            console.warn('Results array is undefined or null, using empty array');
+            results = [];
+        }
+        
+        // Ensure selectedTemplates is an array
+        if (!selectedTemplates) {
+            console.warn('Selected templates array is undefined or null, using empty array');
+            selectedTemplates = [];
+        }
+        
+        const multiResultsContainer = document.getElementById('multi-results-container');
+        
+        // Make sure the container exists
+        if (!multiResultsContainer) {
+            console.error('Multi-results container not found');
+            showError('Unable to display results - container not found');
+            return;
+        }
+        
+        // Find the grid within the container
+        const multiResultsGrid = multiResultsContainer.querySelector('.multi-results-container');
+        
+        if (!multiResultsGrid) {
+            console.error('Multi-results grid not found');
+            showError('Unable to display results - grid not found');
+            return;
+        }
+        
+        console.log('Found multi-results containers, processing results...');
+        
+        // Add new results to our global array with careful validation
+        if (Array.isArray(results) && results.length > 0) {
+            results.forEach((result, index) => {
+                // Ensure we have a valid template object
+                const template = (index < selectedTemplates.length) ? selectedTemplates[index] : null;
+                
+                allProcessedResults.push({
+                    result: result,
+                    template: template,
+                    timestamp: new Date().getTime()
+                });
+            });
+        } else {
+            console.warn('No results to process');
+        }
+        
+        console.log('Total processed results:', allProcessedResults.length);
+        
+        // Show the container and clear previous results
+        multiResultsContainer.classList.remove('d-none');
+        multiResultsGrid.innerHTML = '';
+        
+        // Only proceed if allProcessedResults is an array and has items
+        if (!Array.isArray(allProcessedResults) || allProcessedResults.length === 0) {
+            console.warn('No processed results to display, showing empty state message');
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'text-center text-muted w-100 py-5';
+            emptyMessage.innerHTML = `
+                <i class="fas fa-images fa-3x mb-3"></i>
+                <p>No face swap results yet. Try uploading your photo and selecting some templates!</p>
+            `;
+            multiResultsGrid.appendChild(emptyMessage);
+            return;
+        }
+        
+        // Update the result count in the heading
+        const countElement = document.getElementById('results-count');
+        if (countElement) {
+            countElement.textContent = `(${allProcessedResults.length})`;
+        }
+        
+        // Create HTML for all result cards at once (more efficient)
+        let resultsHTML = '';
+        
+        // Now we can safely iterate through the array
+        allProcessedResults.forEach((item, index) => {
+            try {
+                // Check if item is valid
+                if (!item || typeof item !== 'object') {
+                    console.error(`Invalid item at index ${index}:`, item);
+                    return; // Skip this item
+                }
+                
+                const result = item.result || {};
+                const template = item.template || {}; // Use empty object as fallback
+                
+                // Determine ceremony type with fallbacks
+                const ceremonyType = result.ceremony || template.ceremony || 'wedding';
+                const displayCeremony = ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1);
+            
+                // Ensure we have a path to display the image from
+                // Server might return result_image (multi-template) or result_path (single template)
+                const resultPath = result.result_path || result.result_image || '';
+                
+                // Full URL path for displaying the image
+                // Check if the path already contains /uploads/ to avoid duplication
+                const resultFullPath = resultPath 
+                    ? (resultPath.startsWith('/uploads/') ? resultPath : `/uploads/${resultPath}`)
+                    : '';
+                
+                if (!resultPath) {
+                    console.warn('No result path found for card:', result);
+                    return; // Skip this item
+                }
+                
+                // Check if this is a new result (less than 30 seconds old)
+                const isNew = item.timestamp ? (Date.now() - item.timestamp < 30000) : true;
+                
+                // Create HTML for this card in the exact format requested
+                resultsHTML += `<div class="multi-result-card mx-2 mb-2 animate__animated animate__fadeIn" 
+                    data-result-index="${index}" 
+                    data-result-path="${resultFullPath}" 
+                    data-ceremony-type="${ceremonyType}"
+                    style="width: 180px; flex-shrink: 0; flex-grow: 0; scroll-snap-align: start; position: relative;">
+                    <div class="position-relative overflow-hidden rounded shadow-sm" style="height: 240px; cursor: pointer;" 
+                        onclick="openFullImage('${resultFullPath}', '${displayCeremony}', ${index})">
+                        <img src="${resultFullPath}" class="w-100 h-100" alt="Result for ${displayCeremony}" 
+                            style="object-fit: cover; transition: transform 0.3s ease-in-out;">
+                        
+                        ${isNew ? `<div class="position-absolute top-0 start-0 m-2">
+                            <span class="badge bg-success">NEW</span>
+                        </div>` : ''}
+                        
+                        <div class="position-absolute bottom-0 w-100 p-1 d-flex justify-content-between align-items-center" 
+                            style="background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);">
+                            <small class="text-white">${displayCeremony}</small>
+                            <div>
+                                <button class="btn btn-sm text-white p-1 remove-result-btn" data-index="${index}" title="Remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <a href="${resultFullPath}" class="btn btn-sm text-white p-1" download title="Download">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            } catch (error) {
+                console.error(`Error creating result card ${index}:`, error);
+            }
+        });
+        
+        // Set the HTML for all results at once
+        multiResultsGrid.innerHTML = resultsHTML;
+        
+        // Add event listeners to the remove buttons
+        try {
+            const removeButtons = document.querySelectorAll('.remove-result-btn');
+            if (removeButtons && removeButtons.length > 0) {
+                removeButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        removeProcessedResult(index);
+                    });
+                });
+            }
+            
+            // Scroll to results container
+            multiResultsContainer.scrollIntoView({ behavior: 'smooth' });
+        } catch (error) {
+            console.error('Error adding event listeners:', error);
+        }
+    }
+    
+    // Function to remove a processed result
+    function removeProcessedResult(index) {
+        if (index >= 0 && index < allProcessedResults.length) {
+            // Remove the result from the array
+            allProcessedResults.splice(index, 1);
+            
+            // If no results left, hide the container
+            if (allProcessedResults.length === 0) {
+                document.getElementById('multi-results-container').classList.add('d-none');
+                return;
+            }
+            
+            // Otherwise, refresh the display with remaining results
+            displayMultiResults([], []);
+        }
+    }
+    
+    // Add event listeners to buttons in the results section after page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Find the buttons
+        const multiTryAgainBtn = document.getElementById('multi-try-again-btn');
+        const selectMoreBtn = document.getElementById('select-more-btn');
+        
+        if (multiTryAgainBtn) {
+            multiTryAgainBtn.addEventListener('click', function() {
+                console.log('Try Again button clicked');
+                
+                // Reset selection mode and clear all results
+                if (toggleSelectionModeBtn) {
+                    toggleSelectionModeBtn.click(); // This will turn off selection mode
+                }
+                
+                // Clear all selections
+                document.querySelectorAll('.template-card').forEach(card => {
+                    card.classList.remove('selected');
+                    const checkbox = card.querySelector('.template-checkbox');
+                    if (checkbox) checkbox.checked = false;
+                });
+                
+                // Reset selection count
+                updateSelectionCount(0);
+                
+                // Clear all processed results
+                allProcessedResults = [];
+                
+                // Hide results container
+                document.getElementById('multi-results-container').classList.add('d-none');
+                
+                // Scroll back to templates section
+                document.querySelector('.template-tab-content').scrollIntoView({behavior: 'smooth'});
+            });
+        }
+        
+        if (selectMoreBtn) {
+            selectMoreBtn.addEventListener('click', function() {
+                console.log('Select More button clicked');
+                
+                // Keep the existing results visible
+                // Turn on selection mode if it's not already on
+                if (toggleSelectionModeBtn && !isSelectionModeActive) {
+                    toggleSelectionModeBtn.click(); // This will turn on selection mode
+                }
+                
+                // Scroll to templates section
+                document.querySelector('.template-tab-content').scrollIntoView({behavior: 'smooth'});
+                
+                // Flash the selection mode button to draw attention
+                if (toggleSelectionModeBtn) {
+                    toggleSelectionModeBtn.classList.add('btn-flash');
+                    setTimeout(() => {
+                        toggleSelectionModeBtn.classList.remove('btn-flash');
+                    }, 1500);
+                }
+            });
+        }
+    });
+
+    function checkModels() {
+        fetch('/check-models')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.face_detection || !data.face_swap) {
+                    modelStatusAlert.classList.remove('d-none');
+                    modelStatusMessage.textContent = 'Some models are not loaded properly. The application may not work correctly.';
+                    
+                    if (!data.face_detection) {
+                        modelStatusMessage.textContent = 'Face detection model is not loaded. Please check server logs.';
+                    } else if (!data.face_swap) {
+                        modelStatusMessage.textContent = 'Face swap model is not loaded. Please check server logs.';
+                    }
+                } else {
+                    modelStatusAlert.classList.add('d-none');
+                }
+            })
+            .catch(error => {
+                modelStatusAlert.classList.remove('d-none');
+                modelStatusMessage.textContent = 'Could not check model status. There might be connection issues.';
+            });
+    }
+    
+    // Load all ceremony type templates
+    function loadAllTemplates() {
+        console.log('loadAllTemplates called');
+        const ceremonyTypes = ['haldi', 'mehendi', 'wedding', 'reception'];
+        console.log('Loading templates for ceremony types:', ceremonyTypes);
+        ceremonyTypes.forEach(type => loadTemplates(type));
+    }
+    
+    // Function to load templates for a specific ceremony type
+    function loadTemplates(ceremonyType) {
+        console.log(`Loading templates for ${ceremonyType}`);
+        const templateContainer = document.querySelector(`#${ceremonyType}-templates .template-container`);
+        
+        if (!templateContainer) {
+            console.error(`Template container for ${ceremonyType} not found`);
+            return;
+        }
+        
+        // Display loading state
+        templateContainer.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Loading templates...</p></div>';
+        
+        // Add a timestamp to prevent caching
+        const timestamp = Date.now();
+        const apiUrl = `/api/templates?ceremony_type=${ceremonyType}&_t=${timestamp}`;
+        console.log(`Fetching templates from: ${apiUrl}`);
+        
+        // Fetch templates for this ceremony type
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch templates: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(`Received template data for ${ceremonyType}:`, data);
+                
+                // Clear loading state
+                templateContainer.innerHTML = '';
+                
+                // Ensure data has the expected format
+                if (!data || !data.templates || data.templates.length === 0) {
+                    // Display no templates message - simple, without alert styles
+                    templateContainer.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <p class="text-muted">
+                                <i class="fas fa-info-circle me-2"></i>
+                                No templates available
+                            </p>
+                            <div class="mt-3">
+                                <a href="/bulk-upload" class="btn btn-sm btn-outline-dark">
+                                    <i class="fas fa-upload me-1"></i> Upload
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Use templates from the response
+                const templates = data.templates;
+                
+                // Ensure we don't show template count message - never append to container parent
+                // Remove any existing template count messages
+                const tabPane = templateContainer.closest('.tab-pane');
+                if (tabPane) {
+                    // Remove any alerts in the tab pane
+                    tabPane.querySelectorAll('.alert, .template-message').forEach(alert => {
+                        if (alert && alert.parentNode) {
+                            alert.parentNode.removeChild(alert);
+                        }
+                    });
+                    
+                    // Also check for text nodes containing "Found X templates"
+                    tabPane.childNodes.forEach(node => {
+                        if (node.nodeType === 3 && node.textContent && node.textContent.match(/Found \d+ templates/)) {
+                            if (node.parentNode) {
+                                node.parentNode.removeChild(node);
+                            }
+                        }
+                    });
+                }
+                
+                // Clear the container - no alerts or template count message
+                templateContainer.innerHTML = ``;
+                
+                // Display all templates
+                templates.forEach((template, index) => {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-3 col-sm-4 col-6 mb-3';
+                    
+                    const card = document.createElement('div');
+                    card.className = 'position-relative template-card shadow-sm'; // More subtle styling
+                    card.dataset.templateUrl = template.url;
+                    card.dataset.templateId = template.id || '';
+                    card.dataset.templatePath = template.path || template.url;
+                    card.dataset.templateType = 'pinterest';
+                    card.dataset.ceremony = ceremonyType;
+                    
+                    card.innerHTML = `
+                        <div class="position-relative overflow-hidden" style="height: 350px;">
+                            <img src="${template.url}" class="w-100 rounded template-img" 
+                                alt="${ceremonyType} template" style="height: 350px; object-fit: cover;">
+                            
+                            <div class="position-absolute top-0 end-0 m-2 template-checkbox-wrapper opacity-75">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input template-checkbox" 
+                                        id="template-check-${ceremonyType}-${index}">
+                                </div>
+                            </div>
+                        </div>
+                        <small class="text-center text-light-emphasis d-block mt-1">${ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1)}</small>
+                    `;
+                    
+                    templateContainer.appendChild(col);
+                    col.appendChild(card);
+                    
+                    // Add click event to the card
+                    // Add click events based on mode
+                    card.addEventListener('click', function(e) {
+                        console.log('Card clicked, selection mode:', isSelectionMode);
+                        
+                        // Don't trigger if clicking on a checkbox or its container
+                        if (e.target.classList.contains('template-checkbox') || 
+                            e.target.closest('.template-checkbox-container')) {
+                            console.log('Clicked on checkbox or its container - ignoring');
+                            return;
+                        }
+                        
+                        if (isSelectionMode) {
+                            console.log('In selection mode, toggling selected state');
+                            // Toggle the checkbox when clicking on the card in selection mode
+                            const checkbox = this.querySelector('.template-checkbox');
+                            if (checkbox) {
+                                checkbox.checked = !checkbox.checked;
+                                this.classList.toggle('selected', checkbox.checked);
+                                console.log('Toggled checkbox to:', checkbox.checked);
+                                updateSelectedCount();
+                            }
+                            return;
+                        }
+                        
+                        console.log('Using template in single mode');
+                        useTemplate(this);
+                    });
+                    
+                    // Since we removed the select button, make the card itself clickable in single selection mode
+                    card.addEventListener('click', function(e) {
+                        // Skip if clicked on checkbox
+                        if (e.target.classList.contains('template-checkbox') || 
+                            e.target.closest('.template-checkbox-container')) {
+                            return;
+                        }
+                        
+                        // In single selection mode, use this template
+                        if (!isSelectionMode) {
+                            useTemplate(this);
+                        }
+                    });
+                    
+                    // Add click event to the checkbox
+                    const checkbox = card.querySelector('.template-checkbox');
+                    if (checkbox) {
+                        checkbox.addEventListener('change', function(e) {
+                            e.stopPropagation(); // Prevent the card click event
+                            const card = this.closest('.template-card');
+                            if (card) {
+                                card.classList.toggle('selected', this.checked);
+                                console.log('Checkbox changed:', this.checked, 'Card selected:', card.classList.contains('selected'));
+                                updateSelectedCount();
+                            }
+                        });
+                        
+                        // Also listen for clicks on the card when in selection mode
+                        card.addEventListener('click', function(e) {
+                            // Only handle clicks in selection mode and not on the checkbox or its container
+                            if (isSelectionMode && 
+                                !e.target.classList.contains('template-checkbox') && 
+                                !e.target.closest('.template-checkbox-container')) {
+                                checkbox.checked = !checkbox.checked;
+                                this.classList.toggle('selected', checkbox.checked);
+                                console.log('Card clicked in selection mode, now selected:', this.classList.contains('selected'));
+                                // Update the selected count and thumbnail preview
+                                updateSelectedCount();
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                        });
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error loading templates:', error);
+                templateContainer.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Error loading templates: ${error.message}
+                        </div>
+                    </div>
+                `;
+            });
+    }
+    
+    // Register event listener for fullscreen modal closing
+    document.getElementById('fullImageModal').addEventListener('hidden.bs.modal', function() {
+        document.removeEventListener('keydown', handleModalKeyNavigation);
+    });
+});
+</script>
+
+</body>
+</html>
