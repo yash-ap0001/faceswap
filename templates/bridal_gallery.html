@@ -1797,24 +1797,38 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup category filter checkboxes
     function updateCeremonyVisibility() {
-        // Get all the checked ceremony checkboxes
-        const checkedCeremonies = Array.from(document.querySelectorAll('input[id^="cat-"]:checked'))
-                                .map(checkbox => checkbox.value);
-        
-        console.log('Checked ceremonies:', checkedCeremonies);
-        
-        // Get all ceremony sections
-        const ceremonySections = document.querySelectorAll('.template-container');
-        
-        // Hide/show based on selection
-        ceremonySections.forEach(section => {
-            const ceremonyId = section.id.replace('-carousel', '');
-            if (checkedCeremonies.includes(ceremonyId)) {
-                section.style.display = 'block';
-            } else {
-                section.style.display = 'none';
-            }
-        });
+        try {
+            // Get all the checked ceremony checkboxes
+            const checkedCeremonies = Array.from(document.querySelectorAll('input[id^="cat-"]:checked'))
+                                    .map(checkbox => checkbox.value);
+            
+            console.log('Checked ceremonies:', checkedCeremonies);
+            
+            // Get all ceremony sections
+            const ceremonySections = document.querySelectorAll('.template-container');
+            console.log('Found ceremony sections:', ceremonySections.length);
+            
+            // Hide/show based on selection
+            ceremonySections.forEach(section => {
+                if (!section.id) {
+                    console.log('Section missing ID:', section);
+                    return;
+                }
+                
+                const ceremonyId = section.id.replace('-carousel', '');
+                console.log('Processing section:', ceremonyId, section.id);
+                
+                if (checkedCeremonies.includes(ceremonyId)) {
+                    section.style.display = 'block';
+                    console.log('Showing section:', ceremonyId);
+                } else {
+                    section.style.display = 'none';
+                    console.log('Hiding section:', ceremonyId);
+                }
+            });
+        } catch (error) {
+            console.error('Error in updateCeremonyVisibility:', error);
+        }
     }
     
     // Add event listeners to ceremony checkboxes
