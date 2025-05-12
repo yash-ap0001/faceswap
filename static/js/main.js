@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showError('Network error: ' + error.message);
             });
         });
-    });
+    }
 
     // Helper functions
     function handleFileInputChange(input, preview, placeholder) {
