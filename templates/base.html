@@ -524,29 +524,40 @@
             letter-spacing: 1.5px;
         }
         
-        /* Sidebar edge toggle button */
+        /* Sidebar edge toggle button - semicircle shape */
         .sidebar-edge-toggle {
             position: absolute;
-            right: -20px;
+            right: -25px;
             top: 50%;
             transform: translateY(-50%);
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #8A2BE2, #663399);
-            border-radius: 0 8px 8px 0;
+            width: 50px;
+            height: 80px;
+            background: linear-gradient(135deg, #8A2BE2, #663399, #DA70D6, #9370DB);
+            background-size: 300% 300%;
+            animation: shimmer 8s ease infinite;
+            border-radius: 0 40px 40px 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding-right: 0;
+            padding-left: 10px;
             color: white;
             cursor: pointer;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.3);
             z-index: 1030;
             transition: all 0.3s ease;
         }
         
         .sidebar-edge-toggle:hover {
-            background: linear-gradient(135deg, #DA70D6, #9370DB);
-            width: 45px;
+            background: linear-gradient(135deg, #DA70D6, #9370DB, #8A2BE2, #663399);
+            background-size: 300% 300%;
+            animation: shimmer 3s ease infinite;
+            width: 55px;
+            right: -30px;
+            box-shadow: 5px 0 15px rgba(138, 43, 226, 0.5);
+        }
+        
+        .sidebar.closed .sidebar-edge-toggle {
             right: -25px;
         }
         
@@ -555,6 +566,7 @@
         }
         
         .sidebar-edge-toggle i {
+            font-size: 1.5rem;
             transition: transform 0.3s ease;
         }
     </style>
@@ -810,7 +822,17 @@
                 sidebarEdgeToggle.addEventListener('click', function(e) {
                     console.log("Sidebar edge toggle button clicked");
                     e.preventDefault();
+                    e.stopPropagation();
                     toggleSidebar();
+                    // Update icon for closed/open state
+                    const icon = this.querySelector('i');
+                    if (sidebar.classList.contains('closed')) {
+                        icon.classList.remove('fa-chevron-left');
+                        icon.classList.add('fa-chevron-right');
+                    } else {
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-chevron-left');
+                    }
                 });
             } else {
                 console.log("Sidebar edge toggle button not found, skipping event listener");
