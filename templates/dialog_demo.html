@@ -278,7 +278,7 @@ myDialog.setProgress('Step 2 of 3 completed');</code></pre>
         document.querySelectorAll('.demo-image').forEach(function(img, index) {
             img.onerror = function() {
                 // Try to use existing photos from the wedding app
-                this.src = `{{ url_for('static', filename='img/placeholder_' + (index + 1) + '.jpg') }}`;
+                this.src = "{{ url_for('static', filename='img/placeholder_1.jpg') }}".replace('placeholder_1', 'placeholder_' + (index + 1));
                 
                 // If those fail too, use a generic placeholder
                 this.onerror = function() {
