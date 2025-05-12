@@ -428,6 +428,11 @@ def bridal_gallery():
     # Define ceremony types
     ceremony_types = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
     
+@app.route('/ar-filters')
+def ar_filters():
+    """Show the AR filters page with real-time preview."""
+    return render_template('ar_filters.html')
+    
     # Structure to store all templates
     all_templates = {}
     

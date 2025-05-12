@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block title %}AR Filters - Real-time Preview{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-light">
+                    <h4 class="mb-0"><i class="fas fa-camera me-2"></i>AR Filters - Real-time Preview</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-primary" role="alert">
+                        <i class="fas fa-info-circle me-2"></i> Allow camera access to try on bridal accessories and face filters in real-time!
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-8 mb-3">
+                            <div class="border rounded p-2 bg-dark" style="position: relative;">
+                                <video id="webcam" autoplay playsinline style="width: 100%; max-height: 480px; display: none;"></video>
+                                <canvas id="canvas" style="width: 100%; max-height: 480px;"></canvas>
+                                <div id="loadingSpinner" class="position-absolute top-50 start-50 translate-middle" style="display: none;">
+                                    <div class="spinner-border text-light" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                                <div id="noFaceDetected" class="position-absolute top-50 start-50 translate-middle text-center text-light p-3 rounded" style="display: none; background-color: rgba(0,0,0,0.7);">
+                                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                                    <p>No face detected. Please position your face clearly in the camera.</p>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <button id="startCameraBtn" class="btn btn-primary">
+                                    <i class="fas fa-camera me-2"></i>Start Camera
+                                </button>
+                                <button id="takePictureBtn" class="btn btn-success" disabled>
+                                    <i class="fas fa-camera-retro me-2"></i>Take Picture
+                                </button>
+                                <button id="downloadBtn" class="btn btn-info" disabled>
+                                    <i class="fas fa-download me-2"></i>Download
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header bg-dark text-light">
+                                    <h5 class="mb-0">Select Filter</h5>
+                                </div>
+                                <div class="card-body filter-selection">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="filterOption" id="filterNone" value="none" checked>
+                                        <label class="form-check-label" for="filterNone">
+                                            No Filter
+                                        </label>
+                                    </div>
+                                    
+                                    <h6 class="fw-bold mt-3 mb-2">Bridal Templates</h6>
+                                    {% for ceremony in ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'] %}
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="filterOption" id="filter{{ ceremony|capitalize }}" value="{{ ceremony }}">
+                                        <label class="form-check-label" for="filter{{ ceremony|capitalize }}">
+                                            {{ ceremony|capitalize }} Look
+                                        </label>
+                                        <div class="filter-thumbnail mt-1">
+                                            <img src="{{ url_for('static', filename='img/thumbnails/' + ceremony + '.jpg') }}" 
+                                                 alt="{{ ceremony|capitalize }} filter" class="img-thumbnail"
+                                                 style="max-width: 120px;">
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    
+                                    <h6 class="fw-bold mt-3 mb-2">Special Effects</h6>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="filterOption" id="filterGlitter" value="glitter">
+                                        <label class="form-check-label" for="filterGlitter">
+                                            Glitter Effect
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="filterOption" id="filterGlow" value="glow">
+                                        <label class="form-check-label" for="filterGlow">
+                                            Radiant Glow
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row" id="capturedImages" style="display: none;">
+                        <div class="col-12">
+                            <h5 class="mb-3">Captured Images</h5>
+                            <div class="row" id="imageGallery">
+                                <!-- Captured images will be displayed here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startCameraBtn = document.getElementById('startCameraBtn');
+        const takePictureBtn = document.getElementById('takePictureBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const webcamElement = document.getElementById('webcam');
+        const canvasElement = document.getElementById('canvas');
+        const ctx = canvasElement.getContext('2d');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const noFaceDetected = document.getElementById('noFaceDetected');
+        const capturedImages = document.getElementById('capturedImages');
+        const imageGallery = document.getElementById('imageGallery');
+        const filterOptions = document.querySelectorAll('input[name="filterOption"]');
+        
+        let currentFilter = 'none';
+        let streamStarted = false;
+        let currentStream = null;
+        let processingInterval = null;
+        let faceDetected = false;
+        let currentTemplateImage = null;
+        let capturedImageCount = 0;
+        
+        // Video stream constraints
+        const constraints = {
+            video: {
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+                facingMode: 'user'
+            },
+            audio: false
+        };
+        
+        // Set canvas size based on video dimensions
+        function setCanvasSize() {
+            canvasElement.width = webcamElement.videoWidth;
+            canvasElement.height = webcamElement.videoHeight;
+        }
+        
+        // Start the webcam stream
+        startCameraBtn.addEventListener('click', function() {
+            if (streamStarted) {
+                stopCamera();
+                startCameraBtn.innerHTML = '<i class="fas fa-camera me-2"></i>Start Camera';
+                takePictureBtn.disabled = true;
+                streamStarted = false;
+            } else {
+                loadingSpinner.style.display = 'block';
+                navigator.mediaDevices.getUserMedia(constraints)
+                    .then(function(stream) {
+                        currentStream = stream;
+                        webcamElement.srcObject = stream;
+                        webcamElement.style.display = 'none';
+                        
+                        webcamElement.onloadedmetadata = function() {
+                            setCanvasSize();
+                            loadingSpinner.style.display = 'none';
+                            startCameraBtn.innerHTML = '<i class="fas fa-stop me-2"></i>Stop Camera';
+                            takePictureBtn.disabled = false;
+                            streamStarted = true;
+                            
+                            // Start processing frames
+                            processingInterval = setInterval(processFrame, 100);
+                        };
+                    })
+                    .catch(function(error) {
+                        console.error('Error accessing the camera: ', error);
+                        loadingSpinner.style.display = 'none';
+                        alert('Error accessing the camera. Please make sure you have granted camera permissions.');
+                    });
+            }
+        });
+        
+        // Stop the camera stream
+        function stopCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => {
+                    track.stop();
+                });
+                webcamElement.srcObject = null;
+                clearInterval(processingInterval);
+                noFaceDetected.style.display = 'none';
+            }
+        }
+        
+        // Process each frame from the webcam
+        function processFrame() {
+            if (streamStarted) {
+                ctx.drawImage(webcamElement, 0, 0, canvasElement.width, canvasElement.height);
+                
+                // Send the frame to the server for face detection and processing
+                // We'll simulate face detection here for now
+                detectFace();
+                
+                // Apply filter based on the selected option
+                applyFilter(currentFilter);
+            }
+        }
+        
+        // Simulate face detection for demo purposes
+        // In production, this would use Flask routes to perform server-side face detection
+        function detectFace() {
+            // For demo purposes, we'll randomly show/hide the no face detected message
+            // In a real implementation, this would use actual face detection from the server
+            if (Math.random() > 0.8) {
+                faceDetected = false;
+                noFaceDetected.style.display = 'block';
+            } else {
+                faceDetected = true;
+                noFaceDetected.style.display = 'none';
+            }
+        }
+        
+        // Apply the selected filter to the canvas
+        function applyFilter(filter) {
+            if (!faceDetected) return;
+            
+            switch(filter) {
+                case 'none':
+                    // No filter, just display the camera feed
+                    break;
+                    
+                case 'haldi':
+                case 'mehendi':
+                case 'sangeeth':
+                case 'wedding':
+                case 'reception':
+                    // Apply bridal template filter
+                    applyTemplateFilter(filter);
+                    break;
+                    
+                case 'glitter':
+                    // Apply glitter effect
+                    applyGlitterEffect();
+                    break;
+                    
+                case 'glow':
+                    // Apply radiant glow effect
+                    applyGlowEffect();
+                    break;
+            }
+        }
+        
+        // Apply a template filter based on ceremony type
+        function applyTemplateFilter(ceremonyType) {
+            // This is a placeholder. In a real implementation, this would use backend face detection
+            // and template application, similar to the existing face swap functionality,
+            // but streamed back to the client for real-time preview.
+            
+            // Draw a colored border to indicate a template is being applied
+            const borderWidth = 10;
+            const borderColor = getCeremonyColor(ceremonyType);
+            
+            ctx.strokeStyle = borderColor;
+            ctx.lineWidth = borderWidth;
+            ctx.strokeRect(borderWidth/2, borderWidth/2, 
+                          canvasElement.width - borderWidth, 
+                          canvasElement.height - borderWidth);
+            
+            // Add text to simulate template application
+            ctx.fillStyle = borderColor;
+            ctx.font = '24px Arial';
+            ctx.fillText(`${ceremonyType.toUpperCase()} look applied`, 20, 40);
+        }
+        
+        // Get a color representing each ceremony type
+        function getCeremonyColor(ceremonyType) {
+            switch(ceremonyType) {
+                case 'haldi': return '#FFD700'; // Gold
+                case 'mehendi': return '#228B22'; // Forest Green
+                case 'sangeeth': return '#9370DB'; // Medium Purple
+                case 'wedding': return '#DC143C'; // Crimson
+                case 'reception': return '#4169E1'; // Royal Blue
+                default: return '#FFFFFF';
+            }
+        }
+        
+        // Apply a glitter effect to the canvas
+        function applyGlitterEffect() {
+            const numParticles = 50;
+            
+            // Add shimmering particles
+            for (let i = 0; i < numParticles; i++) {
+                const x = Math.random() * canvasElement.width;
+                const y = Math.random() * canvasElement.height;
+                const radius = Math.random() * 3 + 1;
+                const opacity = Math.random() * 0.7 + 0.3;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+                ctx.fill();
+            }
+            
+            // Add text to indicate the filter
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '24px Arial';
+            ctx.fillText('Glitter Effect applied', 20, 40);
+        }
+        
+        // Apply a radiant glow effect to the canvas
+        function applyGlowEffect() {
+            // Apply a vignette effect
+            const gradient = ctx.createRadialGradient(
+                canvasElement.width / 2, canvasElement.height / 2, 
+                canvasElement.width * 0.2,
+                canvasElement.width / 2, canvasElement.height / 2,
+                canvasElement.width * 0.8
+            );
+            
+            gradient.addColorStop(0, 'rgba(255, 220, 180, 0.3)');
+            gradient.addColorStop(1, 'rgba(255, 220, 180, 0)');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvasElement.width, canvasElement.height);
+            
+            // Add text to indicate the filter
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '24px Arial';
+            ctx.fillText('Radiant Glow applied', 20, 40);
+        }
+        
+        // Handle filter selection change
+        filterOptions.forEach(option => {
+            option.addEventListener('change', function() {
+                if (this.checked) {
+                    currentFilter = this.value;
+                }
+            });
+        });
+        
+        // Take a picture
+        takePictureBtn.addEventListener('click', function() {
+            if (!streamStarted || !faceDetected) return;
+            
+            const img = new Image();
+            img.src = canvasElement.toDataURL('image/png');
+            
+            // Create a thumbnail of the captured image and add it to the gallery
+            const col = document.createElement('div');
+            col.className = 'col-md-3 col-sm-6 mb-3';
+            
+            const card = document.createElement('div');
+            card.className = 'card h-100';
+            
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body p-2';
+            
+            const cardFooter = document.createElement('div');
+            cardFooter.className = 'card-footer bg-dark text-light p-2';
+            cardFooter.textContent = `Filter: ${currentFilter}`;
+            
+            img.className = 'card-img-top';
+            cardBody.appendChild(img);
+            card.appendChild(cardBody);
+            card.appendChild(cardFooter);
+            col.appendChild(card);
+            
+            imageGallery.appendChild(col);
+            capturedImages.style.display = 'block';
+            capturedImageCount++;
+            
+            // Enable download button after capturing images
+            if (capturedImageCount > 0) {
+                downloadBtn.disabled = false;
+            }
+        });
+        
+        // Download the last captured image
+        downloadBtn.addEventListener('click', function() {
+            if (capturedImageCount > 0) {
+                const images = imageGallery.querySelectorAll('img');
+                const lastImage = images[images.length - 1];
+                
+                const link = document.createElement('a');
+                link.download = `ar-filter-${Date.now()}.png`;
+                link.href = lastImage.src;
+                link.click();
+            }
+        });
+        
+        // Clean up resources when the page is closed
+        window.addEventListener('beforeunload', function() {
+            stopCamera();
+        });
+    });
+</script>
+{% endblock %}
