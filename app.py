@@ -1723,3 +1723,9 @@ def upload_model():
             return render_template('upload_model.html', error=f"Error saving model: {str(e)}")
     
     return render_template('upload_model.html')
+@app.route('/dialog_demo')
+def dialog_demo():
+    """
+    Show the dialog component demo page.
+    """
+    return render_template('dialog_demo.html')
