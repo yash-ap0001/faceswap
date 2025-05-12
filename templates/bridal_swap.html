@@ -2024,9 +2024,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                 onclick="openFullImage('${resultFullPath}', '${displayCeremony}', ${index})">
                                 <img src="${resultFullPath}" class="multi-result-img" alt="Result for ${displayCeremony}" 
                                     style="width: 100%; height: 100%; object-fit: cover;">
-                                <div class="position-absolute top-0 end-0 m-2">
-                                    <span class="badge bg-primary">${displayCeremony}</span>
-                                </div>
                                 ${newBadge}
                                 <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2 d-none d-md-block">
                                     <span class="badge bg-dark bg-opacity-75 px-3 py-2">
@@ -2034,14 +2031,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </span>
                                 </div>
                             </div>
-                            <div class="card-footer d-flex justify-content-between align-items-center bg-dark text-light p-1" style="height: 50px; max-height: 50px; min-height: 50px;">
-                                <span class="ceremony-badge small"><i class="fas fa-check-circle text-success me-1"></i> ${displayCeremony}</span>
+                            <div class="card-footer d-flex justify-content-end align-items-center bg-dark text-light p-1" style="height: 50px; max-height: 50px; min-height: 50px;">
                                 <div class="btn-group">
                                     <button class="btn btn-sm btn-outline-danger remove-result-btn" data-index="${index}" title="Remove this result">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                     <a href="${resultFullPath}" class="btn btn-sm btn-success" download title="Download this image">
-                                        <i class="fas fa-download"></i> Save
+                                        <i class="fas fa-download"></i>
                                     </a>
                                 </div>
                             </div>
@@ -2300,11 +2296,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </div>
                             </div>
                             
-                            <div class="position-absolute bottom-0 start-0 end-0 p-2 bg-dark bg-opacity-75">
-                                <button type="button" class="btn btn-sm btn-primary w-100 select-template-btn">
-                                    <i class="fas fa-magic me-1"></i> Use This Template
-                                </button>
-                            </div>
+
                         </div>
                     `;
                     
@@ -2340,16 +2332,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         useTemplate(this);
                     });
                     
-                    // Add click event to the select button
-                    const selectBtn = card.querySelector('.select-template-btn');
-                    if (selectBtn) {
-                        selectBtn.addEventListener('click', function(e) {
-                            e.stopPropagation(); // Prevent the card click event
-                            if (!isSelectionMode) {
-                                useTemplate(this.closest('.template-card'));
-                            }
-                        });
-                    }
+                    // Since we removed the select button, make the card itself clickable in single selection mode
+                    card.addEventListener('click', function(e) {
+                        // Skip if clicked on checkbox
+                        if (e.target.classList.contains('template-checkbox') || 
+                            e.target.closest('.template-checkbox-container')) {
+                            return;
+                        }
+                        
+                        // In single selection mode, use this template
+                        if (!isSelectionMode) {
+                            useTemplate(this);
+                        }
+                    });
                     
                     // Add click event to the checkbox
                     const checkbox = card.querySelector('.template-checkbox');
