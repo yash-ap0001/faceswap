@@ -198,6 +198,8 @@
             top: 0;
             width: 250px;
             height: 100vh;
+            /* Position is relative to allow absolute positioning of the toggle button */
+            z-index: 1040;
             background-color: rgba(30, 30, 30, 0.92);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
@@ -525,35 +527,36 @@
         }
         
         /* Sidebar edge toggle button - perfect semicircle shape */
+        .sidebar {
+            position: relative; /* Ensure relative positioning for absolute children */
+        }
+        
         .sidebar-edge-toggle {
-            position: fixed; /* Change to fixed position */
-            right: 240px; /* Position relative to viewport */
+            position: absolute;
+            right: -25px; /* Position outside the sidebar */
             top: 50%;
             transform: translateY(-50%);
-            width: 30px;
-            height: 60px;
-            background: #FF00FF; /* Bright magenta */
-            border-radius: 0 30px 30px 0;
-            border: 4px solid #8A2BE2;
+            width: 25px;
+            height: 50px;
+            background: #DA70D6; /* Orchid */
+            border-radius: 0 25px 25px 0; /* Right side semicircle */
+            border: 3px solid #8A2BE2; /* Purple border */
             border-left: none;
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            padding-left: 2px;
+            justify-content: center;
             color: white;
             cursor: pointer;
             z-index: 1050; /* Higher z-index */
             transition: all 0.3s ease;
-            box-shadow: 2px 0 15px rgba(138, 43, 226, 0.7);
         }
         
         .sidebar-edge-toggle:hover {
-            background: #9370DB;
-            box-shadow: 2px 0 20px rgba(255, 0, 255, 0.8);
+            background: #9370DB; /* Medium purple */
         }
         
         .sidebar.closed .sidebar-edge-toggle {
-            right: 0; /* When sidebar is closed, position at the edge */
+            right: -25px; /* Keep position consistent when sidebar is closed */
             left: auto;
         }
         
