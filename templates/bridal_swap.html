@@ -1371,14 +1371,11 @@ document.addEventListener('DOMContentLoaded', function() {
             templateImg.classList.add('selected-glow');
         }
         
-        // Find container elements - with additional null checks
-        const templatePreviewContainer = document.getElementById('template-preview-container');
-        
-        // Visual feedback in the upload form - with enhanced null checks
+        // Visual feedback in the upload form - use the global templatePreviewContainer and templatePreview variables
         if (templatePreviewContainer) {
             templatePreviewContainer.classList.remove('d-none');
             
-            const templatePreview = document.getElementById('template-preview');
+            // Use the global templatePreview variable
             if (templatePreview) {
                 templatePreview.src = templatePath;
                 templatePreview.alt = `Selected ${ceremonyType} template`;
