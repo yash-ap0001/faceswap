@@ -565,10 +565,10 @@
             position: fixed;
             left: 254px; /* Exactly at the sidebar edge based on screenshot */
             top: 282px;
-            width: 18px; /* Smaller width */
-            height: 30px; /* Smaller height */
+            width: 15px; /* Half the height for perfect semicircle */
+            height: 30px; /* Height */
             background: linear-gradient(to right, #8A2BE2, #FF00FF);
-            border-radius: 0 10px 10px 0; /* Smaller radius */
+            border-radius: 0 15px 15px 0; /* Radius must be the same as width for perfect semicircle */
             border: none;
             display: flex;
             align-items: center;
@@ -586,7 +586,7 @@
         
         .menu-toggle-btn:hover {
             box-shadow: 0 0 15px #FF00FF;
-            width: 25px; /* Smaller hover width */
+            /* No width change to keep perfect semicircle */
         }
         
         .menu-toggle-btn i {
