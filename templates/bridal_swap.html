@@ -1339,6 +1339,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // If we're in selection mode, don't allow single template selection
+        if (isSelectionMode) {
+            console.log('In selection mode, ignoring single template selection');
+            return;
+        }
+        
         console.log('Using template:', templateCard.dataset);
         
         // Extract template info
@@ -1365,9 +1371,14 @@ document.addEventListener('DOMContentLoaded', function() {
             templateImg.classList.add('selected-glow');
         }
         
-        // Visual feedback in the upload form
+        // Find container elements - with additional null checks
+        const templatePreviewContainer = document.getElementById('template-preview-container');
+        
+        // Visual feedback in the upload form - with enhanced null checks
         if (templatePreviewContainer) {
             templatePreviewContainer.classList.remove('d-none');
+            
+            const templatePreview = document.getElementById('template-preview');
             if (templatePreview) {
                 templatePreview.src = templatePath;
                 templatePreview.alt = `Selected ${ceremonyType} template`;
