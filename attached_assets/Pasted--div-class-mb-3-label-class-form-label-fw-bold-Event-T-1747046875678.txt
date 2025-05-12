@@ -1,0 +1,27 @@
+<div class="mb-3">
+                                        <label class="form-label fw-bold">Event Type</label>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="haldi" value="haldi" checked="">
+                                            <label class="form-check-label" for="haldi">
+                                                <strong>Haldi Ceremony</strong> - Yellow saree with marigold decorations
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="mehendi" value="mehendi">
+                                            <label class="form-check-label" for="mehendi">
+                                                <strong>Mehendi Function</strong> - Green lehenga with henna designs
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="wedding" value="wedding">
+                                            <label class="form-check-label" for="wedding">
+                                                <strong>Wedding Ceremony</strong> - Traditional red bridal lehenga
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="radio" name="bridalStyle" id="reception" value="reception">
+                                            <label class="form-check-label" for="reception">
+                                                <strong>Reception</strong> - Stylish maroon designer gown/lehenga
+                                            </label>
+                                        </div>
+                                    </div>
