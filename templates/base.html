@@ -565,11 +565,12 @@
             position: fixed;
             left: 262px;
             top: 282px;
-            width: 40px;
-            height: 40px;
-            background-color: #FF00FF;
-            border-radius: 0 50% 50% 0;
-            border: 2px solid #FFF;
+            width: 30px;
+            height: 60px;
+            background: linear-gradient(to right, #8A2BE2, #FF00FF);
+            border-radius: 0 30px 30px 0;
+            border: 3px solid #FFF;
+            border-left: none;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -578,11 +579,22 @@
             z-index: 9999;
             animation: pulse 2s infinite;
             box-shadow: 0 0 10px rgba(138, 43, 226, 0.8);
+            transition: all 0.3s ease;
+        }
+        
+        .menu-toggle-btn:hover {
+            box-shadow: 0 0 15px #FF00FF;
+            width: 35px;
         }
         
         .menu-toggle-btn i {
             font-size: 1.2rem;
             color: white;
+            transition: transform 0.3s ease;
+        }
+        
+        body.sidebar-closed .menu-toggle-btn i {
+            transform: rotate(180deg);
         }
         
         /* Original toggle styles */
@@ -610,7 +622,7 @@
 </head>
 <body>
     <!-- Fixed position menu toggle button -->
-    <div class="menu-toggle-btn" id="menuToggleBtn" onclick="toggleSidebar()">
+    <div class="menu-toggle-btn" id="menuToggleBtn">
         <i class="fas fa-chevron-left"></i>
     </div>
     
@@ -834,7 +846,7 @@
             }
             
             // Function to toggle sidebar
-            function toggleSidebar() {
+            window.toggleSidebar = function() {
                 console.log("Toggle sidebar called");
                 if (sidebar) {
                     console.log("Toggling sidebar class");
@@ -849,12 +861,41 @@
                         sidebar.classList.add('closed');
                         document.body.classList.add('sidebar-closed');
                     }
+                    
+                    // Update our new menu toggle button icon
+                    const menuToggleBtn = document.getElementById('menuToggleBtn');
+                    if (menuToggleBtn) {
+                        const menuIcon = menuToggleBtn.querySelector('i');
+                        if (menuIcon) {
+                            if (sidebar.classList.contains('closed')) {
+                                menuIcon.classList.remove('fa-chevron-left');
+                                menuIcon.classList.add('fa-chevron-right');
+                            } else {
+                                menuIcon.classList.remove('fa-chevron-right');
+                                menuIcon.classList.add('fa-chevron-left');
+                            }
+                        }
+                    }
                 } else {
                     console.error("Sidebar element not found");
                 }
+            };
+            
+            // New menu toggle button
+            const menuToggleBtn = document.getElementById('menuToggleBtn');
+            if (menuToggleBtn) {
+                console.log("Adding event listener to menu toggle button");
+                menuToggleBtn.addEventListener('click', function(e) {
+                    console.log("Menu toggle button clicked");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleSidebar();
+                });
+            } else {
+                console.log("Menu toggle button not found");
             }
             
-            // Toggle sidebar from edge button
+            // Legacy toggle sidebar from edge button (if it exists)
             if (sidebarEdgeToggle) {
                 console.log("Adding event listener to sidebar edge toggle button");
                 sidebarEdgeToggle.addEventListener('click', function(e) {
@@ -862,15 +903,6 @@
                     e.preventDefault();
                     e.stopPropagation();
                     toggleSidebar();
-                    // Update icon for closed/open state
-                    const icon = this.querySelector('i');
-                    if (sidebar.classList.contains('closed')) {
-                        icon.classList.remove('fa-chevron-left');
-                        icon.classList.add('fa-chevron-right');
-                    } else {
-                        icon.classList.remove('fa-chevron-right');
-                        icon.classList.add('fa-chevron-left');
-                    }
                 });
             } else {
                 console.log("Sidebar edge toggle button not found, skipping event listener");
@@ -895,10 +927,11 @@
             // Close sidebar when clicking outside
             document.addEventListener('click', function(event) {
                 if (sidebar) {
+                    const menuToggleBtn = document.getElementById('menuToggleBtn');
                     const isClickInside = 
                         sidebar.contains(event.target) || 
-                        (sidebarToggle && sidebarToggle.contains(event.target)) ||
-                        (navSidebarToggle && navSidebarToggle.contains(event.target));
+                        (menuToggleBtn && menuToggleBtn.contains(event.target)) ||
+                        (sidebarEdgeToggle && sidebarEdgeToggle.contains(event.target));
                     
                     if (!isClickInside && !sidebar.classList.contains('closed')) {
                         // Use the toggleSidebar function for consistency
