@@ -538,11 +538,11 @@
             <div class="card-header bg-dark d-flex justify-content-between align-items-center">
                 <h2 class="h4 mb-0">Available Templates</h2>
                 <div class="btn-group">
-                    <button id="toggleSelectionModeBtn" class="btn btn-outline-light btn-sm me-2">
+                    <button id="multiSelectBtn" class="btn btn-outline-light btn-sm me-2">
                         <i class="fas fa-check-square"></i> Multi-Select
                     </button>
-                    <button id="processSelectedBtn" class="btn btn-primary btn-sm me-2 d-none">
-                        <i class="fas fa-magic"></i> Multi Swap (<span id="selectedCount">0</span>)
+                    <button id="multiSwapBtn" class="btn btn-primary btn-sm me-2 d-none">
+                        <i class="fas fa-magic"></i> Multi Swap (<span id="selectedCountDisplay">0</span>)
                     </button>
                     <button id="refreshTemplatesBtn" class="btn btn-outline-light btn-sm">
                         <i class="fas fa-sync-alt"></i> Refresh
@@ -1536,9 +1536,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Multi-template selection functionality
-    const toggleSelectionModeBtn = document.getElementById('toggleSelectionModeBtn');
-    const processSelectedBtn = document.getElementById('processSelectedBtn');
-    const selectedCount = document.getElementById('selectedCount');
+    const toggleSelectionModeBtn = document.getElementById('multiSelectBtn');
+    const processSelectedBtn = document.getElementById('multiSwapBtn');
+    const selectedCount = document.getElementById('selectedCountDisplay');
     let isSelectionMode = false;
     
     if (toggleSelectionModeBtn) {
