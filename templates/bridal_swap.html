@@ -858,6 +858,62 @@ let currentResultIndex = 0;
 let resultImages = [];
 
 // Function to open the full image modal
+// Open the custom dialog
+function openDialog() {
+    const dialogBackdrop = document.getElementById('image-dialog-backdrop');
+    const dialog = document.getElementById('image-dialog');
+    
+    if (dialogBackdrop && dialog) {
+        // Reset body overflow to prevent scrolling
+        document.body.style.overflow = 'hidden';
+        
+        // Display the backdrop and dialog
+        dialogBackdrop.style.display = 'block';
+        dialog.style.display = 'flex';
+        
+        // Use a small timeout to ensure display property takes effect before animations
+        setTimeout(() => {
+            dialogBackdrop.classList.add('dialog-open');
+            dialog.classList.add('dialog-open');
+            
+            // Apply subtle entrance animation to the image
+            const fullSizeImage = document.getElementById('full-size-image');
+            if (fullSizeImage) {
+                fullSizeImage.style.opacity = '0';
+                setTimeout(() => {
+                    fullSizeImage.style.transition = 'opacity 0.3s ease-in-out';
+                    fullSizeImage.style.opacity = '1';
+                }, 100);
+            }
+        }, 10);
+    }
+}
+
+// Close the custom dialog
+function closeDialog() {
+    const dialogBackdrop = document.getElementById('image-dialog-backdrop');
+    const dialog = document.getElementById('image-dialog');
+    
+    if (dialogBackdrop && dialog) {
+        // Remove open classes to trigger animations
+        dialogBackdrop.classList.remove('dialog-open');
+        dialog.classList.remove('dialog-open');
+        
+        // Reset zoom when closing
+        resetZoom();
+        
+        // Wait for animations to complete before hiding
+        setTimeout(() => {
+            dialogBackdrop.style.display = 'none';
+            dialog.style.display = 'none';
+            document.body.style.overflow = '';
+            
+            // Remove keyboard event listener
+            document.removeEventListener('keydown', handleModalKeyNavigation);
+        }, 300);
+    }
+}
+
 function openFullImage(imagePath, ceremonyType, resultIndex) {
     // Get all result cards
     const resultCards = document.querySelectorAll('.multi-result-card');
@@ -933,15 +989,6 @@ function openFullImage(imagePath, ceremonyType, resultIndex) {
     
     // Add keyboard navigation
     document.addEventListener('keydown', handleModalKeyNavigation);
-}
-    
-    // Apply subtle entrance animation to the image
-    const fullSizeImage = document.getElementById('full-size-image');
-    fullSizeImage.style.opacity = '0';
-    setTimeout(() => {
-        fullSizeImage.style.transition = 'opacity 0.3s ease-in-out';
-        fullSizeImage.style.opacity = '1';
-    }, 100);
 }
 
 // Zoom functionality variables
@@ -1117,32 +1164,43 @@ function setupDragHandlers() {
 
 // Handle keyboard navigation in modal
 function handleModalKeyNavigation(event) {
-    // Only handle events when modal is visible
-    const modal = document.getElementById('fullImageModal');
-    if (!modal.classList.contains('show')) {
+    // Only handle events when dialog is visible
+    const dialog = document.getElementById('image-dialog');
+    if (!dialog.classList.contains('dialog-open')) {
+        return;
+    }
+    
+    // Don't do anything if we're in an input field
+    if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
         return;
     }
     
     switch (event.key) {
         case 'ArrowLeft':
             navigateToPrevImage();
+            event.preventDefault();
             break;
         case 'ArrowRight':
             navigateToNextImage();
+            event.preventDefault();
             break;
         case '+':
         case '=':
             zoomIn();
+            event.preventDefault();
             break;
         case '-':
         case '_':
             zoomOut();
+            event.preventDefault();
             break;
         case '0':
             resetZoom();
+            event.preventDefault();
             break;
         case 'Escape':
-            document.removeEventListener('keydown', handleModalKeyNavigation);
+            closeDialog();
+            event.preventDefault();
             break;
     }
 }
