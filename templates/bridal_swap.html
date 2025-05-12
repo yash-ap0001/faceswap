@@ -1134,6 +1134,9 @@ function handleModalKeyNavigation(event) {
     }
 }
 
+// Global variables for template selection
+let isSelectionMode = false;
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing bridal swap page');
     
@@ -1591,7 +1594,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const toggleSelectionModeBtn = document.getElementById('multiSelectBtn');
     const processSelectedBtn = document.getElementById('multiSwapBtn');
     const selectedCount = document.getElementById('selectedCountDisplay');
-    let isSelectionMode = false;
+    // isSelectionMode is now defined globally
     
     if (toggleSelectionModeBtn) {
         toggleSelectionModeBtn.addEventListener('click', function() {
