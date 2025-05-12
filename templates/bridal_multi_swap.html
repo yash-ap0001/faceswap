@@ -462,21 +462,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.templates.forEach(template => {
                     const templateCard = document.createElement('div');
                     templateCard.className = 'template-card';
-                    templateCard.dataset.ceremony = ceremony;
+                    // No longer need ceremony type for unified template display
                     // No longer tracking template type since we only use Pinterest templates
                     templateCard.dataset.path = template.path;
                     
                     templateCard.innerHTML = `
                         <div class="template-img-container">
-                            <img src="${template.url}" class="template-img" alt="${capitalize(ceremony)} Template">
-                            <!-- Template badge removed - no need to show template type -->
+                            <img src="${template.url}" class="template-img" alt="Template">
                         </div>
                         <div class="template-info">
                             <div class="d-flex justify-content-end align-items-center">
                                 <div class="form-check">
                                     <input class="form-check-input template-checkbox" type="checkbox" 
-                                           value="${template.id}" id="template-${template.id}"
-                                           data-ceremony="${ceremony}">
+                                           value="${template.id}" id="template-${template.id}">
                                 </div>
                             </div>
                         </div>
