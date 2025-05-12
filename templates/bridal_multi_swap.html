@@ -421,24 +421,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Helper Functions
     function setupTemplateGallery() {
-        templatesContainer.innerHTML = '';
-        
-        // Create a single container for all templates
-        const templateGallery = document.createElement('div');
-        templateGallery.className = 'template-gallery';
-        templateGallery.id = 'all-templates';
-        templateGallery.innerHTML = `
-            <!-- Templates will be loaded here -->
-            <div class="loading-placeholder text-center py-5 w-100">
-                <div class="spinner-border text-secondary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-2">Loading templates...</p>
-            </div>
-        `;
-        templatesContainer.appendChild(templateGallery);
-        
-        // Load all available templates
+        // The template gallery is already defined in the HTML,
+        // so we just need to load all available templates
         loadAllTemplates();
     }
     
