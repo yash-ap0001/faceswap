@@ -801,8 +801,17 @@
                 console.log("Toggle sidebar called");
                 if (sidebar) {
                     console.log("Toggling sidebar class");
-                    sidebar.classList.toggle('closed');
-                    document.body.classList.toggle('sidebar-closed');
+                    const isClosed = sidebar.classList.contains('closed');
+                    
+                    // Always remove first to ensure clean state
+                    sidebar.classList.remove('closed');
+                    document.body.classList.remove('sidebar-closed');
+                    
+                    // If it wasn't closed before, close it now
+                    if (!isClosed) {
+                        sidebar.classList.add('closed');
+                        document.body.classList.add('sidebar-closed');
+                    }
                 } else {
                     console.error("Sidebar element not found");
                 }
@@ -839,8 +848,11 @@
                     console.log("Close button clicked");
                     e.preventDefault();
                     if (sidebar) {
-                        sidebar.classList.add('closed');
-                        document.body.classList.add('sidebar-closed');
+                        // Use the toggleSidebar function to ensure consistent behavior
+                        const isClosed = sidebar.classList.contains('closed');
+                        if (!isClosed) {
+                            toggleSidebar();
+                        }
                     }
                 });
             }
@@ -854,8 +866,8 @@
                         (navSidebarToggle && navSidebarToggle.contains(event.target));
                     
                     if (!isClickInside && !sidebar.classList.contains('closed')) {
-                        sidebar.classList.add('closed');
-                        document.body.classList.add('sidebar-closed');
+                        // Use the toggleSidebar function for consistency
+                        toggleSidebar();
                     }
                 }
             });
