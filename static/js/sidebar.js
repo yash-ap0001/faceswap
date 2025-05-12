@@ -3,8 +3,21 @@
  * This file contains all the sidebar-related functionality
  */
 
+// Define global sidebar function first - this needs to be accessible from anywhere
+window.toggleSidebar = function() {
+    console.log("Global toggleSidebar called");
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+        console.log("Toggling sidebar class");
+        sidebar.classList.toggle('closed');
+        document.body.classList.toggle('sidebar-closed');
+    } else {
+        console.error("Sidebar element not found");
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("Sidebar initialization");
+    console.log("Sidebar.js initialization started");
     
     // Get sidebar elements
     const sidebar = document.getElementById('sidebar');
@@ -12,92 +25,86 @@ document.addEventListener('DOMContentLoaded', function() {
     const navSidebarToggle = document.getElementById('navSidebarToggle');
     const closeBtn = document.querySelector('.close-sidebar');
     
-    console.log("Sidebar element:", sidebar);
-    console.log("Sidebar toggle button:", sidebarToggle);
-    console.log("Nav sidebar toggle button:", navSidebarToggle);
-    console.log("Close button:", closeBtn);
+    console.log("Sidebar.js found elements:", {
+        sidebar: sidebar ? true : false, 
+        sidebarToggle: sidebarToggle ? true : false,
+        navSidebarToggle: navSidebarToggle ? true : false,
+        closeBtn: closeBtn ? true : false
+    });
     
     // Initialize sidebar in open state by default
     if (sidebar) {
-        console.log("Initializing sidebar in open state");
         sidebar.classList.remove('closed');
         document.body.classList.remove('sidebar-closed');
+        console.log("Sidebar initialized in open state");
     }
     
-    // Function to toggle sidebar
-    function toggleSidebar() {
-        console.log("Toggle sidebar function called");
-        if (sidebar) {
-            console.log("Toggling sidebar class");
-            sidebar.classList.toggle('closed');
-            document.body.classList.toggle('sidebar-closed');
-        } else {
-            console.error("Sidebar element not found");
-        }
-    }
-    
-    // Make toggleSidebar available globally
-    window.toggleSidebar = toggleSidebar;
-    
-    // Toggle sidebar from floating button
+    // Toggle sidebar from floating button (ensure no duplicate listeners)
     if (sidebarToggle) {
-        console.log("Adding event listener to sidebar toggle button");
-        sidebarToggle.addEventListener('click', function(e) {
-            console.log("Sidebar toggle button clicked");
+        // Remove any existing listeners first
+        const newSidebarToggle = sidebarToggle.cloneNode(true);
+        sidebarToggle.parentNode.replaceChild(newSidebarToggle, sidebarToggle);
+        
+        // Add our listener
+        newSidebarToggle.addEventListener('click', function(e) {
+            console.log("Sidebar.js: Toggle button clicked");
             e.preventDefault();
-            toggleSidebar();
+            window.toggleSidebar();
         });
+        console.log("Sidebar toggle button listener added");
     }
     
     // Toggle sidebar from navbar button
     if (navSidebarToggle) {
-        console.log("Adding event listener to nav sidebar toggle button");
-        navSidebarToggle.addEventListener('click', function(e) {
-            console.log("Nav sidebar toggle button clicked");
+        // Remove any existing listeners first
+        const newNavSidebarToggle = navSidebarToggle.cloneNode(true);
+        navSidebarToggle.parentNode.replaceChild(newNavSidebarToggle, navSidebarToggle);
+        
+        // Add our listener
+        newNavSidebarToggle.addEventListener('click', function(e) {
+            console.log("Sidebar.js: Nav toggle button clicked");
             e.preventDefault();
-            toggleSidebar();
+            window.toggleSidebar();
         });
-    } else {
-        console.log("Nav sidebar toggle button not found, skipping event listener");
+        console.log("Nav sidebar toggle button listener added");
     }
     
-    // Close sidebar
+    // Close sidebar button
     if (closeBtn) {
-        console.log("Adding event listener to close button");
-        closeBtn.addEventListener('click', function(e) {
-            console.log("Close button clicked");
+        // Remove any existing listeners first
+        const newCloseBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+        
+        // Add our listener
+        newCloseBtn.addEventListener('click', function(e) {
+            console.log("Sidebar.js: Close button clicked");
             e.preventDefault();
             if (sidebar) {
                 sidebar.classList.add('closed');
                 document.body.classList.add('sidebar-closed');
             }
         });
+        console.log("Close button listener added");
     }
     
     // Close sidebar when clicking outside
     document.addEventListener('click', function(event) {
-        if (sidebar) {
-            const isClickInside = 
-                sidebar.contains(event.target) || 
-                (sidebarToggle && sidebarToggle.contains(event.target)) ||
-                (navSidebarToggle && navSidebarToggle.contains(event.target));
+        if (sidebar && !sidebar.classList.contains('closed')) {
+            const clickedElement = event.target;
             
-            if (!isClickInside && !sidebar.classList.contains('closed')) {
-                console.log("Clicked outside sidebar, closing it");
+            // Check if the click was inside the sidebar or on toggle buttons
+            const isClickInside = 
+                sidebar.contains(clickedElement) || 
+                (sidebarToggle && sidebarToggle.contains(clickedElement)) ||
+                (navSidebarToggle && navSidebarToggle.contains(clickedElement));
+            
+            if (!isClickInside) {
+                console.log("Sidebar.js: Clicked outside, closing sidebar");
                 sidebar.classList.add('closed');
                 document.body.classList.add('sidebar-closed');
             }
         }
     });
     
-    // Attach listeners for accordion items
-    const accordionButtons = document.querySelectorAll('.accordion-button');
-    
-    accordionButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            console.log("Accordion button clicked:", this.textContent.trim());
-        });
-    });
-    
-    console.log("Sidebar initialization complete");
+    console.log("Sidebar.js initialization complete");
 });
