@@ -1349,17 +1349,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 const statusCard = document.getElementById('model-status-card');
                 const statusMessage = document.getElementById('model-status-message');
                 
-                if (statusCard && statusMessage && (!data.face_detection || !data.face_swap)) {
-                    statusCard.classList.remove('d-none');
-                    let message = 'Some models are not loaded properly.';
-                    
-                    if (!data.face_detection) {
-                        message = 'Face detection model is not loaded.';
-                    } else if (!data.face_swap) {
-                        message = 'Face swap model is not loaded.';
+                if (statusCard && statusMessage) {
+                    if (data.face_detection && data.face_swap) {
+                        // Both models are loaded successfully
+                        statusCard.classList.remove('alert-warning');
+                        statusCard.classList.add('alert-success');
+                        statusCard.classList.remove('d-none');
+                        statusMessage.textContent = 'All models loaded successfully! You can now use the face swap feature.';
+                        
+                        // Enable any buttons that may need the models
+                        const generateBtn = document.getElementById('generate-btn');
+                        if (generateBtn) {
+                            generateBtn.classList.remove('d-none');
+                        }
+                    } else if (!data.face_detection || !data.face_swap) {
+                        // Some models are not loaded
+                        statusCard.classList.remove('alert-success');
+                        statusCard.classList.add('alert-warning');
+                        statusCard.classList.remove('d-none');
+                        let message = 'Some models are not loaded properly.';
+                        
+                        if (!data.face_detection) {
+                            message = 'Face detection model is not loaded.';
+                        } else if (!data.face_swap) {
+                            message = 'Face swap model is not loaded.';
+                        }
+                        
+                        statusMessage.textContent = message;
                     }
-                    
-                    statusMessage.textContent = message;
                 }
             })
             .catch(error => {
@@ -1370,6 +1387,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const statusMessage = document.getElementById('model-status-message');
                 
                 if (statusCard && statusMessage) {
+                    statusCard.classList.remove('alert-success');
+                    statusCard.classList.add('alert-warning');
                     statusCard.classList.remove('d-none');
                     statusMessage.textContent = 'Could not check model status.';
                 }
