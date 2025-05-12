@@ -3,10 +3,12 @@
  * A reusable dialog/modal component based on shadcn/ui design principles
  */
 
-/**
- * Dialog class for creating and managing dialog components
- */
-class Dialog {
+// Check if Dialog is already defined to avoid redeclaration
+if (typeof Dialog === 'undefined') {
+  /**
+   * Dialog class for creating and managing dialog components
+   */
+  class Dialog {
   constructor(options = {}) {
     // Default options
     this.options = Object.assign({
@@ -339,19 +341,19 @@ class Dialog {
       this.elements.backdrop.parentNode.removeChild(this.elements.backdrop);
     }
   }
-}
+} // End of Dialog class
 
-/**
- * Create a dialog hook for ease of use (similar to React hooks)
- */
-function useDialog(options = {}) {
-  return new Dialog(options);
-}
-
-/**
- * Initialize dialog triggers in the DOM
- */
-document.addEventListener('DOMContentLoaded', function() {
+  /**
+   * Create a dialog hook for ease of use (similar to React hooks)
+   */
+  function useDialog(options = {}) {
+    return new Dialog(options);
+  }
+  
+  /**
+   * Initialize dialog triggers in the DOM
+   */
+  document.addEventListener('DOMContentLoaded', function() {
   // Initialize dialog triggers
   const dialogTriggers = document.querySelectorAll('[data-open-dialog]');
   dialogTriggers.forEach(trigger => {
@@ -376,4 +378,5 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
-});
+  }); // End of DOMContentLoaded listener
+} // End of if block
