@@ -563,12 +563,12 @@
         /* Menu Toggle Button (Fixed Position) */
         .menu-toggle-btn {
             position: fixed;
-            left: 260px; /* Touch the border of sidebar */
+            left: 254px; /* Exactly at the sidebar edge based on screenshot */
             top: 282px;
-            width: 20px; /* Smaller width */
-            height: 40px; /* Smaller height */
+            width: 18px; /* Smaller width */
+            height: 30px; /* Smaller height */
             background: linear-gradient(to right, #8A2BE2, #FF00FF);
-            border-radius: 0 20px 20px 0; /* Smaller radius */
+            border-radius: 0 10px 10px 0; /* Smaller radius */
             border: none;
             display: flex;
             align-items: center;
@@ -576,8 +576,7 @@
             color: white;
             cursor: pointer;
             z-index: 9999;
-            animation: pulse 2s infinite;
-            box-shadow: 0 0 10px rgba(138, 43, 226, 0.8);
+            box-shadow: 0 0 5px rgba(138, 43, 226, 0.6);
             transition: all 0.3s ease;
         }
         
