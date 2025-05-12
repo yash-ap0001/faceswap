@@ -563,12 +563,12 @@
         /* Menu Toggle Button (Fixed Position) */
         .menu-toggle-btn {
             position: fixed;
-            left: 262px;
+            left: 260px; /* Touch the border of sidebar */
             top: 282px;
-            width: 30px;
-            height: 60px;
+            width: 20px; /* Smaller width */
+            height: 40px; /* Smaller height */
             background: linear-gradient(to right, #8A2BE2, #FF00FF);
-            border-radius: 0 30px 30px 0;
+            border-radius: 0 20px 20px 0; /* Smaller radius */
             border: none;
             display: flex;
             align-items: center;
@@ -587,11 +587,11 @@
         
         .menu-toggle-btn:hover {
             box-shadow: 0 0 15px #FF00FF;
-            width: 35px;
+            width: 25px; /* Smaller hover width */
         }
         
         .menu-toggle-btn i {
-            font-size: 1.2rem;
+            font-size: 0.9rem; /* Smaller icon */
             color: white;
             transition: transform 0.3s ease;
         }
