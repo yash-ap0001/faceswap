@@ -537,6 +537,9 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
+            <button type="button" class="btn btn-outline-light me-3" id="navSidebarToggle" aria-label="Open Menu">
+                <i class="fas fa-bars"></i>
+            </button>
             
             <a class="navbar-brand" href="/">
                 <span class="brand-gradient">Bridal Vision</span>
@@ -767,12 +770,12 @@
                     console.log("Toggling sidebar class");
                     const isClosed = sidebar.classList.contains('closed');
                     
-                    // Always remove first to ensure clean state
-                    sidebar.classList.remove('closed');
-                    document.body.classList.remove('sidebar-closed');
-                    
-                    // If it wasn't closed before, close it now
-                    if (!isClosed) {
+                    if (isClosed) {
+                        // If it's closed, open it
+                        sidebar.classList.remove('closed');
+                        document.body.classList.remove('sidebar-closed');
+                    } else {
+                        // If it's open, close it
                         sidebar.classList.add('closed');
                         document.body.classList.add('sidebar-closed');
                     }
@@ -791,7 +794,8 @@
                 });
             }
             
-            // Toggle sidebar from navbar button (skip if element doesn't exist)
+            // Toggle sidebar from navbar button
+            
             if (navSidebarToggle) {
                 console.log("Adding event listener to nav sidebar toggle button");
                 navSidebarToggle.addEventListener('click', function(e) {
@@ -800,8 +804,6 @@
                     toggleSidebar();
                 });
             } else {
-                // Create a placeholder to prevent errors
-                window.navSidebarToggle = null;
                 console.log("Nav sidebar toggle button not found, skipping event listener");
             }
             
