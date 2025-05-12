@@ -351,11 +351,6 @@
                 </h1>
             </div>
             <div class="card-body">
-                <div class="alert alert-info" role="alert">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Upload your photo to see yourself in traditional Indian bridal attire for different ceremonies.
-                </div>
-                
                 <div id="model-status-alert" class="alert alert-warning d-none" role="alert">
                     <i class="fas fa-exclamation-triangle me-2"></i>
                     <span id="model-status-message">Checking model status...</span>
@@ -2139,16 +2134,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Use templates from the response
                 const templates = data.templates;
                 
-                // Show template count info
-                templateContainer.innerHTML = `
-                    <div class="col-12 mb-3">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Found ${templates.length} templates for ${ceremonyType} ceremony.
-                            <span class="small text-muted ms-2">Last updated: ${new Date().toLocaleTimeString()}</span>
-                        </div>
-                    </div>
-                `;
+                // Clear the container - no alerts
+                templateContainer.innerHTML = ``;
                 
                 // Display all templates
                 templates.forEach((template, index) => {
