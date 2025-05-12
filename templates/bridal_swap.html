@@ -1486,18 +1486,23 @@ document.addEventListener('DOMContentLoaded', function() {
     uploadForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        if (!sourceInput.files.length) {
+        if (!sourceInput || !sourceInput.files.length) {
             showError('Please select your photo.');
             return;
         }
         
-        if (!templateUrlInput.value) {
+        if (!templateUrlInput || !templateUrlInput.value) {
             showError('Please select a template from the available templates section.');
             return;
         }
 
-        // Get selected bridal style
-        const selectedStyle = document.querySelector('input[name="bridalStyle"]:checked').value;
+        // Get selected bridal style (with null check)
+        const selectedStyleElement = document.querySelector('input[name="bridalStyle"]:checked');
+        if (!selectedStyleElement) {
+            showError('Please select a bridal style.');
+            return;
+        }
+        const selectedStyle = selectedStyleElement.value;
 
         // Check file sizes
         const maxSize = 16 * 1024 * 1024; // 16MB
@@ -1513,11 +1518,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Show loading
-        loadingContainer.classList.remove('d-none');
-        errorContainer.classList.add('d-none');
-        resultContainer.classList.add('d-none');
-        swapBtn.disabled = true;
+        // Show loading (with null checks)
+        if (loadingContainer) loadingContainer.classList.remove('d-none');
+        if (errorContainer) errorContainer.classList.add('d-none');
+        if (resultContainer) resultContainer.classList.add('d-none');
+        if (swapBtn) swapBtn.disabled = true;
 
         // Create form data
         const formData = new FormData();
@@ -1532,25 +1537,31 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            loadingContainer.classList.add('d-none');
-            swapBtn.disabled = false;
+            // Add null checks for all DOM elements
+            if (loadingContainer) loadingContainer.classList.add('d-none');
+            if (swapBtn) swapBtn.disabled = false;
 
             if (data.success) {
-                resultImage.src = `/uploads/${data.result_image}`;
-                downloadBtn.href = `/uploads/${data.result_image}`;
-                downloadBtn.download = data.result_image;
-                resultContainer.classList.remove('d-none');
-                window.scrollTo({
-                    top: resultContainer.offsetTop,
-                    behavior: 'smooth'
-                });
+                // Add null checks for all DOM elements
+                if (resultImage) resultImage.src = `/uploads/${data.result_image}`;
+                if (downloadBtn) {
+                    downloadBtn.href = `/uploads/${data.result_image}`;
+                    downloadBtn.download = data.result_image;
+                }
+                if (resultContainer) {
+                    resultContainer.classList.remove('d-none');
+                    window.scrollTo({
+                        top: resultContainer.offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
             } else {
                 showError(data.error || 'An unknown error occurred.');
             }
         })
         .catch(error => {
-            loadingContainer.classList.add('d-none');
-            swapBtn.disabled = false;
+            if (loadingContainer) loadingContainer.classList.add('d-none');
+            if (swapBtn) swapBtn.disabled = false;
             showError('Network error: ' + error.message);
         });
     });
