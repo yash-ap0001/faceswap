@@ -9,25 +9,25 @@ if (typeof Dialog === 'undefined') {
    * Dialog class for creating and managing dialog components
    */
   class Dialog {
-  constructor(options = {}) {
-    // Default options
-    this.options = Object.assign({
-      id: `dialog-${Date.now()}`, // Unique ID
-      title: 'Dialog',
-      description: null,
-      content: '',
-      size: 'md', // xs, sm, md, lg, xl, full
-      closeOnBackdropClick: true,
-      closeOnEscapeKey: true,
-      showCloseButton: true,
-      submitText: 'Submit',
-      cancelText: 'Cancel',
-      footer: true,
-      onSubmit: null,
-      onCancel: null,
-      onOpen: null,
-      onClose: null
-    }, options);
+    constructor(options = {}) {
+      // Default options
+      this.options = Object.assign({
+        id: `dialog-${Date.now()}`, // Unique ID
+        title: 'Dialog',
+        description: null,
+        content: '',
+        size: 'md', // xs, sm, md, lg, xl, full
+        closeOnBackdropClick: true,
+        closeOnEscapeKey: true,
+        showCloseButton: true,
+        submitText: 'Submit',
+        cancelText: 'Cancel',
+        footer: true,
+        onSubmit: null,
+        onCancel: null,
+        onOpen: null,
+        onClose: null
+      }, options);
     
     // State variables
     this.isOpen = false;
@@ -343,6 +343,9 @@ if (typeof Dialog === 'undefined') {
   }
 } // End of Dialog class
 
+  // Make Dialog globally available
+  window.Dialog = Dialog;
+
   /**
    * Create a dialog hook for ease of use (similar to React hooks)
    */
@@ -350,33 +353,36 @@ if (typeof Dialog === 'undefined') {
     return new Dialog(options);
   }
   
+  // Make useDialog globally available
+  window.useDialog = useDialog;
+  
   /**
    * Initialize dialog triggers in the DOM
    */
   document.addEventListener('DOMContentLoaded', function() {
-  // Initialize dialog triggers
-  const dialogTriggers = document.querySelectorAll('[data-open-dialog]');
-  dialogTriggers.forEach(trigger => {
-    trigger.addEventListener('click', function(e) {
-      e.preventDefault();
-      const dialogId = this.getAttribute('data-open-dialog');
-      const dialog = document.getElementById(dialogId);
-      
-      if (!dialog) {
-        console.warn(`Dialog with id "${dialogId}" not found.`);
-        return;
-      }
-      
-      // Show the modal using Bootstrap if available
-      if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(dialog);
-        modal.show();
-      } else {
-        // Fallback to basic functionality
-        dialog.style.display = 'block';
-        dialog.classList.add('show');
-      }
+    // Initialize dialog triggers
+    const dialogTriggers = document.querySelectorAll('[data-open-dialog]');
+    dialogTriggers.forEach(trigger => {
+      trigger.addEventListener('click', function(e) {
+        e.preventDefault();
+        const dialogId = this.getAttribute('data-open-dialog');
+        const dialog = document.getElementById(dialogId);
+        
+        if (!dialog) {
+          console.warn(`Dialog with id "${dialogId}" not found.`);
+          return;
+        }
+        
+        // Show the modal using Bootstrap if available
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+          const modal = new bootstrap.Modal(dialog);
+          modal.show();
+        } else {
+          // Fallback to basic functionality
+          dialog.style.display = 'block';
+          dialog.classList.add('show');
+        }
+      });
     });
-  });
   }); // End of DOMContentLoaded listener
 } // End of if block
