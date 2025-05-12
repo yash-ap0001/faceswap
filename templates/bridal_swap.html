@@ -623,6 +623,50 @@
         </div>
     </div>
 </div>
+
+<!-- Full Image Modal -->
+<div class="modal fade" id="fullImageModal" tabindex="-1" aria-labelledby="fullImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="fullImageModalLabel">
+                    <i class="fas fa-image me-2"></i>
+                    <span id="modal-ceremony-name">Bridal Look</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex flex-column align-items-center justify-content-center p-0">
+                <div class="position-relative" style="height: 85vh; max-width: 100%;">
+                    <img id="full-size-image" src="" alt="Full size image" 
+                        class="img-fluid" style="max-height: 85vh; max-width: 100%;">
+                    
+                    <!-- Navigation Controls -->
+                    <button id="prev-image-btn" class="btn btn-dark position-absolute start-0 top-50 translate-middle-y ms-3 opacity-75">
+                        <i class="fas fa-chevron-left fa-2x"></i>
+                    </button>
+                    <button id="next-image-btn" class="btn btn-dark position-absolute end-0 top-50 translate-middle-y me-3 opacity-75">
+                        <i class="fas fa-chevron-right fa-2x"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <div class="d-flex justify-content-between w-100">
+                    <div>
+                        <span id="image-counter">Image 1 of 5</span>
+                    </div>
+                    <div>
+                        <a id="download-full-image" href="#" download class="btn btn-success">
+                            <i class="fas fa-download me-2"></i>Download Image
+                        </a>
+                        <button type="button" class="btn btn-secondary ms-2" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -1552,13 +1596,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     resultCard.innerHTML = `
                         <div class="card bg-dark border-0 shadow position-relative" style="height: 280px; max-height: 280px; min-height: 280px;">
-                            <div class="card-img-top position-relative overflow-hidden" style="height: 230px; max-height: 230px; min-height: 230px;">
+                            <div class="card-img-top position-relative overflow-hidden" style="height: 230px; max-height: 230px; min-height: 230px; cursor: pointer;" 
+                                onclick="openFullImage('${resultFullPath}', '${displayCeremony}', ${index})">
                                 <img src="${resultFullPath}" class="multi-result-img" alt="Result for ${displayCeremony}" 
                                     style="width: 100%; height: 100%; object-fit: cover;">
                                 <div class="position-absolute top-0 end-0 m-2">
                                     <span class="badge bg-primary">${displayCeremony}</span>
                                 </div>
                                 ${newBadge}
+                                <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2 d-none d-md-block">
+                                    <span class="badge bg-dark bg-opacity-75 px-3 py-2">
+                                        <i class="fas fa-search-plus me-1"></i> Click to enlarge
+                                    </span>
+                                </div>
                             </div>
                             <div class="card-footer d-flex justify-content-between align-items-center bg-dark text-light p-1" style="height: 50px; max-height: 50px; min-height: 50px;">
                                 <span class="ceremony-badge small"><i class="fas fa-check-circle text-success me-1"></i> ${displayCeremony}</span>
@@ -1573,6 +1623,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                     `;
+                    
+                    // Store the result info in the card's dataset for modal navigation
+                    resultCard.dataset.resultPath = resultFullPath;
+                    resultCard.dataset.ceremonyType = displayCeremony;
                     
                     multiResultsGrid.appendChild(resultCard);
                 } catch (cardError) {
