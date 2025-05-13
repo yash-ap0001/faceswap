@@ -553,15 +553,96 @@ def groom_face_swap():
 
 @app.route('/traditional-wear')
 def traditional_wear():
-    return render_template('groom/traditional_wear.html')
+    """Browse traditional wear for grooms across different styles."""
+    # Get available templates organized by category
+    traditional_categories = {
+        "sherwani": {"name": "Sherwanis", "templates": []},
+        "kurta": {"name": "Kurta Pajamas", "templates": []},
+        "indo_western": {"name": "Indo-Western", "templates": []},
+        "dhoti": {"name": "Dhoti Sets", "templates": []},
+        "jodhpuri": {"name": "Jodhpuri Suits", "templates": []}
+    }
+    
+    traditional_dir = os.path.join(app.static_folder, 'templates', 'groom', 'traditional')
+    os.makedirs(traditional_dir, exist_ok=True)
+    
+    # Scan for template images in each category directory
+    for category in traditional_categories:
+        category_dir = os.path.join(traditional_dir, category)
+        os.makedirs(category_dir, exist_ok=True)
+        
+        if os.path.exists(category_dir):
+            for file in os.listdir(category_dir):
+                if allowed_file(file):
+                    template_path = os.path.join('templates', 'groom', 'traditional', category, file)
+                    traditional_categories[category]["templates"].append({
+                        "path": template_path,
+                        "url": url_for('static', filename=template_path)
+                    })
+    
+    return render_template('groom/traditional_wear.html', categories=traditional_categories)
 
 @app.route('/modern-suits')
 def modern_suits():
-    return render_template('groom/modern_suits.html')
+    """Browse modern suits and formal wear for grooms."""
+    # Get available templates organized by category
+    suits_categories = {
+        "tuxedos": {"name": "Tuxedos", "templates": []},
+        "three_piece": {"name": "Three Piece Suits", "templates": []},
+        "two_piece": {"name": "Two Piece Suits", "templates": []},
+        "blazers": {"name": "Blazers & Separates", "templates": []},
+        "casual": {"name": "Casual & Smart Casual", "templates": []}
+    }
+    
+    suits_dir = os.path.join(app.static_folder, 'templates', 'groom', 'suits')
+    os.makedirs(suits_dir, exist_ok=True)
+    
+    # Scan for template images in each category directory
+    for category in suits_categories:
+        category_dir = os.path.join(suits_dir, category)
+        os.makedirs(category_dir, exist_ok=True)
+        
+        if os.path.exists(category_dir):
+            for file in os.listdir(category_dir):
+                if allowed_file(file):
+                    template_path = os.path.join('templates', 'groom', 'suits', category, file)
+                    suits_categories[category]["templates"].append({
+                        "path": template_path,
+                        "url": url_for('static', filename=template_path)
+                    })
+    
+    return render_template('groom/modern_suits.html', categories=suits_categories)
 
 @app.route('/groom-accessories')
 def groom_accessories():
-    return render_template('groom/accessories.html')
+    """Browse accessories for grooms."""
+    # Get available templates organized by category
+    accessories_categories = {
+        "watches": {"name": "Watches", "templates": []},
+        "cufflinks": {"name": "Cufflinks", "templates": []},
+        "ties": {"name": "Ties & Bow Ties", "templates": []},
+        "pocket_squares": {"name": "Pocket Squares", "templates": []},
+        "shoes": {"name": "Formal Shoes", "templates": []}
+    }
+    
+    accessories_dir = os.path.join(app.static_folder, 'templates', 'groom', 'accessories')
+    os.makedirs(accessories_dir, exist_ok=True)
+    
+    # Scan for template images in each category directory
+    for category in accessories_categories:
+        category_dir = os.path.join(accessories_dir, category)
+        os.makedirs(category_dir, exist_ok=True)
+        
+        if os.path.exists(category_dir):
+            for file in os.listdir(category_dir):
+                if allowed_file(file):
+                    template_path = os.path.join('templates', 'groom', 'accessories', category, file)
+                    accessories_categories[category]["templates"].append({
+                        "path": template_path,
+                        "url": url_for('static', filename=template_path)
+                    })
+    
+    return render_template('groom/accessories.html', categories=accessories_categories)
 
 # Convention halls section routes
 @app.route('/venue-search')
