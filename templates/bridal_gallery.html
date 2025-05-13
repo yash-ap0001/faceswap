@@ -965,18 +965,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Call initialization when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeCarouselsCollapsed();
-        
-        // Initialize multi-selection variables
-        window.selectedTemplates = [];
-        const multiSelectionInterface = document.getElementById('multiSelectionInterface');
-        const selectedCount = document.getElementById('selectedCount');
-        const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
-        const processMultipleBtn = document.getElementById('processMultipleBtn');
-        const clearSelectionBtn = document.getElementById('clearSelectionBtn');
-        const multiSourceInput = document.getElementById('multiSourceInput');
+    // Initialize when this script runs (already inside a DOMContentLoaded handler)
+    initializeCarouselsCollapsed();
+    
+    // Initialize multi-selection variables
+    window.selectedTemplates = [];
+    const multiSelectionInterface = document.getElementById('multiSelectionInterface');
+    const selectedCount = document.getElementById('selectedCount');
+    const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
+    const processMultipleBtn = document.getElementById('processMultipleBtn');
+    const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+    const multiSourceInput = document.getElementById('multiSourceInput');
         const multiSourcePreview = document.getElementById('multiSourcePreview');
         const multiSourcePlaceholder = document.getElementById('multiSourcePlaceholder');
         
