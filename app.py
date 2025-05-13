@@ -1132,6 +1132,8 @@ def bridal_swap_multi():
     - template_0, template_1, etc.: paths to template images
     - ceremony_0, ceremony_1, etc.: corresponding ceremony types
     - template_count: number of templates
+    - enhance: whether to enhance the face after swapping (optional)
+    - enhance_method: enhancement method to use (optional: "gfpgan", "codeformer", or "auto")
     Returns:
     - JSON with results array or error message
     """
@@ -1156,6 +1158,11 @@ def bridal_swap_multi():
     # Get template count
     template_count = int(request.form.get('template_count', '0'))
     logger.info(f"Template count from form: {template_count}")
+    
+    # Face enhancement options
+    enhance = request.form.get('enhance', 'false').lower() == 'true'
+    enhance_method = request.form.get('enhance_method', 'auto')
+    logger.info(f"Enhancement options: enhance={enhance}, method={enhance_method}")
     
     if template_count <= 0 or template_count > 5:
         return jsonify({'success': False, 'error': 'Invalid number of templates. Please select 1-5 templates.'}), 400
