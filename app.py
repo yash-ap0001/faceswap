@@ -861,91 +861,125 @@ def delete_templates():
 @app.route('/bulk-upload')
 def bulk_upload_page():
     """Display the bulk template upload page."""
-    return render_template('bulk_upload.html')
+    # Define all available categories
+    categories = {
+        'bride': {
+            'bridal': ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'],
+            'outfits': ['casual', 'formal', 'party', 'ethnic', 'western'],
+            'jewelry': ['necklaces', 'earrings', 'maang_tikka', 'bangles', 'rings'],
+            'makeup': ['traditional', 'modern', 'natural', 'bold', 'reception']
+        },
+        'groom': {
+            'traditional': ['sherwani', 'kurta', 'indo_western', 'dhoti', 'jodhpuri'],
+            'suits': ['tuxedos', 'three_piece', 'two_piece', 'blazers', 'casual'],
+            'accessories': ['watches', 'cufflinks', 'ties', 'pocket_squares', 'shoes']
+        }
+    }
+    
+    return render_template('bulk_upload.html', categories=categories)
 
 @app.route('/upload-bulk-templates', methods=['POST'])
 def upload_bulk_templates():
     """
-    Handle bulk template upload.
-    Process multiple images for different ceremony types.
+    Handle bulk template upload for any category.
+    Process multiple images for different categories and subcategories.
     """
     if 'files' not in request.files:
         return jsonify({'error': 'No files part'}), 400
     
-    # Default ceremony type (used as fallback)
-    default_ceremony_type = request.form.get('ceremony_type')
-    if not default_ceremony_type:
-        return jsonify({'error': 'Default ceremony type is required'}), 400
+    # Get category information
+    category_type = request.form.get('category_type')
+    subcategory = request.form.get('subcategory')
+    item_category = request.form.get('item_category')
     
-    if default_ceremony_type not in ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']:
-        return jsonify({'error': 'Invalid ceremony type'}), 400
+    if not category_type or not subcategory or not item_category:
+        return jsonify({'error': 'Category type, subcategory and item category are required'}), 400
     
-    # Get the files and their categories
+    # Define valid categories and validate user input
+    valid_categories = {
+        'bride': {
+            'bridal': ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'],
+            'outfits': ['casual', 'formal', 'party', 'ethnic', 'western'],
+            'jewelry': ['necklaces', 'earrings', 'maang_tikka', 'bangles', 'rings'],
+            'makeup': ['traditional', 'modern', 'natural', 'bold', 'reception']
+        },
+        'groom': {
+            'traditional': ['sherwani', 'kurta', 'indo_western', 'dhoti', 'jodhpuri'],
+            'suits': ['tuxedos', 'three_piece', 'two_piece', 'blazers', 'casual'],
+            'accessories': ['watches', 'cufflinks', 'ties', 'pocket_squares', 'shoes']
+        }
+    }
+    
+    if (category_type not in valid_categories or 
+        subcategory not in valid_categories[category_type] or 
+        item_category not in valid_categories[category_type][subcategory]):
+        return jsonify({'error': 'Invalid category combination'}), 400
+    
     files = request.files.getlist('files')
     if not files or len(files) == 0:
         return jsonify({'error': 'No files selected'}), 400
     
-    # Get the individual file categories if provided
-    file_categories = request.form.getlist('file_categories')
+    # Determine the target directory based on category type and subcategory
+    if category_type == 'bride':
+        if subcategory == 'bridal':
+            # Use Pinterest directory for bridal ceremony templates
+            target_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates', 'pinterest', item_category)
+        else:
+            # Use static templates directory for other bride categories
+            target_dir = os.path.join(app.static_folder, 'templates', subcategory, item_category)
+    else:  # groom categories
+        target_dir = os.path.join(app.static_folder, 'templates', 'groom', subcategory, item_category)
     
-    # Base path for template directory
-    template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
-    os.makedirs(template_dir, exist_ok=True)
+    # Ensure the target directory exists
+    os.makedirs(target_dir, exist_ok=True)
     
-    # Directory for 'pinterest' template type
-    pinterest_dir = os.path.join(template_dir, 'pinterest')
-    os.makedirs(pinterest_dir, exist_ok=True)
-    
-    # Make sure we have ceremony directories for all types
-    valid_ceremonies = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
-    for ceremony in valid_ceremonies:
-        ceremony_dir = os.path.join(pinterest_dir, ceremony)
-        os.makedirs(ceremony_dir, exist_ok=True)
-    
-    # Track uploads by category
-    uploaded_counts = {ceremony: 0 for ceremony in valid_ceremonies}
-    main_templates_updated = {ceremony: False for ceremony in valid_ceremonies}
+    # Track uploads
+    uploaded_files = []
     
     # Process each file
-    for i, file in enumerate(files):
+    for file in files:
         if file and allowed_file(file.filename):
-            # Determine ceremony type for this specific file
-            file_ceremony = default_ceremony_type
-            if i < len(file_categories) and file_categories[i] in valid_ceremonies:
-                file_ceremony = file_categories[i]
+            # Create a secure filename with the category and a unique index
+            existing_files = [f for f in os.listdir(target_dir) if os.path.isfile(os.path.join(target_dir, f))]
+            next_index = len(existing_files) + 1
             
-            # Get the directory for this ceremony
-            ceremony_dir = os.path.join(pinterest_dir, file_ceremony)
+            # Get original file extension
+            orig_filename = secure_filename(file.filename)
+            _, ext = os.path.splitext(orig_filename)
+            if not ext:
+                ext = '.jpg'  # Default to jpg if no extension found
             
-            # Create a secure filename with index
-            next_index = uploaded_counts[file_ceremony] + 1
-            filename = f"{file_ceremony}_{next_index}.jpg"
-            filepath = os.path.join(ceremony_dir, filename)
+            # Create the new filename
+            filename = f"{item_category}_{next_index}{ext}"
+            filepath = os.path.join(target_dir, filename)
             
             # Save the file
             file.save(filepath)
-            uploaded_counts[file_ceremony] += 1
+            uploaded_files.append(filepath)
             
-            # If it's the first file for this ceremony, set it as the main template
-            if not main_templates_updated[file_ceremony]:
-                # Main ceremony template in the pinterest directory
-                main_path = os.path.join(ceremony_dir, f"{file_ceremony}.jpg")
-                shutil.copy(filepath, main_path)
+            # If it's a bridal ceremony category, also update the main template
+            if category_type == 'bride' and subcategory == 'bridal' and len(uploaded_files) == 1:
+                # Update main ceremony template
+                templates_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
+                os.makedirs(templates_dir, exist_ok=True)
                 
-                # Also update as the main pinterest template in the templates root
-                template_path = os.path.join(template_dir, f"{file_ceremony}_pinterest.jpg")
-                shutil.copy(filepath, template_path)
-                main_templates_updated[file_ceremony] = True
+                # The main Pinterest template for this ceremony type
+                main_template_path = os.path.join(templates_dir, f"{item_category}_pinterest.jpg")
+                shutil.copy(filepath, main_template_path)
     
-    # Calculate total uploaded count
-    total_uploaded = sum(uploaded_counts.values())
-    categories_updated = [ceremony for ceremony, count in uploaded_counts.items() if count > 0]
+    # Return success response
+    if len(uploaded_files) == 0:
+        return jsonify({'error': 'No valid files were uploaded'}), 400
     
     return jsonify({
         'success': True,
-        'uploaded_count': total_uploaded,
-        'categories_updated': categories_updated,
-        'main_template_updated': any(main_templates_updated.values())
+        'message': f'Successfully uploaded {len(uploaded_files)} images to {category_type}/{subcategory}/{item_category}',
+        'uploaded_count': len(uploaded_files),
+        'category_info': {
+            'type': category_type,
+            'subcategory': subcategory,
+            'item_category': item_category
+        }
     })
 
 @app.route('/bridal-multi-swap', methods=['GET'])
