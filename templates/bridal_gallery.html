@@ -1891,62 +1891,49 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Fullsize Preview Modal -->
 <div class="modal fade" id="fullsizePreviewModal" tabindex="-1" aria-labelledby="fullsizePreviewModalLabel" aria-hidden="true" style="transition: opacity 0.2s ease">
     <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 90%; transition: transform 0.3s ease">
-        <div class="modal-content" style="background-color: rgba(18, 18, 18, 0.97); backdrop-filter: blur(25px);">
-            <div class="modal-header" style="border-color: rgba(70, 70, 70, 0.5);">
-                <h5 class="modal-title" id="fullsize-preview-title">Template Preview</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center p-0 position-relative">
-                <div class="image-container" style="overflow: hidden; position: relative;">
+        <div class="modal-content" style="background-color: rgba(20, 20, 20, 0.75); border-radius: 10px; backdrop-filter: blur(15px); border: none;">
+            <!-- No header -->
+            <div class="modal-body p-0 position-relative">
+                <div id="gallery-image-container" class="image-container" style="overflow: hidden; position: relative; max-height: 85vh; cursor: move;">
                     <img id="fullsize-preview-image" src="" class="img-fluid" alt="Template Preview" style="transition: transform 0.3s ease; transform-origin: center;">
-                </div>
                 
-                <!-- Navigation Buttons -->
-                <div class="navigation-controls position-absolute start-0 top-50 translate-middle-y ps-2" style="z-index: 10;">
-                    <button class="btn btn-dark rounded-circle" id="prevImageBtn">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                </div>
-                <div class="navigation-controls position-absolute end-0 top-50 translate-middle-y pe-2" style="z-index: 10;">
-                    <button class="btn btn-dark rounded-circle" id="nextImageBtn">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
+                    <!-- Close button -->
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close" style="z-index: 1050;"></button>
                 
-                <!-- Zoom Controls - Top Right -->
-                <div class="position-absolute top-0 end-0 p-3 d-flex" style="z-index: 10;">
-                    <button class="btn btn-sm btn-dark me-2" id="zoomInBtn">
-                        <i class="fas fa-search-plus"></i>
-                    </button>
-                    <button class="btn btn-sm btn-dark me-2" id="zoomOutBtn">
-                        <i class="fas fa-search-minus"></i>
-                    </button>
-                    <button class="btn btn-sm btn-dark" id="resetZoomBtn">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                </div>
+                    <!-- Navigation Buttons -->
+                    <div class="navigation-controls position-absolute start-0 top-50 translate-middle-y ps-2 ms-2" style="z-index: 1050;">
+                        <button class="btn btn-dark rounded-circle shadow" id="prevImageBtn">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    </div>
+                    <div class="navigation-controls position-absolute end-0 top-50 translate-middle-y pe-2 me-2" style="z-index: 1050;">
+                        <button class="btn btn-dark rounded-circle shadow" id="nextImageBtn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 
-                <!-- Zoom Controls - Bottom Right -->
-                <div class="position-absolute bottom-0 end-0 p-3" style="z-index: 10;">
-                    <div class="btn-group">
-                        <button class="btn btn-sm btn-dark" id="zoomInBtnBottom">
+                    <!-- Zoom Controls - Top Left -->
+                    <div class="position-absolute top-0 start-0 p-2 m-2" style="z-index: 1050;">
+                        <button class="btn btn-sm btn-dark ms-1" id="zoomInBtn">
                             <i class="fas fa-search-plus"></i>
                         </button>
-                        <button class="btn btn-sm btn-dark" id="zoomOutBtnBottom">
+                        <button class="btn btn-sm btn-dark ms-1" id="zoomOutBtn">
                             <i class="fas fa-search-minus"></i>
                         </button>
-                        <button class="btn btn-sm btn-dark" id="resetZoomBtnBottom">
+                        <button class="btn btn-sm btn-dark ms-1" id="resetZoomBtn">
                             <i class="fas fa-sync-alt"></i>
                         </button>
                     </div>
+                
+                    <!-- Image counter -->
+                    <div class="image-counter position-absolute bottom-0 start-50 translate-middle-x mb-3 px-3 py-1 rounded bg-dark bg-opacity-75 text-white" style="z-index: 1050;">
+                        <span id="current-image-index">1</span> / <span id="total-image-count">1</span>
+                    </div>
+                
+                    <!-- Removed duplicate Zoom Controls from Bottom Right -->
                 </div>
             </div>
-            <div class="modal-footer" style="border-color: rgba(70, 70, 70, 0.5);">
-                <div class="image-counter">
-                    <span id="current-image-index">1</span> / <span id="total-image-count">1</span>
-                </div>
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
+            <!-- No footer -->
         </div>
     </div>
 </div>

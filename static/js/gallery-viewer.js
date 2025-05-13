@@ -222,8 +222,77 @@ function resetZoom() {
 function applyZoom() {
     const previewImage = document.getElementById('fullsize-preview-image');
     if (previewImage) {
-        previewImage.style.transform = `scale(${zoomLevel})`;
+        previewImage.style.transform = `scale(${zoomLevel}) translate(${currentX}px, ${currentY}px)`;
+        
+        // Update cursor style based on zoom level
+        const container = document.querySelector('.image-container');
+        if (container) {
+            if (zoomLevel > 1) {
+                container.style.cursor = 'move';
+            } else {
+                container.style.cursor = 'default';
+                // Reset position when zoom is at default
+                currentX = 0;
+                currentY = 0;
+            }
+        }
     }
+}
+
+// Function to initialize drag and pan
+function initializeDragAndPan() {
+    const container = document.querySelector('.image-container');
+    const previewImage = document.getElementById('fullsize-preview-image');
+    
+    if (!container || !previewImage) return;
+    
+    // Mouse events
+    container.addEventListener('mousedown', function(e) {
+        // Only enable dragging when zoomed in
+        if (zoomLevel <= 1) return;
+        
+        isDragging = true;
+        startX = e.clientX - currentX;
+        startY = e.clientY - currentY;
+        e.preventDefault();
+    });
+    
+    document.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        
+        currentX = e.clientX - startX;
+        currentY = e.clientY - startY;
+        applyZoom();
+        e.preventDefault();
+    });
+    
+    document.addEventListener('mouseup', function() {
+        isDragging = false;
+    });
+    
+    // Touch events for mobile
+    container.addEventListener('touchstart', function(e) {
+        // Only enable dragging when zoomed in
+        if (zoomLevel <= 1) return;
+        
+        isDragging = true;
+        startX = e.touches[0].clientX - currentX;
+        startY = e.touches[0].clientY - currentY;
+        e.preventDefault();
+    }, { passive: false });
+    
+    container.addEventListener('touchmove', function(e) {
+        if (!isDragging) return;
+        
+        currentX = e.touches[0].clientX - startX;
+        currentY = e.touches[0].clientY - startY;
+        applyZoom();
+        e.preventDefault();
+    }, { passive: false });
+    
+    container.addEventListener('touchend', function() {
+        isDragging = false;
+    });
 }
 
 // Initialize event listeners when the DOM is loaded
@@ -231,8 +300,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clean up event listeners when the modal is hidden
     const modal = document.getElementById('fullsizePreviewModal');
     if (modal) {
+        // Initialize drag and pan when modal is shown
+        modal.addEventListener('shown.bs.modal', function() {
+            initializeDragAndPan();
+            // Reset zoom and position when showing a new image
+            resetZoom();
+        });
+        
         modal.addEventListener('hidden.bs.modal', function() {
             document.removeEventListener('keydown', handleImageNavigation);
+            // Reset drag state
+            isDragging = false;
         });
     }
 });
