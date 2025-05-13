@@ -90,7 +90,25 @@
                     <div id="deleteStatusMessage" class="mt-2 small text-light"></div>
                 </div>
                 
-                <div class="btn-group w-100 mb-3" role="group" aria-label="Ceremony selection">
+                <!-- Category selection for deletion -->
+                <div class="mb-3">
+                    <select class="form-select form-select-sm bg-dark text-light border-secondary" id="deleteCategoryType">
+                        <option value="bride" selected>Bride</option>
+                        <option value="groom">Groom</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <select class="form-select form-select-sm bg-dark text-light border-secondary" id="deleteSubcategory">
+                        <option value="bridal" selected>Bridal Ceremonies</option>
+                        <option value="outfits">Modern Outfits</option>
+                        <option value="jewelry">Jewelry</option>
+                        <option value="makeup">Makeup</option>
+                    </select>
+                </div>
+                
+                <!-- Bridal ceremony tabs (shown only for bride/bridal) -->
+                <div id="bridalCeremonyTabs" class="btn-group w-100 mb-3" role="group" aria-label="Ceremony selection">
                     <input type="radio" class="btn-check" name="ceremonyTab" id="haldi-tab-radio" value="haldi" checked>
                     <label class="btn btn-outline-secondary btn-sm" for="haldi-tab-radio">Haldi</label>
                     
@@ -105,6 +123,13 @@
                     
                     <input type="radio" class="btn-check" name="ceremonyTab" id="reception-tab-radio" value="reception">
                     <label class="btn btn-outline-secondary btn-sm" for="reception-tab-radio">Reception</label>
+                </div>
+                
+                <!-- Non-bridal category selector -->
+                <div id="otherCategoriesList" class="mb-3" style="display: none;">
+                    <select class="form-select form-select-sm bg-dark text-light border-secondary" id="deleteItemCategory">
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
                 </div>
                 
                 <div class="tab-content" id="deleteTabContent">

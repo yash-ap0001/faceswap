@@ -747,55 +747,101 @@ def event_managers():
 @app.route('/delete-templates', methods=['POST'])
 def delete_templates():
     """
-    Delete selected templates or all templates for a ceremony.
+    Delete selected templates or all templates for a specific category.
     Expected JSON payload: 
     - For specific templates: { template_paths: [path1, path2, ...] }
-    - For clearing all ceremony templates: { ceremony_type: "haldi", clear_all: true }
+    - For clearing all bridal ceremony templates: { category_type: "bride", subcategory: "bridal", item_category: "haldi", clear_all: true }
+    - For clearing all other category templates: { category_type: "bride", subcategory: "outfits", item_category: "casual", clear_all: true }
     """
     if not request.is_json:
         return jsonify({"success": False, "message": "Expected JSON payload"}), 400
     
     data = request.get_json()
     template_paths = data.get('template_paths', [])
-    ceremony_type = data.get('ceremony_type')
+    category_type = data.get('category_type')
+    subcategory = data.get('subcategory')
+    item_category = data.get('item_category')
     clear_all = data.get('clear_all', False)
     
-    # Handle clearing all templates for a ceremony
-    if clear_all and ceremony_type:
-        if ceremony_type not in ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']:
-            return jsonify({"success": False, "message": "Invalid ceremony type"}), 400
+    # Backward compatibility for old ceremony_type format
+    ceremony_type = data.get('ceremony_type')
+    if ceremony_type and clear_all:
+        category_type = 'bride'
+        subcategory = 'bridal'
+        item_category = ceremony_type
+    
+    # Handle clearing all templates for a category
+    if clear_all and category_type and subcategory and item_category:
+        # Define valid categories
+        valid_categories = {
+            'bride': {
+                'bridal': ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'],
+                'outfits': ['casual', 'formal', 'party', 'ethnic', 'western'],
+                'jewelry': ['necklaces', 'earrings', 'maang_tikka', 'bangles', 'rings'],
+                'makeup': ['traditional', 'modern', 'natural', 'bold', 'reception']
+            },
+            'groom': {
+                'traditional': ['sherwani', 'kurta', 'indo_western', 'dhoti', 'jodhpuri'],
+                'suits': ['tuxedos', 'three_piece', 'two_piece', 'blazers', 'casual'],
+                'accessories': ['watches', 'cufflinks', 'ties', 'pocket_squares', 'shoes']
+            }
+        }
+        
+        # Validate category information
+        if (category_type not in valid_categories or 
+            subcategory not in valid_categories[category_type] or 
+            item_category not in valid_categories[category_type][subcategory]):
+            return jsonify({"success": False, "message": "Invalid category combination"}), 400
         
         deleted_count = 0
         errors = []
-        template_types = ['ai', 'natural', 'real', 'pinterest']
-        template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
         
         try:
-            # Clear all temple files for the ceremony in the main directory
-            for template_type in template_types:
-                main_path = os.path.join(template_dir, f"{ceremony_type}_{template_type}.jpg")
-                if os.path.exists(main_path):
-                    os.remove(main_path)
-                    deleted_count += 1
-                    app.logger.info(f"Deleted main template: {main_path}")
-            
-            # Clear all templates in subdirectories
-            for template_type in template_types:
-                type_dir = os.path.join(template_dir, template_type)
+            # Handle bridal ceremony templates specially since they're in uploads/templates
+            if category_type == 'bride' and subcategory == 'bridal':
+                template_types = ['ai', 'natural', 'real', 'pinterest']
+                template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
                 
-                # Delete the standard template file
-                standard_path = os.path.join(type_dir, f"{ceremony_type}.jpg")
-                if os.path.exists(standard_path):
-                    os.remove(standard_path)
-                    deleted_count += 1
-                    app.logger.info(f"Deleted standard template: {standard_path}")
+                # Clear all template files for the ceremony in the main directory
+                for template_type in template_types:
+                    main_path = os.path.join(template_dir, f"{item_category}_{template_type}.jpg")
+                    if os.path.exists(main_path):
+                        os.remove(main_path)
+                        deleted_count += 1
+                        app.logger.info(f"Deleted main template: {main_path}")
                 
-                # Check for ceremony-specific directory
-                ceremony_dir = os.path.join(type_dir, ceremony_type)
-                if os.path.exists(ceremony_dir) and os.path.isdir(ceremony_dir):
-                    for file in os.listdir(ceremony_dir):
+                # Clear all templates in subdirectories
+                for template_type in template_types:
+                    type_dir = os.path.join(template_dir, template_type)
+                    
+                    # Delete the standard template file
+                    standard_path = os.path.join(type_dir, f"{item_category}.jpg")
+                    if os.path.exists(standard_path):
+                        os.remove(standard_path)
+                        deleted_count += 1
+                        app.logger.info(f"Deleted standard template: {standard_path}")
+                    
+                    # Check for ceremony-specific directory
+                    ceremony_dir = os.path.join(type_dir, item_category)
+                    if os.path.exists(ceremony_dir) and os.path.isdir(ceremony_dir):
+                        for file in os.listdir(ceremony_dir):
+                            if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                                file_path = os.path.join(ceremony_dir, file)
+                                if os.path.isfile(file_path):
+                                    os.remove(file_path)
+                                    deleted_count += 1
+                                    app.logger.info(f"Deleted template: {file_path}")
+            else:
+                # Handle other category types in static/templates
+                if category_type == 'bride':
+                    target_dir = os.path.join(app.static_folder, 'templates', subcategory, item_category)
+                else:  # groom categories
+                    target_dir = os.path.join(app.static_folder, 'templates', 'groom', subcategory, item_category)
+                
+                if os.path.exists(target_dir) and os.path.isdir(target_dir):
+                    for file in os.listdir(target_dir):
                         if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
-                            file_path = os.path.join(ceremony_dir, file)
+                            file_path = os.path.join(target_dir, file)
                             if os.path.isfile(file_path):
                                 os.remove(file_path)
                                 deleted_count += 1
@@ -804,8 +850,8 @@ def delete_templates():
             return jsonify({
                 "success": True,
                 "deleted_count": deleted_count,
-                "ceremony_type": ceremony_type,
-                "message": f"Cleared all templates for {ceremony_type} ceremony"
+                "category": f"{category_type}/{subcategory}/{item_category}",
+                "message": f"Cleared all templates for {category_type}/{subcategory}/{item_category}"
             })
             
         except Exception as e:
@@ -824,8 +870,14 @@ def delete_templates():
     
     for path in template_paths:
         try:
-            # Validate the path - ensure it starts with /uploads/templates
-            if not path or not (path.startswith('/uploads/templates/') or path.startswith('uploads/templates/')):
+            # Validate the path - ensure it has a valid prefix
+            valid_prefixes = [
+                '/uploads/templates/', 'uploads/templates/',
+                '/static/templates/', 'static/templates/'
+            ]
+            
+            is_valid_path = any(path.startswith(prefix) for prefix in valid_prefixes)
+            if not path or not is_valid_path:
                 errors.append(f"Invalid path: {path}")
                 continue
                 
