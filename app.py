@@ -455,14 +455,14 @@ def bridal_gallery():
 # Bride section routes
 @app.route('/bridal-outfits')
 def bridal_outfits():
-    """Browse bridal outfits for different ceremonies and styles."""
+    """Browse modern outfits for girls across different styles."""
     # Get available templates organized by category
     outfits_categories = {
-        "wedding_saree": {"name": "Wedding Sarees", "templates": []},
-        "lehenga": {"name": "Bridal Lehengas", "templates": []},
-        "reception": {"name": "Reception Gowns", "templates": []},
-        "sangeet": {"name": "Sangeet Outfits", "templates": []},
-        "mehndi": {"name": "Mehndi Dresses", "templates": []}
+        "casual": {"name": "Casual Wear", "templates": []},
+        "formal": {"name": "Formal Attire", "templates": []},
+        "party": {"name": "Party Dresses", "templates": []},
+        "ethnic": {"name": "Ethnic Wear", "templates": []},
+        "western": {"name": "Western Outfits", "templates": []}
     }
     
     outfits_dir = os.path.join(app.static_folder, 'templates', 'outfits')
@@ -482,7 +482,7 @@ def bridal_outfits():
                         "url": url_for('static', filename=template_path)
                     })
     
-    return render_template('bridal_outfits.html', categories=outfits_categories)
+    return render_template('modern_outfits.html', categories=outfits_categories)
 
 @app.route('/jewelry-collections')
 def jewelry_collections():
