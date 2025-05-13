@@ -1,6 +1,7 @@
 import os
 import cv2
 import numpy as np
+import logging
 
 """
 Image Enhancement Module for VowBride
@@ -15,7 +16,10 @@ This module provides image enhancement capabilities using various methods:
 Most methods require additional models that will be downloaded on first use.
 """
 
-# Enhancement options that we plan to support
+# Configure logging
+logger = logging.getLogger(__name__)
+
+# Enhancement options that we support
 ENHANCEMENT_METHODS = [
     'basic',      # Basic image enhancement with OpenCV
     'gfpgan',     # Face restoration (future)
@@ -23,6 +27,15 @@ ENHANCEMENT_METHODS = [
     'esrgan',     # General image upscaling (future)
     'gpen',       # Face reconstruction (future)
 ]
+
+# Model paths - will be used when models are available
+MODEL_PATHS = {
+    'gfpgan': './models/gfpgan/GFPGANv1.3.pth',
+    'codeformer': './models/codeformer/codeformer.pth',
+    'esrgan': './models/esrgan/RealESRGAN_x4plus.pth',
+    'gpen_256': './models/gpen/GPEN-BFR-256.onnx',
+    'gpen_512': './models/gpen/GPEN-BFR-512.onnx',
+}
 
 def basic_enhance(img, brightness=1.1, contrast=1.2, sharpen=True):
     """
@@ -103,21 +116,63 @@ def try_esrgan_upscale(img, upscale_factor=2, ensure_folder='models/esrgan'):
     print("ESRGAN upscaling not available")
     return None
 
-def try_gpen_enhance(img, ensure_folder='models/gpen'):
+def try_gpen_enhance(img, model_size=256, ensure_folder='models/gpen'):
     """
     Enhance face using GPEN if available
     
     Args:
         img: Input image (numpy array)
+        model_size: GPEN model size (256 or 512)
         
     Returns:
         Enhanced image or None if GPEN is not available
     """
-    # GPEN implementation would go here
-    # This is a placeholder for future implementation
-    return None
+    # Import ONNX runtime only when needed to avoid startup dependency
+    try:
+        import onnxruntime
+        
+        # Ensure model folder exists
+        os.makedirs(ensure_folder, exist_ok=True)
+        
+        # Select model based on size
+        if model_size == 512:
+            model_path = MODEL_PATHS['gpen_512']
+        else:
+            model_path = MODEL_PATHS['gpen_256']
+            
+        # Skip if model doesn't exist
+        if not os.path.isfile(model_path):
+            logger.warning(f"GPEN model not found at {model_path}")
+            return None
+        
+        # Load model
+        providers = ['CPUExecutionProvider']
+        session = onnxruntime.InferenceSession(model_path, providers=providers)
+        
+        # Preprocess image
+        h, w, c = img.shape
+        size = model_size  # model input size
+        img_input = cv2.resize(img, (size, size))
+        img_input = img_input.astype(np.float32) / 255.0
+        img_input = np.transpose(img_input, (2, 0, 1))
+        img_input = np.expand_dims(img_input, axis=0)
+        
+        # Run inference
+        input_name = session.get_inputs()[0].name
+        output_name = session.get_outputs()[0].name
+        output = session.run([output_name], {input_name: img_input})[0]
+        
+        # Postprocess output
+        output = np.clip(output, 0, 1)
+        output = np.transpose(output[0], (1, 2, 0)) * 255.0
+        output = cv2.resize(output, (w, h))
+        
+        return output.astype(np.uint8)
+    except (ImportError, Exception) as e:
+        logger.error(f"GPEN enhancement failed: {e}")
+        return None
 
-def enhance_image(img, method='basic', strength=0.8, upscale_factor=2):
+def enhance_image(img, method='basic', strength=0.8, upscale_factor=2, model_size=256):
     """
     Enhance image using specified method
     
@@ -125,7 +180,8 @@ def enhance_image(img, method='basic', strength=0.8, upscale_factor=2):
         img: Input image path or numpy array
         method: Enhancement method ('basic', 'gfpgan', 'codeformer', 'esrgan', 'gpen')
         strength: Enhancement strength (0.0 to 1.0)
-        upscale_factor: Upscale factor for ESRGAN
+        upscale_factor: Upscale factor for ESRGAN (2, 4)
+        model_size: Size for GPEN model (256 or 512)
         
     Returns:
         Enhanced image
@@ -134,44 +190,74 @@ def enhance_image(img, method='basic', strength=0.8, upscale_factor=2):
     if isinstance(img, str):
         img = cv2.imread(img)
         if img is None:
-            raise ValueError(f"Could not read image from {img}")
+            logger.error(f"Could not read image from {img}")
+            return None
     
     # Make a copy to ensure we don't modify the original
     result = img.copy()
     
-    # Apply enhancement based on method
-    if method == 'basic':
-        result = basic_enhance(result)
-    elif method == 'gfpgan':
-        enhanced = try_gfpgan_enhance(result, strength)
-        if enhanced is not None:
-            result = enhanced
-        else:
-            # Fall back to basic enhancement
+    # Log the enhancement method
+    logger.info(f"Enhancing image using {method} method")
+    
+    try:
+        # Apply enhancement based on method
+        if method == 'basic':
             result = basic_enhance(result)
-    elif method == 'codeformer':
-        enhanced = try_codeformer_enhance(result, strength)
-        if enhanced is not None:
-            result = enhanced
+            logger.info("Basic enhancement applied")
+        elif method == 'gfpgan':
+            enhanced = try_gfpgan_enhance(result, strength)
+            if enhanced is not None:
+                result = enhanced
+                logger.info("GFPGAN enhancement successful")
+            else:
+                # Fall back to basic enhancement
+                result = basic_enhance(result)
+                logger.info("Fallback to basic enhancement (GFPGAN not available)")
+        elif method == 'codeformer':
+            enhanced = try_codeformer_enhance(result, strength)
+            if enhanced is not None:
+                result = enhanced
+                logger.info("CodeFormer enhancement successful")
+            else:
+                # Fall back to basic enhancement
+                result = basic_enhance(result)
+                logger.info("Fallback to basic enhancement (CodeFormer not available)")
+        elif method == 'esrgan':
+            enhanced = try_esrgan_upscale(result, upscale_factor)
+            if enhanced is not None:
+                result = enhanced
+                logger.info(f"ESRGAN upscaling (x{upscale_factor}) successful")
+            else:
+                # Fall back to basic enhancement
+                result = basic_enhance(result)
+                logger.info("Fallback to basic enhancement (ESRGAN not available)")
+        elif method == 'gpen':
+            enhanced = try_gpen_enhance(result, model_size)
+            if enhanced is not None:
+                result = enhanced
+                logger.info(f"GPEN-{model_size} enhancement successful")
+            else:
+                # Fall back to basic enhancement
+                result = basic_enhance(result)
+                logger.info(f"Fallback to basic enhancement (GPEN-{model_size} not available)")
         else:
-            # Fall back to basic enhancement
+            # Default to basic enhancement for unknown methods
+            logger.warning(f"Unknown enhancement method: {method}, using basic enhancement")
             result = basic_enhance(result)
-    elif method == 'esrgan':
-        enhanced = try_esrgan_upscale(result, upscale_factor)
-        if enhanced is not None:
-            result = enhanced
-        else:
-            # Fall back to basic enhancement
-            result = basic_enhance(result)
-    elif method == 'gpen':
-        enhanced = try_gpen_enhance(result)
-        if enhanced is not None:
-            result = enhanced
-        else:
-            # Fall back to basic enhancement
-            result = basic_enhance(result)
-    else:
-        # Default to basic enhancement
-        result = basic_enhance(result)
+            
+    except Exception as e:
+        # Handle any unexpected errors in the enhancement process
+        logger.error(f"Error during image enhancement: {str(e)}")
+        # Return the original image if enhancement fails
+        logger.info("Returning original image due to enhancement error")
+        result = img.copy()
     
     return result
+
+def preprocess_for_face_swap(img):
+    """Prepare an image for face swapping by enhancing brightness and contrast"""
+    return basic_enhance(img, brightness=1.1, contrast=1.15, sharpen=False)
+
+def postprocess_face_swap(img, method='basic'):
+    """Apply post-processing enhancement after face swap"""
+    return enhance_image(img, method=method)
