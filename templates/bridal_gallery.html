@@ -1013,18 +1013,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (processMultipleBtn) {
             processMultipleBtn.addEventListener('click', function() {
                 if (!multiSourceInput.files || !multiSourceInput.files[0]) {
-                showError('Please upload your source image first.');
-                return;
-            }
+                    showError('Please upload your source image first.');
+                    return;
+                }
+                
+                if (selectedTemplates.length === 0) {
+                    showError('Please select at least one template.');
+                    return;
+                }
             
-            if (selectedTemplates.length === 0) {
-                showError('Please select at least one template.');
-                return;
-            }
-            
-            processMultipleTemplates();
-        });
-    }
+                processMultipleTemplates();
+            });
+        }
     });
     
     // Toggle select mode for bulk deletion
@@ -1899,6 +1899,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize visibility based on checked boxes
     updateCeremonyVisibility();
+    
+    } catch (error) {
+        console.error("Error initializing bridal gallery:", error);
+    }
 });
 </script>
 
