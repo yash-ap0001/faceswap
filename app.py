@@ -402,10 +402,6 @@ try:
         
         swapper = get_model(swap_model_path, providers=providers)
         logger.info("Face swap model initialized successfully")
-        
-        # Initialize enhancement models
-        initialize_enhancement_models()
-        
         print("All models loaded successfully!")
     except Exception as e:
         logger.warning(f"Failed to initialize face swap model: {str(e)}")
