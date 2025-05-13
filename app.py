@@ -15,9 +15,6 @@ import traceback
 import logging
 from flask_login import LoginManager
 
-# Import our enhancement module
-import enhancement
-
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -1070,14 +1067,6 @@ def bridal_swap():
             logger.info(f"Performing face swap with style: {selected_style}, using Pinterest template")
             result_img = swapper.get(target_img, target_faces[0], source_faces[0], paste_back=True)
             
-            # Get enhancement method from request or use default
-            enhancement_method = request.form.get('enhancement', 'basic')
-            
-            # Apply post-processing enhancement
-            logger.info(f"Applying {enhancement_method} enhancement to swapped image")
-            result_img = enhancement.postprocess_face_swap(result_img, method=enhancement_method)
-            logger.info(f"Face swap and enhancement successful")
-            
             # Save result
             timestamp = int(time.time())
             output_filename = f'bridal_{selected_style}_{timestamp}_{secure_filename(source_file.filename)}'
@@ -1227,15 +1216,7 @@ def bridal_swap_multi():
                         # This is the same approach used in bridal_swap that works
                         # Fixed to use explicit paste_back=True parameter
                         result_img = swapper.get(template_img, target_face, source_face, paste_back=True)
-                        
-                        # Get enhancement method from request or use default
-                        enhancement_method = request.form.get('enhancement', 'basic')
-                        
-                        # Apply post-processing enhancement
-                        logger.info(f"Applying {enhancement_method} enhancement to swapped image")
-                        result_img = enhancement.postprocess_face_swap(result_img, method=enhancement_method)
-                        
-                        logger.info(f"Face swap and enhancement successful")
+                        logger.info(f"Face swap successful")
                     except Exception as inner_error:
                         logger.error(f"Face swap operation failed: {inner_error}")
                         logger.error(f"Detailed error: {traceback.format_exc()}")
@@ -1648,14 +1629,6 @@ def upload_file():
             logger.info("Performing face swap with the model")
             # Fixed to use explicit paste_back=True parameter
             result_img = swapper.get(target_img, target_faces[0], source_faces[0], paste_back=True)
-            
-            # Get enhancement method from request or use default
-            enhancement_method = request.form.get('enhancement', 'basic')
-            
-            # Apply post-processing enhancement
-            logger.info(f"Applying {enhancement_method} enhancement to swapped image")
-            result_img = enhancement.postprocess_face_swap(result_img, method=enhancement_method)
-            logger.info(f"Face swap and enhancement successful")
         
         # Save result
         output_filename = 'result_' + secure_filename(target_file.filename)
@@ -1694,70 +1667,12 @@ def uploaded_file(filename):
 
 @app.route('/check-models')
 def check_models():
-    # Check face swap models
     status = {
         'face_detection': faceapp is not None,
         'face_swap': swapper is not None,
         'demo_mode': demo_mode
     }
-    
-    # Check available enhancement models
-    from enhancement import MODEL_PATHS
-    
-    enhancement_status = {}
-    for model_name, model_path in MODEL_PATHS.items():
-        enhancement_status[model_name] = os.path.exists(model_path)
-    
-    status['enhancement_models'] = enhancement_status
-    
     return jsonify(status)
-
-# Function to initialize enhancement models on startup
-def initialize_enhancement_models():
-    """
-    Initialize enhancement models by downloading them if they don't exist.
-    This is called during application startup.
-    """
-    try:
-        from enhancement import MODEL_PATHS
-        import subprocess
-        import sys
-        
-        # Check which models are missing
-        missing_models = []
-        for model_name, model_path in MODEL_PATHS.items():
-            if not os.path.exists(model_path):
-                missing_models.append(model_name)
-        
-        if not missing_models:
-            logger.info("All enhancement models are available")
-            return
-        
-        logger.info(f"Downloading missing enhancement models: {missing_models}")
-        
-        # Run the download script
-        result = subprocess.run(
-            [sys.executable, "download_enhancement_models.py"],
-            capture_output=True,
-            text=True,
-            check=False
-        )
-        
-        if result.returncode != 0:
-            logger.error(f"Error downloading enhancement models: {result.stderr}")
-            return
-        
-        # Check which models are now available
-        available_models = []
-        for model_name, model_path in MODEL_PATHS.items():
-            if os.path.exists(model_path):
-                available_models.append(model_name)
-        
-        logger.info(f"Enhancement models available: {available_models}")
-        
-    except Exception as e:
-        logger.error(f"Error initializing enhancement models: {str(e)}")
-        logger.error(traceback.format_exc())
 
 @app.route('/upload-model', methods=['GET', 'POST'])
 def upload_model():
