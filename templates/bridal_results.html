@@ -210,36 +210,28 @@
     const totalResultCounter = document.getElementById('total-result-count');
     
     // Variables for image navigation
-    let currentResultIndex = 0;
     const allResultImages = [];
+    let currentResultIndex = 0;
     
     // Add keyboard navigation support
     document.addEventListener('keydown', (e) => {
-        if (resultPreviewModal._isShown) {
+        // Only if the result modal is visible
+        if (resultPreviewModal._element && resultPreviewModal._element.classList.contains('show')) {
             if (e.key === 'ArrowRight') {
                 navigateResults('next');
             } else if (e.key === 'ArrowLeft') {
                 navigateResults('prev');
             } else if (e.key === '+' || e.key === '=') {
-                if (resultZoomLevel < resultMaxZoom) {
-                    resultZoomLevel += resultZoomStep;
-                    resultPreviewModalImage.style.transform = `scale(${resultZoomLevel})`;
-                }
-            } else if (e.key === '-') {
-                if (resultZoomLevel > resultMinZoom) {
-                    resultZoomLevel -= resultZoomStep;
-                    resultPreviewModalImage.style.transform = `scale(${resultZoomLevel})`;
-                }
+                zoomResultIn();
+            } else if (e.key === '-' || e.key === '_') {
+                zoomResultOut();
             } else if (e.key === '0') {
-                resultZoomLevel = 1;
-                resultPreviewModalImage.style.transform = 'scale(1)';
+                resetResultZoom();
             }
         }
     });
     
-    // Array to store all result images
-    let allResultImages = [];
-    let currentResultIndex = 0;
+    // Variable declarations moved to top of script
     
     // Navigate between result images
     function navigateResults(direction) {
@@ -515,26 +507,7 @@
         }
     }
     
-    // Handle keyboard navigation
-    document.addEventListener('keydown', function(e) {
-        // Only if the result modal is visible
-        if (resultPreviewModal._element.classList.contains('show')) {
-            if (e.key === 'ArrowLeft') {
-                navigateResults('prev');
-            } else if (e.key === 'ArrowRight') {
-                navigateResults('next');
-            } else if (e.key === '+' || e.key === '=') {
-                // Zoom in with + key
-                zoomResultIn();
-            } else if (e.key === '-' || e.key === '_') {
-                // Zoom out with - key
-                zoomResultOut();
-            } else if (e.key === '0') {
-                // Reset zoom with 0 key
-                resetResultZoom();
-            }
-        }
-    });
+
     
     // Zoom functionality for result preview
     let resultZoomLevel = 1;
