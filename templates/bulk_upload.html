@@ -509,7 +509,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Fetch templates from API
-        fetch(`/get-templates?ceremony=${ceremonyType}`)
+        fetch(`/api/templates?ceremony_type=${ceremonyType}`)
             .then(response => response.json())
             .then(data => {
                 if (loadingPlaceholder) {
