@@ -19,6 +19,7 @@
                     <label for="images" class="form-label">Select Images</label>
                     <input type="file" class="form-control" id="images" name="files" multiple accept="image/*" required>
                     <div class="form-text text-light">You can select multiple images at once. Supported formats: JPG, PNG</div>
+                    <div id="fileListContainer" class="mt-2"></div>
                 </div>
 
                 <div class="card bg-dark mb-4 border border-secondary">
@@ -69,19 +70,8 @@
         </div>
     </div>
 
-    <!-- Preview Section -->
-    <div class="card bg-dark text-light mt-4">
-        <div class="card-header bg-primary text-white">
-            <h3>Image Preview</h3>
-        </div>
-        <div class="card-body">
-            <div id="imagePreview" class="row g-3">
-                <div class="col-12 text-center text-muted">
-                    <p>Selected images will appear here</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Hidden container for image data processing -->
+    <div id="imagePreview" class="d-none"></div>
     
     <!-- Current Templates Section -->
     <div class="card bg-dark text-light mt-4">
@@ -163,72 +153,66 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadResult = document.getElementById('uploadResult');
     const successMessage = document.getElementById('successMessage');
 
-    // Show image previews when files are selected
+    // File count display update without previews
     imageInput.addEventListener('change', function() {
+        const fileCount = this.files.length;
+        const selectAllButton = document.getElementById('selectAll');
+        const deselectAllButton = document.getElementById('deselectAll');
+        const uploadSelectedButton = document.getElementById('uploadSelected');
+        
+        // Clear the hidden container
         imagePreview.innerHTML = '';
         
-        if (this.files.length === 0) {
-            imagePreview.innerHTML = '<div class="col-12 text-center text-muted"><p>Selected images will appear here</p></div>';
-            return;
-        }
-
+        // Create hidden elements to store file data for processing
         for (let i = 0; i < this.files.length; i++) {
             const file = this.files[i];
-            const reader = new FileReader();
+            const hiddenElement = document.createElement('div');
+            hiddenElement.className = 'd-none';
+            hiddenElement.dataset.fileName = file.name;
             
-            reader.onload = function(e) {
-                const col = document.createElement('div');
-                col.className = 'col-md-4 col-sm-6';
-                
-                const card = document.createElement('div');
-                card.className = 'card h-100 bg-secondary';
-                
-                // Add checkbox for selection
-                const checkboxWrapper = document.createElement('div');
-                checkboxWrapper.className = 'form-check position-absolute top-0 start-0 m-2';
-                checkboxWrapper.style.zIndex = '10';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.className = 'form-check-input image-checkbox';
-                checkbox.id = 'checkbox-' + file.name.replace(/[^a-zA-Z0-9]/g, '-');
-                checkbox.dataset.fileName = file.name;
-                
-                checkboxWrapper.appendChild(checkbox);
-                
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.className = 'card-img-top';
-                img.alt = 'Preview';
-                img.style.height = '200px';
-                img.style.objectFit = 'cover';
-                
-                const cardBody = document.createElement('div');
-                cardBody.className = 'card-body';
-                
-                const fileName = document.createElement('p');
-                fileName.className = 'card-text small text-truncate';
-                fileName.textContent = file.name;
-                
-                // Save the file object reference for later use
-                cardBody.dataset.fileName = file.name;
-                
-                // Add ceremony type label that will be updated when images are processed
-                const categoryLabel = document.createElement('p');
-                categoryLabel.className = 'card-text small mb-0 category-label';
-                categoryLabel.innerHTML = '<span class="text-muted">Not assigned</span>';
-                categoryLabel.dataset.fileName = file.name;
-                
-                cardBody.appendChild(fileName);
-                cardBody.appendChild(categoryLabel);
-                card.appendChild(checkboxWrapper);
-                card.appendChild(img);
-                card.appendChild(cardBody);
-                col.appendChild(card);
-                imagePreview.appendChild(col);
-            };
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'image-checkbox';
+            checkbox.checked = true; // Default to checked
+            checkbox.dataset.fileName = file.name;
+            checkbox.dataset.fileIndex = i;
             
-            reader.readAsDataURL(file);
+            hiddenElement.appendChild(checkbox);
+            imagePreview.appendChild(hiddenElement);
+        }
+        
+        // Update upload button text with file count
+        if (fileCount > 0) {
+            uploadSelectedButton.textContent = `Upload ${fileCount} File${fileCount !== 1 ? 's' : ''}`;
+            uploadSelectedButton.className = 'btn btn-primary';
+            selectAllButton.disabled = false;
+            deselectAllButton.disabled = false;
+        } else {
+            uploadSelectedButton.textContent = 'Upload Selected';
+            uploadSelectedButton.className = 'btn btn-primary disabled';
+            selectAllButton.disabled = true;
+            deselectAllButton.disabled = true;
+        }
+        
+        // Add file count display to form
+        const fileListContainer = document.getElementById('fileListContainer');
+        if (fileListContainer) {
+            fileListContainer.innerHTML = '';
+            
+            if (fileCount > 0) {
+                const fileListElement = document.createElement('div');
+                fileListElement.className = 'alert alert-info mt-3';
+                fileListElement.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file-image me-2"></i>
+                        <div>
+                            <strong>${fileCount} file${fileCount !== 1 ? 's' : ''} selected</strong>
+                            <div class="small text-muted">All files will be uploaded to the selected ceremony type</div>
+                        </div>
+                    </div>
+                `;
+                fileListContainer.appendChild(fileListElement);
+            }
         }
     });
 
@@ -271,6 +255,18 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Disable form elements during upload
+        const uploadButton = document.getElementById('uploadSelected');
+        const selectAllButton = document.getElementById('selectAll');
+        const deselectAllButton = document.getElementById('deselectAll');
+        const ceremonySelect = document.getElementById('ceremonyType');
+        
+        uploadButton.disabled = true;
+        selectAllButton.disabled = true;
+        deselectAllButton.disabled = true;
+        ceremonySelect.disabled = true;
+        imageInput.disabled = true;
+        
         // Create FormData for upload
         const formData = new FormData();
         formData.append('ceremony_type', ceremonyType);
@@ -296,7 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
         uploadStatus.style.display = 'block';
         uploadResult.style.display = 'none';
         uploadProgress.style.width = '0%';
-        statusMessage.textContent = 'Uploading selected images...';
+        statusMessage.textContent = `Uploading ${uploadingFileNames.length} image${uploadingFileNames.length !== 1 ? 's' : ''} to ${ceremonyType}...`;
         statusMessage.className = 'alert alert-info';
         
         // Create a progress animation
@@ -319,36 +315,42 @@ document.addEventListener('DOMContentLoaded', function() {
             clearInterval(progressInterval);
             uploadProgress.style.width = '100%';
             
+            // Re-enable form elements
+            uploadButton.disabled = false;
+            selectAllButton.disabled = false;
+            deselectAllButton.disabled = false;
+            ceremonySelect.disabled = false;
+            imageInput.disabled = false;
+            
             if (data.success) {
                 statusMessage.textContent = 'Upload complete!';
                 statusMessage.className = 'alert alert-success';
                 
-                // Update labels for uploaded images
-                uploadingFileNames.forEach(fileName => {
-                    // Find checkboxes and labels for this file
-                    const checkbox = document.querySelector(`.image-checkbox[data-file-name="${fileName}"]`);
-                    const label = document.querySelector(`.category-label[data-file-name="${fileName}"]`);
-                    
-                    if (checkbox && label) {
-                        // Mark as uploaded and update label
-                        checkbox.disabled = true;
-                        checkbox.checked = false;
-                        label.innerHTML = `<span class="text-success">Uploaded to ${ceremonyType}</span>`;
-                        
-                        // Optionally: add a visual effect to show it's been processed
-                        const card = checkbox.closest('.card');
-                        if (card) {
-                            card.classList.add('opacity-50');
-                        }
-                    }
-                });
-                
                 // Show success message
                 uploadResult.style.display = 'block';
                 successMessage.innerHTML = `
-                    <strong>Success!</strong> Uploaded ${data.uploaded_count} images to ${ceremonyType}.
-                    ${data.main_template_updated ? '<p>Main templates have been updated.</p>' : ''}
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle text-success me-2" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <strong>Successfully uploaded ${data.uploaded_count || uploadingFileNames.length} template${(data.uploaded_count || uploadingFileNames.length) !== 1 ? 's' : ''}</strong>
+                            <div>Templates are now available in the ${ceremonyType} ceremony gallery</div>
+                        </div>
+                    </div>
                 `;
+                
+                // Reset the file input and hidden container
+                imageInput.value = '';
+                imagePreview.innerHTML = '';
+                
+                // Update the file list container
+                const fileListContainer = document.getElementById('fileListContainer');
+                if (fileListContainer) {
+                    fileListContainer.innerHTML = '';
+                }
+                
+                // Reset the upload button text
+                uploadButton.textContent = 'Upload Selected';
+                uploadButton.className = 'btn btn-primary disabled';
                 
                 // Refresh the templates for this ceremony type
                 refreshTemplatesAfterUpload(ceremonyType);
@@ -383,6 +385,13 @@ document.addEventListener('DOMContentLoaded', function() {
             uploadProgress.style.width = '100%';
             statusMessage.textContent = 'Error: ' + error.message;
             statusMessage.className = 'alert alert-danger';
+            
+            // Re-enable form elements on error
+            uploadButton.disabled = false;
+            selectAllButton.disabled = false;
+            deselectAllButton.disabled = false;
+            ceremonySelect.disabled = false;
+            imageInput.disabled = false;
         });
     }
     
