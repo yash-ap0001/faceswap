@@ -1262,6 +1262,26 @@ def bridal_swap_multi():
                     result_img = create_demo_result(source_img, template_img, source_face, target_face)
                     logger.info("Created fallback result with face boxes")
                 
+                # Apply face enhancement if requested
+                enhanced = False
+                enhanced_method = None
+                if enhance:
+                    try:
+                        from face_enhancer import FaceEnhancer
+                        # Initialize the face enhancer
+                        enhancer = FaceEnhancer()
+                        logger.info(f"Applying face enhancement with method: {enhance_method}")
+                        
+                        # Apply face enhancement
+                        result_img = enhancer.enhance(result_img, method=enhance_method, strength=0.8)
+                        logger.info("Face enhancement applied successfully")
+                        enhanced = True
+                        enhanced_method = enhance_method
+                    except Exception as e:
+                        logger.error(f"Face enhancement failed: {str(e)}")
+                        logger.error(traceback.format_exc())
+                        # Continue with the unenhanced result
+                
                 # Save result
                 timestamp = int(time.time())
                 result_filename = f"multi_{i}_{ceremony_type}_{timestamp}_{secure_filename(source_file.filename)}"
@@ -1273,7 +1293,9 @@ def bridal_swap_multi():
                 # Add to results
                 results.append({
                     'ceremony': ceremony_type,
-                    'result_path': f"/uploads/results/{result_filename}"
+                    'result_path': f"/uploads/results/{result_filename}",
+                    'enhanced': enhanced,
+                    'enhance_method': enhanced_method
                 })
                 
             except Exception as e:

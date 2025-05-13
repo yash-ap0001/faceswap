@@ -216,9 +216,20 @@
                     // Update the result container with the processed image
                     // Determine enhancement badge
                     let enhanceBadge = '';
-                    if (enhanceEnabled) {
-                        const methodName = enhanceMethod.charAt(0).toUpperCase() + enhanceMethod.slice(1);
-                        enhanceBadge = `<span class="badge bg-info" title="Enhanced with ${methodName}">Enhanced</span>`;
+                    if (data.enhanced) {
+                        let methodName = data.enhance_method || 'Auto';
+                        // Format the method name for display
+                        if (methodName === 'auto') methodName = 'Auto';
+                        else if (methodName === 'gfpgan') methodName = 'GFPGAN';
+                        else if (methodName === 'codeformer') methodName = 'CodeFormer';
+                        methodName = methodName.charAt(0).toUpperCase() + methodName.slice(1);
+                        
+                        // Use different badge colors based on the method
+                        let badgeClass = 'bg-info';
+                        if (methodName === 'GFPGAN') badgeClass = 'bg-purple';
+                        else if (methodName === 'CodeFormer') badgeClass = 'bg-teal';
+                        
+                        enhanceBadge = `<span class="badge ${badgeClass}" title="Enhanced with ${methodName}">Enhanced (${methodName})</span>`;
                     }
                     
                     resultContainer.innerHTML = `
