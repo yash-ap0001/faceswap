@@ -827,51 +827,52 @@
 <script src="{{ url_for('static', filename='js/gallery-viewer.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM Elements
-    const sourceInput = document.getElementById('source-input');
-    const sourcePreview = document.getElementById('source-preview');
-    const sourcePlaceholder = document.getElementById('source-placeholder');
-    const sourceClearBtn = document.getElementById('source-clear-btn');
-    const generateBtn = document.getElementById('generate-btn');
-    const templateCards = document.querySelectorAll('.bridal-card');
-    const emptyResults = document.getElementById('empty-results');
-    
-    // Multi-selection Elements will be defined below for simplicity
-    
-    // Variables for multi-selection
-    const resultGallery = document.getElementById('result-gallery');
-    const loadingOverlay = document.getElementById('loading-overlay');
-    const loadingMessage = document.getElementById('loading-message');
-    const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
-    const errorMessage = document.getElementById('error-message');
-    const modelStatusCard = document.getElementById('model-status-card');
-    
-    // Check model status
-    checkModels();
-    
-    // Initialize modals
-    const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-    const imagePreviewModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
-    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-    
-    // Current state for delete and preview operations
-    let currentDeletePath = null;
-    
-    // Template selection state
-    let selectedTemplates = [];
-    
-    // Multi-Selection Elements
-    const multiSelectionInterface = document.getElementById('multiSelectionInterface');
-    const selectedCount = document.getElementById('selectedCount');
-    const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
-    const clearSelectionBtn = document.getElementById('clearSelectionBtn');
-    const processMultipleBtn = document.getElementById('processMultipleBtn');
-    const multiSourceInput = document.getElementById('multiSourceInput');
-    const multiSourcePreview = document.getElementById('multiSourcePreview');
-    const multiSourcePlaceholder = document.getElementById('multiSourcePlaceholder');
-    let multiSourceFile = null;
-    let currentDeleteCeremony = null;
-    let currentBulkDeletePaths = [];
+    try {
+        // DOM Elements - Add try-catch for robust error handling
+        console.log("Starting bridal gallery initialization");
+        const sourceInput = document.getElementById('source-input');
+        const sourcePreview = document.getElementById('source-preview');
+        const sourcePlaceholder = document.getElementById('source-placeholder');
+        const sourceClearBtn = document.getElementById('source-clear-btn');
+        const generateBtn = document.getElementById('generate-btn');
+        const templateCards = document.querySelectorAll('.bridal-card');
+        const emptyResults = document.getElementById('empty-results');
+        console.log("Found basic elements, template cards:", templateCards.length);
+        
+        // Variables for multi-selection
+        const resultGallery = document.getElementById('result-gallery');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingMessage = document.getElementById('loading-message');
+        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+        const errorMessage = document.getElementById('error-message');
+        const modelStatusCard = document.getElementById('model-status-card');
+        
+        // Check model status
+        checkModels();
+        
+        // Initialize modals
+        const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+        const imagePreviewModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        
+        // Current state for delete and preview operations
+        let currentDeletePath = null;
+        
+        // Template selection state
+        let selectedTemplates = [];
+        
+        // Multi-Selection Elements
+        const multiSelectionInterface = document.getElementById('multiSelectionInterface');
+        const selectedCount = document.getElementById('selectedCount');
+        const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
+        const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+        const processMultipleBtn = document.getElementById('processMultipleBtn');
+        const multiSourceInput = document.getElementById('multiSourceInput');
+        const multiSourcePreview = document.getElementById('multiSourcePreview');
+        const multiSourcePlaceholder = document.getElementById('multiSourcePlaceholder');
+        let multiSourceFile = null;
+        let currentDeleteCeremony = null;
+        let currentBulkDeletePaths = [];
     
     // Carousel navigation removed
     
