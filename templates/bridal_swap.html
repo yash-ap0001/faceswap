@@ -500,6 +500,32 @@
                         </div>
                     </div>
 
+                    <!-- Enhancement options -->
+                    <div class="row mb-4">
+                        <div class="col-md-8 offset-md-2">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="text-center mb-3">Image Enhancement</h6>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <select class="form-select form-select-sm" name="enhancement" id="enhancement-select">
+                                                <option value="basic" selected>Basic Enhancement</option>
+                                                <option value="gpen">GPEN Face Enhancement</option>
+                                                <option value="gfpgan">GFPGAN Face Restoration</option>
+                                                <option value="codeformer">CodeFormer Face Enhancement</option>
+                                                <option value="esrgan">ESRGAN Upscaling</option>
+                                            </select>
+                                            <div class="form-text small text-muted mt-2">
+                                                Choose enhancement method for post-processing. 
+                                                If an advanced method is unavailable, basic enhancement will be used.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="text-center">
                         <button type="submit" id="swap-btn" class="btn btn-primary">
                             <i class="fas fa-magic me-2"></i>Single Swap

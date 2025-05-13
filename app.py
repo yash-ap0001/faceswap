@@ -1648,6 +1648,14 @@ def upload_file():
             logger.info("Performing face swap with the model")
             # Fixed to use explicit paste_back=True parameter
             result_img = swapper.get(target_img, target_faces[0], source_faces[0], paste_back=True)
+            
+            # Get enhancement method from request or use default
+            enhancement_method = request.form.get('enhancement', 'basic')
+            
+            # Apply post-processing enhancement
+            logger.info(f"Applying {enhancement_method} enhancement to swapped image")
+            result_img = enhancement.postprocess_face_swap(result_img, method=enhancement_method)
+            logger.info(f"Face swap and enhancement successful")
         
         # Save result
         output_filename = 'result_' + secure_filename(target_file.filename)
