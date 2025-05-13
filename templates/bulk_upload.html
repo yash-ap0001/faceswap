@@ -4,67 +4,138 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="card bg-dark text-light">
-        <div class="card-header bg-primary text-white">
-            <h2>Bulk Template Upload</h2>
-        </div>
-        <div class="card-body">
-            <div class="alert alert-info">
-                <p>Upload multiple images for a specific ceremony type. These will be added as Pinterest template options.</p>
-                <p>The first image uploaded will be set as the main template for the selected ceremony type.</p>
-            </div>
+    <h2 class="mb-4 text-center">Template Management</h2>
+    
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card bg-dark text-light mb-4 border-0 shadow">
+                <div class="card-body p-4">
+                    <h4 class="mb-3">Upload Templates</h4>
+                    
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="images" class="form-label">Select Images</label>
+                            <input type="file" class="form-control" id="images" name="files" multiple accept="image/*" required>
+                            <div class="form-text text-muted small">JPG, PNG formats | First image becomes main template</div>
+                            <div id="fileListContainer" class="mt-2"></div>
+                        </div>
 
-            <form id="uploadForm" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label for="images" class="form-label">Select Images</label>
-                    <input type="file" class="form-control" id="images" name="files" multiple accept="image/*" required>
-                    <div class="form-text text-light">You can select multiple images at once. Supported formats: JPG, PNG</div>
-                    <div id="fileListContainer" class="mt-2"></div>
-                </div>
-
-                <div class="card bg-dark mb-4 border border-secondary">
-                    <div class="card-header bg-dark">
-                        <h5 class="mb-0">Batch Processing Controls</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row align-items-end">
+                        <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <div class="form-group mb-md-0 mb-3">
-                                    <label for="ceremonyType" class="form-label">Ceremony Type</label>
-                                    <select class="form-select" id="ceremonyType" name="ceremony_type" required>
-                                        <option value="" disabled selected>Select ceremony type</option>
-                                        <option value="haldi">Haldi</option>
-                                        <option value="mehendi">Mehendi</option>
-                                        <option value="sangeeth">Sangeeth</option>
-                                        <option value="wedding">Wedding</option>
-                                        <option value="reception">Reception</option>
-                                    </select>
+                                <label for="ceremonyType" class="form-label">Ceremony</label>
+                                <select class="form-select bg-dark text-light border-secondary" id="ceremonyType" name="ceremony_type" required>
+                                    <option value="" disabled selected>Select ceremony type</option>
+                                    <option value="haldi">Haldi</option>
+                                    <option value="mehendi">Mehendi</option>
+                                    <option value="sangeeth">Sangeeth</option>
+                                    <option value="wedding">Wedding</option>
+                                    <option value="reception">Reception</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <div class="btn-group w-100">
+                                    <button type="button" id="selectAll" class="btn btn-outline-light btn-sm">Select All</button>
+                                    <button type="button" id="deselectAll" class="btn btn-outline-secondary btn-sm">Deselect</button>
+                                    <button type="button" id="uploadSelected" class="btn btn-primary btn-sm">Upload</button>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="d-flex">
-                                    <button type="button" id="selectAll" class="btn btn-outline-light me-2">Select All</button>
-                                    <button type="button" id="deselectAll" class="btn btn-outline-secondary me-2">Deselect All</button>
-                                    <button type="button" id="uploadSelected" class="btn btn-primary">Upload Selected</button>
+                        </div>
+                    </form>
+                    
+                    <div id="uploadStatus" class="mt-3" style="display: none;">
+                        <div class="progress" style="height: 8px;">
+                            <div id="uploadProgress" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <div id="statusMessage" class="mt-2 p-2 small rounded bg-dark text-light"></div>
+                    </div>
+
+                    <div id="uploadResult" class="mt-3" style="display: none;">
+                        <div id="successMessage" class="p-2 rounded bg-success bg-opacity-25 text-success border border-success small"></div>
+                        <div class="d-flex justify-content-end mt-2">
+                            <a href="/bridal-gallery" class="btn btn-link btn-sm text-light">View Gallery</a>
+                            <a href="/bridal-swap" class="btn btn-link btn-sm text-primary">Try Face Swap</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card bg-dark text-light border-0 shadow">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="mb-0">Delete Templates</h4>
+                        <div class="d-flex">
+                            <button id="refreshTemplates" class="btn btn-outline-light btn-sm me-2">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <button id="deleteSelected" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash-alt me-1"></i> Delete Selected
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="deleteStatus" class="mb-3" style="display: none;">
+                        <div class="progress" style="height: 8px;">
+                            <div id="deleteProgress" class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <div id="deleteStatusMessage" class="mt-2 p-2 small rounded bg-dark text-light"></div>
+                    </div>
+                    
+                    <div class="btn-group w-100 mb-3" role="group" aria-label="Ceremony selection">
+                        <input type="radio" class="btn-check" name="ceremonyTab" id="haldi-tab-radio" value="haldi" checked>
+                        <label class="btn btn-outline-secondary btn-sm" for="haldi-tab-radio">Haldi</label>
+                        
+                        <input type="radio" class="btn-check" name="ceremonyTab" id="mehendi-tab-radio" value="mehendi">
+                        <label class="btn btn-outline-secondary btn-sm" for="mehendi-tab-radio">Mehendi</label>
+                        
+                        <input type="radio" class="btn-check" name="ceremonyTab" id="sangeeth-tab-radio" value="sangeeth">
+                        <label class="btn btn-outline-secondary btn-sm" for="sangeeth-tab-radio">Sangeeth</label>
+                        
+                        <input type="radio" class="btn-check" name="ceremonyTab" id="wedding-tab-radio" value="wedding">
+                        <label class="btn btn-outline-secondary btn-sm" for="wedding-tab-radio">Wedding</label>
+                        
+                        <input type="radio" class="btn-check" name="ceremonyTab" id="reception-tab-radio" value="reception">
+                        <label class="btn btn-outline-secondary btn-sm" for="reception-tab-radio">Reception</label>
+                    </div>
+                    
+                    <div class="tab-content pt-1" id="deleteTabContent">
+                        <div class="tab-pane fade show active" id="haldi-delete" role="tabpanel">
+                            <div id="haldi-templates" class="row g-3 template-container">
+                                <div class="col-12 text-center text-muted loading-placeholder">
+                                    <p>Loading haldi templates...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="mehendi-delete" role="tabpanel">
+                            <div id="mehendi-templates" class="row g-3 template-container">
+                                <div class="col-12 text-center text-muted loading-placeholder">
+                                    <p>Loading mehendi templates...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="sangeeth-delete" role="tabpanel">
+                            <div id="sangeeth-templates" class="row g-3 template-container">
+                                <div class="col-12 text-center text-muted loading-placeholder">
+                                    <p>Loading sangeeth templates...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="wedding-delete" role="tabpanel">
+                            <div id="wedding-templates" class="row g-3 template-container">
+                                <div class="col-12 text-center text-muted loading-placeholder">
+                                    <p>Loading wedding templates...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="reception-delete" role="tabpanel">
+                            <div id="reception-templates" class="row g-3 template-container">
+                                <div class="col-12 text-center text-muted loading-placeholder">
+                                    <p>Loading reception templates...</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </form>
-
-            <div id="uploadStatus" class="mt-4" style="display: none;">
-                <div class="progress mb-3">
-                    <div id="uploadProgress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
-                </div>
-                <div id="statusMessage" class="alert alert-info"></div>
-            </div>
-
-            <div id="uploadResult" class="mt-4" style="display: none;">
-                <div id="successMessage" class="alert alert-success"></div>
-                <div class="text-center mt-3">
-                    <a href="/bridal-gallery" class="btn btn-outline-light">View Bridal Gallery</a>
-                    <a href="/bridal-swap" class="btn btn-outline-primary">Try Face Swap</a>
                 </div>
             </div>
         </div>
@@ -73,77 +144,14 @@
     <!-- Hidden container for image data processing -->
     <div id="imagePreview" class="d-none"></div>
     
-    <!-- Current Templates Section -->
-    <div class="card bg-dark text-light mt-4">
-        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-            <h3 class="mb-0">Current Templates</h3>
-            <button id="refreshTemplates" class="btn btn-outline-light btn-sm">
-                <i class="fas fa-sync-alt"></i> Refresh
-            </button>
-        </div>
-        <div class="card-body">
-            <ul class="nav nav-tabs" id="templateTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="haldi-tab" data-bs-toggle="tab" data-bs-target="#haldi" type="button" role="tab">Haldi</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="mehendi-tab" data-bs-toggle="tab" data-bs-target="#mehendi" type="button" role="tab">Mehendi</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="sangeeth-tab" data-bs-toggle="tab" data-bs-target="#sangeeth" type="button" role="tab">Sangeeth</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="wedding-tab" data-bs-toggle="tab" data-bs-target="#wedding" type="button" role="tab">Wedding</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="reception-tab" data-bs-toggle="tab" data-bs-target="#reception" type="button" role="tab">Reception</button>
-                </li>
-            </ul>
-            <div class="tab-content pt-4" id="templateTabContent">
-                <div class="tab-pane fade show active" id="haldi" role="tabpanel">
-                    <div id="haldi-templates" class="row g-3">
-                        <div class="col-12 text-center text-muted loading-placeholder">
-                            <p>Loading haldi templates...</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="mehendi" role="tabpanel">
-                    <div id="mehendi-templates" class="row g-3">
-                        <div class="col-12 text-center text-muted loading-placeholder">
-                            <p>Loading mehendi templates...</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="sangeeth" role="tabpanel">
-                    <div id="sangeeth-templates" class="row g-3">
-                        <div class="col-12 text-center text-muted loading-placeholder">
-                            <p>Loading sangeeth templates...</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="wedding" role="tabpanel">
-                    <div id="wedding-templates" class="row g-3">
-                        <div class="col-12 text-center text-muted loading-placeholder">
-                            <p>Loading wedding templates...</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="reception" role="tabpanel">
-                    <div id="reception-templates" class="row g-3">
-                        <div class="col-12 text-center text-muted loading-placeholder">
-                            <p>Loading reception templates...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize elements
     const uploadForm = document.getElementById('uploadForm');
     const imageInput = document.getElementById('images');
     const imagePreview = document.getElementById('imagePreview');
@@ -152,6 +160,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const statusMessage = document.getElementById('statusMessage');
     const uploadResult = document.getElementById('uploadResult');
     const successMessage = document.getElementById('successMessage');
+    const deleteButton = document.getElementById('deleteSelected');
+    const deleteStatus = document.getElementById('deleteStatus');
+    const deleteProgress = document.getElementById('deleteProgress');
+    const deleteStatusMessage = document.getElementById('deleteStatusMessage');
 
     // File count display update without previews
     imageInput.addEventListener('change', function() {
