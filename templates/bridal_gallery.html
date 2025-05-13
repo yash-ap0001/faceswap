@@ -325,7 +325,64 @@
     /* View more button styles */
     /* Removed view-more button styles */
     
-    /* Removed fullscreen gallery styles */
+    /* Enhanced modal styling */
+    .modal-content {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60vh;
+        position: relative;
+    }
+    
+    #fullsize-preview-image {
+        max-height: 75vh;
+        transition: transform 0.3s ease;
+        cursor: move;
+    }
+    
+    .image-counter {
+        color: #adb5bd;
+        font-size: 0.9rem;
+        margin-right: auto;
+    }
+    
+    /* Navigation controls */
+    #prevImageBtn, #nextImageBtn {
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 15px;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+    }
+    
+    #prevImageBtn:hover, #nextImageBtn:hover {
+        opacity: 1;
+    }
+    
+    /* Zoom controls styling */
+    .btn-group .btn {
+        border-radius: 0;
+    }
+    
+    .btn-group .btn:first-child {
+        border-top-left-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+    }
+    
+    .btn-group .btn:last-child {
+        border-top-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+    }
 </style>
 {% endblock %}
 
@@ -1694,10 +1751,44 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
+    // Global variables for image navigation
+    let currentCeremonyType = "";
+    let currentTemplateIndex = 0;
+    let currentCeremonyImages = [];
+    let zoomLevel = 1;
+    
     // Function to show the full-size preview
     function showFullsizePreview(imagePath, ceremonyType) {
+        currentCeremonyType = ceremonyType;
+        
+        // Find all template images for this ceremony
+        const container = document.getElementById(ceremonyType + '-carousel');
+        if (!container) return;
+        
+        // Get all templates for this ceremony
+        const templateCards = container.querySelectorAll('.template-card');
+        currentCeremonyImages = [];
+        
+        // Store all template paths and find the index of the current image
+        templateCards.forEach((card, index) => {
+            const path = card.getAttribute('data-template-path');
+            if (path) {
+                currentCeremonyImages.push(path);
+                if (path === imagePath) {
+                    currentTemplateIndex = index;
+                }
+            }
+        });
+        
+        // Update image counter
+        updateImageCounter();
+        
         // Set the image source
-        document.getElementById('fullsize-preview-image').src = imagePath;
+        const previewImage = document.getElementById('fullsize-preview-image');
+        previewImage.src = imagePath;
+        
+        // Reset zoom level
+        resetZoom();
         
         // Set the title with the ceremony type
         document.getElementById('fullsize-preview-title').textContent = 
@@ -1706,7 +1797,143 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show the modal
         const previewModal = new bootstrap.Modal(document.getElementById('fullsizePreviewModal'));
         previewModal.show();
+        
+        // Initialize navigation buttons
+        initializeNavigation();
     }
+    
+    // Function to initialize navigation buttons
+    function initializeNavigation() {
+        // Previous image button
+        document.getElementById('prevImageBtn').addEventListener('click', navigateToPreviousImage);
+        
+        // Next image button
+        document.getElementById('nextImageBtn').addEventListener('click', navigateToNextImage);
+        
+        // Zoom controls - Top
+        document.getElementById('zoomInBtn').addEventListener('click', zoomIn);
+        document.getElementById('zoomOutBtn').addEventListener('click', zoomOut);
+        document.getElementById('resetZoomBtn').addEventListener('click', resetZoom);
+        
+        // Zoom controls - Bottom
+        document.getElementById('zoomInBtnBottom').addEventListener('click', zoomIn);
+        document.getElementById('zoomOutBtnBottom').addEventListener('click', zoomOut);
+        document.getElementById('resetZoomBtnBottom').addEventListener('click', resetZoom);
+        
+        // Add keyboard navigation
+        document.addEventListener('keydown', handleImageNavigation);
+    }
+    
+    // Function to handle keyboard navigation
+    function handleImageNavigation(e) {
+        const modal = document.getElementById('fullsizePreviewModal');
+        
+        // Only handle keys if the modal is visible
+        if (modal && modal.classList.contains('show')) {
+            switch (e.key) {
+                case 'ArrowLeft':
+                    navigateToPreviousImage();
+                    break;
+                case 'ArrowRight':
+                    navigateToNextImage();
+                    break;
+                case '+':
+                case '=': // + key on most keyboards
+                    zoomIn();
+                    break;
+                case '-':
+                    zoomOut();
+                    break;
+                case '0':
+                    resetZoom();
+                    break;
+                case 'Escape':
+                    // Close the modal
+                    const bsModal = bootstrap.Modal.getInstance(modal);
+                    if (bsModal) bsModal.hide();
+                    break;
+            }
+        }
+    }
+    
+    // Function to navigate to the previous image
+    function navigateToPreviousImage() {
+        if (currentCeremonyImages.length === 0) return;
+        
+        // Decrease index and wrap around if needed
+        currentTemplateIndex--;
+        if (currentTemplateIndex < 0) {
+            currentTemplateIndex = currentCeremonyImages.length - 1;
+        }
+        
+        // Update the preview image
+        const previewImage = document.getElementById('fullsize-preview-image');
+        previewImage.src = currentCeremonyImages[currentTemplateIndex];
+        
+        // Reset zoom level
+        resetZoom();
+        
+        // Update image counter
+        updateImageCounter();
+    }
+    
+    // Function to navigate to the next image
+    function navigateToNextImage() {
+        if (currentCeremonyImages.length === 0) return;
+        
+        // Increase index and wrap around if needed
+        currentTemplateIndex++;
+        if (currentTemplateIndex >= currentCeremonyImages.length) {
+            currentTemplateIndex = 0;
+        }
+        
+        // Update the preview image
+        const previewImage = document.getElementById('fullsize-preview-image');
+        previewImage.src = currentCeremonyImages[currentTemplateIndex];
+        
+        // Reset zoom level
+        resetZoom();
+        
+        // Update image counter
+        updateImageCounter();
+    }
+    
+    // Function to update the image counter
+    function updateImageCounter() {
+        document.getElementById('current-image-index').textContent = currentTemplateIndex + 1;
+        document.getElementById('total-image-count').textContent = currentCeremonyImages.length;
+    }
+    
+    // Function to zoom in
+    function zoomIn() {
+        zoomLevel += 0.1;
+        if (zoomLevel > 3) zoomLevel = 3; // Limit maximum zoom
+        applyZoom();
+    }
+    
+    // Function to zoom out
+    function zoomOut() {
+        zoomLevel -= 0.1;
+        if (zoomLevel < 0.5) zoomLevel = 0.5; // Limit minimum zoom
+        applyZoom();
+    }
+    
+    // Function to reset zoom
+    function resetZoom() {
+        zoomLevel = 1;
+        applyZoom();
+    }
+    
+    // Function to apply zoom level
+    function applyZoom() {
+        const previewImage = document.getElementById('fullsize-preview-image');
+        previewImage.style.transform = `scale(${zoomLevel})`;
+    }
+    
+    // Clean up event listeners when the modal is hidden
+    document.getElementById('fullsizePreviewModal').addEventListener('hidden.bs.modal', function() {
+        document.removeEventListener('keydown', handleImageNavigation);
+    });
     
     // Toggle template selection
     function toggleTemplateSelection(event, templatePath, ceremonyType) {
