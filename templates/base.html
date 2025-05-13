@@ -752,47 +752,26 @@
                     </div>
                 </div>
                 
-                <!-- Wedding Services Section -->
+                <!-- Services Section -->
                 <div class="accordion-item bg-transparent border-0 mb-2">
-                    <h6 class="accordion-header" id="headingWeddingServices">
+                    <h6 class="accordion-header" id="headingServices">
                         <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
                                 type="button" data-bs-toggle="collapse" 
-                                data-bs-target="#collapseWeddingServices" aria-expanded="false" 
-                                aria-controls="collapseWeddingServices">
-                            <i class="fas fa-concierge-bell me-2"></i>Wedding Services by Location
+                                data-bs-target="#collapseServices" aria-expanded="false" 
+                                aria-controls="collapseServices">
+                            <i class="fas fa-concierge-bell me-2"></i>Services
                         </button>
                     </h6>
-                    <div id="collapseWeddingServices" class="accordion-collapse collapse" 
-                         aria-labelledby="headingWeddingServices" data-bs-parent="#sidebarAccordion">
+                    <div id="collapseServices" class="accordion-collapse collapse" 
+                         aria-labelledby="headingServices" data-bs-parent="#sidebarAccordion">
                         <div class="accordion-body p-0 pt-2">
                             <!-- Service Categories -->
-                            <div class="mb-4">
-                                <h6 class="text-light-purple fw-bold mb-2 fs-6 service-category-header"><i class="fas fa-user-tie me-2"></i>Event Managers</h6>
-                                <div class="mb-3">
-                                    <a href="{{ url_for('event_managers') }}" class="btn btn-sm btn-outline-secondary w-100">View All</a>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <h6 class="text-light-purple fw-bold mb-2 fs-6 service-category-header"><i class="fas fa-building me-2"></i>Venues</h6>
-                                <div class="mb-3">
-                                    <a href="{{ url_for('venue_search') }}" class="btn btn-sm btn-outline-secondary w-100">View All</a>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <h6 class="text-light-purple fw-bold mb-2 fs-6 service-category-header"><i class="fas fa-camera me-2"></i>Photography</h6>
-                                <div class="mb-3">
-                                    <a href="#" onclick="alert('Photography services coming soon')" class="btn btn-sm btn-outline-secondary w-100">View All</a>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <h6 class="text-light-purple fw-bold mb-2 fs-6 service-category-header"><i class="fas fa-utensils me-2"></i>Catering</h6>
-                                <div class="mb-3">
-                                    <a href="#" onclick="alert('Catering services coming soon')" class="btn btn-sm btn-outline-secondary w-100">View All</a>
-                                </div>
-                            </div>
+                            <ul class="sidebar-menu">
+                                <li><a href="{{ url_for('event_managers') }}"><i class="fas fa-user-tie me-2"></i>Event Managers</a></li>
+                                <li><a href="{{ url_for('venue_search') }}"><i class="fas fa-building me-2"></i>Venues</a></li>
+                                <li><a href="#" onclick="alert('Photography services coming soon')"><i class="fas fa-camera me-2"></i>Photography</a></li>
+                                <li><a href="#" onclick="alert('Catering services coming soon')"><i class="fas fa-utensils me-2"></i>Catering</a></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
