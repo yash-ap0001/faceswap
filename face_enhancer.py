@@ -9,10 +9,13 @@ Both models are optional and the module will use whichever is available.
 """
 
 import os
+import logging
 import cv2
 import numpy as np
-import logging
+import onnxruntime as ort
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 class FaceEnhancer:
@@ -22,157 +25,210 @@ class FaceEnhancer:
     """
     
     def __init__(self):
+        """Initialize the face enhancer with available models."""
         self.codeformer_model = None
+        self.codeformer_session = None
         self.gfpgan_model = None
+        self.gfpgan_session = None
+        
+        # Model paths - check multiple possible locations
+        self.model_dirs = [
+            'models',
+            os.path.join(os.path.dirname(__file__), 'models'),
+            '/home/runner/workspace/models',
+            '.'
+        ]
+        
+        # Load available enhancement models
         self._load_models()
-    
+
     def _load_models(self):
         """Load available enhancement models."""
-        import onnxruntime as ort
-        
         # Try to load CodeFormer
-        codeformer_paths = [
-            'models/enhancement/faster_codeformer_onnx.onnx',
-            'models/codeformer.onnx',
-            'models/faster_codeformer_onnx.onnx'
+        codeformer_filenames = [
+            'codeformer.onnx', 
+            'faster_codeformer_onnx.onnx',
+            'codeformer_fp16.onnx'
         ]
         
-        for codeformer_path in codeformer_paths:
-            if os.path.exists(codeformer_path):
-                try:
-                    logger.info(f"Loading CodeFormer model from {codeformer_path}")
-                    self.codeformer_model = ort.InferenceSession(
-                        codeformer_path, 
-                        providers=['CPUExecutionProvider']
-                    )
-                    logger.info("CodeFormer model loaded successfully")
-                    break
-                except Exception as e:
-                    logger.error(f"Failed to load CodeFormer model from {codeformer_path}: {e}")
-        
-        if self.codeformer_model is None:
-            logger.warning("No CodeFormer model could be loaded from any path")
-        
+        for model_dir in self.model_dirs:
+            for filename in codeformer_filenames:
+                codeformer_path = os.path.join(model_dir, filename)
+                if os.path.exists(codeformer_path):
+                    try:
+                        logger.info(f"Loading CodeFormer model from {codeformer_path}")
+                        self.codeformer_model = codeformer_path
+                        self.codeformer_session = ort.InferenceSession(
+                            codeformer_path, 
+                            providers=['CPUExecutionProvider']
+                        )
+                        logger.info("CodeFormer model loaded successfully")
+                        break
+                    except Exception as e:
+                        logger.error(f"Failed to load CodeFormer model: {str(e)}")
+                        self.codeformer_model = None
+                        self.codeformer_session = None
+            
+            if self.codeformer_session is not None:
+                break
+                
         # Try to load GFPGAN
-        gfpgan_paths = [
-            'models/enhancement/gfpgan_1.4.onnx',
-            'models/gfpgan_1.4.onnx',
-            'models/gfpgan.onnx'
+        gfpgan_filenames = [
+            'gfpgan_1.4.onnx',
+            'gfpgan.onnx',
+            'GFPGANv1.4.onnx'
         ]
         
-        for gfpgan_path in gfpgan_paths:
-            if os.path.exists(gfpgan_path):
-                try:
-                    logger.info(f"Loading GFPGAN model from {gfpgan_path}")
-                    self.gfpgan_model = ort.InferenceSession(
-                        gfpgan_path, 
-                        providers=['CPUExecutionProvider']
-                    )
-                    logger.info("GFPGAN model loaded successfully")
-                    break
-                except Exception as e:
-                    logger.error(f"Failed to load GFPGAN model from {gfpgan_path}: {e}")
-        
-        if self.gfpgan_model is None:
-            logger.warning("No GFPGAN model could be loaded from any path")
-    
+        for model_dir in self.model_dirs:
+            for filename in gfpgan_filenames:
+                gfpgan_path = os.path.join(model_dir, filename)
+                if os.path.exists(gfpgan_path):
+                    try:
+                        logger.info(f"Loading GFPGAN model from {gfpgan_path}")
+                        self.gfpgan_model = gfpgan_path
+                        self.gfpgan_session = ort.InferenceSession(
+                            gfpgan_path, 
+                            providers=['CPUExecutionProvider']
+                        )
+                        logger.info("GFPGAN model loaded successfully")
+                        break
+                    except Exception as e:
+                        logger.error(f"Failed to load GFPGAN model: {str(e)}")
+                        self.gfpgan_model = None
+                        self.gfpgan_session = None
+            
+            if self.gfpgan_session is not None:
+                break
+
+        if not self.has_enhancement_models():
+            logger.warning("No face enhancement models were loaded. Only basic enhancement will be available.")
+
     def has_enhancement_models(self):
         """Check if any enhancement models are available."""
-        return self.codeformer_model is not None or self.gfpgan_model is not None
-    
+        return self.codeformer_session is not None or self.gfpgan_session is not None
+
     def preprocess(self, img):
         """Preprocess image for model input."""
-        if img.shape[0] != 512 or img.shape[1] != 512:
-            img = cv2.resize(img, (512, 512))
+        # Convert BGR to RGB if needed (models expect RGB)
+        if img.shape[2] == 3:
+            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        else:
+            img_rgb = img
+            
+        # Resize to model input size
+        if self.codeformer_session is not None:
+            # Get input shape from model
+            input_shape = self.codeformer_session.get_inputs()[0].shape
+            if len(input_shape) == 4:  # [batch_size, channels, height, width]
+                height, width = input_shape[2], input_shape[3]
+            else:
+                # Default to 512x512 if shape information is not available
+                height, width = 512, 512
+        elif self.gfpgan_session is not None:
+            # Get input shape from model
+            input_shape = self.gfpgan_session.get_inputs()[0].shape
+            if len(input_shape) == 4:  # [batch_size, channels, height, width]
+                height, width = input_shape[2], input_shape[3]
+            else:
+                # Default to 512x512 if shape information is not available
+                height, width = 512, 512
+        else:
+            # Default to 512x512 if no models are available
+            height, width = 512, 512
         
-        # Convert to RGB if needed
-        if len(img.shape) == 2:
-            img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-        elif img.shape[2] == 4:
-            img = img[:, :, :3]
-        elif img.shape[2] == 1:
-            img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+        # Resize image
+        img_resized = cv2.resize(img_rgb, (width, height))
         
-        # Normalize to [0, 1]
-        img = img.astype(np.float32) / 255.0
+        # Normalize pixel values to [0, 1]
+        img_norm = img_resized.astype(np.float32) / 255.0
         
-        # HWC to NCHW
-        img = np.transpose(img, (2, 0, 1))
-        img = np.expand_dims(img, axis=0)
+        # Transpose from HWC to CHW (Height, Width, Channels) -> (Channels, Height, Width)
+        img_chw = img_norm.transpose(2, 0, 1)
         
-        return img
-    
-    def postprocess(self, output, original_img):
+        # Add batch dimension
+        img_batch = np.expand_dims(img_chw, 0)
+        
+        return img_batch, img.shape[:2]
+
+    def postprocess(self, output, original_shape):
         """Convert model output back to image."""
-        # NCHW to HWC
-        output = np.clip(output[0], 0, 1)
-        output = np.transpose(output, (1, 2, 0))
+        # Remove batch dimension and transpose back to HWC
+        if len(output.shape) == 4:
+            img = output[0].transpose(1, 2, 0)
+        else:
+            img = output.transpose(1, 2, 0)
         
-        # Convert back to uint8
-        output = (output * 255.0).astype(np.uint8)
+        # Denormalize to [0, 255]
+        img = (img * 255.0).clip(0, 255).astype(np.uint8)
         
-        # Resize to original size if needed
-        if output.shape[0] != original_img.shape[0] or output.shape[1] != original_img.shape[1]:
-            output = cv2.resize(output, (original_img.shape[1], original_img.shape[0]))
+        # Convert back to BGR if needed
+        img_bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         
-        return output
-    
+        # Resize back to original shape
+        img_resized = cv2.resize(img_bgr, (original_shape[1], original_shape[0]))
+        
+        return img_resized
+
     def enhance_with_codeformer(self, img, strength=0.7):
         """Enhance face using CodeFormer model."""
-        if self.codeformer_model is None:
-            logger.warning("CodeFormer model not loaded. Using basic enhancement.")
-            return self._basic_enhance(img)
+        if self.codeformer_session is None:
+            logger.warning("CodeFormer model not loaded. Cannot enhance with CodeFormer.")
+            return img
         
         try:
-            # Preprocess
-            input_img = self.preprocess(img)
+            # Preprocess image
+            input_tensor, original_shape = self.preprocess(img)
+            
+            # Get input and output names
+            input_name = self.codeformer_session.get_inputs()[0].name
+            output_name = self.codeformer_session.get_outputs()[0].name
             
             # Run inference
-            outputs = self.codeformer_model.run(None, {'input': input_img})
+            outputs = self.codeformer_session.run([output_name], {input_name: input_tensor})
+            enhanced_img = outputs[0]
             
-            # Get enhanced face
-            enhanced_face = outputs[0]
-            
-            # Postprocess
-            enhanced_face = self.postprocess(enhanced_face, img)
+            # Postprocess result
+            result = self.postprocess(enhanced_img, original_shape)
             
             # Blend with original based on strength
             if strength < 1.0:
-                enhanced_face = cv2.addWeighted(img, 1 - strength, enhanced_face, strength, 0)
+                result = cv2.addWeighted(img, 1 - strength, result, strength, 0)
             
-            return enhanced_face
+            return result
         except Exception as e:
-            logger.error(f"Error enhancing with CodeFormer: {e}")
-            return self._basic_enhance(img)
-    
+            logger.error(f"CodeFormer enhancement failed: {str(e)}")
+            return img
+
     def enhance_with_gfpgan(self, img, strength=0.7):
         """Enhance face using GFPGAN model."""
-        if self.gfpgan_model is None:
-            logger.warning("GFPGAN model not loaded. Using basic enhancement.")
-            return self._basic_enhance(img)
+        if self.gfpgan_session is None:
+            logger.warning("GFPGAN model not loaded. Cannot enhance with GFPGAN.")
+            return img
         
         try:
-            # Preprocess
-            input_img = self.preprocess(img)
+            # Preprocess image
+            input_tensor, original_shape = self.preprocess(img)
+            
+            # Get input and output names
+            input_name = self.gfpgan_session.get_inputs()[0].name
+            output_name = self.gfpgan_session.get_outputs()[0].name
             
             # Run inference
-            outputs = self.gfpgan_model.run(None, {'input': input_img})
+            outputs = self.gfpgan_session.run([output_name], {input_name: input_tensor})
+            enhanced_img = outputs[0]
             
-            # Get enhanced face
-            enhanced_face = outputs[0]
-            
-            # Postprocess
-            enhanced_face = self.postprocess(enhanced_face, img)
+            # Postprocess result
+            result = self.postprocess(enhanced_img, original_shape)
             
             # Blend with original based on strength
             if strength < 1.0:
-                enhanced_face = cv2.addWeighted(img, 1 - strength, enhanced_face, strength, 0)
+                result = cv2.addWeighted(img, 1 - strength, result, strength, 0)
             
-            return enhanced_face
+            return result
         except Exception as e:
-            logger.error(f"Error enhancing with GFPGAN: {e}")
-            return self._basic_enhance(img)
-    
+            logger.error(f"GFPGAN enhancement failed: {str(e)}")
+            return img
+
     def enhance(self, img, method='auto', strength=0.7):
         """
         Enhance a face image using the best available method.
@@ -185,50 +241,62 @@ class FaceEnhancer:
         Returns:
             np.ndarray: Enhanced image or original if enhancement failed
         """
-        if not self.has_enhancement_models():
-            logger.warning("No enhancement models available. Using basic enhancement.")
-            return self._basic_enhance(img)
-        
-        # Ensure strength is between 0 and 1
+        # Validate strength parameter
         strength = max(0.0, min(1.0, strength))
         
-        if method == 'codeformer' and self.codeformer_model is not None:
+        # Choose enhancement method
+        if method == 'codeformer' and self.codeformer_session is not None:
             logger.info("Enhancing with CodeFormer")
             return self.enhance_with_codeformer(img, strength)
-        
-        elif method == 'gfpgan' and self.gfpgan_model is not None:
+        elif method == 'gfpgan' and self.gfpgan_session is not None:
             logger.info("Enhancing with GFPGAN")
             return self.enhance_with_gfpgan(img, strength)
-        
-        else:  # Auto or requested model not available
-            # Use whichever model is available, preferring CodeFormer
-            if self.codeformer_model is not None:
-                logger.info("Auto-enhancing with CodeFormer")
+        elif method == 'auto':
+            # Use whichever model is available, prioritizing CodeFormer
+            if self.codeformer_session is not None:
+                logger.info("Auto-selected CodeFormer for enhancement")
                 return self.enhance_with_codeformer(img, strength)
-            elif self.gfpgan_model is not None:
-                logger.info("Auto-enhancing with GFPGAN")
+            elif self.gfpgan_session is not None:
+                logger.info("Auto-selected GFPGAN for enhancement")
                 return self.enhance_with_gfpgan(img, strength)
             else:
                 logger.warning("No enhancement models available. Using basic enhancement.")
                 return self._basic_enhance(img)
-    
+        else:
+            logger.warning(f"Unknown enhancement method '{method}'. Using basic enhancement.")
+            return self._basic_enhance(img)
+
     def _basic_enhance(self, img):
         """
         Apply basic image enhancements when no models are available.
         """
-        # Simple color and contrast enhancement
-        enhanced = img.copy()
-        
-        # Apply mild sharpening
-        kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
-        enhanced = cv2.filter2D(enhanced, -1, kernel)
-        
-        # Slight brightness and contrast adjustment
-        alpha = 1.1  # Contrast control
-        beta = 5    # Brightness control
-        enhanced = cv2.convertScaleAbs(enhanced, alpha=alpha, beta=beta)
-        
-        # Remove noise
-        enhanced = cv2.fastNlMeansDenoisingColored(enhanced, None, 5, 5, 7, 21)
-        
-        return enhanced
+        try:
+            # Convert to LAB color space for better processing
+            lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+            
+            # Split the LAB image to L, A and B channels
+            l, a, b = cv2.split(lab)
+            
+            # Apply CLAHE to L channel
+            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+            cl = clahe.apply(l)
+            
+            # Merge the CLAHE enhanced L channel with the A and B channels
+            enhanced_lab = cv2.merge((cl, a, b))
+            
+            # Convert back to BGR color space
+            enhanced_img = cv2.cvtColor(enhanced_lab, cv2.COLOR_LAB2BGR)
+            
+            # Slightly sharpen the image
+            kernel = np.array([[-1, -1, -1], 
+                              [-1, 9, -1], 
+                              [-1, -1, -1]])
+            enhanced_img = cv2.filter2D(enhanced_img, -1, kernel)
+            
+            return enhanced_img
+        except Exception as e:
+            logger.error(f"Basic enhancement failed: {str(e)}")
+            return img
+
+# Initialize a global enhancer instance for convenient import
+enhancer = FaceEnhancer()
