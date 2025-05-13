@@ -627,10 +627,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Process the template
         try {
+            // Get the selected enhancement method
+            const enhancementSelect = document.getElementById('enhancement-select');
+            const enhancementMethod = enhancementSelect ? enhancementSelect.value : 'basic';
+            
             const formData = new FormData();
             formData.append('source', uploadedFile);
             formData.append('style', template.ceremony);
             formData.append('template_type', template.type);
+            formData.append('enhancement', enhancementMethod);
             
             const response = await fetch('/bridal-swap', {
                 method: 'POST',
