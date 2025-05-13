@@ -769,56 +769,28 @@
                             <div class="mb-4">
                                 <h6 class="text-light-purple fw-bold mb-2 fs-6 service-category-header"><i class="fas fa-user-tie me-2"></i>Event Managers</h6>
                                 <div class="mb-3">
-                                    <select class="form-select form-select-sm bg-dark text-white border-secondary location-select" 
-                                            onchange="if(this.value) window.location.href='{{ url_for('event_managers') }}?location='+this.value;">
-                                        <option value="">Select Location</option>
-                                        <option value="delhi">Delhi</option>
-                                        <option value="mumbai">Mumbai</option>
-                                        <option value="bangalore">Bangalore</option>
-                                        <option value="hyderabad">Hyderabad</option>
-                                    </select>
+                                    <a href="{{ url_for('event_managers') }}" class="btn btn-sm btn-outline-secondary w-100">View All</a>
                                 </div>
                             </div>
                             
                             <div class="mb-4">
                                 <h6 class="text-light-purple fw-bold mb-2 fs-6 service-category-header"><i class="fas fa-building me-2"></i>Venues</h6>
                                 <div class="mb-3">
-                                    <select class="form-select form-select-sm bg-dark text-white border-secondary location-select" 
-                                            onchange="if(this.value) window.location.href='{{ url_for('venue_search') }}?location='+this.value;">
-                                        <option value="">Select Location</option>
-                                        <option value="delhi">Delhi</option>
-                                        <option value="mumbai">Mumbai</option>
-                                        <option value="bangalore">Bangalore</option>
-                                        <option value="hyderabad">Hyderabad</option>
-                                    </select>
+                                    <a href="{{ url_for('venue_search') }}" class="btn btn-sm btn-outline-secondary w-100">View All</a>
                                 </div>
                             </div>
                             
                             <div class="mb-4">
                                 <h6 class="text-light-purple fw-bold mb-2 fs-6 service-category-header"><i class="fas fa-camera me-2"></i>Photography</h6>
                                 <div class="mb-3">
-                                    <select class="form-select form-select-sm bg-dark text-white border-secondary location-select" 
-                                            onchange="if(this.value) alert(this.value + ' Photographers - Coming Soon')">
-                                        <option value="">Select Location</option>
-                                        <option value="Delhi">Delhi</option>
-                                        <option value="Mumbai">Mumbai</option>
-                                        <option value="Bangalore">Bangalore</option>
-                                        <option value="Hyderabad">Hyderabad</option>
-                                    </select>
+                                    <a href="#" onclick="alert('Photography services coming soon')" class="btn btn-sm btn-outline-secondary w-100">View All</a>
                                 </div>
                             </div>
                             
                             <div class="mb-4">
                                 <h6 class="text-light-purple fw-bold mb-2 fs-6 service-category-header"><i class="fas fa-utensils me-2"></i>Catering</h6>
                                 <div class="mb-3">
-                                    <select class="form-select form-select-sm bg-dark text-white border-secondary location-select" 
-                                            onchange="if(this.value) alert(this.value + ' Catering - Coming Soon')">
-                                        <option value="">Select Location</option>
-                                        <option value="Delhi">Delhi</option>
-                                        <option value="Mumbai">Mumbai</option>
-                                        <option value="Bangalore">Bangalore</option>
-                                        <option value="Hyderabad">Hyderabad</option>
-                                    </select>
+                                    <a href="#" onclick="alert('Catering services coming soon')" class="btn btn-sm btn-outline-secondary w-100">View All</a>
                                 </div>
                             </div>
                         </div>
