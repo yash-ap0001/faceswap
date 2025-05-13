@@ -862,6 +862,8 @@ def process_template():
     Expects:
     - source_path: path to the source image
     - template_path: path to the template image
+    - enhance: whether to enhance the face after swapping (optional)
+    - enhance_method: enhancement method to use (optional: "gfpgan", "codeformer", or "auto")
     Returns:
     - JSON with result path or error
     """
@@ -871,6 +873,10 @@ def process_template():
     data = request.get_json()
     source_path = data.get('source_path')
     template_path = data.get('template_path')
+    
+    # Face enhancement options
+    enhance = data.get('enhance', False)
+    enhance_method = data.get('enhance_method', 'auto')
     
     if not source_path or not template_path:
         return jsonify({'success': False, 'error': 'Missing source or template path'})
@@ -896,6 +902,19 @@ def process_template():
         # Perform face swap
         result_img = swapper.get(template_img, target_faces[0], source_faces[0], source_img)
         
+        # Apply face enhancement if requested
+        if enhance:
+            try:
+                from face_enhancer import enhancer
+                app.logger.info(f"Applying face enhancement with method: {enhance_method}")
+                
+                # Apply face enhancement
+                result_img = enhancer.enhance(result_img, method=enhance_method, strength=0.8)
+                app.logger.info("Face enhancement applied successfully")
+            except Exception as e:
+                app.logger.error(f"Face enhancement failed: {str(e)}")
+                # Continue with the unenhanced result
+        
         # Save result
         timestamp = int(time.time())
         result_filename = f"result_{timestamp}_{os.path.basename(template_path)}"
@@ -910,7 +929,8 @@ def process_template():
         # Return the result path for display
         return jsonify({
             'success': True,
-            'result_path': f"/uploads/results/{result_filename}"
+            'result_path': f"/uploads/results/{result_filename}",
+            'enhanced': enhance
         })
         
     except Exception as e:
