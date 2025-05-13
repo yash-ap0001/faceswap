@@ -256,14 +256,27 @@
         
         .service-category-header {
             position: relative;
-            padding-left: 10px;
+            padding: 5px 10px;
+            margin-left: -5px;
             border-left: 3px solid var(--light-purple);
+            border-radius: 0 4px 4px 0;
             transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
         }
         
         .service-category-header:hover {
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: rgba(255, 255, 255, 0.08);
             padding-left: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .service-category-header i {
+            transition: transform 0.3s ease;
+        }
+        
+        .service-category-header:hover i {
+            transform: translateX(3px);
         }
         
         .sidebar-section:last-child {
@@ -733,8 +746,8 @@
                          aria-labelledby="headingWeddingServices" data-bs-parent="#sidebarAccordion">
                         <div class="accordion-body p-0 pt-2">
                             <!-- Service Categories -->
-                            <div class="mb-3">
-                                <h6 class="text-light-purple fw-bold ps-2 mb-2 fs-6 service-category-header"><i class="fas fa-user-tie me-2"></i>Event Management</h6>
+                            <div class="mb-4">
+                                <h6 class="text-light-purple fw-bold mb-3 fs-6 service-category-header"><i class="fas fa-user-tie me-2"></i>Event Management</h6>
                                 <ul class="sidebar-menu mb-3">
                                     <li><a href="{{ url_for('event_managers') }}"><i class="fas fa-angle-right me-2"></i>Event Managers</a></li>
                                     <li><a href="#" onclick="alert('Guest Management - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Guest Management</a></li>
@@ -743,8 +756,8 @@
                                 </ul>
                             </div>
                             
-                            <div class="mb-3">
-                                <h6 class="text-light-purple fw-bold ps-2 mb-2 fs-6 service-category-header"><i class="fas fa-building me-2"></i>Venues</h6>
+                            <div class="mb-4">
+                                <h6 class="text-light-purple fw-bold mb-3 fs-6 service-category-header"><i class="fas fa-building me-2"></i>Venues</h6>
                                 <ul class="sidebar-menu mb-3">
                                     <li><a href="{{ url_for('venue_search') }}"><i class="fas fa-angle-right me-2"></i>Venue Search</a></li>
                                     <li><a href="{{ url_for('hall_comparison') }}"><i class="fas fa-angle-right me-2"></i>Hall Comparison</a></li>
@@ -753,8 +766,8 @@
                                 </ul>
                             </div>
                             
-                            <div class="mb-3">
-                                <h6 class="text-light-purple fw-bold ps-2 mb-2 fs-6"><i class="fas fa-camera me-2"></i>Photography</h6>
+                            <div class="mb-4">
+                                <h6 class="text-light-purple fw-bold mb-3 fs-6 service-category-header"><i class="fas fa-camera me-2"></i>Photography</h6>
                                 <ul class="sidebar-menu mb-3">
                                     <li><a href="#" onclick="alert('Photographers - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Photographers</a></li>
                                     <li><a href="#" onclick="alert('Photo Packages - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Photo Packages</a></li>
@@ -762,8 +775,8 @@
                                 </ul>
                             </div>
                             
-                            <div class="mb-3">
-                                <h6 class="text-light-purple fw-bold ps-2 mb-2 fs-6"><i class="fas fa-utensils me-2"></i>Catering</h6>
+                            <div class="mb-4">
+                                <h6 class="text-light-purple fw-bold mb-3 fs-6 service-category-header"><i class="fas fa-utensils me-2"></i>Catering</h6>
                                 <ul class="sidebar-menu">
                                     <li><a href="#" onclick="alert('Food Caterers - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Food Caterers</a></li>
                                     <li><a href="#" onclick="alert('Menu Selection - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Menu Selection</a></li>
