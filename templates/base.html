@@ -739,7 +739,7 @@
                                 type="button" data-bs-toggle="collapse" 
                                 data-bs-target="#collapseWeddingServices" aria-expanded="false" 
                                 aria-controls="collapseWeddingServices">
-                            <i class="fas fa-concierge-bell me-2"></i>Wedding Services
+                            <i class="fas fa-concierge-bell me-2"></i>Wedding Services by Location
                         </button>
                     </h6>
                     <div id="collapseWeddingServices" class="accordion-collapse collapse" 
@@ -747,40 +747,42 @@
                         <div class="accordion-body p-0 pt-2">
                             <!-- Service Categories -->
                             <div class="mb-4">
-                                <h6 class="text-light-purple fw-bold mb-3 fs-6 service-category-header"><i class="fas fa-user-tie me-2"></i>Event Management</h6>
+                                <h6 class="text-light-purple fw-bold mb-3 fs-6 service-category-header"><i class="fas fa-user-tie me-2"></i>Event Managers</h6>
                                 <ul class="sidebar-menu mb-3">
-                                    <li><a href="{{ url_for('event_managers') }}"><i class="fas fa-angle-right me-2"></i>Event Managers</a></li>
-                                    <li><a href="#" onclick="alert('Guest Management - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Guest Management</a></li>
-                                    <li><a href="#" onclick="alert('Timeline Creator - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Timeline Creator</a></li>
-                                    <li><a href="#" onclick="alert('Budget Calculator - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Budget Calculator</a></li>
+                                    <li><a href="{{ url_for('event_managers') }}?location=delhi"><i class="fas fa-angle-right me-2"></i>Delhi</a></li>
+                                    <li><a href="{{ url_for('event_managers') }}?location=mumbai"><i class="fas fa-angle-right me-2"></i>Mumbai</a></li>
+                                    <li><a href="{{ url_for('event_managers') }}?location=bangalore"><i class="fas fa-angle-right me-2"></i>Bangalore</a></li>
+                                    <li><a href="{{ url_for('event_managers') }}?location=hyderabad"><i class="fas fa-angle-right me-2"></i>Hyderabad</a></li>
                                 </ul>
                             </div>
                             
                             <div class="mb-4">
                                 <h6 class="text-light-purple fw-bold mb-3 fs-6 service-category-header"><i class="fas fa-building me-2"></i>Venues</h6>
                                 <ul class="sidebar-menu mb-3">
-                                    <li><a href="{{ url_for('venue_search') }}"><i class="fas fa-angle-right me-2"></i>Venue Search</a></li>
-                                    <li><a href="{{ url_for('hall_comparison') }}"><i class="fas fa-angle-right me-2"></i>Hall Comparison</a></li>
-                                    <li><a href="{{ url_for('virtual_tours') }}"><i class="fas fa-angle-right me-2"></i>Virtual Tours</a></li>
-                                    <li><a href="{{ url_for('booking_management') }}"><i class="fas fa-angle-right me-2"></i>Booking Management</a></li>
+                                    <li><a href="{{ url_for('venue_search') }}?location=delhi"><i class="fas fa-angle-right me-2"></i>Delhi</a></li>
+                                    <li><a href="{{ url_for('venue_search') }}?location=mumbai"><i class="fas fa-angle-right me-2"></i>Mumbai</a></li>
+                                    <li><a href="{{ url_for('venue_search') }}?location=bangalore"><i class="fas fa-angle-right me-2"></i>Bangalore</a></li>
+                                    <li><a href="{{ url_for('venue_search') }}?location=hyderabad"><i class="fas fa-angle-right me-2"></i>Hyderabad</a></li>
                                 </ul>
                             </div>
                             
                             <div class="mb-4">
                                 <h6 class="text-light-purple fw-bold mb-3 fs-6 service-category-header"><i class="fas fa-camera me-2"></i>Photography</h6>
                                 <ul class="sidebar-menu mb-3">
-                                    <li><a href="#" onclick="alert('Photographers - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Photographers</a></li>
-                                    <li><a href="#" onclick="alert('Photo Packages - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Photo Packages</a></li>
-                                    <li><a href="#" onclick="alert('Photo Booths - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Photo Booths</a></li>
+                                    <li><a href="#" onclick="alert('Delhi Photographers - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Delhi</a></li>
+                                    <li><a href="#" onclick="alert('Mumbai Photographers - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Mumbai</a></li>
+                                    <li><a href="#" onclick="alert('Bangalore Photographers - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Bangalore</a></li>
+                                    <li><a href="#" onclick="alert('Hyderabad Photographers - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Hyderabad</a></li>
                                 </ul>
                             </div>
                             
                             <div class="mb-4">
                                 <h6 class="text-light-purple fw-bold mb-3 fs-6 service-category-header"><i class="fas fa-utensils me-2"></i>Catering</h6>
-                                <ul class="sidebar-menu">
-                                    <li><a href="#" onclick="alert('Food Caterers - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Food Caterers</a></li>
-                                    <li><a href="#" onclick="alert('Menu Selection - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Menu Selection</a></li>
-                                    <li><a href="#" onclick="alert('Special Dietary Options - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Special Dietary Options</a></li>
+                                <ul class="sidebar-menu mb-3">
+                                    <li><a href="#" onclick="alert('Delhi Catering - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Delhi</a></li>
+                                    <li><a href="#" onclick="alert('Mumbai Catering - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Mumbai</a></li>
+                                    <li><a href="#" onclick="alert('Bangalore Catering - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Bangalore</a></li>
+                                    <li><a href="#" onclick="alert('Hyderabad Catering - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Hyderabad</a></li>
                                 </ul>
                             </div>
                         </div>
