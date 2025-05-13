@@ -22,6 +22,18 @@
         transform: translateY(-2px);
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
+    /* Navigation controls styling */
+    .navigation-controls button {
+        opacity: 0.7;
+        transition: all 0.2s ease;
+    }
+    .navigation-controls button:hover {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    .image-container {
+        max-height: 75vh;
+    }
 </style>
 {% endblock %}
 
@@ -122,6 +134,18 @@
             <div class="modal-body text-center p-0 position-relative">
                 <div class="image-container" style="overflow: hidden; position: relative;">
                     <img id="resultPreviewModalImage" src="" class="img-fluid" alt="Result Preview" style="transition: transform 0.3s ease; transform-origin: center;">
+                    
+                    <!-- Navigation arrows -->
+                    <div class="navigation-controls position-absolute start-0 top-50 translate-middle-y ps-2">
+                        <button class="btn btn-dark rounded-circle" onclick="navigateResults('prev')">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    </div>
+                    <div class="navigation-controls position-absolute end-0 top-50 translate-middle-y pe-2">
+                        <button class="btn btn-dark rounded-circle" onclick="navigateResults('next')">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="zoom-controls position-absolute top-0 end-0 p-2">
                     <button class="btn btn-sm btn-dark ms-1" id="result-zoom-in">
@@ -389,15 +413,19 @@
                     // Add click handler for the result image
                     const resultImage = resultContainer.querySelector('.result-image');
                     resultImage.addEventListener('click', function() {
-                        resultPreviewModalImage.src = this.getAttribute('data-full-path');
-                        downloadResultBtn.href = this.getAttribute('data-full-path');
-                        downloadResultBtn.download = this.getAttribute('data-full-path').split('/').pop();
-                        resultPreviewModal.show();
+                        showResultPreview(this);
                     });
                     
                     // Update badge to show success
                     processingBadge.className = 'badge bg-success';
                     processingBadge.textContent = 'Completed';
+                    
+                    // Add to allResultImages array for navigation
+                    allResultImages.push({
+                        src: data.result_path,
+                        template: template,
+                        index: i
+                    });
                     
                     results.push({
                         template: template,

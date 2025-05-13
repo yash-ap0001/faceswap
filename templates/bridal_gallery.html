@@ -1902,12 +1902,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 
                 <!-- Navigation Buttons -->
-                <button class="btn btn-lg position-absolute top-50 start-0 translate-middle-y text-white" id="prevImageBtn" style="background-color: rgba(0,0,0,0.5); z-index: 10;">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <button class="btn btn-lg position-absolute top-50 end-0 translate-middle-y text-white" id="nextImageBtn" style="background-color: rgba(0,0,0,0.5); z-index: 10;">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
+                <div class="navigation-controls position-absolute start-0 top-50 translate-middle-y ps-2" style="z-index: 10;">
+                    <button class="btn btn-dark rounded-circle" id="prevImageBtn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+                <div class="navigation-controls position-absolute end-0 top-50 translate-middle-y pe-2" style="z-index: 10;">
+                    <button class="btn btn-dark rounded-circle" id="nextImageBtn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
                 
                 <!-- Zoom Controls - Top Right -->
                 <div class="position-absolute top-0 end-0 p-3 d-flex" style="z-index: 10;">
