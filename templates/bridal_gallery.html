@@ -1843,8 +1843,14 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Checked ceremonies:', checkedCeremonies);
             
             // First, hide/show ceremony sections (with ID format 'ceremony-carousel')
-            document.querySelectorAll('div[id$="-carousel"]').forEach(section => {
-                if (!section.id) return;
+            const carouselSections = document.querySelectorAll('div[id$="-carousel"]');
+            console.log(`Found ${carouselSections.length} carousel sections`);
+            
+            carouselSections.forEach(section => {
+                if (!section.id) {
+                    console.error('Section has no ID:', section);
+                    return;
+                }
                 
                 // Extract ceremony name from section ID (like 'haldi-carousel' → 'haldi')
                 const ceremonyId = section.id.replace('-carousel', '');
