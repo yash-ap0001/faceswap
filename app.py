@@ -661,6 +661,11 @@ def virtual_tours():
 def booking_management():
     return render_template('venues/booking.html')
 
+@app.route('/saloons')
+def saloons():
+    """Browse saloons and makeup artists for wedding preparation."""
+    return render_template('saloons.html')
+
 # Event Manager section routes
 @app.route('/event-managers')
 def event_managers():
