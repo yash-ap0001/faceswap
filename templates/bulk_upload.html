@@ -494,60 +494,72 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (data.templates && data.templates.length > 0) {
                     data.templates.forEach(template => {
-                        // Create template card with checkbox for bulk selection
-                        const col = document.createElement('div');
-                        col.className = 'col-4 col-md-3 mb-2';
-                        
-                        const card = document.createElement('div');
-                        card.className = 'card h-100 bg-dark border-0 shadow-sm';
-                        
-                        // Add checkbox for bulk selection
-                        const checkboxWrapper = document.createElement('div');
-                        checkboxWrapper.className = 'form-check position-absolute top-0 start-0 m-1';
-                        checkboxWrapper.style.zIndex = '10';
-                        
-                        const checkbox = document.createElement('input');
-                        checkbox.type = 'checkbox';
-                        checkbox.className = 'form-check-input template-checkbox';
-                        checkbox.dataset.templatePath = template.path;
-                        checkbox.dataset.ceremony = ceremonyType;
-                        
-                        checkboxWrapper.appendChild(checkbox);
-                        
-                        // Image container
-                        const imgWrapper = document.createElement('div');
-                        imgWrapper.className = 'position-relative';
-                        
-                        const img = document.createElement('img');
-                        img.src = template.url;
-                        img.className = 'card-img-top';
-                        img.alt = template.name;
-                        img.style.height = '80px';
-                        img.style.objectFit = 'cover';
-                        
-                        // Add "Main" badge if needed
-                        if (template.is_main) {
-                            const badge = document.createElement('div');
-                            badge.className = 'position-absolute top-0 end-0 m-1';
-                            badge.innerHTML = `<span class="badge bg-primary">Main</span>`;
-                            imgWrapper.appendChild(badge);
+                        try {
+                            // Extract filename from path (for display)
+                            const pathParts = template.path.split('/');
+                            const filename = pathParts[pathParts.length - 1];
+                            
+                            // Create template card with checkbox for bulk selection
+                            const col = document.createElement('div');
+                            col.className = 'col-4 col-md-3 mb-2';
+                            
+                            const card = document.createElement('div');
+                            card.className = 'card h-100 bg-dark border-0 shadow-sm';
+                            
+                            // Add checkbox for bulk selection
+                            const checkboxWrapper = document.createElement('div');
+                            checkboxWrapper.className = 'form-check position-absolute top-0 start-0 m-1';
+                            checkboxWrapper.style.zIndex = '10';
+                            
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.className = 'form-check-input template-checkbox';
+                            checkbox.dataset.templatePath = template.path;
+                            checkbox.dataset.ceremony = ceremonyType;
+                            
+                            checkboxWrapper.appendChild(checkbox);
+                            
+                            // Image container
+                            const imgWrapper = document.createElement('div');
+                            imgWrapper.className = 'position-relative';
+                            
+                            const img = document.createElement('img');
+                            img.src = template.url;
+                            img.className = 'card-img-top';
+                            img.alt = filename;
+                            img.style.height = '80px';
+                            img.style.objectFit = 'cover';
+                            
+                            // Add "Main" badge if needed
+                            if (template.is_main) {
+                                const badge = document.createElement('div');
+                                badge.className = 'position-absolute top-0 end-0 m-1';
+                                badge.innerHTML = '<span class="badge bg-primary">Main</span>';
+                                imgWrapper.appendChild(badge);
+                            }
+                            
+                            imgWrapper.appendChild(img);
+                            
+                            // Simple footer with filename (truncated)
+                            const cardFooter = document.createElement('div');
+                            cardFooter.className = 'p-1 bg-dark text-center';
+                            const displayName = filename || 'Template';
+                            const truncatedName = displayName.length > 15 
+                                ? displayName.substring(0, 15) + '...' 
+                                : displayName;
+                            
+                            cardFooter.innerHTML = '<small class="text-light text-truncate d-block" style="font-size: 0.7rem;">'
+                                + truncatedName + '</small>';
+                            
+                            // Assemble card
+                            card.appendChild(checkboxWrapper);
+                            card.appendChild(imgWrapper);
+                            card.appendChild(cardFooter);
+                            col.appendChild(card);
+                            templateContainer.appendChild(col);
+                        } catch (err) {
+                            console.error('Error creating template card:', err);
                         }
-                        
-                        imgWrapper.appendChild(img);
-                        
-                        // Simple footer with filename (truncated)
-                        const cardFooter = document.createElement('div');
-                        cardFooter.className = 'p-1 bg-dark text-center';
-                        cardFooter.innerHTML = `
-                            <small class="text-light text-truncate d-block" style="font-size: 0.7rem;">${template.name.substring(0, 15)}${template.name.length > 15 ? '...' : ''}</small>
-                        `;
-                        
-                        // Assemble card
-                        card.appendChild(checkboxWrapper);
-                        card.appendChild(imgWrapper);
-                        card.appendChild(cardFooter);
-                        col.appendChild(card);
-                        templateContainer.appendChild(col);
                     });
                 } else {
                     // Empty state
@@ -567,29 +579,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 errorMessage.innerHTML = '<p>Error loading templates</p>';
                 templateContainer.appendChild(errorMessage);
                 
-                // More detailed error logging to help debug
                 console.error('Template loading error:', error);
-                console.error('URL requested:', `/api/templates?ceremony_type=${ceremonyType}`);
-                
-                // Try a direct debugging fetch to see the response
-                fetch(`/api/templates?ceremony_type=${ceremonyType}`)
-                    .then(response => {
-                        console.log('Response status:', response.status);
-                        return response.text(); // Get raw text instead of JSON
-                    })
-                    .then(text => {
-                        console.log('Raw response:', text);
-                        // Now try to parse it to see where it fails
-                        try {
-                            const json = JSON.parse(text);
-                            console.log('Parsed JSON:', json);
-                        } catch (e) {
-                            console.error('JSON parse error:', e);
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Debug fetch error:', err);
-                    });
             });
     }
     
