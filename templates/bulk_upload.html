@@ -567,7 +567,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 errorMessage.innerHTML = '<p>Error loading templates</p>';
                 templateContainer.appendChild(errorMessage);
                 
+                // More detailed error logging to help debug
                 console.error('Template loading error:', error);
+                console.error('URL requested:', `/api/templates?ceremony_type=${ceremonyType}`);
+                
+                // Try a direct debugging fetch to see the response
+                fetch(`/api/templates?ceremony_type=${ceremonyType}`)
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        return response.text(); // Get raw text instead of JSON
+                    })
+                    .then(text => {
+                        console.log('Raw response:', text);
+                        // Now try to parse it to see where it fails
+                        try {
+                            const json = JSON.parse(text);
+                            console.log('Parsed JSON:', json);
+                        } catch (e) {
+                            console.error('JSON parse error:', e);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Debug fetch error:', err);
+                    });
             });
     }
     
