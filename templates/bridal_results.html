@@ -126,50 +126,52 @@
 <!-- Image preview modal -->
 <div class="modal fade" id="resultPreviewModal" tabindex="-1" aria-labelledby="resultPreviewModalLabel" aria-hidden="true" style="transition: opacity 0.2s ease">
     <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 90%; transition: transform 0.3s ease">
-        <div class="modal-content" style="background-color: rgba(18, 18, 18, 0.97); backdrop-filter: blur(25px);">
-            <div class="modal-header" style="border-color: rgba(70, 70, 70, 0.5);">
-                <h5 class="modal-title" id="resultPreviewModalLabel">Face Swap Result</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center p-0 position-relative">
-                <div class="image-container" style="overflow: hidden; position: relative;">
+        <div class="modal-content" style="background-color: rgba(20, 20, 20, 0.75); border-radius: 10px; backdrop-filter: blur(15px); border: none;">
+            <!-- Removed header -->
+            <div class="modal-body p-0 position-relative">
+                <div id="result-image-container" class="image-container" style="overflow: hidden; position: relative; max-height: 85vh; cursor: move;">
                     <img id="resultPreviewModalImage" src="" class="img-fluid" alt="Result Preview" style="transition: transform 0.3s ease; transform-origin: center;">
                     
                     <!-- Navigation arrows -->
-                    <div class="navigation-controls position-absolute start-0 top-50 translate-middle-y ps-2">
-                        <button class="btn btn-dark rounded-circle" onclick="navigateResults('prev')">
+                    <div class="navigation-controls position-absolute start-0 top-50 translate-middle-y ps-2 ms-2" style="z-index: 1050;">
+                        <button class="btn btn-dark rounded-circle shadow" onclick="navigateResults('prev')">
                             <i class="fas fa-chevron-left"></i>
                         </button>
                     </div>
-                    <div class="navigation-controls position-absolute end-0 top-50 translate-middle-y pe-2">
-                        <button class="btn btn-dark rounded-circle" onclick="navigateResults('next')">
+                    <div class="navigation-controls position-absolute end-0 top-50 translate-middle-y pe-2 me-2" style="z-index: 1050;">
+                        <button class="btn btn-dark rounded-circle shadow" onclick="navigateResults('next')">
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
-                </div>
-                <div class="zoom-controls position-absolute top-0 end-0 p-2">
-                    <button class="btn btn-sm btn-dark ms-1" id="result-zoom-in">
-                        <i class="fas fa-search-plus"></i>
-                    </button>
-                    <button class="btn btn-sm btn-dark ms-1" id="result-zoom-out">
-                        <i class="fas fa-search-minus"></i>
-                    </button>
-                    <button class="btn btn-sm btn-dark ms-1" id="result-zoom-reset">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="modal-footer" style="border-color: rgba(70, 70, 70, 0.5);">
-                <div class="image-counter">
-                    <span id="current-result-index">1</span> / <span id="total-result-count">1</span>
-                </div>
-                <div>
-                    <a id="downloadResultBtn" href="#" class="btn btn-outline-primary me-2" download>
+                    
+                    <!-- Close button -->
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close" style="z-index: 1050;"></button>
+                    
+                    <!-- Zoom controls -->
+                    <div class="zoom-controls position-absolute top-0 start-0 p-2 m-2" style="z-index: 1050;">
+                        <button class="btn btn-sm btn-dark ms-1" id="result-zoom-in">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button class="btn btn-sm btn-dark ms-1" id="result-zoom-out">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button class="btn btn-sm btn-dark ms-1" id="result-zoom-reset">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Image counter -->
+                    <div class="image-counter position-absolute bottom-0 start-50 translate-middle-x mb-3 px-3 py-1 rounded bg-dark bg-opacity-75 text-white" style="z-index: 1050;">
+                        <span id="current-result-index">1</span> / <span id="total-result-count">1</span>
+                    </div>
+                    
+                    <!-- Download button -->
+                    <a id="downloadResultBtn" href="#" class="btn btn-sm btn-outline-light position-absolute bottom-0 end-0 m-3" download style="z-index: 1050;">
                         <i class="fas fa-download me-1"></i> Download
                     </a>
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
+            <!-- Removed footer -->
         </div>
     </div>
 </div>
@@ -509,11 +511,13 @@
     
 
     
-    // Zoom functionality for result preview
+    // Zoom and panning functionality for result preview
     let resultZoomLevel = 1;
     const resultZoomStep = 0.1;
     const resultMaxZoom = 3;
     const resultMinZoom = 0.5;
+    let isDragging = false;
+    let startX, startY, currentX = 0, currentY = 0;
     
     function zoomResultIn() {
         if (resultZoomLevel < resultMaxZoom) {
@@ -531,12 +535,84 @@
     
     function resetResultZoom() {
         resultZoomLevel = 1;
+        currentX = 0;
+        currentY = 0;
         applyResultZoom();
     }
     
     function applyResultZoom() {
-        resultPreviewModalImage.style.transform = `scale(${resultZoomLevel})`;
+        resultPreviewModalImage.style.transform = `scale(${resultZoomLevel}) translate(${currentX}px, ${currentY}px)`;
+        
+        // Only enable dragging when zoomed in
+        const container = document.getElementById('result-image-container');
+        if (container) {
+            if (resultZoomLevel > 1) {
+                container.style.cursor = 'move';
+            } else {
+                container.style.cursor = 'default';
+                // Reset position when zoom is at default
+                currentX = 0;
+                currentY = 0;
+            }
+        }
     }
+    
+    // Initialize drag and pan functionality for zoomed images
+    function initDragPan() {
+        const container = document.getElementById('result-image-container');
+        if (!container) return;
+        
+        // Mouse events
+        container.addEventListener('mousedown', (e) => {
+            // Only enable dragging when zoomed in
+            if (resultZoomLevel <= 1) return;
+            
+            isDragging = true;
+            startX = e.clientX - currentX;
+            startY = e.clientY - currentY;
+            e.preventDefault();
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            currentX = e.clientX - startX;
+            currentY = e.clientY - startY;
+            applyResultZoom();
+            e.preventDefault();
+        });
+        
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        
+        // Touch events for mobile
+        container.addEventListener('touchstart', (e) => {
+            if (resultZoomLevel <= 1) return;
+            
+            isDragging = true;
+            startX = e.touches[0].clientX - currentX;
+            startY = e.touches[0].clientY - currentY;
+        }, { passive: false });
+        
+        container.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            currentX = e.touches[0].clientX - startX;
+            currentY = e.touches[0].clientY - startY;
+            applyResultZoom();
+            e.preventDefault();
+        }, { passive: false });
+        
+        container.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+    }
+    
+    // Initialize drag and pan when modal is shown
+    document.getElementById('resultPreviewModal').addEventListener('shown.bs.modal', () => {
+        initDragPan();
+    });
     
     // Initialize processing
     document.addEventListener('DOMContentLoaded', function() {
