@@ -23,7 +23,7 @@
                     </div>
 
                     <div class="row g-2 mb-3">
-                        <div class="col-md-5">
+                        <div class="col-md-8">
                             <select class="form-select form-select-sm bg-dark text-light border-secondary" id="ceremonyType" name="ceremony_type" required>
                                 <option value="" disabled selected>Select ceremony</option>
                                 <option value="haldi">Haldi</option>
@@ -33,12 +33,8 @@
                                 <option value="reception">Reception</option>
                             </select>
                         </div>
-                        <div class="col-md-7">
-                            <div class="d-flex gap-2">
-                                <button type="button" id="selectAll" class="btn btn-sm btn-outline-secondary flex-grow-1 px-1">Select All</button>
-                                <button type="button" id="deselectAll" class="btn btn-sm btn-outline-secondary flex-grow-1 px-1">Deselect</button>
-                                <button type="button" id="uploadSelected" class="btn btn-sm btn-primary flex-grow-1 px-2">Upload</button>
-                            </div>
+                        <div class="col-md-4">
+                            <button type="button" id="uploadSelected" class="btn btn-sm btn-primary w-100">Upload</button>
                         </div>
                     </div>
                 </form>
@@ -175,14 +171,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // File input change handler - show count without previews
     imageInput.addEventListener('change', function() {
         const fileCount = this.files.length;
-        const selectAllButton = document.getElementById('selectAll');
-        const deselectAllButton = document.getElementById('deselectAll');
         const uploadSelectedButton = document.getElementById('uploadSelected');
         
         // Clear previous data
         imagePreview.innerHTML = '';
         
-        // Create hidden checkboxes for files (for data tracking)
+        // Create hidden elements for files (all selected by default)
         for (let i = 0; i < this.files.length; i++) {
             const file = this.files[i];
             const hiddenElement = document.createElement('div');
@@ -191,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.className = 'image-checkbox';
-            checkbox.checked = true; // Default to checked
+            checkbox.checked = true; // All files are selected by default
             checkbox.dataset.fileName = file.name;
             checkbox.dataset.fileIndex = i;
             
@@ -199,17 +193,13 @@ document.addEventListener('DOMContentLoaded', function() {
             imagePreview.appendChild(hiddenElement);
         }
         
-        // Update button states based on file count
+        // Update button state based on file count
         if (fileCount > 0) {
             uploadSelectedButton.textContent = `Upload (${fileCount})`;
             uploadSelectedButton.disabled = false;
-            selectAllButton.disabled = false;
-            deselectAllButton.disabled = false;
         } else {
             uploadSelectedButton.textContent = 'Upload';
             uploadSelectedButton.disabled = true;
-            selectAllButton.disabled = true;
-            deselectAllButton.disabled = true;
         }
         
         // Show file count indicator
@@ -231,23 +221,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Setup select/deselect buttons for uploads
-    const selectAllButton = document.getElementById('selectAll');
-    const deselectAllButton = document.getElementById('deselectAll');
+    // Get upload button
     const uploadSelectedButton = document.getElementById('uploadSelected');
-    
-    // Image selection buttons
-    selectAllButton.addEventListener('click', () => {
-        document.querySelectorAll('.image-checkbox').forEach(checkbox => {
-            checkbox.checked = true;
-        });
-    });
-    
-    deselectAllButton.addEventListener('click', () => {
-        document.querySelectorAll('.image-checkbox').forEach(checkbox => {
-            checkbox.checked = false;
-        });
-    });
     
     // Upload handler function
     function uploadCheckedImages() {
@@ -266,12 +241,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Disable form controls during upload
-        const formControls = [
-            uploadSelectedButton, selectAllButton, deselectAllButton, 
-            document.getElementById('ceremonyType'), imageInput
-        ];
-        
-        formControls.forEach(control => { if (control) control.disabled = true; });
+        uploadSelectedButton.disabled = true;
+        document.getElementById('ceremonyType').disabled = true;
+        imageInput.disabled = true;
         
         // Prepare form data
         const formData = new FormData();
@@ -316,7 +288,9 @@ document.addEventListener('DOMContentLoaded', function() {
             uploadProgress.style.width = '100%';
             
             // Re-enable form controls
-            formControls.forEach(control => { if (control) control.disabled = false; });
+            uploadSelectedButton.disabled = false;
+            document.getElementById('ceremonyType').disabled = false;
+            imageInput.disabled = false;
             
             if (data.success) {
                 statusMessage.textContent = 'Upload complete!';
@@ -601,9 +575,7 @@ document.addEventListener('DOMContentLoaded', function() {
         refreshTemplates(selectedCeremony);
     });
     
-    // Load initial templates for the default selected ceremony
-    const initialCeremony = document.querySelector('input[name="ceremonyTab"]:checked').value;
-    refreshTemplates(initialCeremony);
+    // Don't load templates automatically - wait for refresh button click
 });
 </script>
 {% endblock %}
