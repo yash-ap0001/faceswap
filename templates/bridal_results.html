@@ -235,9 +235,60 @@
         }
     });
     
+    // Array to store all result images
+    let allResultImages = [];
+    let currentResultIndex = 0;
+    
+    // Navigate between result images
+    function navigateResults(direction) {
+        if (allResultImages.length <= 1) return;
+        
+        if (direction === 'next') {
+            currentResultIndex = (currentResultIndex + 1) % allResultImages.length;
+        } else if (direction === 'prev') {
+            currentResultIndex = (currentResultIndex - 1 + allResultImages.length) % allResultImages.length;
+        }
+        
+        // Update the image and download button
+        const resultData = allResultImages[currentResultIndex];
+        resultPreviewModalImage.src = resultData.src;
+        downloadResultBtn.href = resultData.src;
+        downloadResultBtn.download = resultData.src.split('/').pop();
+        
+        // Reset zoom level
+        resultZoomLevel = 1;
+        resultPreviewModalImage.style.transform = 'scale(1)';
+        
+        // Update counter
+        document.getElementById('current-result-index').textContent = currentResultIndex + 1;
+    }
+    
+    // Show result preview with navigation
+    function showResultPreview(resultImg) {
+        // Store the index of the clicked image
+        currentResultIndex = allResultImages.findIndex(img => img.src === resultImg.getAttribute('data-full-path'));
+        if (currentResultIndex === -1) currentResultIndex = 0;
+        
+        // Update the image and download button
+        resultPreviewModalImage.src = resultImg.getAttribute('data-full-path');
+        downloadResultBtn.href = resultImg.getAttribute('data-full-path');
+        downloadResultBtn.download = resultImg.getAttribute('data-full-path').split('/').pop();
+        
+        // Update counter
+        document.getElementById('current-result-index').textContent = currentResultIndex + 1;
+        document.getElementById('total-result-count').textContent = allResultImages.length;
+        
+        // Reset zoom level
+        resultZoomLevel = 1;
+        resultPreviewModalImage.style.transform = 'scale(1)';
+        
+        // Show modal
+        resultPreviewModal.show();
+    }
+    
     // Process all templates sequentially
     async function processAllTemplates() {
-        const results = [];
+        allResultImages = []; // Reset result images array
         let processedCount = 0;
         
         // Get enhancement options
