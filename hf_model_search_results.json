@@ -1,0 +1,108 @@
+[
+  {
+    "_id": "64c605bfe4e2212a4f146817",
+    "id": "bluefoxcreation/Codeformer-ONNX",
+    "likes": 5,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 0,
+    "tags": [
+      "onnx",
+      "license:other",
+      "region:us"
+    ],
+    "createdAt": "2023-07-30T06:39:59.000Z",
+    "modelId": "bluefoxcreation/Codeformer-ONNX"
+  },
+  {
+    "_id": "65600a4aac420e0afdcb491c",
+    "id": "Oil3/faster_codeformer_onnx",
+    "likes": 1,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 0,
+    "tags": [
+      "onnx",
+      "region:us"
+    ],
+    "createdAt": "2023-11-24T02:28:26.000Z",
+    "modelId": "Oil3/faster_codeformer_onnx"
+  },
+  {
+    "_id": "660440ab4a6939fbe1441a5f",
+    "id": "karanjakhar/codeformer",
+    "likes": 0,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 0,
+    "tags": [
+      "onnx",
+      "region:us"
+    ],
+    "createdAt": "2024-03-27T15:52:11.000Z",
+    "modelId": "karanjakhar/codeformer"
+  },
+  {
+    "_id": "661cc756fbadbe6a9d1a02e3",
+    "id": "yuvraj108c/codeformer-onnx",
+    "likes": 1,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 0,
+    "tags": [
+      "onnx",
+      "region:us"
+    ],
+    "createdAt": "2024-04-15T06:21:10.000Z",
+    "modelId": "yuvraj108c/codeformer-onnx"
+  },
+  {
+    "_id": "62f74a38ebf2bab99325902c",
+    "id": "Larvik/GFPGANx",
+    "likes": 0,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 0,
+    "tags": [
+      "onnx",
+      "region:us"
+    ],
+    "createdAt": "2022-08-13T06:52:40.000Z",
+    "modelId": "Larvik/GFPGANx"
+  },
+  {
+    "_id": "64974ddaad206c18276c6e8d",
+    "id": "Neus/GFPGANv1.4",
+    "likes": 5,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 0,
+    "tags": [
+      "onnx",
+      "AMD",
+      "CUDA",
+      "stablediffusion",
+      "DirectML",
+      "ONNX",
+      "text-to-image",
+      "region:us"
+    ],
+    "pipeline_tag": "text-to-image",
+    "createdAt": "2023-06-24T20:11:06.000Z",
+    "modelId": "Neus/GFPGANv1.4"
+  },
+  {
+    "_id": "680273f930403e82448c0f70",
+    "id": "antinoice/GFPGANv1.4",
+    "likes": 0,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 0,
+    "tags": [
+      "onnx",
+      "region:us"
+    ],
+    "createdAt": "2025-04-18T15:47:05.000Z",
+    "modelId": "antinoice/GFPGANv1.4"
+  }
+]
