@@ -402,6 +402,10 @@ try:
         
         swapper = get_model(swap_model_path, providers=providers)
         logger.info("Face swap model initialized successfully")
+        
+        # Initialize enhancement models
+        initialize_enhancement_models()
+        
         print("All models loaded successfully!")
     except Exception as e:
         logger.warning(f"Failed to initialize face swap model: {str(e)}")
@@ -1712,19 +1716,28 @@ def check_models():
     
     return jsonify(status)
 
-@app.route('/download-enhancement-models', methods=['GET', 'POST'])
-def download_enhancement_models():
+# Function to initialize enhancement models on startup
+def initialize_enhancement_models():
     """
-    Download enhancement models from Hugging Face and GitHub.
-    Models include GPEN, GFPGAN, CodeFormer, and ESRGAN.
+    Initialize enhancement models by downloading them if they don't exist.
+    This is called during application startup.
     """
-    if request.method == 'GET':
-        return render_template('download_models.html')
-    
-    # Start download process
     try:
+        from enhancement import MODEL_PATHS
         import subprocess
         import sys
+        
+        # Check which models are missing
+        missing_models = []
+        for model_name, model_path in MODEL_PATHS.items():
+            if not os.path.exists(model_path):
+                missing_models.append(model_name)
+        
+        if not missing_models:
+            logger.info("All enhancement models are available")
+            return
+        
+        logger.info(f"Downloading missing enhancement models: {missing_models}")
         
         # Run the download script
         result = subprocess.run(
@@ -1735,33 +1748,20 @@ def download_enhancement_models():
         )
         
         if result.returncode != 0:
-            logger.error(f"Error downloading models: {result.stderr}")
-            return jsonify({
-                'success': False,
-                'message': f"Error downloading models: {result.stderr}"
-            })
+            logger.error(f"Error downloading enhancement models: {result.stderr}")
+            return
         
         # Check which models are now available
-        from enhancement import MODEL_PATHS
-        
         available_models = []
         for model_name, model_path in MODEL_PATHS.items():
             if os.path.exists(model_path):
                 available_models.append(model_name)
         
-        return jsonify({
-            'success': True,
-            'message': "Enhancement models downloaded successfully",
-            'available_models': available_models,
-            'log': result.stdout
-        })
+        logger.info(f"Enhancement models available: {available_models}")
         
     except Exception as e:
-        logger.error(f"Error downloading enhancement models: {str(e)}")
-        return jsonify({
-            'success': False,
-            'message': f"Error downloading enhancement models: {str(e)}"
-        }), 500
+        logger.error(f"Error initializing enhancement models: {str(e)}")
+        logger.error(traceback.format_exc())
 
 @app.route('/upload-model', methods=['GET', 'POST'])
 def upload_model():
