@@ -2,6 +2,29 @@
 
 {% block title %}Multi-Template Results{% endblock %}
 
+{% block styles %}
+<style>
+    /* Custom badge colors for enhancement methods */
+    .badge.bg-purple {
+        background-color: #6f42c1;
+        color: white;
+    }
+    .badge.bg-teal {
+        background-color: #20c997;
+        color: white;
+    }
+    /* Enhanced badge hover effects */
+    .badge[title] {
+        cursor: help;
+        transition: all 0.2s ease;
+    }
+    .badge[title]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     <div class="row mb-4">
