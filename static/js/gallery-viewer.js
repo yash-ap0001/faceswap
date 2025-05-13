@@ -7,6 +7,8 @@ let currentCeremonyType = "";
 let currentTemplateIndex = 0;
 let currentCeremonyImages = [];
 let zoomLevel = 1;
+let isDragging = false;
+let startX, startY, currentX = 0, currentY = 0;
 
 // Function to show the full-size preview
 function showFullsizePreview(imagePath, ceremonyType) {
