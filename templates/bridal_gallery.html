@@ -511,12 +511,12 @@
         </div>
     </div>
     
-    <!-- Multi-Template Selection Interface -->
-    <div class="card mb-4 shadow d-none" id="multiSelectionInterface">
+    <!-- Multi-Template Selection Interface (Legacy, keeping for reference only) -->
+    <div class="card mb-4 shadow d-none" id="multiSelectionInterfaceLegacy">
         <div class="card-header bg-primary text-white">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-tasks me-2"></i> Selected Templates (<span id="selectedCount">0</span>/5)</h5>
-                <button type="button" class="btn btn-sm btn-light" id="clearSelectionBtn">
+                <h5 class="mb-0"><i class="fas fa-tasks me-2"></i> Selected Templates (<span id="selectedCountLegacy">0</span>/5)</h5>
+                <button type="button" class="btn btn-sm btn-light" id="clearSelectionBtnLegacy">
                     <i class="fas fa-times"></i> Clear Selection
                 </button>
             </div>
@@ -968,60 +968,53 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize when this script runs (already inside a DOMContentLoaded handler)
     initializeCarouselsCollapsed();
     
-    // Initialize multi-selection variables
-    window.selectedTemplates = [];
-    const multiSelectionInterface = document.getElementById('multiSelectionInterface');
-    const selectedCount = document.getElementById('selectedCount');
-    const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
-    const processMultipleBtn = document.getElementById('processMultipleBtn');
-    const clearSelectionBtn = document.getElementById('clearSelectionBtn');
-    const multiSourceInput = document.getElementById('multiSourceInput');
-        const multiSourcePreview = document.getElementById('multiSourcePreview');
-        const multiSourcePlaceholder = document.getElementById('multiSourcePlaceholder');
-        
-        // Clear selection button
-        if (clearSelectionBtn) {
-            clearSelectionBtn.addEventListener('click', function() {
-                clearTemplateSelection();
-            });
-        }
-        
-        // Source image preview for multi-selection
-        if (multiSourceInput) {
-            multiSourceInput.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        multiSourcePreview.src = e.target.result;
-                        multiSourcePreview.classList.remove('d-none');
-                        multiSourcePlaceholder.classList.add('d-none');
-                        
-                        // Enable process button if we have templates selected
-                        if (selectedTemplates.length > 0) {
-                            processMultipleBtn.disabled = false;
-                        }
-                    };
-                    reader.readAsDataURL(this.files[0]);
-                }
-            });
-        }
-        
-        // Process multiple templates button
-        if (processMultipleBtn) {
-            processMultipleBtn.addEventListener('click', function() {
-                if (!multiSourceInput.files || !multiSourceInput.files[0]) {
-                    showError('Please upload your source image first.');
-                    return;
-                }
-                
-                if (selectedTemplates.length === 0) {
-                    showError('Please select at least one template.');
-                    return;
-                }
-                
-                processMultipleTemplates();
-            });
-        }
+    // Initialize multi-selection variables - these were already defined above, no need to redeclare
+    // Just reference the existing window.selectedTemplates array 
+    // Keep variables in global scope so they're accessible to all functions
+    
+    // Clear selection button
+    if (clearSelectionBtn) {
+        clearSelectionBtn.addEventListener('click', function() {
+            clearTemplateSelection();
+        });
+    }
+    
+    // Source image preview for multi-selection
+    if (multiSourceInput) {
+        multiSourceInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    multiSourcePreview.src = e.target.result;
+                    multiSourcePreview.classList.remove('d-none');
+                    multiSourcePlaceholder.classList.add('d-none');
+                    
+                    // Enable process button if we have templates selected
+                    if (selectedTemplates.length > 0) {
+                        processMultipleBtn.disabled = false;
+                    }
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+    
+    // Process multiple templates button
+    if (processMultipleBtn) {
+        processMultipleBtn.addEventListener('click', function() {
+            if (!multiSourceInput.files || !multiSourceInput.files[0]) {
+                showError('Please upload your source image first.');
+                return;
+            }
+            
+            if (selectedTemplates.length === 0) {
+                showError('Please select at least one template.');
+                return;
+            }
+            
+            processMultipleTemplates();
+        });
+    }
     });
     
     // Toggle select mode for bulk deletion
