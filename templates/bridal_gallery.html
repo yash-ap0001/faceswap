@@ -1845,15 +1845,56 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Fullsize Preview Modal -->
 <div class="modal fade" id="fullsizePreviewModal" tabindex="-1" aria-labelledby="fullsizePreviewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content bg-dark">
+        <div class="modal-content" style="background-color: rgba(33, 33, 33, 0.95); backdrop-filter: blur(10px);">
             <div class="modal-header border-secondary">
                 <h5 class="modal-title" id="fullsize-preview-title">Template Preview</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center p-0">
-                <img id="fullsize-preview-image" src="" class="img-fluid" alt="Template Preview">
+            <div class="modal-body text-center p-0 position-relative">
+                <div class="image-container" style="overflow: hidden; position: relative;">
+                    <img id="fullsize-preview-image" src="" class="img-fluid" alt="Template Preview" style="transition: transform 0.3s ease; transform-origin: center;">
+                </div>
+                
+                <!-- Navigation Buttons -->
+                <button class="btn btn-lg position-absolute top-50 start-0 translate-middle-y text-white" id="prevImageBtn" style="background-color: rgba(0,0,0,0.5); z-index: 10;">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="btn btn-lg position-absolute top-50 end-0 translate-middle-y text-white" id="nextImageBtn" style="background-color: rgba(0,0,0,0.5); z-index: 10;">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                
+                <!-- Zoom Controls - Top Right -->
+                <div class="position-absolute top-0 end-0 p-3 d-flex" style="z-index: 10;">
+                    <button class="btn btn-sm btn-dark me-2" id="zoomInBtn">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button class="btn btn-sm btn-dark me-2" id="zoomOutBtn">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                    <button class="btn btn-sm btn-dark" id="resetZoomBtn">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                
+                <!-- Zoom Controls - Bottom Right -->
+                <div class="position-absolute bottom-0 end-0 p-3" style="z-index: 10;">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-dark" id="zoomInBtnBottom">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button class="btn btn-sm btn-dark" id="zoomOutBtnBottom">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button class="btn btn-sm btn-dark" id="resetZoomBtnBottom">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer border-secondary">
+                <div class="image-counter">
+                    <span id="current-image-index">1</span> / <span id="total-image-count">1</span>
+                </div>
                 <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
