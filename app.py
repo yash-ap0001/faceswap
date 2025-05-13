@@ -903,14 +903,18 @@ def process_template():
         result_img = swapper.get(template_img, target_faces[0], source_faces[0], source_img)
         
         # Apply face enhancement if requested
+        enhanced = False
         if enhance:
             try:
-                from face_enhancer import enhancer
+                from face_enhancer import FaceEnhancer
+                # Initialize the face enhancer
+                enhancer = FaceEnhancer()
                 app.logger.info(f"Applying face enhancement with method: {enhance_method}")
                 
                 # Apply face enhancement
                 result_img = enhancer.enhance(result_img, method=enhance_method, strength=0.8)
                 app.logger.info("Face enhancement applied successfully")
+                enhanced = True
             except Exception as e:
                 app.logger.error(f"Face enhancement failed: {str(e)}")
                 # Continue with the unenhanced result
@@ -930,7 +934,8 @@ def process_template():
         return jsonify({
             'success': True,
             'result_path': f"/uploads/results/{result_filename}",
-            'enhanced': enhance
+            'enhanced': enhanced,
+            'enhance_method': enhance_method if enhanced else None
         })
         
     except Exception as e:
