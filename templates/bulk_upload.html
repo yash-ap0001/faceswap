@@ -520,8 +520,16 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Get selected ceremony for refreshing later
-        const selectedCeremony = document.querySelector('input[name="ceremonyTab"]:checked').value;
+        // Get category information for refreshing later
+        const categoryType = document.getElementById('deleteCategoryType').value;
+        const subcategory = document.getElementById('deleteSubcategory').value;
+        let itemCategory;
+        
+        if (categoryType === 'bride' && subcategory === 'bridal') {
+            itemCategory = document.querySelector('input[name="ceremonyTab"]:checked').value;
+        } else {
+            itemCategory = document.getElementById('deleteItemCategory').value;
+        }
         
         // Collect template paths to delete
         const templatePaths = Array.from(checkedTemplates).map(checkbox => checkbox.dataset.templatePath);
@@ -558,12 +566,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 deleteStatusMessage.textContent = `Successfully deleted ${templatePaths.length} template${templatePaths.length !== 1 ? 's' : ''}`;
                 
                 // Refresh templates
-                refreshTemplates(selectedCeremony);
+                refreshTemplates(itemCategory);
                 
                 // Notify other pages
                 const timestamp = Date.now().toString();
                 localStorage.setItem('refreshTemplates', 'true');
-                localStorage.setItem('lastUpdatedCeremony', selectedCeremony);
+                localStorage.setItem('lastUpdatedCeremony', itemCategory);
                 localStorage.setItem('updateTimestamp', timestamp);
                 
                 // Hide status after delay
@@ -587,17 +595,96 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Select all templates for deletion
     selectAllTemplatesButton.addEventListener('click', function() {
-        const currentCeremony = document.querySelector('input[name="ceremonyTab"]:checked').value;
-        const templateCheckboxes = document.querySelectorAll(`.template-checkbox[data-ceremony="${currentCeremony}"]`);
+        // Get category information
+        const categoryType = document.getElementById('deleteCategoryType').value;
+        const subcategory = document.getElementById('deleteSubcategory').value;
         
-        templateCheckboxes.forEach(checkbox => {
-            checkbox.checked = true;
-        });
+        let templateCheckboxes;
+        
+        if (categoryType === 'bride' && subcategory === 'bridal') {
+            // For bridal ceremonies, use data-ceremony attribute
+            const currentCeremony = document.querySelector('input[name="ceremonyTab"]:checked').value;
+            templateCheckboxes = document.querySelectorAll(`.template-checkbox[data-ceremony="${currentCeremony}"]`);
+        } else {
+            // For other categories, select all visible template checkboxes in the dynamic container
+            const dynamicContainer = document.getElementById('dynamic-templates-container');
+            if (dynamicContainer) {
+                templateCheckboxes = dynamicContainer.querySelectorAll('.template-checkbox');
+            } else {
+                // If no dynamic container, get any visible template checkboxes
+                templateCheckboxes = document.querySelectorAll('.template-checkbox:not([style*="display: none"])');
+            }
+        }
+        
+        if (templateCheckboxes && templateCheckboxes.length > 0) {
+            templateCheckboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        } else {
+            console.log('No template checkboxes found to select');
+        }
     });
     
     // Template refresh functionality
-    function refreshTemplates(ceremonyType) {
-        const templateContainer = document.getElementById(`${ceremonyType}-templates`);
+    function refreshTemplates(itemCategory) {
+        // Get category information
+        const categoryType = document.getElementById('deleteCategoryType').value;
+        const subcategory = document.getElementById('deleteSubcategory').value;
+        
+        // Get item category from selected tab if not provided
+        if (!itemCategory) {
+            if (categoryType === 'bride' && subcategory === 'bridal') {
+                itemCategory = document.querySelector('input[name="ceremonyTab"]:checked').value;
+            } else {
+                itemCategory = document.getElementById('deleteItemCategory').value;
+            }
+        }
+        
+        // For bridal ceremonies, use existing template containers
+        let templateContainer;
+        if (categoryType === 'bride' && subcategory === 'bridal') {
+            templateContainer = document.getElementById(`${itemCategory}-templates`);
+        } else {
+            // For other categories, we'll need to create a container dynamically
+            // First, get the parent tab-pane for non-bridal templates
+            const tabContent = document.getElementById('deleteTabContent');
+            
+            // Clear any existing dynamic template containers
+            const existingDynamic = document.getElementById('dynamic-templates-container');
+            if (existingDynamic) {
+                existingDynamic.remove();
+            }
+            
+            // Create a new dynamic template container
+            templateContainer = document.createElement('div');
+            templateContainer.id = 'dynamic-templates-container';
+            templateContainer.className = 'row g-2 template-container';
+            
+            // Add loading placeholder
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'col-12 text-center loading-placeholder py-4';
+            loadingDiv.innerHTML = `
+                <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            `;
+            templateContainer.appendChild(loadingDiv);
+            
+            // Show the dynamic container by making it the only visible one
+            document.querySelectorAll('.tab-pane').forEach(tab => {
+                tab.classList.remove('show', 'active');
+            });
+            
+            // Create a new tab-pane for the dynamic content
+            const newTabPane = document.createElement('div');
+            newTabPane.className = 'tab-pane fade show active';
+            newTabPane.id = 'dynamic-tab-pane';
+            newTabPane.appendChild(templateContainer);
+            
+            // Add it to the tab content
+            tabContent.appendChild(newTabPane);
+        }
+        
         if (!templateContainer) return;
         
         const loadingPlaceholder = templateContainer.querySelector('.loading-placeholder');
@@ -612,8 +699,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+        // Construct appropriate API URL
+        let apiUrl;
+        if (categoryType === 'bride' && subcategory === 'bridal') {
+            apiUrl = `/api/templates?ceremony_type=${itemCategory}`;
+        } else {
+            apiUrl = `/api/templates?category_type=${categoryType}&subcategory=${subcategory}&item_category=${itemCategory}`;
+        }
+        
         // Fetch templates from API
-        fetch(`/api/templates?ceremony_type=${ceremonyType}`)
+        fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 if (loadingPlaceholder) {
@@ -875,8 +970,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Refresh button handler
     document.getElementById('refreshTemplates').addEventListener('click', function() {
-        const selectedCeremony = document.querySelector('input[name="ceremonyTab"]:checked').value;
-        refreshTemplates(selectedCeremony);
+        // Get category information
+        const categoryType = document.getElementById('deleteCategoryType').value;
+        const subcategory = document.getElementById('deleteSubcategory').value;
+        
+        let itemCategory;
+        if (categoryType === 'bride' && subcategory === 'bridal') {
+            itemCategory = document.querySelector('input[name="ceremonyTab"]:checked').value;
+        } else {
+            itemCategory = document.getElementById('deleteItemCategory').value;
+        }
+        
+        refreshTemplates(itemCategory);
     });
     
     // Don't load templates automatically - wait for refresh button click
