@@ -28,37 +28,53 @@ class FaceEnhancer:
     
     def _load_models(self):
         """Load available enhancement models."""
+        import onnxruntime as ort
+        
         # Try to load CodeFormer
-        codeformer_path = 'models/codeformer.onnx'
-        if os.path.exists(codeformer_path):
-            try:
-                import onnxruntime as ort
-                logger.info(f"Loading CodeFormer model from {codeformer_path}")
-                self.codeformer_model = ort.InferenceSession(
-                    codeformer_path, 
-                    providers=['CPUExecutionProvider']
-                )
-                logger.info("CodeFormer model loaded successfully")
-            except Exception as e:
-                logger.error(f"Failed to load CodeFormer model: {e}")
-        else:
-            logger.warning(f"CodeFormer model not found at {codeformer_path}")
+        codeformer_paths = [
+            'models/enhancement/faster_codeformer_onnx.onnx',
+            'models/codeformer.onnx',
+            'models/faster_codeformer_onnx.onnx'
+        ]
+        
+        for codeformer_path in codeformer_paths:
+            if os.path.exists(codeformer_path):
+                try:
+                    logger.info(f"Loading CodeFormer model from {codeformer_path}")
+                    self.codeformer_model = ort.InferenceSession(
+                        codeformer_path, 
+                        providers=['CPUExecutionProvider']
+                    )
+                    logger.info("CodeFormer model loaded successfully")
+                    break
+                except Exception as e:
+                    logger.error(f"Failed to load CodeFormer model from {codeformer_path}: {e}")
+        
+        if self.codeformer_model is None:
+            logger.warning("No CodeFormer model could be loaded from any path")
         
         # Try to load GFPGAN
-        gfpgan_path = 'models/gfpgan_1.4.onnx'
-        if os.path.exists(gfpgan_path):
-            try:
-                import onnxruntime as ort
-                logger.info(f"Loading GFPGAN model from {gfpgan_path}")
-                self.gfpgan_model = ort.InferenceSession(
-                    gfpgan_path, 
-                    providers=['CPUExecutionProvider']
-                )
-                logger.info("GFPGAN model loaded successfully")
-            except Exception as e:
-                logger.error(f"Failed to load GFPGAN model: {e}")
-        else:
-            logger.warning(f"GFPGAN model not found at {gfpgan_path}")
+        gfpgan_paths = [
+            'models/enhancement/gfpgan_1.4.onnx',
+            'models/gfpgan_1.4.onnx',
+            'models/gfpgan.onnx'
+        ]
+        
+        for gfpgan_path in gfpgan_paths:
+            if os.path.exists(gfpgan_path):
+                try:
+                    logger.info(f"Loading GFPGAN model from {gfpgan_path}")
+                    self.gfpgan_model = ort.InferenceSession(
+                        gfpgan_path, 
+                        providers=['CPUExecutionProvider']
+                    )
+                    logger.info("GFPGAN model loaded successfully")
+                    break
+                except Exception as e:
+                    logger.error(f"Failed to load GFPGAN model from {gfpgan_path}: {e}")
+        
+        if self.gfpgan_model is None:
+            logger.warning("No GFPGAN model could be loaded from any path")
     
     def has_enhancement_models(self):
         """Check if any enhancement models are available."""
