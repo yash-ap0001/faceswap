@@ -206,34 +206,12 @@
     const resultPreviewModal = new bootstrap.Modal(document.getElementById('resultPreviewModal'));
     const resultPreviewModalImage = document.getElementById('resultPreviewModalImage');
     const downloadResultBtn = document.getElementById('downloadResultBtn');
-    const currentResultIndex = document.getElementById('current-result-index');
-    const totalResultCount = document.getElementById('total-result-count');
+    const currentResultCounter = document.getElementById('current-result-index');
+    const totalResultCounter = document.getElementById('total-result-count');
     
-    // Initialize zoom variables
-    let resultZoomLevel = 1;
-    const resultZoomStep = 0.1;
-    const resultMaxZoom = 3;
-    const resultMinZoom = 0.5;
-    
-    // Zoom controls for result preview
-    document.getElementById('result-zoom-in').addEventListener('click', () => {
-        if (resultZoomLevel < resultMaxZoom) {
-            resultZoomLevel += resultZoomStep;
-            resultPreviewModalImage.style.transform = `scale(${resultZoomLevel})`;
-        }
-    });
-    
-    document.getElementById('result-zoom-out').addEventListener('click', () => {
-        if (resultZoomLevel > resultMinZoom) {
-            resultZoomLevel -= resultZoomStep;
-            resultPreviewModalImage.style.transform = `scale(${resultZoomLevel})`;
-        }
-    });
-    
-    document.getElementById('result-zoom-reset').addEventListener('click', () => {
-        resultZoomLevel = 1;
-        resultPreviewModalImage.style.transform = 'scale(1)';
-    });
+    // Variables for image navigation
+    let currentResultIndex = 0;
+    const allResultImages = [];
     
     // Add keyboard navigation support
     document.addEventListener('keydown', (e) => {
@@ -481,6 +459,112 @@
         }
     }
     
+    // Variables for image navigation
+    let currentResultIndex = 0;
+    const allResultImages = [];
+    
+    // Show result preview and set up navigation
+    function showResultPreview(imageElement) {
+        const imgPath = imageElement.getAttribute('data-full-path');
+        
+        // Find this image in our array for navigation
+        const index = allResultImages.findIndex(img => img.src === imgPath);
+        if (index !== -1) {
+            currentResultIndex = index;
+        }
+        
+        // Update current image info
+        updateResultCounter();
+        
+        // Set image source and download link
+        resultPreviewModalImage.src = imgPath;
+        downloadResultBtn.href = imgPath;
+        downloadResultBtn.download = imgPath.split('/').pop();
+        
+        // Reset zoom
+        resetResultZoom();
+        
+        // Show modal
+        resultPreviewModal.show();
+    }
+    
+    // Navigate between result images
+    function navigateResults(direction) {
+        if (allResultImages.length === 0) return;
+        
+        if (direction === 'prev') {
+            currentResultIndex = (currentResultIndex - 1 + allResultImages.length) % allResultImages.length;
+        } else {
+            currentResultIndex = (currentResultIndex + 1) % allResultImages.length;
+        }
+        
+        const imgData = allResultImages[currentResultIndex];
+        resultPreviewModalImage.src = imgData.src;
+        downloadResultBtn.href = imgData.src;
+        downloadResultBtn.download = imgData.src.split('/').pop();
+        
+        // Update counter
+        updateResultCounter();
+    }
+    
+    // Update the counter display
+    function updateResultCounter() {
+        if (currentResultCounter && totalResultCounter) {
+            currentResultCounter.textContent = (currentResultIndex + 1).toString();
+            totalResultCounter.textContent = allResultImages.length.toString();
+        }
+    }
+    
+    // Handle keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        // Only if the result modal is visible
+        if (resultPreviewModal._element.classList.contains('show')) {
+            if (e.key === 'ArrowLeft') {
+                navigateResults('prev');
+            } else if (e.key === 'ArrowRight') {
+                navigateResults('next');
+            } else if (e.key === '+' || e.key === '=') {
+                // Zoom in with + key
+                zoomResultIn();
+            } else if (e.key === '-' || e.key === '_') {
+                // Zoom out with - key
+                zoomResultOut();
+            } else if (e.key === '0') {
+                // Reset zoom with 0 key
+                resetResultZoom();
+            }
+        }
+    });
+    
+    // Zoom functionality for result preview
+    let resultZoomLevel = 1;
+    const resultZoomStep = 0.1;
+    const resultMaxZoom = 3;
+    const resultMinZoom = 0.5;
+    
+    function zoomResultIn() {
+        if (resultZoomLevel < resultMaxZoom) {
+            resultZoomLevel += resultZoomStep;
+            applyResultZoom();
+        }
+    }
+    
+    function zoomResultOut() {
+        if (resultZoomLevel > resultMinZoom) {
+            resultZoomLevel -= resultZoomStep;
+            applyResultZoom();
+        }
+    }
+    
+    function resetResultZoom() {
+        resultZoomLevel = 1;
+        applyResultZoom();
+    }
+    
+    function applyResultZoom() {
+        resultPreviewModalImage.style.transform = `scale(${resultZoomLevel})`;
+    }
+    
     // Initialize processing
     document.addEventListener('DOMContentLoaded', function() {
         const enhanceSwitch = document.getElementById('enhanceSwitch');
@@ -488,6 +572,15 @@
             enhanceSwitch.addEventListener('change', toggleEnhancementOptions);
             toggleEnhancementOptions(); // Initial state
         }
+        
+        // Initialize zoom controls
+        const zoomInBtn = document.getElementById('result-zoom-in');
+        const zoomOutBtn = document.getElementById('result-zoom-out');
+        const zoomResetBtn = document.getElementById('result-zoom-reset');
+        
+        if (zoomInBtn) zoomInBtn.addEventListener('click', zoomResultIn);
+        if (zoomOutBtn) zoomOutBtn.addEventListener('click', zoomResultOut);
+        if (zoomResetBtn) zoomResetBtn.addEventListener('click', resetResultZoom);
         
         if (templatePaths.length > 0) {
             processAllTemplates().catch(error => {
