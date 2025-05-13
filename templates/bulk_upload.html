@@ -343,7 +343,9 @@ document.addEventListener('DOMContentLoaded', function() {
             statusMessage.textContent = 'Error: ' + error.message;
             
             // Re-enable form controls on error
-            formControls.forEach(control => { if (control) control.disabled = false; });
+            uploadSelectedButton.disabled = false;
+            document.getElementById('ceremonyType').disabled = false;
+            imageInput.disabled = false;
         });
     }
     
@@ -371,8 +373,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     tabPane.classList.add('show', 'active');
                 }
                 
-                // Load templates for this ceremony type
-                refreshTemplates(ceremony);
+                // Don't automatically load templates for this ceremony type
+                // Templates will be loaded when user clicks refresh button
             }
         });
     });
