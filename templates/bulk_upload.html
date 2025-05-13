@@ -495,9 +495,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.templates && data.templates.length > 0) {
                     data.templates.forEach(template => {
                         try {
-                            // Extract filename from path (for display)
-                            const pathParts = template.path.split('/');
-                            const filename = pathParts[pathParts.length - 1];
+                            // Get a safe filename for display
+                            let displayName = 'Template';
+                            
+                            if (template.path) {
+                                const pathParts = template.path.split('/');
+                                if (pathParts.length > 0) {
+                                    displayName = pathParts[pathParts.length - 1] || 'Template';
+                                }
+                            }
                             
                             // Create template card with checkbox for bulk selection
                             const col = document.createElement('div');
@@ -514,7 +520,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             const checkbox = document.createElement('input');
                             checkbox.type = 'checkbox';
                             checkbox.className = 'form-check-input template-checkbox';
-                            checkbox.dataset.templatePath = template.path;
+                            checkbox.dataset.templatePath = template.path || '';
                             checkbox.dataset.ceremony = ceremonyType;
                             
                             checkboxWrapper.appendChild(checkbox);
@@ -524,9 +530,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             imgWrapper.className = 'position-relative';
                             
                             const img = document.createElement('img');
-                            img.src = template.url;
+                            img.src = template.url || '';
                             img.className = 'card-img-top';
-                            img.alt = filename;
+                            img.alt = displayName;
                             img.style.height = '80px';
                             img.style.objectFit = 'cover';
                             
@@ -543,10 +549,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             // Simple footer with filename (truncated)
                             const cardFooter = document.createElement('div');
                             cardFooter.className = 'p-1 bg-dark text-center';
-                            const displayName = filename || 'Template';
-                            const truncatedName = displayName.length > 15 
-                                ? displayName.substring(0, 15) + '...' 
-                                : displayName;
+                            
+                            // Truncate filename if needed
+                            let truncatedName = displayName;
+                            if (displayName && displayName.length > 15) {
+                                truncatedName = displayName.substring(0, 15) + '...';
+                            }
                             
                             cardFooter.innerHTML = '<small class="text-light text-truncate d-block" style="font-size: 0.7rem;">'
                                 + truncatedName + '</small>';
