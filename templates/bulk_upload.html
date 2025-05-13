@@ -22,20 +22,33 @@
                         <div id="fileListContainer" class="mt-2"></div>
                     </div>
 
-                    <div class="row g-2 mb-3">
-                        <div class="col-md-8">
-                            <select class="form-select form-select-sm bg-dark text-light border-secondary" id="ceremonyType" name="ceremony_type" required>
-                                <option value="" disabled selected>Select ceremony</option>
-                                <option value="haldi">Haldi</option>
-                                <option value="mehendi">Mehendi</option>
-                                <option value="sangeeth">Sangeeth</option>
-                                <option value="wedding">Wedding</option>
-                                <option value="reception">Reception</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <button type="button" id="uploadSelected" class="btn btn-sm btn-primary w-100">Upload</button>
-                        </div>
+                    <div class="mb-3">
+                        <label for="categoryType" class="form-label small">Category Type</label>
+                        <select class="form-select form-select-sm bg-dark text-light border-secondary" id="categoryType" name="category_type" required>
+                            <option value="" disabled selected>Select category type</option>
+                            <option value="bride">Bride</option>
+                            <option value="groom">Groom</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="subcategory" class="form-label small">Subcategory</label>
+                        <select class="form-select form-select-sm bg-dark text-light border-secondary" id="subcategory" name="subcategory" required disabled>
+                            <option value="" disabled selected>Select subcategory</option>
+                            <!-- Options will be populated via JavaScript -->
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="itemCategory" class="form-label small">Item Category</label>
+                        <select class="form-select form-select-sm bg-dark text-light border-secondary" id="itemCategory" name="item_category" required disabled>
+                            <option value="" disabled selected>Select item category</option>
+                            <!-- Options will be populated via JavaScript -->
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <button type="button" id="uploadSelected" class="btn btn-sm btn-primary w-100">Upload</button>
                     </div>
                 </form>
                 
@@ -225,11 +238,77 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadSelectedButton = document.getElementById('uploadSelected');
     
     // Upload handler function
-    function uploadCheckedImages() {
-        const ceremonyType = document.getElementById('ceremonyType').value;
+    // Category structure for populating dropdowns
+    const categories = {{ categories|tojson }};
+    
+    // Setup category selection chain
+    const categoryTypeSelect = document.getElementById('categoryType');
+    const subcategorySelect = document.getElementById('subcategory');
+    const itemCategorySelect = document.getElementById('itemCategory');
+    
+    // When category type changes, update subcategory options
+    categoryTypeSelect.addEventListener('change', function() {
+        const selectedType = this.value;
         
-        if (!ceremonyType) {
-            alert('Please select a ceremony type');
+        // Clear and disable item category
+        itemCategorySelect.innerHTML = '<option value="" disabled selected>Select item category</option>';
+        itemCategorySelect.disabled = true;
+        
+        // Update subcategory options
+        subcategorySelect.innerHTML = '<option value="" disabled selected>Select subcategory</option>';
+        
+        if (selectedType && categories[selectedType]) {
+            // Add subcategory options
+            Object.keys(categories[selectedType]).forEach(subcategory => {
+                const option = document.createElement('option');
+                option.value = subcategory;
+                option.textContent = subcategory.charAt(0).toUpperCase() + subcategory.slice(1).replace('_', ' ');
+                subcategorySelect.appendChild(option);
+            });
+            
+            // Enable subcategory select
+            subcategorySelect.disabled = false;
+        } else {
+            subcategorySelect.disabled = true;
+        }
+    });
+    
+    // When subcategory changes, update item category options
+    subcategorySelect.addEventListener('change', function() {
+        const selectedType = categoryTypeSelect.value;
+        const selectedSubcategory = this.value;
+        
+        // Update item category options
+        itemCategorySelect.innerHTML = '<option value="" disabled selected>Select item category</option>';
+        
+        if (selectedType && selectedSubcategory && 
+            categories[selectedType] && 
+            categories[selectedType][selectedSubcategory]) {
+            
+            // Add item category options
+            categories[selectedType][selectedSubcategory].forEach(itemCategory => {
+                const option = document.createElement('option');
+                option.value = itemCategory;
+                option.textContent = itemCategory.charAt(0).toUpperCase() + itemCategory.slice(1).replace('_', ' ');
+                itemCategorySelect.appendChild(option);
+            });
+            
+            // Enable item category select
+            itemCategorySelect.disabled = false;
+        } else {
+            itemCategorySelect.disabled = true;
+        }
+    });
+    
+    function uploadCheckedImages() {
+        // Get values from all three dropdowns
+        const categoryType = document.getElementById('categoryType').value;
+        const subcategory = document.getElementById('subcategory').value;
+        const itemCategory = document.getElementById('itemCategory').value;
+        
+        // Validate all selections are made
+        if (!categoryType || !subcategory || !itemCategory) {
+            alert('Please select all category options');
             return;
         }
         
@@ -242,12 +321,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Disable form controls during upload
         uploadSelectedButton.disabled = true;
-        document.getElementById('ceremonyType').disabled = true;
+        categoryTypeSelect.disabled = true;
+        subcategorySelect.disabled = true;
+        itemCategorySelect.disabled = true;
         imageInput.disabled = true;
         
         // Prepare form data
         const formData = new FormData();
-        formData.append('ceremony_type', ceremonyType);
+        formData.append('category_type', categoryType);
+        formData.append('subcategory', subcategory);
+        formData.append('item_category', itemCategory);
         
         // Find selected files
         const uploadingFileNames = [];
@@ -258,7 +341,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (isSelected) {
                 formData.append('files', file);
-                formData.append('file_categories', ceremonyType);
                 uploadingFileNames.push(file.name);
             }
         });
@@ -267,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
         uploadStatus.style.display = 'block';
         uploadResult.style.display = 'none';
         uploadProgress.style.width = '0%';
-        statusMessage.textContent = `Uploading ${uploadingFileNames.length} template${uploadingFileNames.length !== 1 ? 's' : ''} to ${ceremonyType}...`;
+        statusMessage.textContent = `Uploading ${uploadingFileNames.length} file${uploadingFileNames.length !== 1 ? 's' : ''} to ${categoryType}/${subcategory}/${itemCategory}...`;
         
         // Animated progress bar
         let progress = 0;
@@ -289,7 +371,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Re-enable form controls
             uploadSelectedButton.disabled = false;
-            document.getElementById('ceremonyType').disabled = false;
+            categoryTypeSelect.disabled = false;
+            subcategorySelect.disabled = false;
+            itemCategorySelect.disabled = false;
             imageInput.disabled = false;
             
             if (data.success) {
@@ -301,7 +385,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="d-flex align-items-center">
                         <i class="fas fa-check-circle text-success me-2"></i>
                         <div>
-                            <strong>Uploaded ${data.uploaded_count || uploadingFileNames.length} template${(data.uploaded_count || uploadingFileNames.length) !== 1 ? 's' : ''}</strong>
+                            <strong>Uploaded ${data.uploaded_count || uploadingFileNames.length} file${(data.uploaded_count || uploadingFileNames.length) !== 1 ? 's' : ''}</strong>
+                            <div class="text-muted small">Category: ${categoryType}/${subcategory}/${itemCategory}</div>
                         </div>
                     </div>
                 `;
@@ -313,15 +398,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 uploadSelectedButton.textContent = 'Upload';
                 uploadSelectedButton.disabled = true;
                 
-                // Refresh the template display
-                refreshTemplates(ceremonyType);
+                // Only refresh ceremony tabs for bridal categories
+                if (categoryType === 'bride' && subcategory === 'bridal') {
+                    // Refresh the template display
+                    refreshTemplates(itemCategory);
+                    
+                    // Select the corresponding tab
+                    const ceremonyTab = document.querySelector(`input[name="ceremonyTab"][value="${itemCategory}"]`);
+                    if (ceremonyTab) {
+                        ceremonyTab.checked = true;
+                    }
+                }
                 
-                // Select the corresponding tab
-                document.querySelector(`input[name="ceremonyTab"][value="${ceremonyType}"]`).checked = true;
-                document.querySelectorAll('.tab-pane').forEach(tab => {
-                    tab.classList.remove('show', 'active');
-                });
-                document.getElementById(`${ceremonyType}-delete`).classList.add('show', 'active');
+                // Only show bridal tab content if we're uploading to bridal ceremonies
+                if (categoryType === 'bride' && subcategory === 'bridal') {
+                    // Update tab display
+                    document.querySelectorAll('.tab-pane').forEach(tab => {
+                        tab.classList.remove('show', 'active');
+                    });
+                    
+                    const tabContent = document.getElementById(`${itemCategory}-delete`);
+                    if (tabContent) {
+                        tabContent.classList.add('show', 'active');
+                    }
+                }
                 
                 // Set localStorage flags for cross-page notifications
                 const timestamp = Date.now().toString();
