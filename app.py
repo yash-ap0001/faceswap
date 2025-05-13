@@ -15,6 +15,9 @@ import traceback
 import logging
 from flask_login import LoginManager
 
+# Import our enhancement module
+import enhancement
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

@@ -1,8 +1,6 @@
 import os
 import cv2
 import numpy as np
-from basicsr.archs.rrdbnet_arch import RRDBNet
-from basicsr.utils.download_util import load_file_from_url
 
 """
 Image Enhancement Module for VowBride
@@ -17,25 +15,14 @@ This module provides image enhancement capabilities using various methods:
 Most methods require additional models that will be downloaded on first use.
 """
 
-# Model URLs and paths
-MODEL_PATHS = {
-    'gfpgan': {
-        'url': 'https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.3.pth',
-        'path': 'models/gfpgan/GFPGANv1.3.pth'
-    },
-    'esrgan': {
-        'url': 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth',
-        'path': 'models/esrgan/RealESRGAN_x4plus.pth'
-    },
-    'codeformer': {
-        'url': 'https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/codeformer.pth',
-        'path': 'models/codeformer/codeformer.pth'
-    },
-}
-
-def ensure_dir(path):
-    """Ensure directory exists."""
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+# Enhancement options that we plan to support
+ENHANCEMENT_METHODS = [
+    'basic',      # Basic image enhancement with OpenCV
+    'gfpgan',     # Face restoration (future)
+    'codeformer', # Face enhancement (future)
+    'esrgan',     # General image upscaling (future)
+    'gpen',       # Face reconstruction (future)
+]
 
 def basic_enhance(img, brightness=1.1, contrast=1.2, sharpen=True):
     """
@@ -79,40 +66,10 @@ def try_gfpgan_enhance(img, strength=0.8, ensure_folder='models/gfpgan'):
     Returns:
         Enhanced image or None if GFPGAN is not available
     """
-    try:
-        from gfpgan import GFPGANer
-        
-        # Ensure model folder exists
-        os.makedirs(ensure_folder, exist_ok=True)
-        
-        # Download model if not exists
-        model_path = MODEL_PATHS['gfpgan']['path']
-        if not os.path.isfile(model_path):
-            ensure_dir(model_path)
-            load_file_from_url(MODEL_PATHS['gfpgan']['url'], model_path)
-        
-        # Initialize GFPGAN
-        restorer = GFPGANer(
-            model_path=model_path,
-            upscale=2,
-            arch='clean',
-            channel_multiplier=2,
-            bg_upsampler=None
-        )
-        
-        # Process image
-        _, _, output = restorer.enhance(
-            img,
-            has_aligned=False,
-            only_center_face=False,
-            paste_back=True,
-            weight=strength
-        )
-        
-        return output
-    except (ImportError, Exception) as e:
-        print(f"GFPGAN enhancement failed: {e}")
-        return None
+    # GFPGAN is not installed in this environment
+    # This is a placeholder for future implementation when the libraries are available
+    print("GFPGAN enhancement not available")
+    return None
 
 def try_codeformer_enhance(img, strength=0.8, ensure_folder='models/codeformer'):
     """
@@ -125,24 +82,10 @@ def try_codeformer_enhance(img, strength=0.8, ensure_folder='models/codeformer')
     Returns:
         Enhanced image or None if CodeFormer is not available
     """
-    try:
-        from codeformer.app import inference_app
-        
-        # Ensure model folder exists
-        os.makedirs(ensure_folder, exist_ok=True)
-        
-        # Download model if not exists
-        model_path = MODEL_PATHS['codeformer']['path']
-        if not os.path.isfile(model_path):
-            ensure_dir(model_path)
-            load_file_from_url(MODEL_PATHS['codeformer']['url'], model_path)
-        
-        # Process image
-        output, _ = inference_app(img, model_path, strength, 2)
-        return output
-    except (ImportError, Exception) as e:
-        print(f"CodeFormer enhancement failed: {e}")
-        return None
+    # CodeFormer is not installed in this environment
+    # This is a placeholder for future implementation when the libraries are available
+    print("CodeFormer enhancement not available")
+    return None
 
 def try_esrgan_upscale(img, upscale_factor=2, ensure_folder='models/esrgan'):
     """
@@ -155,36 +98,10 @@ def try_esrgan_upscale(img, upscale_factor=2, ensure_folder='models/esrgan'):
     Returns:
         Upscaled image or None if ESRGAN is not available
     """
-    try:
-        from realesrgan import RealESRGANer
-        
-        # Ensure model folder exists
-        os.makedirs(ensure_folder, exist_ok=True)
-        
-        # Download model if not exists
-        model_path = MODEL_PATHS['esrgan']['path']
-        if not os.path.isfile(model_path):
-            ensure_dir(model_path)
-            load_file_from_url(MODEL_PATHS['esrgan']['url'], model_path)
-        
-        # Initialize upscaler
-        model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=upscale_factor)
-        upscaler = RealESRGANer(
-            scale=upscale_factor,
-            model_path=model_path,
-            model=model,
-            tile=0,
-            tile_pad=10,
-            pre_pad=0,
-            half=False
-        )
-        
-        # Process image
-        output, _ = upscaler.enhance(img, outscale=upscale_factor)
-        return output
-    except (ImportError, Exception) as e:
-        print(f"ESRGAN upscaling failed: {e}")
-        return None
+    # ESRGAN is not installed in this environment
+    # This is a placeholder for future implementation when the libraries are available
+    print("ESRGAN upscaling not available")
+    return None
 
 def try_gpen_enhance(img, ensure_folder='models/gpen'):
     """
