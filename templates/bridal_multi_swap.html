@@ -269,6 +269,33 @@
                         <!-- Template sections will be populated here -->
                     </div>
                     
+                    <!-- Enhancement Options -->
+                    <div class="row mt-4 mb-4">
+                        <div class="col-md-6 mx-auto">
+                            <div class="card shadow-sm">
+                                <div class="card-header bg-dark">
+                                    <h5 class="mb-0">Image Enhancement</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label for="enhancement-select" class="form-label">Select Enhancement Method:</label>
+                                        <select class="form-select" id="enhancement-select" name="enhancement">
+                                            <option value="basic" selected>Basic Enhancement</option>
+                                            <option value="gpen">GPEN Face Enhancement</option>
+                                            <option value="gfpgan">GFPGAN Face Restoration</option>
+                                            <option value="codeformer">CodeFormer Face Enhancement</option>
+                                            <option value="esrgan">ESRGAN Upscaling</option>
+                                        </select>
+                                        <div class="form-text small text-muted mt-2">
+                                            Choose enhancement method for post-processing. 
+                                            If an advanced method is unavailable, basic enhancement will be applied.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="text-center mt-4">
                         <button id="process-all-btn" class="btn btn-primary btn-lg" disabled>
                             <i class="fas fa-magic me-2"></i>Create All Selected Looks
