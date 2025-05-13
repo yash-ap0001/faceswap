@@ -826,10 +826,20 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/gallery-viewer.js') }}"></script>
 <script>
+// Global variables
+let selectedTemplates = [];
+let selectedTemplatePath = '';
+let isSelectionMode = false;
+let multiSourceFile = null;
+let currentDeletePath = null;
+let currentDeleteCeremony = null;
+let currentBulkDeletePaths = [];
+
 document.addEventListener('DOMContentLoaded', function() {
     try {
-        // DOM Elements - Add try-catch for robust error handling
         console.log("Starting bridal gallery initialization");
+        
+        // DOM Elements
         const sourceInput = document.getElementById('source-input');
         const sourcePreview = document.getElementById('source-preview');
         const sourcePlaceholder = document.getElementById('source-placeholder');
@@ -837,31 +847,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const generateBtn = document.getElementById('generate-btn');
         const templateCards = document.querySelectorAll('.bridal-card');
         const emptyResults = document.getElementById('empty-results');
-        console.log("Found basic elements, template cards:", templateCards.length);
         
-        // Variables for multi-selection
+        // Results and loading elements
         const resultGallery = document.getElementById('result-gallery');
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingMessage = document.getElementById('loading-message');
-        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+        
+        // Modals
+        const errorModal = document.getElementById('errorModal') ? 
+            new bootstrap.Modal(document.getElementById('errorModal')) : null;
         const errorMessage = document.getElementById('error-message');
         const modelStatusCard = document.getElementById('model-status-card');
-        
-        // Check model status
-        checkModels();
-        
-        // Initialize modals
-        const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-        const imagePreviewModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+        const deleteConfirmModal = document.getElementById('deleteConfirmModal') ? 
+            new bootstrap.Modal(document.getElementById('deleteConfirmModal')) : null;
+        const imagePreviewModal = document.getElementById('imagePreviewModal') ? 
+            new bootstrap.Modal(document.getElementById('imagePreviewModal')) : null;
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         
-        // Current state for delete and preview operations
-        let currentDeletePath = null;
-        
-        // Template selection state
-        let selectedTemplates = [];
-        
-        // Multi-Selection Elements
+        // Multi-selection Elements
         const multiSelectionInterface = document.getElementById('multiSelectionInterface');
         const selectedCount = document.getElementById('selectedCount');
         const selectedTemplatesPreview = document.getElementById('selectedTemplatesPreview');
@@ -870,23 +873,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const multiSourceInput = document.getElementById('multiSourceInput');
         const multiSourcePreview = document.getElementById('multiSourcePreview');
         const multiSourcePlaceholder = document.getElementById('multiSourcePlaceholder');
-        let multiSourceFile = null;
-        let currentDeleteCeremony = null;
-        let currentBulkDeletePaths = [];
-    
-    // Carousel navigation removed
-    
-    // Initialization is now handled by initializeCarouselsCollapsed() function
-    
-    // View More buttons
-    // Removed view-more button event handlers (no longer needed)
-    
-    // Delete buttons
-    document.querySelectorAll('.delete-template-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation();
-            currentDeletePath = this.getAttribute('data-template-path');
-            currentDeleteCeremony = this.getAttribute('data-ceremony');
+        
+        console.log("Found basic elements, template cards:", templateCards ? templateCards.length : 0);
+        
+        // Check model status if function exists
+        if (typeof checkModels === 'function') {
+            checkModels();
+        }
+        
+        // Initialization of ceremony sections
+        initializeCarouselsCollapsed();
+        
+        // View More buttons were removed (no longer needed)
+        
+        // Setup Delete buttons
+        document.querySelectorAll('.delete-template-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                currentDeletePath = this.getAttribute('data-template-path');
+                currentDeleteCeremony = this.getAttribute('data-ceremony');
             document.getElementById('delete-confirm-message').textContent = 
                 `Are you sure you want to delete this ${currentDeleteCeremony} template? This action cannot be undone.`;
             deleteConfirmModal.show();
