@@ -147,6 +147,10 @@
         const results = [];
         let processedCount = 0;
         
+        // Get enhancement options
+        const enhanceEnabled = document.getElementById('enhanceSwitch').checked;
+        const enhanceMethod = document.getElementById('enhanceMethod').value;
+        
         // Create template cards first
         templatePaths.forEach((path, index) => {
             const templateName = path.split('/').pop();
@@ -200,7 +204,9 @@
                     },
                     body: JSON.stringify({
                         source_path: sourcePath,
-                        template_path: template
+                        template_path: template,
+                        enhance: enhanceEnabled,
+                        enhance_method: enhanceMethod
                     })
                 });
                 
@@ -208,8 +214,18 @@
                 
                 if (data.success) {
                     // Update the result container with the processed image
+                    // Determine enhancement badge
+                    let enhanceBadge = '';
+                    if (enhanceEnabled) {
+                        const methodName = enhanceMethod.charAt(0).toUpperCase() + enhanceMethod.slice(1);
+                        enhanceBadge = `<span class="badge bg-info" title="Enhanced with ${methodName}">Enhanced</span>`;
+                    }
+                    
                     resultContainer.innerHTML = `
-                        <p class="small text-muted mb-1">Result</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="small text-muted mb-1">Result</p>
+                            ${enhanceBadge}
+                        </div>
                         <img src="${data.result_path}" class="img-fluid rounded result-image" 
                              alt="Result" style="height: 200px; width: 100%; object-fit: cover;"
                              data-full-path="${data.result_path}">
@@ -272,8 +288,24 @@
         errorModal.show();
     }
     
+    // Toggle enhancement options
+    function toggleEnhancementOptions() {
+        const enhanceSwitch = document.getElementById('enhanceSwitch');
+        const methodContainer = document.getElementById('enhanceMethodContainer');
+        
+        if (enhanceSwitch && methodContainer) {
+            methodContainer.style.display = enhanceSwitch.checked ? 'block' : 'none';
+        }
+    }
+    
     // Initialize processing
     document.addEventListener('DOMContentLoaded', function() {
+        const enhanceSwitch = document.getElementById('enhanceSwitch');
+        if (enhanceSwitch) {
+            enhanceSwitch.addEventListener('change', toggleEnhancementOptions);
+            toggleEnhancementOptions(); // Initial state
+        }
+        
         if (templatePaths.length > 0) {
             processAllTemplates().catch(error => {
                 console.error('Error in template processing:', error);
