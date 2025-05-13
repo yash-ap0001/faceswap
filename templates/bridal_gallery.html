@@ -954,67 +954,65 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Initialize all sections to show only the first row
-    function initializeCarouselsCollapsed() {
-        console.log('Initializing all sections in collapsed state');
+        // Initialize all sections to show only the first row
+        function initializeCarouselsCollapsed() {
+            console.log('Initializing all sections in collapsed state');
+            
+            // Hide all cards with the extra-card class
+            const extraCards = document.querySelectorAll('.template-card.extra-card');
+            console.log(`Found ${extraCards.length} extra cards to hide initially`);
+            
+            extraCards.forEach(card => {
+                card.style.display = 'none';
+            });
+            
+            // Make sure all toggle buttons are in collapsed state
+            document.querySelectorAll('.toggle-row-btn').forEach(btn => {
+                const icon = btn.querySelector('i');
+                btn.classList.remove('expanded');
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-outline-primary');
+                btn.innerHTML = '<i class="fas fa-chevron-down"></i>';
+                btn.setAttribute('title', 'Show All Templates');
+            });
+        }
+    
+        // Initialize when this script runs (already inside a DOMContentLoaded handler)
+        initializeCarouselsCollapsed();
+        // Multi-selection variables were already defined as globals
+        // No need to redeclare them here
         
-        // Hide all cards with the extra-card class
-        const extraCards = document.querySelectorAll('.template-card.extra-card');
-        console.log(`Found ${extraCards.length} extra cards to hide initially`);
+        // Clear selection button
+        if (clearSelectionBtn) {
+            clearSelectionBtn.addEventListener('click', function() {
+                clearTemplateSelection();
+            });
+        }
         
-        extraCards.forEach(card => {
-            card.style.display = 'none';
-        });
-        
-        // Make sure all toggle buttons are in collapsed state
-        document.querySelectorAll('.toggle-row-btn').forEach(btn => {
-            const icon = btn.querySelector('i');
-            btn.classList.remove('expanded');
-            btn.classList.remove('btn-primary');
-            btn.classList.add('btn-outline-primary');
-            btn.innerHTML = '<i class="fas fa-chevron-down"></i>';
-            btn.setAttribute('title', 'Show All Templates');
-        });
-    }
+        // Source image preview for multi-selection
+        if (multiSourceInput) {
+            multiSourceInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        multiSourcePreview.src = e.target.result;
+                        multiSourcePreview.classList.remove('d-none');
+                        multiSourcePlaceholder.classList.add('d-none');
+                        
+                        // Enable process button if we have templates selected
+                        if (selectedTemplates.length > 0) {
+                            processMultipleBtn.disabled = false;
+                        }
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
     
-    // Initialize when this script runs (already inside a DOMContentLoaded handler)
-    initializeCarouselsCollapsed();
-    
-    // Initialize multi-selection variables - these were already defined above, no need to redeclare
-    // Just reference the existing window.selectedTemplates array 
-    // Keep variables in global scope so they're accessible to all functions
-    
-    // Clear selection button
-    if (clearSelectionBtn) {
-        clearSelectionBtn.addEventListener('click', function() {
-            clearTemplateSelection();
-        });
-    }
-    
-    // Source image preview for multi-selection
-    if (multiSourceInput) {
-        multiSourceInput.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    multiSourcePreview.src = e.target.result;
-                    multiSourcePreview.classList.remove('d-none');
-                    multiSourcePlaceholder.classList.add('d-none');
-                    
-                    // Enable process button if we have templates selected
-                    if (selectedTemplates.length > 0) {
-                        processMultipleBtn.disabled = false;
-                    }
-                };
-                reader.readAsDataURL(this.files[0]);
-            }
-        });
-    }
-    
-    // Process multiple templates button
-    if (processMultipleBtn) {
-        processMultipleBtn.addEventListener('click', function() {
-            if (!multiSourceInput.files || !multiSourceInput.files[0]) {
+        // Process multiple templates button
+        if (processMultipleBtn) {
+            processMultipleBtn.addEventListener('click', function() {
+                if (!multiSourceInput.files || !multiSourceInput.files[0]) {
                 showError('Please upload your source image first.');
                 return;
             }
