@@ -1694,12 +1694,74 @@ def uploaded_file(filename):
 
 @app.route('/check-models')
 def check_models():
+    # Check face swap models
     status = {
         'face_detection': faceapp is not None,
         'face_swap': swapper is not None,
         'demo_mode': demo_mode
     }
+    
+    # Check available enhancement models
+    from enhancement import MODEL_PATHS
+    
+    enhancement_status = {}
+    for model_name, model_path in MODEL_PATHS.items():
+        enhancement_status[model_name] = os.path.exists(model_path)
+    
+    status['enhancement_models'] = enhancement_status
+    
     return jsonify(status)
+
+@app.route('/download-enhancement-models', methods=['GET', 'POST'])
+def download_enhancement_models():
+    """
+    Download enhancement models from Hugging Face and GitHub.
+    Models include GPEN, GFPGAN, CodeFormer, and ESRGAN.
+    """
+    if request.method == 'GET':
+        return render_template('download_models.html')
+    
+    # Start download process
+    try:
+        import subprocess
+        import sys
+        
+        # Run the download script
+        result = subprocess.run(
+            [sys.executable, "download_enhancement_models.py"],
+            capture_output=True,
+            text=True,
+            check=False
+        )
+        
+        if result.returncode != 0:
+            logger.error(f"Error downloading models: {result.stderr}")
+            return jsonify({
+                'success': False,
+                'message': f"Error downloading models: {result.stderr}"
+            })
+        
+        # Check which models are now available
+        from enhancement import MODEL_PATHS
+        
+        available_models = []
+        for model_name, model_path in MODEL_PATHS.items():
+            if os.path.exists(model_path):
+                available_models.append(model_name)
+        
+        return jsonify({
+            'success': True,
+            'message': "Enhancement models downloaded successfully",
+            'available_models': available_models,
+            'log': result.stdout
+        })
+        
+    except Exception as e:
+        logger.error(f"Error downloading enhancement models: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f"Error downloading enhancement models: {str(e)}"
+        }), 500
 
 @app.route('/upload-model', methods=['GET', 'POST'])
 def upload_model():

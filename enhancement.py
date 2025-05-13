@@ -163,7 +163,7 @@ def try_gpen_enhance(img, model_size=256, ensure_folder='models/gpen'):
         output = session.run([output_name], {input_name: img_input})[0]
         
         # Postprocess output
-        output = np.clip(output, 0, 1)
+        output = np.clip(output.astype(np.float32), 0.0, 1.0)
         output = np.transpose(output[0], (1, 2, 0)) * 255.0
         output = cv2.resize(output, (w, h))
         
