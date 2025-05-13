@@ -1850,19 +1850,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             console.log('Checked ceremonies:', checkedCeremonies);
             
-            // Get all ceremony sections
-            const ceremonySections = document.querySelectorAll('.template-container');
-            console.log('Found ceremony sections:', ceremonySections.length);
-            
-            // Hide/show based on selection
-            ceremonySections.forEach(section => {
-                if (!section.id) {
-                    console.log('Section missing ID:', section);
-                    return;
-                }
+            // First, hide/show ceremony sections (with ID format 'ceremony-carousel')
+            document.querySelectorAll('div[id$="-carousel"]').forEach(section => {
+                if (!section.id) return;
                 
+                // Extract ceremony name from section ID (like 'haldi-carousel' → 'haldi')
                 const ceremonyId = section.id.replace('-carousel', '');
-                console.log('Processing section:', ceremonyId, section.id);
+                console.log('Processing carousel section:', ceremonyId, section.id);
                 
                 if (checkedCeremonies.includes(ceremonyId)) {
                     section.style.display = 'block';
@@ -1870,6 +1864,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     section.style.display = 'none';
                     console.log('Hiding section:', ceremonyId);
+                }
+            });
+            
+            // Additionally, hide/show individual template cards based on their data-style attribute
+            document.querySelectorAll('.template-card').forEach(card => {
+                const cardCeremony = card.getAttribute('data-style');
+                if (!cardCeremony) return;
+                
+                if (checkedCeremonies.includes(cardCeremony)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
                 }
             });
         } catch (error) {
