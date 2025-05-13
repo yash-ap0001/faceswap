@@ -1574,135 +1574,209 @@ def bridal_swap_multi():
 @app.route('/api/templates', methods=['GET'])
 def get_templates():
     """
-    API endpoint to get available templates for a specific ceremony type.
-    Returns templates for the requested ceremony with URLs for display.
+    API endpoint to get available templates for a specific category.
+    Returns templates for the requested category with URLs for display.
     Always performs a fresh scan of the filesystem to avoid caching issues.
+    
+    Query parameters:
+    - ceremony_type: For backward compatibility with bridal ceremonies
+    - category_type: 'bride' or 'groom'
+    - subcategory: e.g., 'bridal', 'outfits', 'jewelry' for bride or 'traditional', 'suits', 'accessories' for groom
+    - item_category: Specific item category, e.g., 'haldi', 'casual', etc.
     """
-    ceremony_type = request.args.get('ceremony_type', request.args.get('ceremony', 'wedding'))
     # Add cache-busting parameter in logs (not used but helps in debugging)
     cache_buster = request.args.get('_t', 'none')
-    app.logger.info(f"Fetching templates for ceremony: {ceremony_type}, cache-buster: {cache_buster}")
     
-    # Validate ceremony name
-    valid_ceremonies = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
-    if ceremony_type not in valid_ceremonies:
-        app.logger.warning(f"Invalid ceremony type requested: {ceremony_type}")
-        return jsonify({'error': f'Invalid ceremony type: {ceremony_type}'}), 400
+    # Check for category-based parameters
+    category_type = request.args.get('category_type')
+    subcategory = request.args.get('subcategory')
+    item_category = request.args.get('item_category')
     
-    # Get templates directory
-    template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
+    # For backward compatibility - check for ceremony_type parameter
+    ceremony_type = request.args.get('ceremony_type', request.args.get('ceremony'))
     
-    # Check if template directory exists
-    if not os.path.exists(template_dir):
-        app.logger.warning(f"Template directory does not exist: {template_dir}")
-        os.makedirs(template_dir, exist_ok=True)
-        app.logger.info(f"Created template directory: {template_dir}")
+    # If ceremony_type is provided, use bridal category structure
+    if ceremony_type and not (category_type and subcategory and item_category):
+        category_type = 'bride'
+        subcategory = 'bridal'
+        item_category = ceremony_type
+        app.logger.info(f"Using ceremony_type parameter: {ceremony_type}")
+    elif category_type and subcategory and item_category:
+        app.logger.info(f"Using category parameters: {category_type}/{subcategory}/{item_category}")
+    else:
+        app.logger.warning("Missing required category parameters")
+        return jsonify({'error': 'Missing required category parameters'}), 400
     
-    app.logger.info(f"Scanning template directory: {template_dir}")
+    # Define valid categories
+    valid_categories = {
+        'bride': {
+            'bridal': ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'],
+            'outfits': ['casual', 'formal', 'party', 'ethnic', 'western'],
+            'jewelry': ['necklaces', 'earrings', 'maang_tikka', 'bangles', 'rings'],
+            'makeup': ['traditional', 'modern', 'natural', 'bold', 'reception']
+        },
+        'groom': {
+            'traditional': ['sherwani', 'kurta', 'indo_western', 'dhoti', 'jodhpuri'],
+            'suits': ['tuxedos', 'three_piece', 'two_piece', 'blazers', 'casual'],
+            'accessories': ['watches', 'cufflinks', 'ties', 'pocket_squares', 'shoes']
+        }
+    }
     
-    # Log all subdirectories in templates for debugging
-    try:
-        subdirs = [d for d in os.listdir(template_dir) if os.path.isdir(os.path.join(template_dir, d))]
-        app.logger.info(f"Template subdirectories: {subdirs}")
-        
-        # Also log files in the template root
-        files = [f for f in os.listdir(template_dir) if os.path.isfile(os.path.join(template_dir, f))]
-        app.logger.info(f"Files in template root: {files}")
-    except Exception as e:
-        app.logger.error(f"Error scanning template directory: {e}")
+    # Validate category parameters
+    if (category_type not in valid_categories or 
+        subcategory not in valid_categories[category_type] or 
+        item_category not in valid_categories[category_type][subcategory]):
+        app.logger.warning(f"Invalid category combination: {category_type}/{subcategory}/{item_category}")
+        return jsonify({'error': f'Invalid category combination: {category_type}/{subcategory}/{item_category}'}), 400
+    
+    app.logger.info(f"Fetching templates for {category_type}/{subcategory}/{item_category}, cache-buster: {cache_buster}")
     
     # Ensure fresh list by explicitly creating a new array
     templates = []
     template_id = 1
     
-    # Now ONLY check for Pinterest templates
-    template_type = 'pinterest'
+    # Set defaults for template variables to avoid "possibly unbound" errors
+    template_dir = None
+    template_type = 'pinterest'  # Default to Pinterest templates
     
-    # Check in main directory
-    main_path = os.path.join(template_dir, f"{ceremony_type}_{template_type}.jpg")
-    if os.path.exists(main_path):
-        app.logger.info(f"Found main template: {main_path}")
-        # Calculate the URL relative to the uploads directory
-        url_path = main_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
-        templates.append({
-            'id': f"{ceremony_type}_{template_type}_{template_id}",
-            'template_type': template_type,
-            'ceremony': ceremony_type,
-            'path': main_path,
-            'url': f"{url_path}?t={int(time.time())}"
-        })
-        template_id += 1
+    # Handle bridal ceremony templates (from uploads/templates)
+    if category_type == 'bride' and subcategory == 'bridal':
+        # Get templates directory for bridal ceremonies
+        template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
         
-    # Check in type subdirectory for standard file
-    subdir_path = os.path.join(template_dir, template_type, f"{ceremony_type}.jpg")
-    if os.path.exists(subdir_path):
-        app.logger.info(f"Found subdir template: {subdir_path}")
-        # Calculate the URL relative to the uploads directory
-        url_path = subdir_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
-        templates.append({
-            'id': f"{ceremony_type}_{template_type}_{template_id}",
-            'template_type': template_type,
-            'ceremony': ceremony_type,
-            'path': subdir_path,
-            'url': f"{url_path}?t={int(time.time())}"
-        })
-        template_id += 1
+        # Check if template directory exists
+        if not os.path.exists(template_dir):
+            app.logger.warning(f"Template directory does not exist: {template_dir}")
+            os.makedirs(template_dir, exist_ok=True)
+            app.logger.info(f"Created template directory: {template_dir}")
         
-    # Check for additional images in the type subdirectory
-    type_dir = os.path.join(template_dir, template_type, ceremony_type)
-    if os.path.exists(type_dir) and os.path.isdir(type_dir):
-        app.logger.info(f"Scanning additional templates in: {type_dir}")
-        for file in sorted(os.listdir(type_dir)):
-            if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
-                file_path = os.path.join(type_dir, file)
-                if os.path.isfile(file_path):
-                    template_id_str = f"{ceremony_type}_{template_type}_{template_id}"
-                    app.logger.info(f"Found additional {template_type} template: {file_path}")
-                    
-                    # Calculate the URL relative to the uploads directory
-                    url_path = file_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
-                    templates.append({
-                        'id': template_id_str,
-                        'template_type': template_type,
-                        'ceremony': ceremony_type,
-                        'path': file_path,
-                        'url': f"{url_path}?t={int(time.time())}"
-                    })
-                    template_id += 1
+        app.logger.info(f"Scanning bridal template directory: {template_dir}")
+        
+        # Log all subdirectories in templates for debugging
+        try:
+            subdirs = [d for d in os.listdir(template_dir) if os.path.isdir(os.path.join(template_dir, d))]
+            app.logger.info(f"Template subdirectories: {subdirs}")
+            
+            # Also log files in the template root
+            files = [f for f in os.listdir(template_dir) if os.path.isfile(os.path.join(template_dir, f))]
+            app.logger.info(f"Files in template root: {files}")
+        except Exception as e:
+            app.logger.error(f"Error scanning template directory: {e}")
+            
+        # We're using Pinterest templates for bridal ceremonies
+        template_type = 'pinterest'
+    
+    # Handle bridal ceremony templates
+    if category_type == 'bride' and subcategory == 'bridal':
+        # Check in main directory
+        main_path = os.path.join(template_dir, f"{item_category}_{template_type}.jpg")
+        if os.path.exists(main_path):
+            app.logger.info(f"Found main template: {main_path}")
+            # Calculate the URL relative to the uploads directory
+            url_path = main_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
+            templates.append({
+                'id': f"{item_category}_{template_type}_{template_id}",
+                'template_type': template_type,
+                'category_type': category_type,
+                'subcategory': subcategory,
+                'item_category': item_category,
+                'path': main_path,
+                'url': f"{url_path}?t={int(time.time())}"
+            })
+            template_id += 1
+            
+        # Check in type subdirectory for standard file
+        subdir_path = os.path.join(template_dir, template_type, f"{item_category}.jpg")
+        if os.path.exists(subdir_path):
+            app.logger.info(f"Found subdir template: {subdir_path}")
+            # Calculate the URL relative to the uploads directory
+            url_path = subdir_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
+            templates.append({
+                'id': f"{item_category}_{template_type}_{template_id}",
+                'template_type': template_type,
+                'category_type': category_type,
+                'subcategory': subcategory,
+                'item_category': item_category,
+                'path': subdir_path,
+                'url': f"{url_path}?t={int(time.time())}"
+            })
+            template_id += 1
+            
+        # Check for additional images in the type subdirectory
+        type_dir = os.path.join(template_dir, template_type, item_category)
+        if os.path.exists(type_dir) and os.path.isdir(type_dir):
+            app.logger.info(f"Scanning additional templates in: {type_dir}")
+            for file in sorted(os.listdir(type_dir)):
+                if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                    file_path = os.path.join(type_dir, file)
+                    if os.path.isfile(file_path):
+                        template_id_str = f"{item_category}_{template_type}_{template_id}"
+                        app.logger.info(f"Found additional {template_type} template: {file_path}")
+                        
+                        # Calculate the URL relative to the uploads directory
+                        url_path = file_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
+                        templates.append({
+                            'id': template_id_str,
+                            'template_type': template_type,
+                            'category_type': category_type,
+                            'subcategory': subcategory,
+                            'item_category': item_category,
+                            'path': file_path,
+                            'url': f"{url_path}?t={int(time.time())}"
+                        })
+                        template_id += 1
+    # Handle other category types (bride non-bridal and groom)
+    else:
+        # Determine the appropriate directory based on category type
+        if category_type == 'bride':
+            target_dir = os.path.join(app.static_folder, 'templates', subcategory, item_category)
+        else:  # groom categories
+            target_dir = os.path.join(app.static_folder, 'templates', 'groom', subcategory, item_category)
+        
+        app.logger.info(f"Scanning category directory: {target_dir}")
+        
+        # Create directory if it doesn't exist
+        if not os.path.exists(target_dir):
+            app.logger.warning(f"Category directory does not exist: {target_dir}")
+            os.makedirs(target_dir, exist_ok=True)
+            app.logger.info(f"Created category directory: {target_dir}")
+            
+        # Scan for template images in the category directory
+        if os.path.exists(target_dir) and os.path.isdir(target_dir):
+            for file in sorted(os.listdir(target_dir)):
+                if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                    file_path = os.path.join(target_dir, file)
+                    if os.path.isfile(file_path):
+                        template_id_str = f"{category_type}_{subcategory}_{item_category}_{template_id}"
+                        app.logger.info(f"Found category template: {file_path}")
+                        
+                        # Calculate the URL relative to the static directory
+                        url_path = file_path.replace(app.static_folder, '/static')
+                        templates.append({
+                            'id': template_id_str,
+                            'category_type': category_type,
+                            'subcategory': subcategory,
+                            'item_category': item_category,
+                            'path': file_path,
+                            'url': f"{url_path}?t={int(time.time())}"
+                        })
+                        template_id += 1
     
     # This section is intentionally removed as it's redundant
     # The pinterest templates are already handled in the loop above
     # via the type_dir approach with template_type = 'pinterest'
     
-    # Also check for main Pinterest template
-    main_pinterest_path = os.path.join(template_dir, f"{ceremony_type}_pinterest.jpg")
-    if os.path.exists(main_pinterest_path):
-        app.logger.info(f"Found main Pinterest template: {main_pinterest_path}")
-        # Calculate the URL relative to the uploads directory
-        url_path = main_pinterest_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
-        templates.append({
-            'id': f"{ceremony_type}_pinterest_{template_id}",
-            'template_type': 'pinterest',
-            'ceremony': ceremony_type,
-            'path': main_pinterest_path,
-            'url': f"{url_path}?t={int(time.time())}"
-        })
-        template_id += 1
+    # Return the collected template information
+    app.logger.info(f"Found {len(templates)} templates for {category_type}/{subcategory}/{item_category}")
     
-    # Add template count to the logging
-    app.logger.info(f"Found {len(templates)} templates for {ceremony_type}")
-    
-    # If no templates found, add a note to the response but don't create fake templates
-    # This is better for debugging and ensures clients only see real templates
-    if not templates:
-        app.logger.warning(f"No templates found for {ceremony_type} ceremony")
-        # We'll return an empty array, but set a flag in the response
-        # The client can handle this appropriately
-    
+    # Include category information in the response
     return jsonify({
-        'success': True,
-        'ceremony': ceremony_type,
         'templates': templates,
+        'count': len(templates),
+        'category_type': category_type,
+        'subcategory': subcategory,
+        'item_category': item_category,
+        'success': True,
         'has_templates': len(templates) > 0,
         'timestamp': int(time.time())
     })
