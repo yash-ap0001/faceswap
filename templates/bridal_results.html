@@ -112,21 +112,39 @@
 </div>
 
 <!-- Image preview modal -->
-<div class="modal fade" id="resultPreviewModal" tabindex="-1" aria-labelledby="resultPreviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
+<div class="modal fade" id="resultPreviewModal" tabindex="-1" aria-labelledby="resultPreviewModalLabel" aria-hidden="true" style="transition: opacity 0.2s ease">
+    <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 90%; transition: transform 0.3s ease">
+        <div class="modal-content" style="background-color: rgba(18, 18, 18, 0.97); backdrop-filter: blur(25px);">
+            <div class="modal-header" style="border-color: rgba(70, 70, 70, 0.5);">
                 <h5 class="modal-title" id="resultPreviewModalLabel">Face Swap Result</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center">
-                <img id="resultPreviewModalImage" src="" class="img-fluid" alt="Result Preview">
+            <div class="modal-body text-center p-0 position-relative">
+                <div class="image-container" style="overflow: hidden; position: relative;">
+                    <img id="resultPreviewModalImage" src="" class="img-fluid" alt="Result Preview" style="transition: transform 0.3s ease; transform-origin: center;">
+                </div>
+                <div class="zoom-controls position-absolute top-0 end-0 p-2">
+                    <button class="btn btn-sm btn-dark ms-1" id="result-zoom-in">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button class="btn btn-sm btn-dark ms-1" id="result-zoom-out">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                    <button class="btn btn-sm btn-dark ms-1" id="result-zoom-reset">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
             </div>
-            <div class="modal-footer">
-                <a id="downloadResultBtn" href="#" class="btn btn-primary" download>
-                    <i class="fas fa-download me-2"></i> Download
-                </a>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <div class="modal-footer" style="border-color: rgba(70, 70, 70, 0.5);">
+                <div class="image-counter">
+                    <span id="current-result-index">1</span> / <span id="total-result-count">1</span>
+                </div>
+                <div>
+                    <a id="downloadResultBtn" href="#" class="btn btn-outline-primary me-2" download>
+                        <i class="fas fa-download me-1"></i> Download
+                    </a>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
@@ -164,6 +182,58 @@
     const resultPreviewModal = new bootstrap.Modal(document.getElementById('resultPreviewModal'));
     const resultPreviewModalImage = document.getElementById('resultPreviewModalImage');
     const downloadResultBtn = document.getElementById('downloadResultBtn');
+    const currentResultIndex = document.getElementById('current-result-index');
+    const totalResultCount = document.getElementById('total-result-count');
+    
+    // Initialize zoom variables
+    let resultZoomLevel = 1;
+    const resultZoomStep = 0.1;
+    const resultMaxZoom = 3;
+    const resultMinZoom = 0.5;
+    
+    // Zoom controls for result preview
+    document.getElementById('result-zoom-in').addEventListener('click', () => {
+        if (resultZoomLevel < resultMaxZoom) {
+            resultZoomLevel += resultZoomStep;
+            resultPreviewModalImage.style.transform = `scale(${resultZoomLevel})`;
+        }
+    });
+    
+    document.getElementById('result-zoom-out').addEventListener('click', () => {
+        if (resultZoomLevel > resultMinZoom) {
+            resultZoomLevel -= resultZoomStep;
+            resultPreviewModalImage.style.transform = `scale(${resultZoomLevel})`;
+        }
+    });
+    
+    document.getElementById('result-zoom-reset').addEventListener('click', () => {
+        resultZoomLevel = 1;
+        resultPreviewModalImage.style.transform = 'scale(1)';
+    });
+    
+    // Add keyboard navigation support
+    document.addEventListener('keydown', (e) => {
+        if (resultPreviewModal._isShown) {
+            if (e.key === 'ArrowRight') {
+                navigateResults('next');
+            } else if (e.key === 'ArrowLeft') {
+                navigateResults('prev');
+            } else if (e.key === '+' || e.key === '=') {
+                if (resultZoomLevel < resultMaxZoom) {
+                    resultZoomLevel += resultZoomStep;
+                    resultPreviewModalImage.style.transform = `scale(${resultZoomLevel})`;
+                }
+            } else if (e.key === '-') {
+                if (resultZoomLevel > resultMinZoom) {
+                    resultZoomLevel -= resultZoomStep;
+                    resultPreviewModalImage.style.transform = `scale(${resultZoomLevel})`;
+                }
+            } else if (e.key === '0') {
+                resultZoomLevel = 1;
+                resultPreviewModalImage.style.transform = 'scale(1)';
+            }
+        }
+    });
     
     // Process all templates sequentially
     async function processAllTemplates() {
