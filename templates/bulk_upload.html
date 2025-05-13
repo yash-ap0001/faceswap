@@ -77,6 +77,9 @@
                         <button id="deleteSelected" class="btn btn-sm btn-danger px-2">
                             <i class="fas fa-trash-alt me-1"></i>Delete
                         </button>
+                        <button id="clearAllTemplatesBtn" class="btn btn-sm btn-outline-danger px-2">
+                            <i class="fas fa-trash me-1"></i>Clear All
+                        </button>
                         <button id="refreshTemplates" class="btn btn-sm btn-outline-light px-2">
                             <i class="fas fa-sync-alt"></i>
                         </button>
@@ -716,6 +719,160 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
+    // Category definitions for dropdown population
+    const categoryOptions = {
+        'bride': {
+            'bridal': ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'],
+            'outfits': ['casual', 'formal', 'party', 'ethnic', 'western'],
+            'jewelry': ['necklaces', 'earrings', 'maang_tikka', 'bangles', 'rings'],
+            'makeup': ['traditional', 'modern', 'natural', 'bold', 'reception']
+        },
+        'groom': {
+            'traditional': ['sherwani', 'kurta', 'indo_western', 'dhoti', 'jodhpuri'],
+            'suits': ['tuxedos', 'three_piece', 'two_piece', 'blazers', 'casual'],
+            'accessories': ['watches', 'cufflinks', 'ties', 'pocket_squares', 'shoes']
+        }
+    };
+    
+    // Handle category type change in delete section
+    document.getElementById('deleteCategoryType').addEventListener('change', function() {
+        const categoryType = this.value;
+        const subcategorySelect = document.getElementById('deleteSubcategory');
+        
+        // Clear existing options
+        subcategorySelect.innerHTML = '';
+        
+        // Add options based on category type
+        if (categoryType === 'bride') {
+            // Add bride subcategories
+            const brideOptions = [
+                ['bridal', 'Bridal Ceremonies'],
+                ['outfits', 'Modern Outfits'],
+                ['jewelry', 'Jewelry'],
+                ['makeup', 'Makeup']
+            ];
+            
+            brideOptions.forEach(option => {
+                const optEl = document.createElement('option');
+                optEl.value = option[0];
+                optEl.textContent = option[1];
+                subcategorySelect.appendChild(optEl);
+            });
+        } else {
+            // Add groom subcategories
+            const groomOptions = [
+                ['traditional', 'Traditional Wear'],
+                ['suits', 'Modern Suits'],
+                ['accessories', 'Accessories']
+            ];
+            
+            groomOptions.forEach(option => {
+                const optEl = document.createElement('option');
+                optEl.value = option[0];
+                optEl.textContent = option[1];
+                subcategorySelect.appendChild(optEl);
+            });
+        }
+        
+        // Trigger change event to update item categories
+        subcategorySelect.dispatchEvent(new Event('change'));
+    });
+    
+    // Handle subcategory change
+    document.getElementById('deleteSubcategory').addEventListener('change', function() {
+        const categoryType = document.getElementById('deleteCategoryType').value;
+        const subcategory = this.value;
+        const bridalTabs = document.getElementById('bridalCeremonyTabs');
+        const otherCategories = document.getElementById('otherCategoriesList');
+        const itemCategorySelect = document.getElementById('deleteItemCategory');
+        
+        // Show/hide appropriate selectors
+        if (categoryType === 'bride' && subcategory === 'bridal') {
+            bridalTabs.style.display = 'flex';
+            otherCategories.style.display = 'none';
+        } else {
+            bridalTabs.style.display = 'none';
+            otherCategories.style.display = 'block';
+            
+            // Populate item categories
+            itemCategorySelect.innerHTML = '';
+            
+            if (categoryOptions[categoryType] && categoryOptions[categoryType][subcategory]) {
+                categoryOptions[categoryType][subcategory].forEach(category => {
+                    const optEl = document.createElement('option');
+                    optEl.value = category;
+                    // Format the category name to look nicer
+                    optEl.textContent = category.charAt(0).toUpperCase() + 
+                        category.slice(1).replace('_', ' ');
+                    itemCategorySelect.appendChild(optEl);
+                });
+            }
+        }
+    });
+    
+    // Initialize subcategory options
+    document.getElementById('deleteCategoryType').dispatchEvent(new Event('change'));
+    
+    // Handle clear all templates button
+    document.getElementById('clearAllTemplatesBtn').addEventListener('click', function() {
+        const categoryType = document.getElementById('deleteCategoryType').value;
+        const subcategory = document.getElementById('deleteSubcategory').value;
+        let itemCategory;
+        
+        // Get the selected item category based on the visible selector
+        if (categoryType === 'bride' && subcategory === 'bridal') {
+            itemCategory = document.querySelector('input[name="ceremonyTab"]:checked').value;
+        } else {
+            itemCategory = document.getElementById('deleteItemCategory').value;
+        }
+        
+        // Format category display name for confirmation
+        let categoryDisplay;
+        if (categoryType === 'bride' && subcategory === 'bridal') {
+            categoryDisplay = `${itemCategory} ceremony`;
+        } else {
+            const subcatName = document.getElementById('deleteSubcategory').options[
+                document.getElementById('deleteSubcategory').selectedIndex].text;
+            const itemName = document.getElementById('deleteItemCategory') ? 
+                document.getElementById('deleteItemCategory').options[
+                    document.getElementById('deleteItemCategory').selectedIndex].text : 
+                itemCategory;
+            categoryDisplay = `${subcatName} > ${itemName}`;
+        }
+        
+        if (confirm(`Are you sure you want to delete ALL templates for ${categoryDisplay}?`)) {
+            fetch('/delete-templates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    category_type: categoryType,
+                    subcategory: subcategory,
+                    item_category: itemCategory,
+                    clear_all: true
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('deleteStatusMessage').innerHTML = 
+                        `<div class="alert alert-success">${data.message} (${data.deleted_count} files)</div>`;
+                    
+                    // Refresh templates
+                    refreshTemplates();
+                } else {
+                    document.getElementById('deleteStatusMessage').innerHTML = 
+                        `<div class="alert alert-danger">${data.message}</div>`;
+                }
+            })
+            .catch(error => {
+                document.getElementById('deleteStatusMessage').innerHTML = 
+                    `<div class="alert alert-danger">Error: ${error}</div>`;
+            });
+        }
+    });
+
     // Refresh button handler
     document.getElementById('refreshTemplates').addEventListener('click', function() {
         const selectedCeremony = document.querySelector('input[name="ceremonyTab"]:checked').value;
