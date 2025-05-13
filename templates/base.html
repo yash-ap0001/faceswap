@@ -104,7 +104,7 @@
             border-top: 1px solid var(--glass-border);
         }
         
-        .text-accent {
+        .text-accent, .text-light-purple {
             color: var(--light-purple);
         }
         
@@ -252,6 +252,18 @@
             margin-bottom: 25px;
             padding-bottom: 25px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .service-category-header {
+            position: relative;
+            padding-left: 10px;
+            border-left: 3px solid var(--light-purple);
+            transition: all 0.3s ease;
+        }
+        
+        .service-category-header:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding-left: 15px;
         }
         
         .sidebar-section:last-child {
@@ -707,48 +719,57 @@
                     </div>
                 </div>
                 
-                <!-- Event Manager Section -->
+                <!-- Wedding Services Section -->
                 <div class="accordion-item bg-transparent border-0 mb-2">
-                    <h6 class="accordion-header" id="headingEventManager">
+                    <h6 class="accordion-header" id="headingWeddingServices">
                         <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
                                 type="button" data-bs-toggle="collapse" 
-                                data-bs-target="#collapseEventManager" aria-expanded="false" 
-                                aria-controls="collapseEventManager">
-                            <i class="fas fa-user-tie me-2"></i>Event Manager
+                                data-bs-target="#collapseWeddingServices" aria-expanded="false" 
+                                aria-controls="collapseWeddingServices">
+                            <i class="fas fa-concierge-bell me-2"></i>Wedding Services
                         </button>
                     </h6>
-                    <div id="collapseEventManager" class="accordion-collapse collapse" 
-                         aria-labelledby="headingEventManager" data-bs-parent="#sidebarAccordion">
+                    <div id="collapseWeddingServices" class="accordion-collapse collapse" 
+                         aria-labelledby="headingWeddingServices" data-bs-parent="#sidebarAccordion">
                         <div class="accordion-body p-0 pt-2">
-                            <ul class="sidebar-menu">
-                                <li><a href="{{ url_for('event_managers') }}"><i class="fas fa-angle-right me-2"></i>Event Managers</a></li>
-                                <li><a href="#" onclick="alert('Guest Management - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Guest Management</a></li>
-                                <li><a href="#" onclick="alert('Timeline Creator - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Timeline Creator</a></li>
-                                <li><a href="#" onclick="alert('Budget Calculator - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Budget Calculator</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Convention Halls Section -->
-                <div class="accordion-item bg-transparent border-0 mb-2">
-                    <h6 class="accordion-header" id="headingConventionHalls">
-                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
-                                type="button" data-bs-toggle="collapse" 
-                                data-bs-target="#collapseConventionHalls" aria-expanded="false" 
-                                aria-controls="collapseConventionHalls">
-                            <i class="fas fa-building me-2"></i>Convention Halls
-                        </button>
-                    </h6>
-                    <div id="collapseConventionHalls" class="accordion-collapse collapse" 
-                         aria-labelledby="headingConventionHalls" data-bs-parent="#sidebarAccordion">
-                        <div class="accordion-body p-0 pt-2">
-                            <ul class="sidebar-menu">
-                                <li><a href="{{ url_for('venue_search') }}"><i class="fas fa-angle-right me-2"></i>Venue Search</a></li>
-                                <li><a href="{{ url_for('hall_comparison') }}"><i class="fas fa-angle-right me-2"></i>Hall Comparison</a></li>
-                                <li><a href="{{ url_for('virtual_tours') }}"><i class="fas fa-angle-right me-2"></i>Virtual Tours</a></li>
-                                <li><a href="{{ url_for('booking_management') }}"><i class="fas fa-angle-right me-2"></i>Booking Management</a></li>
-                            </ul>
+                            <!-- Service Categories -->
+                            <div class="mb-3">
+                                <h6 class="text-light-purple fw-bold ps-2 mb-2 fs-6 service-category-header"><i class="fas fa-user-tie me-2"></i>Event Management</h6>
+                                <ul class="sidebar-menu mb-3">
+                                    <li><a href="{{ url_for('event_managers') }}"><i class="fas fa-angle-right me-2"></i>Event Managers</a></li>
+                                    <li><a href="#" onclick="alert('Guest Management - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Guest Management</a></li>
+                                    <li><a href="#" onclick="alert('Timeline Creator - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Timeline Creator</a></li>
+                                    <li><a href="#" onclick="alert('Budget Calculator - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Budget Calculator</a></li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6 class="text-light-purple fw-bold ps-2 mb-2 fs-6 service-category-header"><i class="fas fa-building me-2"></i>Venues</h6>
+                                <ul class="sidebar-menu mb-3">
+                                    <li><a href="{{ url_for('venue_search') }}"><i class="fas fa-angle-right me-2"></i>Venue Search</a></li>
+                                    <li><a href="{{ url_for('hall_comparison') }}"><i class="fas fa-angle-right me-2"></i>Hall Comparison</a></li>
+                                    <li><a href="{{ url_for('virtual_tours') }}"><i class="fas fa-angle-right me-2"></i>Virtual Tours</a></li>
+                                    <li><a href="{{ url_for('booking_management') }}"><i class="fas fa-angle-right me-2"></i>Booking Management</a></li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6 class="text-light-purple fw-bold ps-2 mb-2 fs-6"><i class="fas fa-camera me-2"></i>Photography</h6>
+                                <ul class="sidebar-menu mb-3">
+                                    <li><a href="#" onclick="alert('Photographers - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Photographers</a></li>
+                                    <li><a href="#" onclick="alert('Photo Packages - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Photo Packages</a></li>
+                                    <li><a href="#" onclick="alert('Photo Booths - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Photo Booths</a></li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6 class="text-light-purple fw-bold ps-2 mb-2 fs-6"><i class="fas fa-utensils me-2"></i>Catering</h6>
+                                <ul class="sidebar-menu">
+                                    <li><a href="#" onclick="alert('Food Caterers - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Food Caterers</a></li>
+                                    <li><a href="#" onclick="alert('Menu Selection - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Menu Selection</a></li>
+                                    <li><a href="#" onclick="alert('Special Dietary Options - Coming Soon')"><i class="fas fa-angle-right me-2"></i>Special Dietary Options</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
