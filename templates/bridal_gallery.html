@@ -892,59 +892,65 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.stopPropagation();
                 currentDeletePath = this.getAttribute('data-template-path');
                 currentDeleteCeremony = this.getAttribute('data-ceremony');
-            document.getElementById('delete-confirm-message').textContent = 
-                `Are you sure you want to delete this ${currentDeleteCeremony} template? This action cannot be undone.`;
-            deleteConfirmModal.show();
+                
+                if (document.getElementById('delete-confirm-message')) {
+                    document.getElementById('delete-confirm-message').textContent = 
+                        `Are you sure you want to delete this ${currentDeleteCeremony} template? This action cannot be undone.`;
+                }
+                
+                if (deleteConfirmModal) {
+                    deleteConfirmModal.show();
+                }
+            });
         });
-    });
     
-    // Simple expand/collapse functionality
-    document.querySelectorAll('.toggle-row-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const targetId = this.getAttribute('data-target');
-            const ceremony = targetId.replace('-row', '');
-            const container = document.getElementById(`${ceremony}-cards`);
-            
-            if (!container) {
-                console.error(`Card container not found: ${ceremony}-cards`);
-                return;
-            }
-            
-            const extraCards = container.querySelectorAll('.template-card.extra-card');
-            console.log(`Toggle row button clicked for ${ceremony}`);
-            console.log(`Found ${extraCards.length} extra cards`);
-            
-            // Check current state (expanded or collapsed)
-            const isExpanded = this.classList.contains('expanded');
-            console.log(`Current state: ${isExpanded ? 'expanded' : 'collapsed'}`);
-            
-            if (isExpanded) {
-                // Collapse - hide extra cards
-                console.log('Collapsing to show only first row');
-                extraCards.forEach(card => {
-                    card.style.display = 'none';
-                });
+        // Simple expand/collapse functionality
+        document.querySelectorAll('.toggle-row-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const ceremony = targetId.replace('-row', '');
+                const container = document.getElementById(`${ceremony}-cards`);
                 
-                // Update button appearance
-                this.classList.remove('expanded');
-                this.classList.remove('btn-primary');
-                this.classList.add('btn-outline-primary');
-                this.innerHTML = '<i class="fas fa-chevron-down"></i>';
-                this.setAttribute('title', 'Show All Templates');
-            } else {
-                // Expand - show all cards
-                console.log('Expanding to show all cards');
-                extraCards.forEach(card => {
-                    card.style.display = 'block';
-                });
+                if (!container) {
+                    console.error(`Card container not found: ${ceremony}-cards`);
+                    return;
+                }
                 
-                // Update button appearance
-                this.classList.add('expanded');
-                this.classList.remove('btn-outline-primary');
-                this.classList.add('btn-primary');
-                this.innerHTML = '<i class="fas fa-chevron-up"></i>';
-                this.setAttribute('title', 'Show Fewer Templates');
-            }
+                const extraCards = container.querySelectorAll('.template-card.extra-card');
+                console.log(`Toggle row button clicked for ${ceremony}`);
+                console.log(`Found ${extraCards.length} extra cards`);
+                
+                // Check current state (expanded or collapsed)
+                const isExpanded = this.classList.contains('expanded');
+                console.log(`Current state: ${isExpanded ? 'expanded' : 'collapsed'}`);
+                
+                if (isExpanded) {
+                    // Collapse - hide extra cards
+                    console.log('Collapsing to show only first row');
+                    extraCards.forEach(card => {
+                        card.style.display = 'none';
+                    });
+                    
+                    // Update button appearance
+                    this.classList.remove('expanded');
+                    this.classList.remove('btn-primary');
+                    this.classList.add('btn-outline-primary');
+                    this.innerHTML = '<i class="fas fa-chevron-down"></i>';
+                    this.setAttribute('title', 'Show All Templates');
+                } else {
+                    // Expand - show all cards
+                    console.log('Expanding to show all cards');
+                    extraCards.forEach(card => {
+                        card.style.display = 'block';
+                    });
+                    
+                    // Update button appearance
+                    this.classList.add('expanded');
+                    this.classList.remove('btn-outline-primary');
+                    this.classList.add('btn-primary');
+                    this.innerHTML = '<i class="fas fa-chevron-up"></i>';
+                    this.setAttribute('title', 'Show Fewer Templates');
+                }
         });
     });
     
