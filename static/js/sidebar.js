@@ -12,17 +12,23 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    // Simple sidebar toggle function
+    // Toggle sidebar function
     function toggleSidebar() {
         sidebar.classList.toggle('sidebar-collapsed');
         if (mainContent) {
             mainContent.classList.toggle('expanded');
         }
         
-        // Store sidebar state
+        // Update icon based on sidebar state
         if (sidebar.classList.contains('sidebar-collapsed')) {
+            // Change icon to right arrow when sidebar is closed
+            menuToggleBtn.querySelector('i').classList.remove('fa-chevron-left');
+            menuToggleBtn.querySelector('i').classList.add('fa-chevron-right');
             localStorage.setItem('sidebarState', 'closed');
         } else {
+            // Change icon to left arrow when sidebar is open
+            menuToggleBtn.querySelector('i').classList.remove('fa-chevron-right');
+            menuToggleBtn.querySelector('i').classList.add('fa-chevron-left');
             localStorage.setItem('sidebarState', 'open');
         }
     }
@@ -34,6 +40,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (mainContent) {
             mainContent.classList.add('expanded');
         }
+        // Set correct initial icon
+        menuToggleBtn.querySelector('i').classList.remove('fa-chevron-left');
+        menuToggleBtn.querySelector('i').classList.add('fa-chevron-right');
     }
     
     // Add click event to toggle button
