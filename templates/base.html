@@ -198,7 +198,7 @@
             top: 0;
             width: 250px;
             height: 100vh;
-            background-color: hsl(271.4, 81.3%, 55.9%);
+            background-color: rgba(30, 30, 30, 0.92);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border-right: 2px solid var(--primary-purple);
@@ -221,11 +221,7 @@
             align-items: center;
             padding-bottom: 15px;
             margin-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            background: linear-gradient(145deg, hsl(271.4, 85%, 60%), hsl(271.4, 85%, 50%));
-            margin: -20px -20px 20px -20px;
-            padding: 20px;
-            border-radius: 0 0 10px 10px;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .sidebar-header h5 {
@@ -383,25 +379,12 @@
         
         /* Style for active/selected menu item */
         .sidebar-menu a.active {
-            color: var(--bs-white);
-            background-color: rgba(255, 255, 255, 0.2);
-            border-left: 4px solid white;
+            color: var(--text-primary);
+            background-color: rgba(126, 87, 194, 0.25);
+            border-left: 4px solid var(--light-purple);
             padding-left: 11px; /* Compensate for the border */
-            font-weight: 600;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Style for active accordion section */
-        .accordion-button.active-section {
-            background-color: rgba(255, 255, 255, 0.2) !important;
-            color: var(--bs-white) !important;
-            font-weight: 600;
-        }
-        
-        /* Style for active list item */
-        .sidebar-menu li.active-item {
-            background-color: rgba(255, 255, 255, 0.05);
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         
         .setting-item {

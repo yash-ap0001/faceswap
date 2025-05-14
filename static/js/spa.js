@@ -15,9 +15,6 @@ function initSPA() {
     // Store the current page for browser history
     window.currentPage = window.location.pathname;
     
-    // Set the initial active state based on the current URL
-    setInitialActiveState();
-    
     // Set up browser back/forward button handling
     window.addEventListener('popstate', function(event) {
         if (event.state && event.state.url) {
@@ -26,30 +23,9 @@ function initSPA() {
     });
 }
 
-function setInitialActiveState() {
-    // Get the current URL
-    const currentUrl = window.location.pathname;
-    
-    // Find the corresponding sidebar link
-    const sidebarLinks = document.querySelectorAll('.sidebar-menu li a');
-    let activeLink = null;
-    
-    sidebarLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        if (href === currentUrl) {
-            activeLink = link;
-        }
-    });
-    
-    // If we found a matching link, set it as active
-    if (activeLink) {
-        updateActiveSidebarItem(activeLink);
-    }
-}
-
 function setupSidebarLinks() {
     // Get all sidebar menu links
-    const sidebarLinks = document.querySelectorAll('.sidebar-menu li a');
+    const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
     
     sidebarLinks.forEach(link => {
         // Skip links with onclick handlers (they already have custom behavior)
@@ -83,14 +59,6 @@ function setupSidebarLinks() {
             
             // Update active state in sidebar
             updateActiveSidebarItem(this);
-            
-            // Close sidebar on mobile
-            if (window.innerWidth < 992) {
-                const sidebar = document.querySelector('.sidebar');
-                if (sidebar && !sidebar.classList.contains('closed')) {
-                    window.toggleSidebar();
-                }
-            }
         });
     });
 }
@@ -152,21 +120,12 @@ function loadContent(url, pushState = true) {
 
 function updateActiveSidebarItem(activeLink) {
     // Remove active class from all menu items
-    document.querySelectorAll('.sidebar-menu li a').forEach(link => {
+    document.querySelectorAll('.sidebar-menu a').forEach(link => {
         link.classList.remove('active');
     });
     
     // Add active class to the clicked link
     activeLink.classList.add('active');
-    
-    // Add active class to parent list item
-    const parentLi = activeLink.closest('li');
-    if (parentLi) {
-        document.querySelectorAll('.sidebar-menu li').forEach(li => {
-            li.classList.remove('active-item');
-        });
-        parentLi.classList.add('active-item');
-    }
     
     // Ensure the parent accordion is open
     const accordionItem = activeLink.closest('.accordion-collapse');
@@ -174,28 +133,7 @@ function updateActiveSidebarItem(activeLink) {
         const accordionId = accordionItem.getAttribute('id');
         const accordionButton = document.querySelector(`[data-bs-target="#${accordionId}"]`);
         if (accordionButton) {
-            // Use Bootstrap's API to open the accordion
-            const bsCollapse = new bootstrap.Collapse(accordionItem, {
-                toggle: false
-            });
-            bsCollapse.show();
-            
-            // Update the accordion button's aria-expanded attribute
-            accordionButton.setAttribute('aria-expanded', 'true');
-            accordionButton.classList.remove('collapsed');
-        }
-    }
-    
-    // Mark the corresponding accordion header as active
-    const accordionHeaders = document.querySelectorAll('.accordion-button');
-    accordionHeaders.forEach(header => {
-        header.classList.remove('active-section');
-    });
-    
-    if (accordionItem) {
-        const header = document.querySelector(`[data-bs-target="#${accordionItem.id}"]`);
-        if (header) {
-            header.classList.add('active-section');
+            accordionButton.click();
         }
     }
 }
@@ -243,67 +181,28 @@ function hideLoading() {
 
 function initContentScripts() {
     // Initialize any scripts that need to run when new content is loaded
-    console.log("Initializing content scripts for newly loaded content");
+    // For example, you might need to set up event handlers for elements in the new content
     
     // This would initialize image galleries, if any
     if (typeof initializeGallery === 'function') {
-        console.log("Initializing gallery for new content");
         initializeGallery();
     }
     
     // This would initialize template selection, if any
     if (typeof refreshTemplates === 'function') {
-        console.log("Refreshing templates for new content");
         refreshTemplates();
     }
     
     // This would initialize any file upload previews, if any
     if (typeof setupImagePreviews === 'function') {
-        console.log("Setting up image previews for new content");
         setupImagePreviews();
     }
     
     // This would initialize any accordion components, if any
     const accordionElements = document.querySelectorAll('.accordion');
     if (accordionElements.length > 0) {
-        console.log("Initializing accordions for new content");
         accordionElements.forEach(accordion => {
             new bootstrap.Accordion(accordion);
         });
-    }
-    
-    // Initialize any ceremony tabs if present
-    const ceremonyTabs = document.querySelectorAll('.ceremony-tab');
-    if (ceremonyTabs.length > 0) {
-        console.log("Initializing ceremony tabs for new content");
-        ceremonyTabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                if (typeof switchCeremonyType === 'function') {
-                    switchCeremonyType(this.dataset.ceremony);
-                }
-            });
-        });
-    }
-    
-    // Initialize any multi-select functionality
-    if (typeof setupMultiSelectMode === 'function') {
-        console.log("Setting up multi-select mode for new content");
-        setupMultiSelectMode();
-    }
-    
-    // Reinitialize any enhanced dropdowns
-    if (typeof enhanceDropdowns === 'function') {
-        console.log("Enhancing dropdowns for new content");
-        enhanceDropdowns();
-    }
-    
-    // Run any page-specific initialization based on URL
-    const currentPath = window.location.pathname;
-    if (currentPath.includes('bridal-swap') && typeof initializeBridalSwap === 'function') {
-        console.log("Initializing bridal swap page");
-        initializeBridalSwap();
-    } else if (currentPath.includes('bridal-gallery') && typeof initializeBridalGallery === 'function') {
-        console.log("Initializing bridal gallery page");
-        initializeBridalGallery();
     }
 }
