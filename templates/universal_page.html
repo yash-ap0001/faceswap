@@ -1240,7 +1240,7 @@
                 }
             });
             
-            // Image Viewer Modal
+            // Image Viewer Modal with Carousel
             const imageViewerModal = new bootstrap.Modal(document.getElementById('imageViewerModal'));
             const zoomImage = document.getElementById('zoomImage');
             const zoomInBtn = document.getElementById('zoomInBtn');
@@ -1248,6 +1248,9 @@
             const resetZoomBtn = document.getElementById('resetZoomBtn');
             const downloadImageBtn = document.getElementById('downloadImageBtn');
             const modalTitle = document.getElementById('imageViewerModalLabel');
+            const prevImageBtn = document.getElementById('prevImageBtn');
+            const nextImageBtn = document.getElementById('nextImageBtn');
+            const imageNavInfo = document.getElementById('imageNavInfo');
             
             // Image zoom variables
             let currentZoom = 1;
@@ -1255,54 +1258,174 @@
             let imageX = 0, imageY = 0;
             let isDragging = false;
             
-            // Add event listener to all image view buttons
+            // Carousel variables
+            let galleryImages = [];
+            let currentImageIndex = 0;
+            
+            // Function to collect all similar images (templates or results)
+            function collectGalleryImages(sourceElement) {
+                // Identify if we're dealing with template or result images
+                const isTemplate = sourceElement.classList.contains('template-preview') || 
+                                  (sourceElement.closest('.template-card') !== null);
+                
+                // Select all similar images
+                const selector = isTemplate ? '.template-preview' : '.result-image';
+                const allImages = Array.from(document.querySelectorAll(selector));
+                
+                // Create gallery data
+                galleryImages = allImages.map((img, index) => {
+                    return {
+                        index: index,
+                        src: img.src,
+                        name: img.dataset.templateName || img.dataset.resultName || `Image ${index + 1}`
+                    };
+                });
+                
+                // Find current image index
+                const imageSrc = sourceElement.src || sourceElement.dataset.imgSrc;
+                currentImageIndex = galleryImages.findIndex(img => img.src === imageSrc);
+                if (currentImageIndex === -1) currentImageIndex = 0;
+                
+                return galleryImages.length > 0;
+            }
+            
+            // Function to update carousel navigation
+            function updateCarouselNavigation() {
+                // Update navigation info text
+                imageNavInfo.textContent = `Image ${currentImageIndex + 1} of ${galleryImages.length}`;
+                
+                // Show/hide navigation buttons
+                prevImageBtn.style.display = currentImageIndex > 0 ? 'block' : 'none';
+                nextImageBtn.style.display = currentImageIndex < galleryImages.length - 1 ? 'block' : 'none';
+            }
+            
+            // Navigate to previous image
+            prevImageBtn.addEventListener('click', function() {
+                if (currentImageIndex > 0) {
+                    currentImageIndex--;
+                    const img = galleryImages[currentImageIndex];
+                    
+                    // Reset zoom
+                    currentZoom = 1;
+                    imageX = 0;
+                    imageY = 0;
+                    updateImageTransform();
+                    
+                    // Update image and download info
+                    zoomImage.src = img.src;
+                    modalTitle.textContent = img.name;
+                    downloadImageBtn.href = img.src;
+                    downloadImageBtn.download = img.name.replace(/\s+/g, '_') + '.jpg';
+                    
+                    // Update navigation
+                    updateCarouselNavigation();
+                }
+            });
+            
+            // Navigate to next image
+            nextImageBtn.addEventListener('click', function() {
+                if (currentImageIndex < galleryImages.length - 1) {
+                    currentImageIndex++;
+                    const img = galleryImages[currentImageIndex];
+                    
+                    // Reset zoom
+                    currentZoom = 1;
+                    imageX = 0;
+                    imageY = 0;
+                    updateImageTransform();
+                    
+                    // Update image and download info
+                    zoomImage.src = img.src;
+                    modalTitle.textContent = img.name;
+                    downloadImageBtn.href = img.src;
+                    downloadImageBtn.download = img.name.replace(/\s+/g, '_') + '.jpg';
+                    
+                    // Update navigation
+                    updateCarouselNavigation();
+                }
+            });
+            
+            // Keyboard navigation for the carousel
+            document.addEventListener('keydown', function(e) {
+                if (!document.getElementById('imageViewerModal').classList.contains('show')) {
+                    return;
+                }
+                
+                if (e.key === 'ArrowLeft') {
+                    prevImageBtn.click();
+                } else if (e.key === 'ArrowRight') {
+                    nextImageBtn.click();
+                }
+            });
+            
+            // Click event for view buttons and images
             document.addEventListener('click', function(e) {
+                // Handle view button clicks
                 if (e.target.closest('.view-image-btn')) {
                     const btn = e.target.closest('.view-image-btn');
                     const imgSrc = btn.dataset.imgSrc;
-                    const imgName = btn.dataset.imgName || 'Image';
                     
                     if (imgSrc) {
-                        // Reset zoom and position
+                        // Find the related image element
+                        const imgElement = document.querySelector(`img[src="${imgSrc}"]`);
+                        
+                        // Collect gallery images
+                        if (imgElement) {
+                            collectGalleryImages(imgElement);
+                        } else {
+                            // Fallback for direct button without image
+                            galleryImages = [{
+                                index: 0,
+                                src: imgSrc,
+                                name: btn.dataset.imgName || 'Image'
+                            }];
+                            currentImageIndex = 0;
+                        }
+                        
+                        // Reset zoom
                         currentZoom = 1;
                         imageX = 0;
                         imageY = 0;
                         updateImageTransform();
                         
-                        // Set image source and download link
-                        zoomImage.src = imgSrc;
-                        downloadImageBtn.href = imgSrc;
-                        downloadImageBtn.download = imgName.replace(/\s+/g, '_') + '.jpg';
+                        // Set current image
+                        const img = galleryImages[currentImageIndex];
+                        zoomImage.src = img.src;
+                        modalTitle.textContent = img.name;
+                        downloadImageBtn.href = img.src;
+                        downloadImageBtn.download = img.name.replace(/\s+/g, '_') + '.jpg';
                         
-                        // Set modal title
-                        modalTitle.textContent = imgName;
+                        // Update navigation
+                        updateCarouselNavigation();
                         
                         // Show modal
                         imageViewerModal.show();
                     }
                 }
-            });
-            
-            // Make template and result images clickable to open in viewer
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('template-preview') || e.target.classList.contains('result-image')) {
-                    const imgSrc = e.target.src;
-                    const imgName = e.target.dataset.templateName || e.target.dataset.resultName || 'Image';
+                // Handle direct clicks on images
+                else if (e.target.classList.contains('template-preview') || e.target.classList.contains('result-image')) {
+                    const imgElement = e.target;
+                    const imgSrc = imgElement.src;
                     
                     if (imgSrc) {
-                        // Reset zoom and position
+                        // Collect gallery images
+                        collectGalleryImages(imgElement);
+                        
+                        // Reset zoom
                         currentZoom = 1;
                         imageX = 0;
                         imageY = 0;
                         updateImageTransform();
                         
-                        // Set image source and download link
-                        zoomImage.src = imgSrc;
-                        downloadImageBtn.href = imgSrc;
-                        downloadImageBtn.download = imgName.replace(/\s+/g, '_') + '.jpg';
+                        // Set current image
+                        const img = galleryImages[currentImageIndex];
+                        zoomImage.src = img.src;
+                        modalTitle.textContent = img.name;
+                        downloadImageBtn.href = img.src;
+                        downloadImageBtn.download = img.name.replace(/\s+/g, '_') + '.jpg';
                         
-                        // Set modal title
-                        modalTitle.textContent = imgName;
+                        // Update navigation
+                        updateCarouselNavigation();
                         
                         // Show modal
                         imageViewerModal.show();
