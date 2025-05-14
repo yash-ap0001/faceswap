@@ -518,17 +518,7 @@ def api_menu():
     API endpoint to get the menu structure for the React sidebar.
     Returns a JSON object with the menu structure.
     """
-    app.logger.info("API menu endpoint called")
     menu = [
-        {
-            "id": "universal",
-            "title": "Universal",
-            "icon": "fa-magic",
-            "subItems": [
-                {"id": "universal-page", "label": "Universal Categories", "link": "/react/universal"},
-                {"id": "universal_face_swap", "label": "Universal Face Swap", "link": "/universal-face-swap"}
-            ]
-        },
         {
             "id": "bride",
             "title": "Bride",
@@ -567,9 +557,7 @@ def api_menu():
         }
     ]
     
-    menu_response = {'menu': menu}
-    app.logger.info(f"Sending menu response: {menu_response}")
-    return jsonify(menu_response)
+    return jsonify(menu)
 
 @app.route('/api/content/<path:page_id>')
 def api_content(page_id):
@@ -2440,13 +2428,6 @@ def resize_image_if_needed(image, max_size=1280):
     # Resize image
     return cv2.resize(image, (new_w, new_h))
 
-# Universal face swap page
-@app.route('/universal-face-swap', methods=['GET'])
-@app.route('/universal_face_swap', methods=['GET'])
-def universal_face_swap_page():
-    """Display the universal face swap page."""
-    return render_template('universal_face_swap.html')
-
 # Universal face swap endpoint to work across groom and saloon categories
 @app.route('/universal-face-swap', methods=['POST'])
 @app.route('/universal_face_swap', methods=['POST'])
@@ -2616,8 +2597,15 @@ def universal_face_swap():
 
 # Import React routes from separate file
 # Universal page route (a direct HTML version that doesn't require React build)
-# Routes for universal pages moved to react_routes.py
-# Now accessible through /react/universal and /react/universal-swap
+@app.route('/universal')
+def universal_page():
+    """Render the universal categories page with a direct HTML template."""
+    return render_template('universal_page.html')
+
+@app.route('/universal-swap')
+def universal_swap_page():
+    """Render the universal face swap page with a direct HTML template."""
+    return render_template('universal_swap.html')
 
 from react_routes import react_bp, api_bp
 

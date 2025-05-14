@@ -12,11 +12,8 @@ const HomePage = () => {
           Transform your wedding planning experience with our AI-powered platform
         </p>
         <div className="mt-4">
-          <a href="/universal-face-swap" className="btn btn-primary me-2">
-            <i className="fas fa-magic me-1"></i> Universal Face Swap (New!)
-          </a>
-          <a href="/bridal-swap" className="btn btn-outline-light me-2">
-            <i className="fas fa-female me-1"></i> Create Bride Look
+          <a href="/bridal-swap" className="btn btn-primary me-2">
+            <i className="fas fa-magic me-1"></i> Create Bride Look
           </a>
           <a href="/groom-face-swap" className="btn btn-outline-light">
             <i className="fas fa-user-tie me-1"></i> Create Groom Look
@@ -31,15 +28,6 @@ const HomePage = () => {
       </div>
       
       <div className="features">
-        <div className="feature-card bg-primary bg-opacity-10">
-          <i className="fas fa-magic"></i>
-          <h3>Universal Face Swap</h3>
-          <p>Try our new all-in-one face swapping tool with all templates in a single easy interface!</p>
-          <div className="mt-3">
-            <a href="/universal-face-swap" className="btn btn-sm btn-primary">Try it Now</a>
-          </div>
-        </div>
-      
         <div className="feature-card">
           <i className="fas fa-female"></i>
           <h3>Bride Section</h3>

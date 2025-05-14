@@ -21,12 +21,6 @@ def react_app(path=None):
     This serves as the entry point for the SPA (Single Page Application).
     The catch-all route ensures all React routes are handled by the SPA.
     """
-    # Special case for universal page
-    if path == 'universal':
-        return render_template('universal_page.html')
-    elif path == 'universal-swap':
-        return render_template('universal_swap.html')
-    
     return render_template('layout.html')
 
 @api_bp.route('/menu')
@@ -35,17 +29,7 @@ def api_menu():
     API endpoint to get the menu structure for the React sidebar.
     Returns a JSON object with the menu structure.
     """
-    print("React routes API menu endpoint called")
     menu = [
-        {
-            "id": "universal",
-            "title": "Universal",
-            "icon": "fa-magic",
-            "subItems": [
-                {"id": "universal-page", "label": "Universal Categories", "link": "/react/universal"},
-                {"id": "universal_face_swap", "label": "Universal Face Swap", "link": "/universal-face-swap"}
-            ]
-        },
         {
             "id": "bride",
             "title": "Bride",
@@ -238,13 +222,11 @@ def api_content(page_id):
     return jsonify(content_map.get(page_id, default_content))
 
 @api_bp.route('/categories')
-@react_bp.route('/api/categories')
 def api_categories():
     """
     API endpoint to get the full categories structure.
     Returns a JSON object with all categories, subcategories, and items.
     """
-    print("API categories endpoint called")
     try:
         with open('static/data/categories.json', 'r') as f:
             categories_data = json.load(f)

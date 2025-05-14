@@ -13,68 +13,22 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // Track which accordion section is open (default to "universal")
-  const [openSection, setOpenSection] = useState('universal');
+  // Track which accordion section is open (default to "bride")
+  const [openSection, setOpenSection] = useState('bride');
   
   // Fetch menu data from API
   useEffect(() => {
     const fetchMenuData = async () => {
       try {
         setLoading(true);
-        
-        console.log('DEBUG: About to fetch menu data from API');
-        
-        // Actually fetch menu from API instead of using hardcoded values
-        console.log('DEBUG: Fetching from /api/menu with timestamp:', new Date().getTime());
-        const response = await fetch('/api/menu?t=' + new Date().getTime(), {
-          headers: {
-            'Accept': 'application/json',
-            'Cache-Control': 'no-cache, no-store, must-revalidate'
-          }
-        });
-        
-        console.log('DEBUG: API response status:', response.status);
-        console.log('DEBUG: API response headers:', Object.fromEntries([...response.headers]));
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch menu: ${response.status}`);
-        }
-        
-        const responseText = await response.text();
-        console.log('DEBUG: Raw response text:', responseText);
-        
-        let data;
-        try {
-          data = JSON.parse(responseText);
-        } catch (parseError) {
-          console.error('DEBUG: Error parsing JSON response:', parseError);
-          throw new Error('Invalid JSON response');
-        }
-        
-        console.log('DEBUG: Menu data from API:', data);
-        
-        if (data && data.menu && Array.isArray(data.menu)) {
-          console.log('DEBUG: Setting menu items:', data.menu.length, 'items');
-          setMenuItems(data.menu);
-        } else {
-          console.error('DEBUG: Invalid menu data format from API:', data);
-          throw new Error('Invalid menu data format from API');
-        }
-        
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching menu data:', err);
-        setError('Failed to load menu data. Please try again later.');
-        
-        // Fallback to hardcoded menu if API fails
+        // Use hardcoded menu structure without Home item
         const defaultMenu = [
           {
             id: 'universal',
             title: 'Universal',
             icon: 'fa-magic',
             subItems: [
-              { id: 'universal-page', label: 'Universal Categories', link: '/react/universal' },
-              { id: 'universal-swap', label: 'Universal Face Swap', link: '/react/universal-swap' }
+              { id: 'universal-categories', label: 'All Categories', link: '/react#universal-categories' }
             ]
           },
           {
@@ -99,9 +53,37 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
               { id: 'modern-suits', label: 'Modern Suits', link: '/react#modern-suits' },
               { id: 'groom-accessories', label: 'Accessories', link: '/react#groom-accessories' }
             ]
+          },
+          {
+            id: 'saloons',
+            title: 'Saloons',
+            icon: 'fa-cut',
+            subItems: [
+              { id: 'bride-saloons', label: 'Bride Saloons', link: '/react#bride-saloons' },
+              { id: 'groom-saloons', label: 'Groom Saloons', link: '/react#groom-saloons' },
+              { id: 'makeup-artists', label: 'Makeup Artists', link: '/react#makeup-artists' },
+              { id: 'saloon-packages', label: 'Saloon Packages', link: '/react#saloon-packages' }
+            ]
+          },
+          {
+            id: 'services',
+            title: 'Services',
+            icon: 'fa-concierge-bell',
+            subItems: [
+              { id: 'venue-search', label: 'Venue Search', link: '/react#venue-search' },
+              { id: 'catering-list', label: 'Catering List', link: '/react#catering-list' },
+              { id: 'event-managers', label: 'Event Managers', link: '/react#event-managers' },
+              { id: 'photographers', label: 'Photographers', link: '/react#photographers' }
+            ]
           }
         ];
+        
         setMenuItems(defaultMenu);
+        setError(null);
+      } catch (err) {
+        console.error('Error setting menu data:', err);
+        setError('Failed to load menu data. Please try again later.');
+        // Menu already set above, no need for fallback
       } finally {
         setLoading(false);
       }
@@ -114,24 +96,12 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
   const handleItemClick = (id, link) => {
     onNavigation(id);
     
-    console.log('DEBUG: Menu item clicked:', id, 'link:', link);
+    // Use history API for navigation without page reload
+    window.history.pushState({}, '', link);
     
-    // Check if the link is a direct URL (not a hash route)
-    if ((link.includes('/react/') && !link.includes('#')) || 
-        link.startsWith('/universal-face-swap') || 
-        link.startsWith('/universal_face_swap')) {
-      // For direct links like /react/universal or non-React endpoints, use regular navigation
-      console.log('DEBUG: Navigating to direct URL:', link);
-      window.location.href = link;
-    } else {
-      // For hash routes, use history API for navigation without page reload
-      console.log('DEBUG: Using history API for hash route:', link);
-      window.history.pushState({}, '', link);
-      
-      // Dispatch a custom event to notify about route change
-      const event = new CustomEvent('routeChange', { detail: { path: link } });
-      window.dispatchEvent(event);
-    }
+    // Dispatch a custom event to notify about route change
+    const event = new CustomEvent('routeChange', { detail: { path: link } });
+    window.dispatchEvent(event);
   };
   
   // Toggle accordion section
@@ -180,32 +150,6 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
         <h5>Menu</h5>
       </div>
       <div className="sidebar-content">
-        {/* Direct Universal Face Swap link - Always visible */}
-        <div className="menu-section universal-shortcut mb-3">
-          <a 
-            href="/universal-face-swap" 
-            className="d-block p-3 rounded text-center text-white" 
-            style={{
-              background: 'linear-gradient(45deg, #6a11cb, #2575fc)',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-              transition: 'all 0.3s ease',
-              border: '1px solid rgba(255, 255, 255, 0.1)'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-            }}
-          >
-            <i className="fas fa-magic me-2"></i>
-            <strong>Universal Face Swap</strong>
-            <span className="badge bg-warning text-dark ms-2">New!</span>
-          </a>
-        </div>
-        
         {menuItems.length > 0 ? (
           menuItems.map((section) => (
             <div key={section.id} className="menu-section accordion-item border-0">
