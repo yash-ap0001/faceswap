@@ -164,79 +164,84 @@ const BridalSwapPage = () => {
 
   return (
     <div className="bridal-swap-page">
-      <h1 className="mb-4">Create Your Bridal Look</h1>
+      <div className="d-flex align-items-center justify-content-between mb-3">
+        <h6 className="m-0">Create Your Bridal Look</h6>
+        
+        <div className="form-check form-switch ms-3">
+          <input 
+            className="form-check-input" 
+            type="checkbox"
+            id="multiSelectSwitch"
+            checked={isMultiSelectMode}
+            onChange={toggleMultiSelectMode}
+          />
+          <label className="form-check-label small" htmlFor="multiSelectSwitch">
+            Multi-Select
+          </label>
+        </div>
+      </div>
       
-      <div className="row">
+      <div className="row g-2">
         <div className="col-md-4">
-          <div className="card mb-4">
-            <div className="card-body">
-              <h5 className="card-title">Upload Your Photo</h5>
-              <div className="form-group mb-3">
-                <input 
-                  type="file" 
-                  className="form-control" 
-                  accept="image/*"
-                  onChange={handleSourceImageChange}
+          <div className="mb-3">
+            <div className="d-flex mb-2 align-items-center">
+              <small className="text-muted me-2">Your photo:</small>
+              <input 
+                type="file" 
+                className="form-control form-control-sm" 
+                accept="image/*"
+                onChange={handleSourceImageChange}
+              />
+            </div>
+            
+            {sourcePreview && (
+              <div className="source-preview">
+                <img 
+                  src={sourcePreview} 
+                  className="img-fluid rounded shadow-sm" 
+                  alt="Your Photo" 
+                  style={{maxHeight: '180px'}}
                 />
               </div>
+            )}
               
-              {sourcePreview && (
-                <div className="source-preview mb-3">
-                  <img 
-                    src={sourcePreview} 
-                    className="img-fluid rounded" 
-                    alt="Your Photo" 
-                  />
-                </div>
-              )}
-              
-              <div className="form-group mb-3">
-                <div className="form-check form-switch">
-                  <input 
-                    className="form-check-input" 
-                    type="checkbox"
-                    id="enhanceSwitch"
-                    checked={enhanceEnabled}
-                    onChange={() => setEnhanceEnabled(!enhanceEnabled)}
-                  />
-                  <label className="form-check-label" htmlFor="enhanceSwitch">
-                    Enhance Face
-                  </label>
-                </div>
+            <div className="d-flex align-items-center mt-2">
+              <div className="form-check form-switch me-3">
+                <input 
+                  className="form-check-input" 
+                  type="checkbox"
+                  id="enhanceSwitch"
+                  checked={enhanceEnabled}
+                  onChange={() => setEnhanceEnabled(!enhanceEnabled)}
+                />
+                <label className="form-check-label small" htmlFor="enhanceSwitch">
+                  Enhance
+                </label>
               </div>
               
               {enhanceEnabled && (
-                <div className="form-group mb-3">
-                  <label className="form-label">Enhancement Method</label>
-                  <select 
-                    className="form-select"
-                    value={enhanceMethod}
-                    onChange={(e) => setEnhanceMethod(e.target.value)}
-                  >
-                    <option value="auto">Auto (Best)</option>
-                    <option value="gfpgan">GFPGAN</option>
-                    <option value="codeformer">CodeFormer</option>
-                  </select>
-                </div>
-              )}
-              
-              <div className="d-grid gap-2">
-                <button 
-                  className={`btn ${isMultiSelectMode ? 'btn-warning' : 'btn-primary'}`}
-                  onClick={toggleMultiSelectMode}
+                <select 
+                  className="form-select form-select-sm"
+                  value={enhanceMethod}
+                  onChange={(e) => setEnhanceMethod(e.target.value)}
+                  style={{width: 'auto'}}
                 >
-                  {isMultiSelectMode ? 'Cancel Multi-Select' : 'Multi-Select Mode'}
-                </button>
-                
-                {isMultiSelectMode && selectedTemplates.length > 0 && (
-                  <button 
-                    className="btn btn-success"
-                    onClick={processMultipleTemplates}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Processing...' : 'Process Selected Templates'}
-                  </button>
-                )}
+                  <option value="auto">Auto</option>
+                  <option value="gfpgan">GFPGAN</option>
+                  <option value="codeformer">CodeFormer</option>
+                </select>
+              )}
+            </div>
+              
+            {isMultiSelectMode && selectedTemplates.length > 0 && (
+              <button 
+                className="btn btn-primary btn-sm mt-3 w-100"
+                onClick={processMultipleTemplates}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Processing...' : `Process ${selectedTemplates.length} Templates`}
+              </button>
+            )}
               </div>
             </div>
           </div>

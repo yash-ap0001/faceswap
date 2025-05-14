@@ -114,43 +114,41 @@ const BridalGalleryPage = () => {
 
   return (
     <div className="bridal-gallery-page">
-      <h1 className="mb-4">Bridal Gallery</h1>
+      <div className="d-flex align-items-center justify-content-between mb-3">
+        <h6 className="m-0">Bridal Gallery</h6>
+        <div className="btn-group btn-group-sm" role="group">
+          {['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'].map(ceremony => (
+            <button
+              key={ceremony}
+              type="button"
+              className={`btn ${ceremonyType === ceremony ? 'btn-primary' : 'btn-outline-primary'}`}
+              onClick={() => setCeremonyType(ceremony)}
+            >
+              {ceremony.charAt(0).toUpperCase() + ceremony.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
       
-      <div className="card mb-4">
-        <div className="card-body">
-          <h5 className="card-title">Select Ceremony</h5>
-          <div className="d-flex justify-content-center mb-3">
-            <div className="btn-group" role="group">
-              {['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'].map(ceremony => (
-                <button
-                  key={ceremony}
-                  type="button"
-                  className={`btn ${ceremonyType === ceremony ? 'btn-primary' : 'btn-outline-primary'}`}
-                  onClick={() => setCeremonyType(ceremony)}
-                >
-                  {ceremony.charAt(0).toUpperCase() + ceremony.slice(1)}
-                </button>
-              ))}
-            </div>
-          </div>
-          
-          <div className="row g-4">
+      <div className="mb-3">
+        <div className="container-fluid p-0">
+          <div className="row g-2">
             {isLoading ? (
-              <div className="col-12 text-center">
-                <div className="spinner-border text-primary" role="status">
+              <div className="col-12 text-center py-3">
+                <div className="spinner-border spinner-border-sm text-primary" role="status">
                   <span className="visually-hidden">Loading...</span>
                 </div>
               </div>
             ) : templates.length > 0 ? (
               templates.map(template => (
-                <div className="col-md-4 col-lg-3" key={template.id}>
+                <div className="col-6 col-sm-4 col-md-3 col-lg-2" key={template.id}>
                   <div 
                     className="gallery-item"
                     onClick={() => openImageModal(template)}
                   >
                     <img 
                       src={template.url} 
-                      className="img-fluid rounded" 
+                      className="img-fluid rounded shadow-sm" 
                       alt={template.id}
                     />
                     <div className="overlay">
@@ -162,26 +160,19 @@ const BridalGalleryPage = () => {
                 </div>
               ))
             ) : (
-              <div className="col-12 text-center">
-                <p>No templates available for this ceremony type.</p>
+              <div className="col-12 text-center py-2">
+                <small>No templates available for this ceremony type.</small>
               </div>
             )}
           </div>
         </div>
       </div>
       
-      {/* Image Modal */}
+      {/* Image Modal - Minimalist Design */}
       {isModalOpen && selectedImage && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h5 className="modal-title">
-                {ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1)} Template
-              </h5>
-              <button type="button" className="btn-close" onClick={closeModal}></button>
-            </div>
-            
-            <div className="modal-body">
+            <div className="modal-body p-0">
               <div className="image-container" style={{ overflow: 'hidden' }}>
                 <img 
                   src={selectedImage.url} 
@@ -195,45 +186,36 @@ const BridalGalleryPage = () => {
               </div>
             </div>
             
-            <div className="modal-footer">
-              <div className="d-flex justify-content-between w-100">
-                <div>
-                  <button 
-                    className="btn btn-outline-secondary me-2" 
-                    onClick={prevImage}
-                    disabled={templates.findIndex(t => t.id === selectedImage.id) === 0}
-                  >
-                    <i className="fas fa-chevron-left"></i> Previous
-                  </button>
-                  <button 
-                    className="btn btn-outline-secondary" 
-                    onClick={nextImage}
-                    disabled={templates.findIndex(t => t.id === selectedImage.id) === templates.length - 1}
-                  >
-                    Next <i className="fas fa-chevron-right"></i>
-                  </button>
-                </div>
-                
-                <div>
-                  <button className="btn btn-outline-primary me-2" onClick={zoomOut}>
-                    <i className="fas fa-search-minus"></i>
-                  </button>
-                  <button className="btn btn-outline-primary" onClick={zoomIn}>
-                    <i className="fas fa-search-plus"></i>
-                  </button>
-                </div>
-              </div>
+            {/* Floating navigation controls */}
+            <div className="floating-controls">
+              <button 
+                className="btn btn-sm btn-dark me-1"
+                onClick={prevImage}
+                disabled={templates.findIndex(t => t.id === selectedImage.id) === 0}
+              >
+                <i className="fas fa-chevron-left"></i>
+              </button>
+              
+              <button 
+                className="btn btn-sm btn-dark ms-1 me-2"
+                onClick={nextImage}
+                disabled={templates.findIndex(t => t.id === selectedImage.id) === templates.length - 1}
+              >
+                <i className="fas fa-chevron-right"></i>
+              </button>
+              
+              <button className="btn btn-sm btn-dark me-1" onClick={zoomOut}>
+                <i className="fas fa-search-minus"></i>
+              </button>
+              
+              <button className="btn btn-sm btn-dark me-1" onClick={zoomIn}>
+                <i className="fas fa-search-plus"></i>
+              </button>
+              
+              <button className="btn btn-sm btn-dark ms-2" onClick={closeModal}>
+                <i className="fas fa-times"></i>
+              </button>
             </div>
-          </div>
-          
-          {/* Zoom controls in top right corner */}
-          <div className="zoom-controls-top">
-            <button className="btn btn-sm btn-dark me-2" onClick={zoomOut}>
-              <i className="fas fa-search-minus"></i>
-            </button>
-            <button className="btn btn-sm btn-dark" onClick={zoomIn}>
-              <i className="fas fa-search-plus"></i>
-            </button>
           </div>
         </div>
       )}
@@ -324,10 +306,54 @@ const BridalGalleryPage = () => {
           height: 60vh;
         }
         
-        .zoom-controls-top {
+        .floating-controls {
           position: absolute;
-          top: 20px;
-          right: 20px;
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: rgba(0, 0, 0, 0.6);
+          padding: 8px 12px;
+          border-radius: 30px;
+          backdrop-filter: blur(5px);
+          z-index: 1060;
+        }
+        
+        .floating-controls button {
+          border-radius: 50%;
+          width: 32px;
+          height: 32px;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: #343a40;
+          border: none;
+          opacity: 0.9;
+          transition: all 0.2s ease;
+        }
+        
+        .floating-controls button:hover:not(:disabled) {
+          background-color: #495057;
+          transform: scale(1.1);
+          opacity: 1;
+        }
+        
+        .floating-controls button:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+        
+        .modal-content {
+          background: transparent;
+          border: none;
+          box-shadow: none;
+        }
+        
+        .modal-body {
+          background-color: transparent;
         }
       `}</style>
     </div>
