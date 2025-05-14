@@ -1348,7 +1348,7 @@ def process_template():
             return jsonify({'success': False, 'error': 'No face detected in template image'})
             
         # Perform face swap
-        result_img = swapper.get(template_img, target_faces[0], source_faces[0], source_img)
+        result_img = swapper.get(template_img, target_faces[0], source_faces[0], paste_back=True)
         
         # Apply face enhancement if requested
         enhanced = False
