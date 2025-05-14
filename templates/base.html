@@ -14,17 +14,18 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <style>
         :root {
-            --primary-purple: #4a148c;
-            --secondary-purple: #6a1b9a;
+            --primary-purple: #9c27b0;
+            --secondary-purple: #6a0dad;
             --dark-purple: #38006b;
-            --light-purple: #9c4dcc;
+            --light-purple: #bb6bd9;
             --dark-surface: #121212;
             --card-surface: #1e1e1e;
             --border-color: #333333;
-            --text-primary: #f5f5f5;
-            --text-secondary: #bdbdbd;
+            --text-primary: #ffffff;
+            --text-secondary: #e1bee7;
             --glass-bg: rgba(18, 18, 18, 0.9);
             --glass-border: rgba(255, 255, 255, 0.1);
+            --sidebar-gradient: linear-gradient(135deg, #9c27b0, #6a0dad);
         }
         
         body {
@@ -198,10 +199,10 @@
             top: 0;
             width: 250px;
             height: 100vh;
-            background-color: var(--primary-purple);
+            background: linear-gradient(135deg, #9c27b0, #6a0dad);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border-right: 2px solid var(--secondary-purple);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 1050;
             padding: 20px;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -226,10 +227,11 @@
         
         .sidebar-header h5 {
             margin: 0;
-            font-size: 1.4rem;
-            font-weight: 600;
+            font-size: 1.8rem;
+            font-weight: 700;
             color: white;
             text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
         }
         
         .close-sidebar {
@@ -320,15 +322,21 @@
         .accordion-button {
             font-size: 1.1rem;
             color: white !important;
-            font-weight: 600;
-            padding: 10px;
+            font-weight: 500;
+            padding: 15px 20px;
             border-radius: 0.35rem;
             background-color: rgba(255, 255, 255, 0.1) !important;
+            transition: all 0.3s ease;
         }
         
         .accordion-button:not(.collapsed) {
             background-color: rgba(255, 255, 255, 0.2) !important;
             color: white !important;
+            font-weight: 600;
+        }
+        
+        .accordion-button::after {
+            filter: brightness(5);
         }
         
         .accordion-button:focus {
@@ -686,7 +694,7 @@
     <!-- Transparent Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h5>Menu</h5>
+            <h5>VOWBRIDE</h5>
         </div>
         <div class="sidebar-content">
             <!-- Bootstrap Accordion -->
