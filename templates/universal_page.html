@@ -351,6 +351,41 @@
                                 <p class="mt-2">Loading templates...</p>
                             </div>
                         </div>
+                        
+                        <!-- Multi-select controls -->
+                        <div id="multiSelectControls" class="mt-4 text-center" style="display: none;">
+                            <div class="mb-3">
+                                <button id="selectAllBtn" class="btn btn-outline-primary btn-sm me-2">
+                                    <i class="fas fa-check-square me-1"></i> Select All
+                                </button>
+                                <button id="deselectAllBtn" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-square me-1"></i> Deselect All
+                                </button>
+                            </div>
+                            
+                            <div class="form-check form-switch d-inline-block me-3 mb-3">
+                                <input class="form-check-input" type="checkbox" id="enhanceCheck" checked>
+                                <label class="form-check-label" for="enhanceCheck">
+                                    Enhance faces
+                                </label>
+                            </div>
+                            
+                            <button id="processSelectedBtn" class="btn btn-lg btn-primary">
+                                <i class="fas fa-magic me-1"></i> Process Selected Templates
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Results Section - Hidden until processing is done -->
+                <div id="resultsSection" class="card mb-4" style="display: none;">
+                    <div class="card-header bg-dark-purple">
+                        <h5 class="card-title mb-0">Results</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="resultsContainer" class="row">
+                            <!-- Results will be added here dynamically -->
+                        </div>
                     </div>
                 </div>
                 
@@ -574,9 +609,16 @@
                                     <div class="card h-100">
                                         <img src="${template.url}" class="card-img-top template-preview" alt="${template.id}">
                                         <div class="card-body text-center">
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input template-checkbox" type="checkbox" 
+                                                    value="${template.path}" id="check_${template.id}" data-template-id="${template.id}">
+                                                <label class="form-check-label" for="check_${template.id}">
+                                                    Select
+                                                </label>
+                                            </div>
                                             <button class="btn btn-sm btn-primary select-template-btn" 
                                                 data-template-path="${template.path}">
-                                                Select Template
+                                                Swap Now
                                             </button>
                                         </div>
                                     </div>
@@ -585,7 +627,10 @@
                                 templatesContainer.appendChild(col);
                             });
                             
-                            // Add event listeners to select template buttons
+                            // Show the multi-select controls
+                            document.getElementById('multiSelectControls').style.display = 'block';
+                            
+                            // Add event listeners to select template buttons (single template processing)
                             document.querySelectorAll('.select-template-btn').forEach(btn => {
                                 btn.addEventListener('click', event => {
                                     const templatePath = event.target.dataset.templatePath;
@@ -594,6 +639,12 @@
                                         alert('Please upload a source image first');
                                         return;
                                     }
+                                    
+                                    // Show processing indicator
+                                    const processingIndicator = document.createElement('span');
+                                    processingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin ms-2"></i>';
+                                    event.target.disabled = true;
+                                    event.target.appendChild(processingIndicator);
                                     
                                     // Create form data for submission
                                     const formData = new FormData();
@@ -609,17 +660,159 @@
                                     .then(response => response.json())
                                     .then(resultData => {
                                         if (resultData.success) {
-                                            // Redirect to the result
-                                            window.location.href = resultData.result_url;
+                                            // Show the result in the results section
+                                            document.getElementById('resultsSection').style.display = 'block';
+                                            const resultsContainer = document.getElementById('resultsContainer');
+                                            
+                                            const resultCol = document.createElement('div');
+                                            resultCol.className = 'col-md-6 col-lg-4 mb-3';
+                                            resultCol.innerHTML = `
+                                                <div class="card h-100">
+                                                    <img src="${resultData.result_path}" class="card-img-top" alt="Result">
+                                                    <div class="card-body text-center">
+                                                        <a href="${resultData.result_path}" class="btn btn-outline-primary" download>
+                                                            <i class="fas fa-download me-1"></i> Download
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            `;
+                                            
+                                            resultsContainer.appendChild(resultCol);
+                                            
+                                            // Scroll to results
+                                            document.getElementById('resultsSection').scrollIntoView({behavior: 'smooth'});
+                                            
+                                            // Re-enable the button
+                                            event.target.disabled = false;
+                                            event.target.removeChild(processingIndicator);
                                         } else {
                                             alert(`Error: ${resultData.message || 'Unknown error occurred'}`);
+                                            event.target.disabled = false;
+                                            event.target.removeChild(processingIndicator);
                                         }
                                     })
                                     .catch(error => {
                                         console.error('Error processing template:', error);
                                         alert('Failed to process template. Please try again.');
+                                        event.target.disabled = false;
+                                        if (processingIndicator.parentNode === event.target) {
+                                            event.target.removeChild(processingIndicator);
+                                        }
                                     });
                                 });
+                            });
+                            
+                            // Add event listeners for multi-select buttons
+                            const selectAllBtn = document.getElementById('selectAllBtn');
+                            const deselectAllBtn = document.getElementById('deselectAllBtn');
+                            const processSelectedBtn = document.getElementById('processSelectedBtn');
+                            
+                            // Select all templates
+                            selectAllBtn.addEventListener('click', () => {
+                                document.querySelectorAll('.template-checkbox').forEach(checkbox => {
+                                    checkbox.checked = true;
+                                });
+                            });
+                            
+                            // Deselect all templates
+                            deselectAllBtn.addEventListener('click', () => {
+                                document.querySelectorAll('.template-checkbox').forEach(checkbox => {
+                                    checkbox.checked = false;
+                                });
+                            });
+                            
+                            // Process selected templates
+                            processSelectedBtn.addEventListener('click', () => {
+                                const selectedCheckboxes = document.querySelectorAll('.template-checkbox:checked');
+                                
+                                if (selectedCheckboxes.length === 0) {
+                                    alert('Please select at least one template.');
+                                    return;
+                                }
+                                
+                                if (!sourceFile) {
+                                    alert('Please upload a source image first.');
+                                    return;
+                                }
+                                
+                                // Disable the button during processing
+                                processSelectedBtn.disabled = true;
+                                processSelectedBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+                                
+                                // Show the results section
+                                document.getElementById('resultsSection').style.display = 'block';
+                                const resultsContainer = document.getElementById('resultsContainer');
+                                resultsContainer.innerHTML = '';
+                                
+                                // Get enhancement setting
+                                const enhance = document.getElementById('enhanceCheck').checked;
+                                
+                                // Process each selected template
+                                let processedCount = 0;
+                                const templatePaths = Array.from(selectedCheckboxes).map(cb => cb.value);
+                                
+                                // Process templates sequentially to avoid overwhelming the server
+                                const processNextTemplate = (index) => {
+                                    if (index >= templatePaths.length) {
+                                        // Processing complete
+                                        processSelectedBtn.disabled = false;
+                                        processSelectedBtn.innerHTML = '<i class="fas fa-magic me-1"></i> Process Selected Templates';
+                                        return;
+                                    }
+                                    
+                                    const templatePath = templatePaths[index];
+                                    const formData = new FormData();
+                                    formData.append('source', sourceFile);
+                                    formData.append('template_path', templatePath);
+                                    formData.append('enhance', enhance);
+                                    
+                                    // Update button text with progress
+                                    processSelectedBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i> Processing (${index + 1}/${templatePaths.length})`;
+                                    
+                                    fetch('/process_template', {
+                                        method: 'POST',
+                                        body: formData
+                                    })
+                                    .then(response => response.json())
+                                    .then(resultData => {
+                                        if (resultData.success) {
+                                            // Add the result to the results container
+                                            const resultCol = document.createElement('div');
+                                            resultCol.className = 'col-md-6 col-lg-4 mb-3';
+                                            resultCol.innerHTML = `
+                                                <div class="card h-100">
+                                                    <img src="${resultData.result_path}" class="card-img-top" alt="Result ${index + 1}">
+                                                    <div class="card-body text-center">
+                                                        <a href="${resultData.result_path}" class="btn btn-outline-primary" download>
+                                                            <i class="fas fa-download me-1"></i> Download
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            `;
+                                            
+                                            resultsContainer.appendChild(resultCol);
+                                            
+                                            // Scroll to show new results
+                                            document.getElementById('resultsSection').scrollIntoView({
+                                                behavior: 'smooth',
+                                                block: 'nearest'
+                                            });
+                                        } else {
+                                            console.error(`Error processing template ${index + 1}:`, resultData.message);
+                                        }
+                                        
+                                        // Process the next template
+                                        processNextTemplate(index + 1);
+                                    })
+                                    .catch(error => {
+                                        console.error(`Error processing template ${index + 1}:`, error);
+                                        // Process the next template even if this one failed
+                                        processNextTemplate(index + 1);
+                                    });
+                                };
+                                
+                                // Start processing from the first template
+                                processNextTemplate(0);
                             });
                         } else {
                             templatesContainer.innerHTML = `
