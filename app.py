@@ -428,15 +428,11 @@ def allowed_file(filename):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # Redirect to the React application
+    return redirect(url_for('react.react_app'))
 
-@app.route('/react')
-def react_app():
-    """
-    Render the React application using the layout template.
-    This serves as the entry point for the SPA (Single Page Application).
-    """
-    return render_template('layout.html')
+# Since we're using the react_bp blueprint, this route is no longer needed 
+# as it's defined in react_routes.py
     
 @app.route('/get_templates')
 def get_templates_route():
