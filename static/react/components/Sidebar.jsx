@@ -93,7 +93,14 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
   }, []);
 
   // Handle menu item click
-  const handleItemClick = (id, link) => {
+  const handleItemClick = (id, link, directLink) => {
+    // For direct links, navigate directly to the URL
+    if (directLink) {
+      window.location.href = link;
+      return;
+    }
+    
+    // For react router links
     onNavigation(id);
     
     // Use history API for navigation without page reload
@@ -171,7 +178,7 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
                     <li 
                       key={item.id} 
                       className={activeItem === item.id ? 'active' : ''}
-                      onClick={() => handleItemClick(item.id, item.link)}
+                      onClick={() => handleItemClick(item.id, item.link, item.directLink)}
                     >
                       <span>{item.label}</span>
                     </li>
