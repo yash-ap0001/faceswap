@@ -177,9 +177,9 @@
     left: var(--sidebar-width);
     width: var(--sidebar-toggle-size);
     height: var(--sidebar-toggle-size);
-    background-color: white;
+    background-color: hsl(271.4, 81.3%, 55.9%);
     border-radius: 0 var(--sidebar-toggle-radius) var(--sidebar-toggle-radius) 0;
-    border: var(--sidebar-toggle-border);
+    border: 2px solid white;
     border-left: none;
     display: flex;
     align-items: center;
@@ -187,12 +187,12 @@
     cursor: pointer;
     z-index: 1031;
     transform: translateY(-50%);
-    box-shadow: 3px 0 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 3px 0 8px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
 }
 
 .sidebar-toggle i {
-    color: var(--sidebar-gradient-start);
+    color: white;
     font-size: 1.2rem;
 }
 
@@ -203,8 +203,8 @@
 }
 
 /* Toggle button position when sidebar is collapsed */
-.sidebar.sidebar-collapsed + #menuToggleBtn {
-    left: 10px;
+.sidebar-collapsed ~ #menuToggleBtn {
+    left: 10px !important;
 }
 
 /* Adjust margin for main content to accommodate sidebar */
