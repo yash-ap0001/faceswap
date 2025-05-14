@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import HomePage from './pages/HomePage';
-import BridalGallery from './pages/BridalGallery';
-import BridalSwap from './pages/BridalSwap';
 import LoadingIndicator from './common/LoadingIndicator';
 
 /**
@@ -113,17 +110,16 @@ const MainContent = ({ currentPage }) => {
       return <div dangerouslySetInnerHTML={{ __html: pageContent }} />;
     }
 
-    // Fallback to React components for specific pages
-    switch (currentPage) {
-      case 'home':
-        return <HomePage />;
-      case 'bridal_gallery':
-        return <BridalGallery />;
-      case 'bridal_swap':
-        return <BridalSwap />;
-      default:
-        return <div className="error-page">Page not found</div>;
-    }
+    // Simple fallback for any pages that don't have dedicated components
+    return (
+      <div className="generic-page">
+        <div className="alert alert-info">
+          <h4>Page Content Not Available</h4>
+          <p>This page is currently under development in the React version.</p>
+          <p>You can return to the <a href="/">original site</a> to access this content.</p>
+        </div>
+      </div>
+    );
   };
 
   return (

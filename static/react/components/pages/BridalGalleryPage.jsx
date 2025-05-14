@@ -1,0 +1,337 @@
+import React, { useState, useEffect } from 'react';
+
+/**
+ * BridalGalleryPage component for browsing bridal templates
+ */
+const BridalGalleryPage = () => {
+  const [ceremonyType, setCeremonyType] = useState('haldi');
+  const [templates, setTemplates] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
+
+  // Fetch templates when component mounts or ceremony type changes
+  useEffect(() => {
+    fetchTemplates(ceremonyType);
+  }, [ceremonyType]);
+
+  // Fetch templates for a specific ceremony
+  const fetchTemplates = async (ceremony) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `/get_templates?ceremony_type=${ceremony}&category_type=bride&subcategory=bridal&item_category=${ceremony}`
+      );
+      const data = await response.json();
+      
+      if (data.success && data.templates) {
+        setTemplates(data.templates);
+      } else {
+        console.error('Error fetching templates:', data.message || 'Unknown error');
+      }
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Open image in modal
+  const openImageModal = (template) => {
+    setSelectedImage(template);
+    setIsModalOpen(true);
+    setZoomLevel(1); // Reset zoom level
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage(null);
+  };
+
+  // Navigate to next image
+  const nextImage = () => {
+    if (!selectedImage) return;
+    
+    const currentIndex = templates.findIndex(t => t.id === selectedImage.id);
+    if (currentIndex < templates.length - 1) {
+      setSelectedImage(templates[currentIndex + 1]);
+      setZoomLevel(1); // Reset zoom level
+    }
+  };
+
+  // Navigate to previous image
+  const prevImage = () => {
+    if (!selectedImage) return;
+    
+    const currentIndex = templates.findIndex(t => t.id === selectedImage.id);
+    if (currentIndex > 0) {
+      setSelectedImage(templates[currentIndex - 1]);
+      setZoomLevel(1); // Reset zoom level
+    }
+  };
+
+  // Zoom in
+  const zoomIn = () => {
+    setZoomLevel(prev => Math.min(prev + 0.25, 3));
+  };
+
+  // Zoom out
+  const zoomOut = () => {
+    setZoomLevel(prev => Math.max(prev - 0.25, 0.5));
+  };
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!isModalOpen) return;
+      
+      switch (e.key) {
+        case 'ArrowRight':
+          nextImage();
+          break;
+        case 'ArrowLeft':
+          prevImage();
+          break;
+        case 'Escape':
+          closeModal();
+          break;
+        case '+':
+          zoomIn();
+          break;
+        case '-':
+          zoomOut();
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isModalOpen, selectedImage]);
+
+  return (
+    <div className="bridal-gallery-page">
+      <h1 className="mb-4">Bridal Gallery</h1>
+      
+      <div className="card mb-4">
+        <div className="card-body">
+          <h5 className="card-title">Select Ceremony</h5>
+          <div className="d-flex justify-content-center mb-3">
+            <div className="btn-group" role="group">
+              {['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'].map(ceremony => (
+                <button
+                  key={ceremony}
+                  type="button"
+                  className={`btn ${ceremonyType === ceremony ? 'btn-primary' : 'btn-outline-primary'}`}
+                  onClick={() => setCeremonyType(ceremony)}
+                >
+                  {ceremony.charAt(0).toUpperCase() + ceremony.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          <div className="row g-4">
+            {isLoading ? (
+              <div className="col-12 text-center">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            ) : templates.length > 0 ? (
+              templates.map(template => (
+                <div className="col-md-4 col-lg-3" key={template.id}>
+                  <div 
+                    className="gallery-item"
+                    onClick={() => openImageModal(template)}
+                  >
+                    <img 
+                      src={template.url} 
+                      className="img-fluid rounded" 
+                      alt={template.id}
+                    />
+                    <div className="overlay">
+                      <div className="zoom-icon">
+                        <i className="fas fa-search-plus"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-12 text-center">
+                <p>No templates available for this ceremony type.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      {/* Image Modal */}
+      {isModalOpen && selectedImage && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h5 className="modal-title">
+                {ceremonyType.charAt(0).toUpperCase() + ceremonyType.slice(1)} Template
+              </h5>
+              <button type="button" className="btn-close" onClick={closeModal}></button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="image-container" style={{ overflow: 'hidden' }}>
+                <img 
+                  src={selectedImage.url} 
+                  style={{ 
+                    transform: `scale(${zoomLevel})`,
+                    transition: 'transform 0.3s ease'
+                  }} 
+                  className="img-fluid" 
+                  alt={selectedImage.id}
+                />
+              </div>
+            </div>
+            
+            <div className="modal-footer">
+              <div className="d-flex justify-content-between w-100">
+                <div>
+                  <button 
+                    className="btn btn-outline-secondary me-2" 
+                    onClick={prevImage}
+                    disabled={templates.findIndex(t => t.id === selectedImage.id) === 0}
+                  >
+                    <i className="fas fa-chevron-left"></i> Previous
+                  </button>
+                  <button 
+                    className="btn btn-outline-secondary" 
+                    onClick={nextImage}
+                    disabled={templates.findIndex(t => t.id === selectedImage.id) === templates.length - 1}
+                  >
+                    Next <i className="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+                
+                <div>
+                  <button className="btn btn-outline-primary me-2" onClick={zoomOut}>
+                    <i className="fas fa-search-minus"></i>
+                  </button>
+                  <button className="btn btn-outline-primary" onClick={zoomIn}>
+                    <i className="fas fa-search-plus"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Zoom controls in top right corner */}
+          <div className="zoom-controls-top">
+            <button className="btn btn-sm btn-dark me-2" onClick={zoomOut}>
+              <i className="fas fa-search-minus"></i>
+            </button>
+            <button className="btn btn-sm btn-dark" onClick={zoomIn}>
+              <i className="fas fa-search-plus"></i>
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Custom CSS for gallery and modal */}
+      <style jsx>{`
+        .gallery-item {
+          position: relative;
+          cursor: pointer;
+          overflow: hidden;
+          transition: transform 0.3s ease;
+        }
+        
+        .gallery-item:hover {
+          transform: scale(1.03);
+        }
+        
+        .gallery-item .overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        
+        .gallery-item:hover .overlay {
+          opacity: 1;
+        }
+        
+        .zoom-icon {
+          color: white;
+          font-size: 2rem;
+        }
+        
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.8);
+          backdrop-filter: blur(5px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1050;
+        }
+        
+        .modal-content {
+          background: #343a40;
+          border-radius: 8px;
+          width: 90%;
+          max-width: 900px;
+          max-height: 90vh;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .modal-header {
+          padding: 1rem;
+          border-bottom: 1px solid #6c757d;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        
+        .modal-body {
+          padding: 1rem;
+          overflow: hidden;
+          flex-grow: 1;
+        }
+        
+        .modal-footer {
+          padding: 1rem;
+          border-top: 1px solid #6c757d;
+        }
+        
+        .image-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 60vh;
+        }
+        
+        .zoom-controls-top {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default BridalGalleryPage;

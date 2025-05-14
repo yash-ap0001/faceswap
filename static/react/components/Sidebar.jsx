@@ -34,12 +34,23 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
         // Fallback to default menu items if API fails
         setMenuItems([
           {
+            id: 'home',
+            title: 'Home',
+            icon: 'fa-home',
+            subItems: [
+              { id: 'home', label: 'Home', link: '/' }
+            ]
+          },
+          {
             id: 'bride',
             title: 'Bride',
             icon: 'fa-female',
             subItems: [
-              { id: 'bridal_gallery', label: 'Bridal Gallery', link: '/bridal-gallery' },
-              { id: 'bridal_swap', label: 'Create Bride Look', link: '/bridal-swap' }
+              { id: 'bridal-gallery', label: 'Bridal Gallery', link: '/bridal-gallery' },
+              { id: 'bridal-swap', label: 'Create Bride Look', link: '/bridal-swap' },
+              { id: 'bridal-outfits', label: 'Bridal Outfits', link: '/bridal-outfits' },
+              { id: 'jewelry-collections', label: 'Jewelry Collections', link: '/jewelry-collections' },
+              { id: 'makeup-styles', label: 'Makeup Styles', link: '/makeup-styles' }
             ]
           },
           {
@@ -47,7 +58,23 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Groom',
             icon: 'fa-male',
             subItems: [
-              { id: 'groom_face_swap', label: 'Create Groom Look', link: '/groom-face-swap' }
+              { id: 'groom-face-swap', label: 'Create Groom Look', link: '/groom-face-swap' },
+              { id: 'traditional-wear', label: 'Traditional Wear', link: '/traditional-wear' },
+              { id: 'modern-suits', label: 'Modern Suits', link: '/modern-suits' },
+              { id: 'groom-accessories', label: 'Accessories', link: '/groom-accessories' }
+            ]
+          },
+          {
+            id: 'services',
+            title: 'Services',
+            icon: 'fa-concierge-bell',
+            subItems: [
+              { id: 'venue-search', label: 'Venue Search', link: '/venue-search' },
+              { id: 'hall-comparison', label: 'Hall Comparison', link: '/hall-comparison' },
+              { id: 'virtual-tours', label: 'Virtual Tours', link: '/virtual-tours' },
+              { id: 'booking-management', label: 'Booking Management', link: '/booking-management' },
+              { id: 'saloons', label: 'Saloons', link: '/saloons' },
+              { id: 'event-managers', label: 'Event Managers', link: '/event-managers' }
             ]
           }
         ]);

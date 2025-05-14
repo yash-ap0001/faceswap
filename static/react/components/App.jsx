@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import MainContent from './MainContent';
+import HomePage from './pages/HomePage';
+import BridalSwapPage from './pages/BridalSwapPage';
+import BridalGalleryPage from './pages/BridalGalleryPage';
 
 /**
  * Main App component that manages the application layout and state
@@ -23,6 +26,9 @@ const App = () => {
     setCurrentPage(page);
     setActiveItem(page);
     
+    // Update URL hash for deep linking
+    window.location.hash = page;
+    
     // For mobile views, close sidebar after navigation
     if (window.innerWidth < 768) {
       setSidebarOpen(false);
@@ -34,19 +40,42 @@ const App = () => {
     // Set initial sidebar state (closed by default)
     setSidebarOpen(false);
     
+    // Check for hash in URL first (for deep linking)
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      setActiveItem(hash);
+      setCurrentPage(hash);
+      return;
+    }
+    
     // Determine initial active page based on current URL path
     const path = window.location.pathname;
-    if (path.includes('bridal_gallery')) {
-      setActiveItem('bridal_gallery');
-      setCurrentPage('bridal_gallery');
-    } else if (path.includes('bridal_swap')) {
-      setActiveItem('bridal_swap');
-      setCurrentPage('bridal_swap');
+    if (path.includes('bridal-gallery')) {
+      setActiveItem('bridal-gallery');
+      setCurrentPage('bridal-gallery');
+    } else if (path.includes('bridal-swap')) {
+      setActiveItem('bridal-swap');
+      setCurrentPage('bridal-swap');
     } else {
       setActiveItem('home');
       setCurrentPage('home');
     }
   }, []);
+
+  // Render the appropriate page component based on currentPage
+  const renderPageContent = () => {
+    switch (currentPage) {
+      case 'home':
+        return <HomePage />;
+      case 'bridal-swap':
+        return <BridalSwapPage />;
+      case 'bridal-gallery':
+        return <BridalGalleryPage />;
+      default:
+        // For pages that don't have dedicated components yet
+        return <MainContent currentPage={currentPage} />;
+    }
+  };
 
   return (
     <div className="app-container">
@@ -61,11 +90,11 @@ const App = () => {
           onClick={toggleSidebar}
           aria-label="Toggle sidebar"
         >
-          {sidebarOpen ? '◄' : '►'}
+          <i className={`fas fa-chevron-${sidebarOpen ? 'left' : 'right'}`}></i>
         </button>
-        <MainContent 
-          currentPage={currentPage}
-        />
+        <div className="content-container">
+          {renderPageContent()}
+        </div>
       </div>
     </div>
   );
