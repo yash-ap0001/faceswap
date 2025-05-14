@@ -364,9 +364,9 @@
                             </div>
                             
                             <div class="form-check form-switch d-inline-block me-3 mb-3">
-                                <input class="form-check-input" type="checkbox" id="enhanceCheck" checked>
+                                <input class="form-check-input" type="checkbox" id="enhanceCheck">
                                 <label class="form-check-label" for="enhanceCheck">
-                                    Enhance faces
+                                    Auto Enhance faces
                                 </label>
                             </div>
                             
@@ -650,7 +650,7 @@
                                     const formData = new FormData();
                                     formData.append('source', sourceFile);
                                     formData.append('template_path', templatePath);
-                                    formData.append('enhance', true); // Enable enhancement by default
+                                    formData.append('enhance', false); // Disable enhancement by default
                                     
                                     // Perform swap via AJAX
                                     fetch('/process_template', {
