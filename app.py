@@ -1260,35 +1260,82 @@ def bridal_results():
 def process_template():
     """
     Process a single template with the source face (for AJAX requests)
-    Expects:
-    - source_path: path to the source image
-    - template_path: path to the template image
-    - enhance: whether to enhance the face after swapping (optional)
-    - enhance_method: enhancement method to use (optional: "gfpgan", "codeformer", or "auto")
+    Accepts data in two forms:
+    1. JSON: 
+       - source_path: path to the source image
+       - template_path: path to the template image
+       
+    2. Form data:
+       - source: uploaded source image file
+       - template_path: path to the template image
+       
+    Common parameters:   
+       - enhance: whether to enhance the face after swapping (optional)
+       - enhance_method: enhancement method to use (optional: "gfpgan", "codeformer", or "auto")
+       
     Returns:
-    - JSON with result path or error
+       - JSON with result path or error
     """
     if faceapp is None or swapper is None:
         return jsonify({'success': False, 'error': 'Models not loaded'})
+    
+    # Handle both JSON and form data
+    source_path = None
+    template_path = None
+    enhance = False
+    enhance_method = 'auto'
+    source_img = None
+    
+    # Process form data or JSON data
+    if request.is_json:
+        data = request.get_json()
+        source_path = data.get('source_path')
+        template_path = data.get('template_path')
+        enhance = data.get('enhance', False)
+        enhance_method = data.get('enhance_method', 'auto')
         
-    data = request.get_json()
-    source_path = data.get('source_path')
-    template_path = data.get('template_path')
-    
-    # Face enhancement options
-    enhance = data.get('enhance', False)
-    enhance_method = data.get('enhance_method', 'auto')
-    
-    if not source_path or not template_path:
-        return jsonify({'success': False, 'error': 'Missing source or template path'})
-    
-    try:
-        # Read source and template images
+        if not source_path or not template_path:
+            return jsonify({'success': False, 'error': 'Missing source or template path'})
+            
+        # Read source image
         source_img = cv2.imread(source_path)
+    else:
+        # Handle form data
+        if 'source' not in request.files:
+            return jsonify({'success': False, 'error': 'No source file provided'})
+            
+        source_file = request.files['source']
+        template_path = request.form.get('template_path')
+        enhance = request.form.get('enhance') == 'true'
+        enhance_method = request.form.get('enhance_method', 'auto')
+        
+        if not source_file or not template_path:
+            return jsonify({'success': False, 'error': 'Missing source file or template path'})
+        
+        # Save the uploaded source file
+        timestamp = int(time.time())
+        source_filename = f"source_{timestamp}_{secure_filename(source_file.filename)}"
+        source_path = os.path.join(app.config['UPLOAD_FOLDER'], 'sources', source_filename)
+        
+        # Create directory if it doesn't exist
+        os.makedirs(os.path.dirname(source_path), exist_ok=True)
+        
+        # Save the file
+        source_file.save(source_path)
+        
+        # Read the source image
+        source_img = cv2.imread(source_path)
+    
+    # Continue with processing
+    try:
+        # Read template image
         template_img = cv2.imread(template_path)
         
-        if source_img is None or template_img is None:
-            return jsonify({'success': False, 'error': 'Failed to read images'})
+        if source_img is None:
+            return jsonify({'success': False, 'error': f'Failed to read source image: {source_path}'})
+            
+        if template_img is None:
+            return jsonify({'success': False, 'error': f'Failed to read template image: {template_path}'})
             
         # Detect faces
         source_faces = faceapp.get(source_img)
@@ -1341,6 +1388,8 @@ def process_template():
         
     except Exception as e:
         app.logger.error(f"Error processing template: {str(e)}")
+        import traceback
+        app.logger.error(traceback.format_exc())
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/bridal-swap', methods=['GET', 'POST'])
