@@ -659,7 +659,10 @@ const BridalSwapPage = () => {
                     style={{ 
                       transform: `scale(${zoomLevel})`,
                       transformOrigin: 'center',
-                      transition: 'transform 0.3s ease'
+                      transition: 'transform 0.3s ease',
+                      maxHeight: '90vh',
+                      maxWidth: '100%',
+                      objectFit: 'contain'
                     }}
                   />
                 </div>

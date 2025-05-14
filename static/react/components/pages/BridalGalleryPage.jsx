@@ -221,7 +221,8 @@ const BridalGalleryPage = () => {
                   style={{ 
                     transform: `scale(${zoomLevel})`,
                     transition: 'transform 0.3s ease',
-                    maxHeight: '80vh',
+                    maxHeight: '90vh',
+                    maxWidth: '100%',
                     objectFit: 'contain'
                   }} 
                   className="img-fluid" 
@@ -271,30 +272,46 @@ const BridalGalleryPage = () => {
           cursor: pointer;
           overflow: hidden;
           transition: transform 0.3s ease;
-          height: 200px;
+          height: 230px;
           display: flex;
           align-items: center;
           justify-content: center;
+          margin-bottom: 8px;
         }
         
         .gallery-item img {
           width: 100%;
-          height: 200px;
+          height: 230px;
           object-fit: contain;
           background-color: rgba(0, 0, 0, 0.03);
         }
         
+        .row {
+          margin-right: -5px;
+          margin-left: -5px;
+        }
+        
+        .col-md-3, .col-sm-4, .col-6 {
+          padding-right: 5px;
+          padding-left: 5px;
+        }
+        
         @media (max-width: 576px) {
           .gallery-item, .gallery-item img {
-            height: 160px;
+            height: 180px;
           }
           
           .col-6 {
-            padding: 4px;
+            padding: 3px;
           }
           
           .gallery-item img {
             object-fit: contain; /* Ensure consistent image display on mobile */
+          }
+          
+          .row {
+            margin-right: -3px;
+            margin-left: -3px;
           }
         }
         
