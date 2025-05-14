@@ -25,19 +25,35 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
         console.log('DEBUG: About to fetch menu data from API');
         
         // Actually fetch menu from API instead of using hardcoded values
-        const response = await fetch('/api/menu');
+        const response = await fetch('/api/menu', {
+          headers: {
+            'Accept': 'application/json',
+            'Cache-Control': 'no-cache'
+          }
+        });
         
         console.log('DEBUG: API response status:', response.status);
+        console.log('DEBUG: API response headers:', Object.fromEntries([...response.headers]));
         
         if (!response.ok) {
           throw new Error(`Failed to fetch menu: ${response.status}`);
         }
         
-        const data = await response.json();
+        const responseText = await response.text();
+        console.log('DEBUG: Raw response text:', responseText);
+        
+        let data;
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('DEBUG: Error parsing JSON response:', parseError);
+          throw new Error('Invalid JSON response');
+        }
+        
         console.log('DEBUG: Menu data from API:', data);
         
         if (data && data.menu && Array.isArray(data.menu)) {
-          console.log('DEBUG: Setting menu items:', data.menu);
+          console.log('DEBUG: Setting menu items:', data.menu.length, 'items');
           setMenuItems(data.menu);
         } else {
           console.error('DEBUG: Invalid menu data format from API:', data);

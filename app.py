@@ -518,6 +518,7 @@ def api_menu():
     API endpoint to get the menu structure for the React sidebar.
     Returns a JSON object with the menu structure.
     """
+    app.logger.info("API menu endpoint called")
     menu = [
         {
             "id": "universal",
@@ -565,7 +566,9 @@ def api_menu():
         }
     ]
     
-    return jsonify(menu)
+    menu_response = {'menu': menu}
+    app.logger.info(f"Sending menu response: {menu_response}")
+    return jsonify(menu_response)
 
 @app.route('/api/content/<path:page_id>')
 def api_content(page_id):
