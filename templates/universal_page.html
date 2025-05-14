@@ -375,11 +375,21 @@
                         <!-- Image Viewer for Selected Template -->
                         <div id="templateViewerSection" class="mb-3" style="display: none;">
                             <div class="row">
-                                <div class="col-md-8 mx-auto text-center">
-                                    <div class="card mb-2">
-                                        <img id="selectedTemplateImage" class="img-fluid" style="max-height: 500px; object-fit: contain;" src="">
-                                        <div class="card-body p-2">
+                                <div class="col-lg-10 mx-auto text-center">
+                                    <div class="card mb-2 shadow-sm">
+                                        <img id="selectedTemplateImage" class="img-fluid" style="max-height: 650px; object-fit: contain; border-radius: 8px 8px 0 0;" src="">
+                                        <div class="card-body p-2 d-flex justify-content-between align-items-center">
                                             <p id="selectedTemplateName" class="small mb-0"></p>
+                                            <div>
+                                                <button class="btn btn-sm btn-outline-primary me-2 process-single-btn" 
+                                                    data-template-path="" id="processViewedTemplateBtn">
+                                                    <i class="fas fa-exchange-alt"></i> Use This Template
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary" 
+                                                    onclick="document.getElementById('selectedTemplateImage').requestFullscreen();">
+                                                    <i class="fas fa-expand"></i> Full Screen
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -701,6 +711,12 @@
                                     const viewerImg = document.getElementById('selectedTemplateImage');
                                     viewerImg.src = e.target.src;
                                     
+                                    // Set the template path on the "Use This Template" button
+                                    const processBtn = document.getElementById('processViewedTemplateBtn');
+                                    if (processBtn) {
+                                        processBtn.dataset.templatePath = templatePath;
+                                    }
+                                    
                                     document.getElementById('selectedTemplateName').textContent = templateName;
                                     
                                     // Scroll to viewer
@@ -1005,6 +1021,110 @@
                         document.body.removeChild(link);
                     }, index * 300); // Add delay between downloads
                 });
+            });
+            
+            // Handle the "Use This Template" button in the template viewer
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('#processViewedTemplateBtn')) {
+                    const btn = e.target.closest('#processViewedTemplateBtn');
+                    const templatePath = btn.dataset.templatePath;
+                    
+                    if (!templatePath || !sourceFile) {
+                        alert('Please upload a source image and select a template first.');
+                        return;
+                    }
+                    
+                    // Show loading state
+                    const originalBtnHtml = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+                    
+                    // Process the selected template
+                    const formData = new FormData();
+                    formData.append('source', sourceFile);
+                    formData.append('template_path', templatePath);
+                    formData.append('enhance', document.getElementById('enhanceCheck').checked);
+                    
+                    fetch('/process_template', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(resultData => {
+                        // Reset button state
+                        btn.disabled = false;
+                        btn.innerHTML = originalBtnHtml;
+                        
+                        if (resultData.success) {
+                            // Show the result in the result viewer
+                            const resultViewerSection = document.getElementById('resultViewerSection');
+                            resultViewerSection.style.display = 'block';
+                            
+                            // Get filename from path for display
+                            const filename = resultData.result_path.split('/').pop();
+                            
+                            // Update the main result viewer
+                            document.getElementById('selectedResultImage').src = resultData.result_path;
+                            document.getElementById('selectedResultName').textContent = `Result - ${filename}`;
+                            document.getElementById('selectedResultDownload').href = resultData.result_path;
+                            
+                            // Add to results grid
+                            const resultCol = document.createElement('div');
+                            resultCol.className = 'col-md-4 col-lg-3 mb-3';
+                            
+                            resultCol.innerHTML = `
+                                <div class="card h-100 shadow-sm">
+                                    <div class="position-relative">
+                                        <img src="${resultData.result_path}" class="card-img-top result-image" 
+                                            alt="Result" 
+                                            data-result-path="${resultData.result_path}"
+                                            data-result-name="Result - ${filename}"
+                                            style="height: 220px; object-fit: cover; cursor: pointer; border-radius: 6px 6px 0 0;">
+                                        <div class="position-absolute top-0 end-0 p-2">
+                                            <button class="btn btn-sm btn-light rounded-circle shadow-sm" 
+                                                onclick="window.open('${resultData.result_path}', '_blank')" 
+                                                title="Open in new tab">
+                                                <i class="fas fa-external-link-alt"></i>
+                                            </button>
+                                        </div>
+                                        <div class="position-absolute bottom-0 start-0 p-2">
+                                            <span class="badge bg-dark text-white">
+                                                Result
+                                            </span>
+                                        </div>
+                                        <div class="position-absolute bottom-0 end-0 p-2">
+                                            <a href="${resultData.result_path}" class="btn btn-sm btn-primary rounded-circle shadow-sm" download title="Download">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            // Add to results container
+                            const resultsContainer = document.getElementById('resultsContainer');
+                            resultsContainer.appendChild(resultCol);
+                            
+                            // Show download all button
+                            document.getElementById('downloadAllBtn').style.display = 'block';
+                            
+                            // Scroll to the result
+                            document.getElementById('resultViewerSection').scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'start' 
+                            });
+                        } else {
+                            alert('Error processing template: ' + (resultData.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        // Reset button state
+                        btn.disabled = false;
+                        btn.innerHTML = originalBtnHtml;
+                        console.error('Error processing template:', error);
+                        alert('Error processing template: ' + error);
+                    });
+                }
             });
         });
     </script>
