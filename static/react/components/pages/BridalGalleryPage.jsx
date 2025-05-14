@@ -216,7 +216,7 @@ const BridalGalleryPage = () => {
                   style={{ 
                     transform: `scale(${zoomLevel})`,
                     transition: 'transform 0.3s ease',
-                    maxHeight: '90vh',
+                    maxHeight: '95vh',
                     maxWidth: '100%',
                     objectFit: 'contain'
                   }} 
@@ -370,7 +370,7 @@ const BridalGalleryPage = () => {
           border-radius: 8px;
           width: 90%;
           max-width: 900px;
-          max-height: 90vh;
+          max-height: 95vh;
           display: flex;
           flex-direction: column;
         }
@@ -398,7 +398,7 @@ const BridalGalleryPage = () => {
           display: flex;
           justify-content: center;
           align-items: center;
-          height: 60vh;
+          height: 85vh;
         }
         
         .floating-controls {
