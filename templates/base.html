@@ -674,6 +674,35 @@
             background-color: #252530;
             color: white;
         }
+        
+        /* React Banner Styles */
+        .react-banner {
+            background: linear-gradient(90deg, var(--primary-purple), var(--dark-purple));
+            color: white;
+            font-weight: 500;
+            position: relative;
+            z-index: 1001;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .react-banner .btn-outline-light {
+            border-width: 2px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .react-banner .btn-outline-light:hover {
+            background: white;
+            color: var(--primary-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .react-banner .badge {
+            background: linear-gradient(45deg, #61DAFB, #764ABC);
+            font-weight: 700;
+            padding: 0.4em 0.6em;
+        }
     </style>
     {% block style %}{% endblock %}
 </head>
