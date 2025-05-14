@@ -269,6 +269,26 @@ const BridalGalleryPage = () => {
           cursor: pointer;
           overflow: hidden;
           transition: transform 0.3s ease;
+          height: 200px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .gallery-item img {
+          width: 100%;
+          height: 200px;
+          object-fit: cover;
+        }
+        
+        @media (max-width: 576px) {
+          .gallery-item, .gallery-item img {
+            height: 160px;
+          }
+          
+          .col-6 {
+            padding: 4px;
+          }
         }
         
         .gallery-item:hover {
