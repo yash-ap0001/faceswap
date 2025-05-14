@@ -1164,6 +1164,122 @@
                     });
                 }
             });
+            
+            // Image Viewer Modal
+            const imageViewerModal = new bootstrap.Modal(document.getElementById('imageViewerModal'));
+            const zoomImage = document.getElementById('zoomImage');
+            const zoomInBtn = document.getElementById('zoomInBtn');
+            const zoomOutBtn = document.getElementById('zoomOutBtn');
+            const resetZoomBtn = document.getElementById('resetZoomBtn');
+            const downloadImageBtn = document.getElementById('downloadImageBtn');
+            const modalTitle = document.getElementById('imageViewerModalLabel');
+            
+            // Image zoom variables
+            let currentZoom = 1;
+            let dragStartX = 0, dragStartY = 0;
+            let imageX = 0, imageY = 0;
+            let isDragging = false;
+            
+            // Add event listener to all image view buttons
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.view-image-btn')) {
+                    const btn = e.target.closest('.view-image-btn');
+                    const imgSrc = btn.dataset.imgSrc;
+                    const imgName = btn.dataset.imgName || 'Image';
+                    
+                    if (imgSrc) {
+                        // Reset zoom and position
+                        currentZoom = 1;
+                        imageX = 0;
+                        imageY = 0;
+                        updateImageTransform();
+                        
+                        // Set image source and download link
+                        zoomImage.src = imgSrc;
+                        downloadImageBtn.href = imgSrc;
+                        downloadImageBtn.download = imgName.replace(/\s+/g, '_') + '.jpg';
+                        
+                        // Set modal title
+                        modalTitle.textContent = imgName;
+                        
+                        // Show modal
+                        imageViewerModal.show();
+                    }
+                }
+            });
+            
+            // Make template and result images clickable to open in viewer
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('template-preview') || e.target.classList.contains('result-image')) {
+                    const imgSrc = e.target.src;
+                    const imgName = e.target.dataset.templateName || e.target.dataset.resultName || 'Image';
+                    
+                    if (imgSrc) {
+                        // Reset zoom and position
+                        currentZoom = 1;
+                        imageX = 0;
+                        imageY = 0;
+                        updateImageTransform();
+                        
+                        // Set image source and download link
+                        zoomImage.src = imgSrc;
+                        downloadImageBtn.href = imgSrc;
+                        downloadImageBtn.download = imgName.replace(/\s+/g, '_') + '.jpg';
+                        
+                        // Set modal title
+                        modalTitle.textContent = imgName;
+                        
+                        // Show modal
+                        imageViewerModal.show();
+                    }
+                }
+            });
+            
+            // Zoom controls
+            zoomInBtn.addEventListener('click', function() {
+                currentZoom += 0.25;
+                if (currentZoom > 5) currentZoom = 5;
+                updateImageTransform();
+            });
+            
+            zoomOutBtn.addEventListener('click', function() {
+                currentZoom -= 0.25;
+                if (currentZoom < 0.5) currentZoom = 0.5;
+                updateImageTransform();
+            });
+            
+            resetZoomBtn.addEventListener('click', function() {
+                currentZoom = 1;
+                imageX = 0;
+                imageY = 0;
+                updateImageTransform();
+            });
+            
+            // Pan image by dragging
+            zoomImage.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                dragStartX = e.clientX - imageX;
+                dragStartY = e.clientY - imageY;
+                zoomImage.style.cursor = 'grabbing';
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                
+                imageX = e.clientX - dragStartX;
+                imageY = e.clientY - dragStartY;
+                updateImageTransform();
+            });
+            
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+                zoomImage.style.cursor = 'move';
+            });
+            
+            // Update image transform
+            function updateImageTransform() {
+                zoomImage.style.transform = `translate(${imageX}px, ${imageY}px) scale(${currentZoom})`;
+            }
         });
     </script>
 </body>
