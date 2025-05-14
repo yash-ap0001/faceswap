@@ -13,22 +13,16 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Track which accordion section is open (default to "bride")
+  const [openSection, setOpenSection] = useState('bride');
   
   // Fetch menu data from API
   useEffect(() => {
     const fetchMenuData = async () => {
       try {
         setLoading(true);
-        // Use hardcoded menu structure to avoid API calls
+        // Use hardcoded menu structure without Home item
         const defaultMenu = [
-          {
-            id: 'home',
-            title: 'Home',
-            icon: 'fa-home',
-            subItems: [
-              { id: 'home', label: 'Home', link: '/react' }
-            ]
-          },
           {
             id: 'bride',
             title: 'Bride',
@@ -92,6 +86,11 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
     const event = new CustomEvent('routeChange', { detail: { path: link } });
     window.dispatchEvent(event);
   };
+  
+  // Toggle accordion section
+  const toggleSection = (sectionId) => {
+    setOpenSection(prev => prev === sectionId ? null : sectionId);
+  };
 
   // Render loading state
   if (loading) {
@@ -136,28 +135,40 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
       <div className="sidebar-content">
         {menuItems.length > 0 ? (
           menuItems.map((section) => (
-            <div key={section.id} className="menu-section">
-              <div className="section-header">
-                <i className={`fas ${section.icon}`}></i>
-                <span>{section.title}</span>
+            <div key={section.id} className="menu-section accordion-item border-0">
+              <div 
+                className="section-header" 
+                onClick={() => toggleSection(section.id)}
+              >
+                <div className="d-flex align-items-center justify-content-between">
+                  <div>
+                    <i className={`fas ${section.icon} me-2`}></i>
+                    <span>{section.title}</span>
+                  </div>
+                  <i className={`fas fa-chevron-${openSection === section.id ? 'up' : 'down'} small`}></i>
+                </div>
               </div>
-              <ul className="menu-items">
-                {section.subItems.map((item) => (
-                  <li 
-                    key={item.id} 
-                    className={activeItem === item.id ? 'active' : ''}
-                    onClick={() => handleItemClick(item.id, item.link)}
-                  >
-                    <span>{item.label}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className={openSection === section.id ? 'show' : 'collapse'}>
+                <ul className="menu-items">
+                  {section.subItems.map((item) => (
+                    <li 
+                      key={item.id} 
+                      className={activeItem === item.id ? 'active' : ''}
+                      onClick={() => handleItemClick(item.id, item.link)}
+                    >
+                      <span>{item.label}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           ))
         ) : (
           <p className="text-center text-secondary py-4">No menu items available</p>
         )}
       </div>
+      
+      {/* CSS added to App.jsx stylesheet */}
     </div>
   );
 };

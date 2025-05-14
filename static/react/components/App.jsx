@@ -96,6 +96,45 @@ const App = () => {
           {renderPageContent()}
         </div>
       </div>
+      
+      {/* Custom CSS for sidebar accordion */}
+      <style>
+        {`
+          .sidebar {
+            max-height: 100vh;
+            overflow-y: auto;
+          }
+          
+          .sidebar-content {
+            overflow-y: auto;
+            max-height: calc(100vh - 60px);
+          }
+          
+          .section-header {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            border-radius: 4px;
+            margin-bottom: 2px;
+          }
+          
+          .section-header:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+          }
+          
+          .menu-section .collapse {
+            display: none;
+            height: 0;
+            overflow: hidden;
+            transition: height 0.3s ease;
+          }
+          
+          .menu-section .show {
+            display: block;
+            height: auto;
+          }
+        `}
+      </style>
     </div>
   );
 };
