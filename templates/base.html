@@ -226,13 +226,10 @@
         
         .sidebar-header h5 {
             margin: 0;
-            color: var(--text-primary);
             font-size: 1.4rem;
             font-weight: 600;
-            background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: white;
+            text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         .close-sidebar {
@@ -288,7 +285,7 @@
         .category-title {
             font-size: 1.1rem;
             margin-bottom: 0;
-            color: var(--light-purple);
+            color: white;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -322,15 +319,15 @@
         /* Custom accordion styling */
         .accordion-button {
             font-size: 1.1rem;
-            color: var(--light-purple) !important;
+            color: white !important;
             font-weight: 600;
             padding: 10px;
             border-radius: 0.35rem;
-            background-color: rgba(255, 255, 255, 0.05) !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;
         }
         
         .accordion-button:not(.collapsed) {
-            background-color: rgba(255, 255, 255, 0.1) !important;
+            background-color: rgba(255, 255, 255, 0.2) !important;
             color: white !important;
         }
         
@@ -363,25 +360,25 @@
         }
         
         .sidebar-menu a {
-            color: var(--text-secondary);
+            color: white;
             text-decoration: none;
             display: block;
             padding: 8px 15px;
             border-radius: 6px;
             transition: all 0.3s ease;
-            background-color: rgba(255, 255, 255, 0.03);
+            background-color: rgba(255, 255, 255, 0.08);
         }
         
         .sidebar-menu a:hover {
-            color: var(--text-primary);
-            background-color: rgba(126, 87, 194, 0.15);
+            color: white;
+            background-color: rgba(255, 255, 255, 0.2);
         }
         
         /* Style for active/selected menu item */
         .sidebar-menu a.active {
-            color: var(--text-primary);
-            background-color: rgba(126, 87, 194, 0.25);
-            border-left: 4px solid var(--light-purple);
+            color: white;
+            background-color: rgba(255, 255, 255, 0.25);
+            border-left: 4px solid white;
             padding-left: 11px; /* Compensate for the border */
             font-weight: 500;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
