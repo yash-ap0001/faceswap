@@ -29,40 +29,51 @@
         }
         
         .app-container {
-            display: flex;
             min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
         }
         
         .brand-name {
-            background: linear-gradient(90deg, #8a2be2, #9d4edd);
+            background: linear-gradient(45deg, #6a0dad, #8a2be2, #9d4edd);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-weight: bold;
+            font-weight: 900;
+            font-style: italic;
             letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .logo-text {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin: 0;
+            padding: 0;
         }
         
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 250px;
+        .app-header {
             background-color: #1a1a1a;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            padding: 15px 25px;
+            position: sticky;
+            top: 0;
             z-index: 1000;
-            overflow-y: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-header .logo-container {
+            display: flex;
+            align-items: center;
         }
         
         .main-container {
             flex: 1;
-            margin-left: 250px;
             position: relative;
-            min-height: 100vh;
+            min-height: calc(100vh - 70px);
+            width: 100%;
         }
         
         .content-container {
