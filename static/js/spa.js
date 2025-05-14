@@ -13,45 +13,68 @@ document.addEventListener('DOMContentLoaded', function() {
 function initSPA() {
     console.log('Initializing SPA functionality');
     
-    // Intercept all internal link clicks
-    document.addEventListener('click', function(event) {
-        // Find closest anchor tag if the click was on a child element
-        const link = event.target.closest('a');
-        
-        // If not a link, don't intercept
-        if (!link) {
-            return;
-        }
-        
-        // Get href attribute and check if it exists
-        const href = link.getAttribute('href');
-        if (!href) {
-            return;
-        }
-        
-        // If it's an external link or has special behavior, don't intercept
-        if (href.startsWith('http') ||
-            href.startsWith('#') ||
-            href === '' ||
-            link.getAttribute('target') === '_blank' ||
-            link.getAttribute('download') ||
-            link.getAttribute('onclick')) {
-            return;
-        }
+    try {
+        // Intercept all internal link clicks
+        document.addEventListener('click', function(event) {
+            try {
+                // Find closest anchor tag if the click was on a child element
+                const link = event.target.closest('a');
+                
+                // If not a link, don't intercept
+                if (!link) {
+                    return;
+                }
+                
+                // Get href attribute and check if it exists
+                const href = link.getAttribute('href');
+                if (!href) {
+                    return;
+                }
+                
+                // Special cases - don't intercept these
+                if (href.startsWith('http') ||      // External links
+                    href.startsWith('#') ||         // Anchor links
+                    href === '' ||                  // Empty links
+                    href.includes('logout') ||      // Logout links (needs full reload)
+                    href.includes('login') ||       // Login links (needs full reload)
+                    href.includes('upload_file') || // File upload endpoints
+                    link.getAttribute('target') === '_blank' || // New window links
+                    link.getAttribute('download') || // Download links
+                    link.hasAttribute('data-no-spa') || // Explicitly marked to avoid SPA
+                    link.hasAttribute('onclick'))   // Has onclick handler
+                {
+                    console.log('Not intercepting link:', href);
+                    return;
+                }
 
-        // Prevent default anchor click behavior
-        event.preventDefault();
-        
-        // Navigate to the link using our SPA loader
-        navigateTo(link.getAttribute('href'));
-    });
+                // Debug info
+                console.log('Intercepting link click:', href);
+                
+                // Prevent default anchor click behavior
+                event.preventDefault();
+                
+                // Navigate to the link using our SPA loader
+                navigateTo(href);
+            } catch (error) {
+                console.error('Error in click handler:', error);
+            }
+        });
 
-    // Handle browser history navigation (back/forward buttons)
-    window.addEventListener('popstate', function(event) {
-        if (event.state) {
-            loadContent(event.state.path, false);
-        }
-    });
+        // Handle browser history navigation (back/forward buttons)
+        window.addEventListener('popstate', function(event) {
+            try {
+                if (event.state && event.state.path) {
+                    loadContent(event.state.path, false);
+                }
+            } catch (error) {
+                console.error('Error in popstate handler:', error);
+            }
+        });
+        
+        console.log('SPA initialization complete');
+    } catch (error) {
+        console.error('Error initializing SPA:', error);
+    }
 }
 
 /**
@@ -75,9 +98,12 @@ function loadContent(url, updateActiveState = true) {
     console.log(`Loading content from: ${url}`);
     
     // Show loading indicator
-    const contentArea = document.querySelector('.content-area');
+    const contentArea = document.querySelector('main');
     if (contentArea) {
-        contentArea.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        contentArea.innerHTML = '<div class="container"><div class="text-center p-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div></div>';
+    } else {
+        console.error('Main content area not found');
+        return;
     }
     
     // Fetch the HTML content from the server
@@ -89,36 +115,42 @@ function loadContent(url, updateActiveState = true) {
             return response.text();
         })
         .then(html => {
-            // Create a temporary element to parse the HTML
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            
-            // Extract the main content from the loaded page
-            const newContent = doc.querySelector('.content-area');
-            
-            // Update the page content if content area found
-            if (newContent && contentArea) {
-                contentArea.innerHTML = newContent.innerHTML;
+            try {
+                // Create a temporary element to parse the HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
                 
-                // Update page title
-                const newTitle = doc.querySelector('title');
-                if (newTitle) {
-                    document.title = newTitle.textContent;
+                // Extract the main content from the loaded page
+                const newContent = doc.querySelector('main');
+                
+                // Update the page content if content area found
+                if (newContent) {
+                    // Only update the inner content of main
+                    contentArea.innerHTML = newContent.innerHTML;
+                    
+                    // Update page title
+                    const newTitle = doc.querySelector('title');
+                    if (newTitle) {
+                        document.title = newTitle.textContent;
+                    }
+                    
+                    // Execute any scripts in the new content
+                    executeScripts(contentArea);
+                    
+                    // Update active state in sidebar if needed
+                    if (updateActiveState) {
+                        updateActiveSidebarItem(url);
+                    }
+                    
+                    // Scroll to top
+                    window.scrollTo(0, 0);
+                } else {
+                    console.error('Could not find main content in loaded page');
+                    // If content area not found, redirect to the page (fallback)
+                    window.location.href = url;
                 }
-                
-                // Execute any scripts in the new content
-                executeScripts(contentArea);
-                
-                // Update active state in sidebar if needed
-                if (updateActiveState) {
-                    updateActiveSidebarItem(url);
-                }
-                
-                // Scroll to top
-                window.scrollTo(0, 0);
-            } else {
-                console.error('Could not find content area in loaded page');
-                // If content area not found, redirect to the page (fallback)
+            } catch (error) {
+                console.error('Error processing HTML:', error);
                 window.location.href = url;
             }
         })
@@ -168,31 +200,58 @@ function executeScripts(contentArea) {
  * @param {string} url - The current URL
  */
 function updateActiveSidebarItem(url) {
-    // Remove active class from all sidebar items
-    document.querySelectorAll('.accordion-body a').forEach(link => {
-        link.classList.remove('active');
-    });
-    
-    // Find the matching sidebar item and make it active
-    document.querySelectorAll('.accordion-body a').forEach(link => {
-        const linkHref = link.getAttribute('href');
-        if (linkHref && (linkHref === url || url.endsWith(linkHref))) {
-            link.classList.add('active');
-            
-            // Open the parent accordion if it's closed
-            const accordionItem = link.closest('.accordion-collapse');
-            if (accordionItem && !accordionItem.classList.contains('show')) {
-                const accordionId = accordionItem.getAttribute('id');
-                const accordionButton = document.querySelector(`[data-bs-target="#${accordionId}"]`);
-                if (accordionButton) {
-                    try {
-                        const bsCollapse = new bootstrap.Collapse(accordionItem);
-                        bsCollapse.show();
-                    } catch (error) {
-                        console.error('Error showing accordion:', error);
+    try {
+        console.log('Updating active sidebar item for URL:', url);
+        
+        // Remove active class from all sidebar items
+        const allLinks = document.querySelectorAll('.accordion-body a');
+        allLinks.forEach(link => {
+            try {
+                link.classList.remove('active');
+            } catch (e) {
+                console.error('Error removing active class:', e);
+            }
+        });
+        
+        // Find the matching sidebar item and make it active
+        let foundMatch = false;
+        allLinks.forEach(link => {
+            try {
+                const linkHref = link.getAttribute('href');
+                if (!linkHref) return;
+                
+                // Check for exact match or if the URL ends with the link href
+                if (linkHref === url || url.endsWith(linkHref)) {
+                    console.log('Found matching sidebar link:', linkHref);
+                    link.classList.add('active');
+                    foundMatch = true;
+                    
+                    // Open the parent accordion if it's closed
+                    const accordionItem = link.closest('.accordion-collapse');
+                    if (accordionItem && !accordionItem.classList.contains('show')) {
+                        const accordionId = accordionItem.getAttribute('id');
+                        if (accordionId) {
+                            const accordionButton = document.querySelector(`[data-bs-target="#${accordionId}"]`);
+                            if (accordionButton && typeof bootstrap !== 'undefined') {
+                                try {
+                                    const bsCollapse = new bootstrap.Collapse(accordionItem);
+                                    bsCollapse.show();
+                                } catch (error) {
+                                    console.error('Error showing accordion:', error);
+                                }
+                            }
+                        }
                     }
                 }
+            } catch (e) {
+                console.error('Error processing sidebar link:', e);
             }
+        });
+        
+        if (!foundMatch) {
+            console.log('No matching sidebar item found for:', url);
         }
-    });
+    } catch (error) {
+        console.error('Error updating active sidebar item:', error);
+    }
 }
