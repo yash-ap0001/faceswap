@@ -1280,6 +1280,94 @@
             function updateImageTransform() {
                 zoomImage.style.transform = `translate(${imageX}px, ${imageY}px) scale(${currentZoom})`;
             }
+            
+            // Download All Button Functionality
+            const downloadAllBtn = document.getElementById('downloadAllBtn');
+            downloadAllBtn.addEventListener('click', function() {
+                // Find all result images
+                const resultImages = document.querySelectorAll('.result-image');
+                if (resultImages.length === 0) {
+                    alert('No results to download.');
+                    return;
+                }
+                
+                // Update button state
+                const originalBtnHtml = downloadAllBtn.innerHTML;
+                downloadAllBtn.disabled = true;
+                downloadAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Preparing...';
+                
+                // Create a zip file with JSZip
+                const JSZipScript = document.createElement('script');
+                JSZipScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+                document.head.appendChild(JSZipScript);
+                
+                JSZipScript.onload = function() {
+                    const zip = new JSZip();
+                    let pending = resultImages.length;
+                    
+                    // For each result image, add to zip
+                    resultImages.forEach((img, index) => {
+                        const imgSrc = img.src;
+                        const imgName = img.dataset.resultName || `result_${index + 1}.jpg`;
+                        const fileName = imgName.replace(/\s+/g, '_') + '.jpg';
+                        
+                        // Fetch the image as blob
+                        fetch(imgSrc)
+                            .then(response => response.blob())
+                            .then(blob => {
+                                zip.file(fileName, blob);
+                                pending--;
+                                
+                                downloadAllBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i> Processing (${resultImages.length - pending}/${resultImages.length})`;
+                                
+                                // When all images are processed, generate the zip
+                                if (pending === 0) {
+                                    zip.generateAsync({ type: 'blob' })
+                                        .then(content => {
+                                            // Create download link
+                                            const link = document.createElement('a');
+                                            link.href = URL.createObjectURL(content);
+                                            link.download = 'wedding_results.zip';
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                            
+                                            // Reset button
+                                            downloadAllBtn.disabled = false;
+                                            downloadAllBtn.innerHTML = originalBtnHtml;
+                                        });
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error downloading image:', error);
+                                pending--;
+                                
+                                // If all images are processed (even with errors), generate the zip
+                                if (pending === 0) {
+                                    zip.generateAsync({ type: 'blob' })
+                                        .then(content => {
+                                            const link = document.createElement('a');
+                                            link.href = URL.createObjectURL(content);
+                                            link.download = 'wedding_results.zip';
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                            
+                                            // Reset button
+                                            downloadAllBtn.disabled = false;
+                                            downloadAllBtn.innerHTML = originalBtnHtml;
+                                        });
+                                }
+                            });
+                    });
+                };
+                
+                JSZipScript.onerror = function() {
+                    alert('Failed to load JSZip library. Please try again later.');
+                    downloadAllBtn.disabled = false;
+                    downloadAllBtn.innerHTML = originalBtnHtml;
+                };
+            });
         });
     </script>
 </body>
