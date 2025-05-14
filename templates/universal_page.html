@@ -530,6 +530,8 @@
             const fileInput = document.getElementById('fileInput');
             const uploadArea = document.getElementById('uploadArea');
             const sourcePreview = document.getElementById('sourcePreview');
+            const previewContainer = document.getElementById('previewContainer');
+            const changePhotoBtn = document.getElementById('changePhotoBtn');
             const templatesSection = document.getElementById('templatesSection');
             const categorySelect = document.getElementById('categorySelect');
             const subcategorySelect = document.getElementById('subcategorySelect');
@@ -571,6 +573,14 @@
             
             fileInput.addEventListener('change', (e) => {
                 handleFileUpload(e.target.files);
+            });
+            
+            // Handle change photo button click
+            changePhotoBtn.addEventListener('click', () => {
+                // Reset UI
+                previewContainer.style.display = 'none';
+                uploadArea.style.display = 'flex';
+                document.getElementById('optionsInfo').innerHTML = '<p class="mb-1"><i class="fas fa-info-circle me-1"></i> Upload your photo first, then select category options</p>';
             });
             
             // Handle drag and drop
