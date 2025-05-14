@@ -496,6 +496,8 @@
     
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
     <!-- Custom JavaScript -->
     <script>
@@ -1052,24 +1054,72 @@
                     });
             });
             
-            // Handle "Download All" button for batch downloading results
+            // Handle "Download All" button for batch downloading results as ZIP
             document.getElementById('downloadAllBtn').addEventListener('click', () => {
                 const resultImages = document.querySelectorAll('.result-image');
-                if (resultImages.length === 0) return;
+                if (resultImages.length === 0) {
+                    alert('No results to download.');
+                    return;
+                }
                 
-                // For each result, create a temporary link and click it
+                // Disable the button and show processing state
+                const downloadBtn = document.getElementById('downloadAllBtn');
+                const originalText = downloadBtn.innerHTML;
+                downloadBtn.disabled = true;
+                downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Creating ZIP...';
+                
+                // Create a new ZIP file
+                const zip = new JSZip();
+                const resultsFolder = zip.folder("face_swap_results");
+                let completedCount = 0;
+                
+                // Function to fetch an image and add it to the ZIP
+                const addImageToZip = (url, filename) => {
+                    // Fetch the image as a blob
+                    return fetch(url)
+                        .then(response => response.blob())
+                        .then(blob => {
+                            // Add the image to the ZIP
+                            resultsFolder.file(filename, blob);
+                            completedCount++;
+                            
+                            // Update button text with progress
+                            downloadBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i> Creating ZIP (${completedCount}/${resultImages.length})...`;
+                            
+                            // If all images have been added, generate and download the ZIP
+                            if (completedCount === resultImages.length) {
+                                zip.generateAsync({type: "blob"})
+                                    .then(zipBlob => {
+                                        // Create download link for the ZIP
+                                        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                                        saveAs(zipBlob, `face_swap_results_${timestamp}.zip`);
+                                        
+                                        // Reset button
+                                        downloadBtn.disabled = false;
+                                        downloadBtn.innerHTML = originalText;
+                                    });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error adding image to ZIP:', error);
+                            alert('Error creating ZIP file. Please try again.');
+                            downloadBtn.disabled = false;
+                            downloadBtn.innerHTML = originalText;
+                        });
+                };
+                
+                // Process each image
+                const promises = [];
                 resultImages.forEach((img, index) => {
                     const path = img.dataset.resultPath;
                     if (!path) return;
                     
-                    setTimeout(() => {
-                        const link = document.createElement('a');
-                        link.href = path;
-                        link.download = `result_${index+1}.jpg`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    }, index * 300); // Add delay between downloads
+                    // Get the result name or a default filename
+                    const filename = `result_${index+1}_${img.dataset.resultName || path.split('/').pop() || 'image.jpg'}`;
+                    const cleanFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
+                    
+                    // Add this image to the ZIP
+                    promises.push(addImageToZip(path, cleanFilename));
                 });
             });
             

@@ -11,6 +11,7 @@
     "bootstrap": "^5.3.6",
     "css-loader": "^7.1.2",
     "file-loader": "^6.2.0",
+    "jszip": "^3.10.1",
     "react": "^19.1.0",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.1.0",
