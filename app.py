@@ -402,17 +402,24 @@ try:
         
         swapper = get_model(swap_model_path, providers=providers)
         logger.info("Face swap model initialized successfully")
+        
+        # Initialize face enhancer
+        enhancer = FaceEnhancer()
+        logger.info("Face enhancer initialized")
+        
         print("All models loaded successfully!")
     except Exception as e:
         logger.warning(f"Failed to initialize face swap model: {str(e)}")
         logger.warning("Running in demonstration mode with visual indicators instead of actual face swapping")
         swapper = None
+        enhancer = None
         demo_mode = True
 except Exception as e:
     logger.error(f"Error loading models: {str(e)}")
     logger.error(traceback.format_exc())
     faceapp = None
     swapper = None
+    enhancer = None
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
