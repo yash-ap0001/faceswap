@@ -392,10 +392,10 @@ const BridalSwapPage = () => {
               <div className="row g-2">
                 {results.map((result, index) => (
                   <div className="col-6 col-sm-4 col-md-3 col-lg-2" key={`result-${index}`}>
-                    <div className="position-relative">
+                    <div className="position-relative result-container">
                       <img 
                         src={`${result.result_path}?t=${Date.now()}`} 
-                        className="img-fluid rounded shadow-sm" 
+                        className="img-fluid rounded shadow-sm result-image" 
                         alt={`Result ${index + 1}`} 
                         onError={(e) => {
                           console.error(`Failed to load image: ${result.result_path}`);
@@ -430,6 +430,42 @@ const BridalSwapPage = () => {
           cursor: pointer;
           transition: all 0.2s ease;
           border-radius: 0.25rem;
+          height: 200px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+        
+        .template-card img, .position-relative img, .result-image {
+          object-fit: cover;
+          width: 100%;
+          height: 200px;
+        }
+        
+        .result-container {
+          height: 200px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          border-radius: 0.25rem;
+        }
+
+        @media (max-width: 576px) {
+          .template-card, .template-card img, .position-relative img, .result-image, .result-container {
+            height: 160px;
+          }
+          
+          .col-6 {
+            padding: 4px;
+          }
+          
+          .btn-sm {
+            width: 20px !important;
+            height: 20px !important;
+            font-size: 10px !important;
+          }
         }
         
         .template-card:hover {
