@@ -5,134 +5,95 @@ This will organize images from the attached_assets folder into the template stru
 
 import os
 import shutil
+from pathlib import Path
 import cv2
 import numpy as np
 
 def create_template_samples():
     """Create sample templates for each ceremony type."""
-    # Create template directories
-    template_dir = 'uploads/templates'
-    os.makedirs(template_dir, exist_ok=True)
+    # Define ceremony types
+    ceremony_types = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
     
-    for template_type in ['real', 'natural', 'ai']:
-        type_dir = os.path.join(template_dir, template_type)
-        os.makedirs(type_dir, exist_ok=True)
+    # Create base directories for templates
+    base_dir = Path("static/images/templates")
+    base_dir.mkdir(exist_ok=True, parents=True)
     
-    # Map attached assets to template types and ceremonies
-    asset_mapping = {
-        'real': {
-            'haldi': ['attached_assets/weeding saree.jpg'],
-            'mehendi': ['attached_assets/halfhand.jpg'],
-            'sangeeth': ['attached_assets/jewellary.jpg'],
-            'wedding': ['attached_assets/voni dress.jpg', 'attached_assets/full dress.jpg'],
-            'reception': ['attached_assets/jewellary.jpg']
-        }
-    }
-    
-    # Process all mapped assets
-    for template_type, ceremonies in asset_mapping.items():
-        type_dir = os.path.join(template_dir, template_type)
+    for ceremony in ceremony_types:
+        ceremony_dir = base_dir / ceremony
+        ceremony_dir.mkdir(exist_ok=True)
         
-        for ceremony, assets in ceremonies.items():
-            # Each ceremony should have up to 5 templates
-            max_templates = min(5, len(assets))
+        # Check if the directory already has templates
+        existing_templates = list(ceremony_dir.glob('*.jpg'))
+        if existing_templates:
+            print(f"Directory {ceremony_dir} already has {len(existing_templates)} templates. Skipping.")
+            continue
             
-            for i in range(max_templates):
-                asset_path = assets[i % len(assets)]  # Loop through available assets if not enough
-                
-                if os.path.exists(asset_path):
-                    # Copy to type-specific directory
-                    output_path = os.path.join(type_dir, f"{ceremony}_{i+1}.jpg")
-                    shutil.copy(asset_path, output_path)
-                    
-                    # Also create the combined template filename
-                    combined_path = os.path.join(template_dir, f"{ceremony}_{template_type}.jpg")
-                    if not os.path.exists(combined_path):
-                        shutil.copy(asset_path, combined_path)
-
-    # Create placeholder images for missing templates
-    create_placeholder_templates(template_dir)
+        print(f"Creating templates for {ceremony}...")
+        
+        # Look for source images in attached_assets
+        source_dir = Path("attached_assets")
+        source_images = list(source_dir.glob('*.jpg'))
+        
+        if not source_images:
+            # Create basic placeholder instead
+            print(f"No source images found for {ceremony}. Creating placeholders.")
+            create_placeholder_templates(ceremony_dir)
+            continue
+            
+        # Use the first 6 images or fewer if not enough images
+        count = min(6, len(source_images))
+        for i in range(count):
+            source_path = source_images[i]
+            target_path = ceremony_dir / f"{i+1}.jpg"
+            
+            # Copy the image
+            try:
+                shutil.copy(source_path, target_path)
+                print(f"  Copied {source_path.name} to {target_path}")
+            except Exception as e:
+                print(f"  Error copying {source_path.name}: {str(e)}")
+                # Create a placeholder instead
+                create_placeholder_image(target_path, ceremony)
 
 def create_placeholder_templates(template_dir):
     """Create placeholder images for ceremonies that don't have templates."""
-    ceremony_types = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
-    template_types = ['natural', 'ai']
-    
-    # Ceremony-specific colors (BGR format)
-    ceremony_colors = {
-        'haldi': (0, 215, 255),     # Yellow
-        'mehendi': (0, 128, 0),     # Green
-        'sangeeth': (255, 100, 0),  # Blue with orange tint
-        'wedding': (0, 0, 255),     # Red
-        'reception': (128, 0, 128)  # Purple
+    ceremony = template_dir.name
+    for i in range(1, 7):
+        target_path = template_dir / f"{i}.jpg"
+        create_placeholder_image(target_path, ceremony)
+        print(f"  Created placeholder template {i} for {ceremony}")
+
+def create_placeholder_image(path, ceremony_type):
+    """Create a custom placeholder image for the specified ceremony type."""
+    # Define colors for different ceremonies
+    colors = {
+        'haldi': (0, 165, 255),  # Yellow
+        'mehendi': (0, 128, 0),   # Green
+        'sangeeth': (128, 0, 128), # Purple
+        'wedding': (0, 0, 255),    # Red
+        'reception': (255, 0, 0)   # Blue
     }
     
-    for ceremony in ceremony_types:
-        for template_type in template_types:
-            # Check if we need to create this template
-            combined_path = os.path.join(template_dir, f"{ceremony}_{template_type}.jpg")
-            type_dir = os.path.join(template_dir, template_type)
-            
-            if not os.path.exists(combined_path):
-                # Create a placeholder image with ceremony-specific color
-                img_height, img_width = 768, 512
-                img = np.zeros((img_height, img_width, 3), dtype=np.uint8)
-                
-                # Set background color
-                img[:] = ceremony_colors.get(ceremony, (100, 100, 100))
-                
-                # Add text
-                font = cv2.FONT_HERSHEY_SIMPLEX
-                text = f"{ceremony.capitalize()} {template_type.capitalize()}"
-                text_size = cv2.getTextSize(text, font, 1, 2)[0]
-                text_x = (img_width - text_size[0]) // 2
-                text_y = (img_height + text_size[1]) // 2
-                
-                # Add a dark overlay for better text visibility
-                cv2.rectangle(img, 
-                             (text_x - 10, text_y - text_size[1] - 10),
-                             (text_x + text_size[0] + 10, text_y + 10),
-                             (0, 0, 0, 128), -1)
-                
-                cv2.putText(img, text, (text_x, text_y), font, 1, (255, 255, 255), 2)
-                
-                # Save the placeholder image
-                cv2.imwrite(combined_path, img)
-                
-                # Also save in type-specific directory (5 variants)
-                for i in range(1, 6):
-                    subtype_path = os.path.join(type_dir, f"{ceremony}_{i}.jpg")
-                    cv2.imwrite(subtype_path, img)
-            
-            # Ensure there are 5 variants in the type-specific directory
-            for i in range(1, 6):
-                subtype_path = os.path.join(type_dir, f"{ceremony}_{i}.jpg")
-                if not os.path.exists(subtype_path):
-                    # If the combined template exists, copy it
-                    if os.path.exists(combined_path):
-                        shutil.copy(combined_path, subtype_path)
-                    else:
-                        # Create a unique placeholder
-                        img_height, img_width = 768, 512
-                        img = np.zeros((img_height, img_width, 3), dtype=np.uint8)
-                        img[:] = ceremony_colors.get(ceremony, (100, 100, 100))
-                        
-                        # Add text with variant number
-                        font = cv2.FONT_HERSHEY_SIMPLEX
-                        text = f"{ceremony.capitalize()} {template_type.capitalize()} #{i}"
-                        text_size = cv2.getTextSize(text, font, 1, 2)[0]
-                        text_x = (img_width - text_size[0]) // 2
-                        text_y = (img_height + text_size[1]) // 2
-                        
-                        # Add a dark overlay for better text visibility
-                        cv2.rectangle(img, 
-                                    (text_x - 10, text_y - text_size[1] - 10),
-                                    (text_x + text_size[0] + 10, text_y + 10),
-                                    (0, 0, 0, 128), -1)
-                        
-                        cv2.putText(img, text, (text_x, text_y), font, 1, (255, 255, 255), 2)
-                        cv2.imwrite(subtype_path, img)
+    # Get color for this ceremony (default to gray if not found)
+    color = colors.get(ceremony_type, (128, 128, 128))
+    
+    # Create a base image (640x480)
+    img = np.ones((480, 640, 3), dtype=np.uint8) * 255
+    
+    # Add a colored border
+    cv2.rectangle(img, (10, 10), (630, 470), color, 5)
+    
+    # Add ceremony name
+    cv2.putText(img, f"{ceremony_type.upper()} TEMPLATE", (120, 240), 
+                cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+    
+    # Add template number from filename
+    template_num = path.stem
+    cv2.putText(img, f"Template #{template_num}", (250, 300), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
+    
+    # Save the image
+    cv2.imwrite(str(path), img)
 
 if __name__ == "__main__":
     create_template_samples()
-    print("Template samples created successfully!")
