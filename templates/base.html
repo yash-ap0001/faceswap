@@ -383,12 +383,25 @@
         
         /* Style for active/selected menu item */
         .sidebar-menu a.active {
-            color: var(--text-primary);
-            background-color: rgba(126, 87, 194, 0.25);
-            border-left: 4px solid var(--light-purple);
+            color: var(--bs-white);
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
             padding-left: 11px; /* Compensate for the border */
-            font-weight: 500;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Style for active accordion section */
+        .accordion-button.active-section {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            color: var(--bs-white) !important;
+            font-weight: 600;
+        }
+        
+        /* Style for active list item */
+        .sidebar-menu li.active-item {
+            background-color: rgba(255, 255, 255, 0.05);
         }
         
         .setting-item {

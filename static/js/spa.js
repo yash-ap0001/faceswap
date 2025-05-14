@@ -15,12 +15,36 @@ function initSPA() {
     // Store the current page for browser history
     window.currentPage = window.location.pathname;
     
+    // Set the initial active state based on the current URL
+    setInitialActiveState();
+    
     // Set up browser back/forward button handling
     window.addEventListener('popstate', function(event) {
         if (event.state && event.state.url) {
             loadContent(event.state.url, false);
         }
     });
+}
+
+function setInitialActiveState() {
+    // Get the current URL
+    const currentUrl = window.location.pathname;
+    
+    // Find the corresponding sidebar link
+    const sidebarLinks = document.querySelectorAll('.sidebar-menu li a');
+    let activeLink = null;
+    
+    sidebarLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === currentUrl) {
+            activeLink = link;
+        }
+    });
+    
+    // If we found a matching link, set it as active
+    if (activeLink) {
+        updateActiveSidebarItem(activeLink);
+    }
 }
 
 function setupSidebarLinks() {
@@ -219,28 +243,67 @@ function hideLoading() {
 
 function initContentScripts() {
     // Initialize any scripts that need to run when new content is loaded
-    // For example, you might need to set up event handlers for elements in the new content
+    console.log("Initializing content scripts for newly loaded content");
     
     // This would initialize image galleries, if any
     if (typeof initializeGallery === 'function') {
+        console.log("Initializing gallery for new content");
         initializeGallery();
     }
     
     // This would initialize template selection, if any
     if (typeof refreshTemplates === 'function') {
+        console.log("Refreshing templates for new content");
         refreshTemplates();
     }
     
     // This would initialize any file upload previews, if any
     if (typeof setupImagePreviews === 'function') {
+        console.log("Setting up image previews for new content");
         setupImagePreviews();
     }
     
     // This would initialize any accordion components, if any
     const accordionElements = document.querySelectorAll('.accordion');
     if (accordionElements.length > 0) {
+        console.log("Initializing accordions for new content");
         accordionElements.forEach(accordion => {
             new bootstrap.Accordion(accordion);
         });
+    }
+    
+    // Initialize any ceremony tabs if present
+    const ceremonyTabs = document.querySelectorAll('.ceremony-tab');
+    if (ceremonyTabs.length > 0) {
+        console.log("Initializing ceremony tabs for new content");
+        ceremonyTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                if (typeof switchCeremonyType === 'function') {
+                    switchCeremonyType(this.dataset.ceremony);
+                }
+            });
+        });
+    }
+    
+    // Initialize any multi-select functionality
+    if (typeof setupMultiSelectMode === 'function') {
+        console.log("Setting up multi-select mode for new content");
+        setupMultiSelectMode();
+    }
+    
+    // Reinitialize any enhanced dropdowns
+    if (typeof enhanceDropdowns === 'function') {
+        console.log("Enhancing dropdowns for new content");
+        enhanceDropdowns();
+    }
+    
+    // Run any page-specific initialization based on URL
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('bridal-swap') && typeof initializeBridalSwap === 'function') {
+        console.log("Initializing bridal swap page");
+        initializeBridalSwap();
+    } else if (currentPath.includes('bridal-gallery') && typeof initializeBridalGallery === 'function') {
+        console.log("Initializing bridal gallery page");
+        initializeBridalGallery();
     }
 }
