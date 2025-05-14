@@ -19,30 +19,14 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
     const fetchMenuData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/menu');
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch menu data: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        if (data && data.menu) {
-          setMenuItems(data.menu);
-        } else {
-          throw new Error('Invalid menu data structure');
-        }
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching menu data:', err);
-        setError('Failed to load menu data. Please try again later.');
-        // Fallback to default menu items if API fails
-        setMenuItems([
+        // Use hardcoded menu structure to avoid API calls
+        const defaultMenu = [
           {
             id: 'home',
             title: 'Home',
             icon: 'fa-home',
             subItems: [
-              { id: 'home', label: 'Home', link: '/' }
+              { id: 'home', label: 'Home', link: '/react' }
             ]
           },
           {
@@ -50,11 +34,11 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Bride',
             icon: 'fa-female',
             subItems: [
-              { id: 'bridal-gallery', label: 'Bridal Gallery', link: '/bridal-gallery' },
-              { id: 'bridal-swap', label: 'Create Bride Look', link: '/bridal-swap' },
-              { id: 'bridal-outfits', label: 'Bridal Outfits', link: '/bridal-outfits' },
-              { id: 'jewelry-collections', label: 'Jewelry Collections', link: '/jewelry-collections' },
-              { id: 'makeup-styles', label: 'Makeup Styles', link: '/makeup-styles' }
+              { id: 'bridal-gallery', label: 'Bridal Gallery', link: '/react#bridal-gallery' },
+              { id: 'bridal-swap', label: 'Create Bride Look', link: '/react#bridal-swap' },
+              { id: 'bridal-outfits', label: 'Bridal Outfits', link: '/react#bridal-outfits' },
+              { id: 'jewelry-collections', label: 'Jewelry Collections', link: '/react#jewelry-collections' },
+              { id: 'makeup-styles', label: 'Makeup Styles', link: '/react#makeup-styles' }
             ]
           },
           {
@@ -62,10 +46,10 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Groom',
             icon: 'fa-male',
             subItems: [
-              { id: 'groom-face-swap', label: 'Create Groom Look', link: '/groom-face-swap' },
-              { id: 'traditional-wear', label: 'Traditional Wear', link: '/traditional-wear' },
-              { id: 'modern-suits', label: 'Modern Suits', link: '/modern-suits' },
-              { id: 'groom-accessories', label: 'Accessories', link: '/groom-accessories' }
+              { id: 'groom-face-swap', label: 'Create Groom Look', link: '/react#groom-face-swap' },
+              { id: 'traditional-wear', label: 'Traditional Wear', link: '/react#traditional-wear' },
+              { id: 'modern-suits', label: 'Modern Suits', link: '/react#modern-suits' },
+              { id: 'groom-accessories', label: 'Accessories', link: '/react#groom-accessories' }
             ]
           },
           {
@@ -73,15 +57,22 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Services',
             icon: 'fa-concierge-bell',
             subItems: [
-              { id: 'venue-search', label: 'Venue Search', link: '/venue-search' },
-              { id: 'hall-comparison', label: 'Hall Comparison', link: '/hall-comparison' },
-              { id: 'virtual-tours', label: 'Virtual Tours', link: '/virtual-tours' },
-              { id: 'booking-management', label: 'Booking Management', link: '/booking-management' },
-              { id: 'saloons', label: 'Saloons', link: '/saloons' },
-              { id: 'event-managers', label: 'Event Managers', link: '/event-managers' }
+              { id: 'venue-search', label: 'Venue Search', link: '/react#venue-search' },
+              { id: 'hall-comparison', label: 'Hall Comparison', link: '/react#hall-comparison' },
+              { id: 'virtual-tours', label: 'Virtual Tours', link: '/react#virtual-tours' },
+              { id: 'booking-management', label: 'Booking Management', link: '/react#booking-management' },
+              { id: 'saloons', label: 'Saloons', link: '/react#saloons' },
+              { id: 'event-managers', label: 'Event Managers', link: '/react#event-managers' }
             ]
           }
-        ]);
+        ];
+        
+        setMenuItems(defaultMenu);
+        setError(null);
+      } catch (err) {
+        console.error('Error setting menu data:', err);
+        setError('Failed to load menu data. Please try again later.');
+        // Menu already set above, no need for fallback
       } finally {
         setLoading(false);
       }
