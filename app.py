@@ -2428,6 +2428,13 @@ def resize_image_if_needed(image, max_size=1280):
     # Resize image
     return cv2.resize(image, (new_w, new_h))
 
+# Universal face swap page
+@app.route('/universal-face-swap', methods=['GET'])
+@app.route('/universal_face_swap', methods=['GET'])
+def universal_face_swap_page():
+    """Display the universal face swap page."""
+    return render_template('universal_face_swap.html')
+
 # Universal face swap endpoint to work across groom and saloon categories
 @app.route('/universal-face-swap', methods=['POST'])
 @app.route('/universal_face_swap', methods=['POST'])
