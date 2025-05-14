@@ -413,15 +413,35 @@
                 <div id="templatesSection" class="card mb-4" style="display: none;">
                     <div class="card-header bg-dark-purple d-flex justify-content-between align-items-center py-2">
                         <h5 class="card-title mb-0">Available Templates</h5>
-                        <!-- Removed multi-select controls per user request -->
+                        <!-- Multi-select controls - compact version -->
                         <div id="compactControls" class="d-flex align-items-center">
-                            <!-- Auto Enhance and Process Selected buttons removed -->
+                            <div class="form-check form-switch me-3 mb-0">
+                                <input class="form-check-input" type="checkbox" id="enhanceCheck">
+                                <label class="form-check-label small" for="enhanceCheck">Auto Enhance</label>
+                            </div>
+                            <button id="processSelectedBtn" class="btn btn-sm btn-primary">
+                                <i class="fas fa-magic me-1"></i> Process Selected
+                            </button>
                         </div>
                     </div>
                     <div class="card-body">
                         <!-- Template Selection Controls -->
-                        <div id="multiSelectControls" class="d-none">
-                            <!-- Multi-select controls removed per user request -->
+                        <div id="multiSelectControls" class="mb-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <button id="selectAllBtn" class="btn btn-outline-primary btn-sm me-1">
+                                    <i class="fas fa-check-square"></i> All
+                                </button>
+                                <button id="deselectAllBtn" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-square"></i> None
+                                </button>
+                            </div>
+                            <div class="form-check form-switch d-inline-block me-3 mb-0">
+                                <input class="form-check-input" type="checkbox" id="enhanceCheck">
+                                <label class="form-check-label small" for="enhanceCheck">Auto Enhance</label>
+                            </div>
+                            <button id="processSelectedBtn" class="btn btn-sm btn-primary">
+                                <i class="fas fa-magic me-1"></i> Process Selected
+                            </button>
                         </div>
                         
                         <!-- Image Viewer for Selected Template -->
@@ -465,7 +485,7 @@
                     <div class="card-header bg-dark-purple d-flex justify-content-between align-items-center py-2">
                         <h5 class="card-title mb-0">Results</h5>
                         <div class="d-flex">
-                            <button id="toggleTemplatesBtn" class="btn btn-sm btn-outline-light me-2" style="display: none;">
+                            <button id="toggleTemplatesBtn" class="btn btn-sm btn-outline-light me-2">
                                 <i class="fas fa-images me-1"></i> Show Templates
                             </button>
                             <button id="downloadAllBtn" class="btn btn-sm btn-outline-light" style="display: none;">
@@ -474,11 +494,6 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <!-- Processing Status Message -->
-                        <div id="processingStatus" class="alert alert-info text-center" style="display: none;">
-                            Processing template... <i class="fas fa-spinner fa-spin ms-2"></i>
-                        </div>
-
                         <!-- Main Result Viewer -->
                         <div id="resultViewerSection" class="mb-3" style="display: none;">
                             <div class="row">
@@ -744,6 +759,12 @@
                                         <div class="position-relative">
                                             <img src="${template.url}" class="card-img-top template-preview" alt="${template.id}" 
                                                 data-template-path="${template.path}" data-template-name="${template.id}">
+                                            <div class="position-absolute top-0 start-0 p-2">
+                                                <div class="form-check m-0">
+                                                    <input class="form-check-input template-checkbox" type="checkbox" 
+                                                        value="${template.path}" id="check_${template.id}" data-template-id="${template.id}">
+                                                </div>
+                                            </div>
                                             <div class="position-absolute top-0 end-0 p-2">
                                                 <button class="btn btn-sm btn-light rounded-circle shadow-sm view-image-btn" 
                                                     data-img-src="${template.url}" 
@@ -839,64 +860,23 @@
                                             document.getElementById('resultsSection').style.display = 'block';
                                             const resultsContainer = document.getElementById('resultsContainer');
                                             
-                                            // Hide templates section when results are shown
-                                            document.getElementById('templatesSection').style.display = 'none';
-                                            
-                                            // Show the toggle templates button
-                                            document.getElementById('toggleTemplatesBtn').style.display = 'block';
-                                            
-                                            // Get filename from path for display
-                                            const filename = resultData.result_path.split('/').pop();
-                                            
                                             const resultCol = document.createElement('div');
-                                            resultCol.className = 'col-md-4 col-lg-3 mb-3';
+                                            resultCol.className = 'col-md-6 col-lg-4 mb-3';
                                             resultCol.innerHTML = `
-                                                <div class="card h-100 shadow-sm">
-                                                    <div class="position-relative">
-                                                        <img src="${resultData.result_path}" class="card-img-top result-image" 
-                                                            alt="Result" 
-                                                            data-result-path="${resultData.result_path}"
-                                                            data-result-name="${filename}"
-                                                            style="height: 220px; object-fit: cover; cursor: pointer; border-radius: 6px 6px 0 0;">
-                                                        <div class="position-absolute top-0 end-0 p-2">
-                                                            <button class="btn btn-sm btn-light rounded-circle shadow-sm view-image-btn" 
-                                                                data-img-src="${resultData.result_path}" 
-                                                                title="View full size">
-                                                                <i class="fas fa-eye"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div class="position-absolute bottom-0 start-0 p-2">
-                                                            <span class="badge bg-dark text-white">
-                                                                Result
-                                                            </span>
-                                                        </div>
-                                                        <div class="position-absolute bottom-0 end-0 p-2">
-                                                            <a href="${resultData.result_path}" class="btn btn-sm btn-primary rounded-circle shadow-sm" download title="Download">
-                                                                <i class="fas fa-download"></i>
-                                                            </a>
-                                                        </div>
+                                                <div class="card h-100">
+                                                    <img src="${resultData.result_path}" class="card-img-top" alt="Result">
+                                                    <div class="card-body text-center">
+                                                        <a href="${resultData.result_path}" class="btn btn-outline-primary" download>
+                                                            <i class="fas fa-download me-1"></i> Download
+                                                        </a>
                                                     </div>
                                                 </div>
                                             `;
                                             
                                             resultsContainer.appendChild(resultCol);
                                             
-                                            // Add event listener to the view image button
-                                            resultCol.querySelector('.view-image-btn').addEventListener('click', function() {
-                                                const imgSrc = this.dataset.imgSrc;
-                                                document.getElementById('selectedResultImage').src = imgSrc;
-                                                document.getElementById('selectedResultName').textContent = filename;
-                                                document.getElementById('selectedResultDownload').href = imgSrc;
-                                                document.getElementById('resultViewerSection').style.display = 'block';
-                                            });
-                                            
                                             // Scroll to results
                                             document.getElementById('resultsSection').scrollIntoView({behavior: 'smooth'});
-                                            
-                                            // Enable download all button if there's more than one result
-                                            if (document.querySelectorAll('.result-image').length > 1) {
-                                                document.getElementById('downloadAllBtn').style.display = 'block';
-                                            }
                                             
                                             // Re-enable the button
                                             event.target.disabled = false;
@@ -960,8 +940,8 @@
                                 const resultsContainer = document.getElementById('resultsContainer');
                                 resultsContainer.innerHTML = '';
                                 
-                                // Enhancement disabled by default
-                                const enhance = false;
+                                // Get enhancement setting
+                                const enhance = document.getElementById('enhanceCheck').checked;
                                 
                                 // Process each selected template
                                 let processedCount = 0;
@@ -1238,7 +1218,7 @@
                     const formData = new FormData();
                     formData.append('source', sourceFile);
                     formData.append('template_path', templatePath);
-                    formData.append('enhance', false); // Enhancement disabled by default
+                    formData.append('enhance', document.getElementById('enhanceCheck').checked);
                     
                     fetch('/process_template', {
                         method: 'POST',
