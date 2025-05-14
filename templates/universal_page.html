@@ -333,10 +333,54 @@
                 
                 <!-- Templates Section - Hidden until categories are selected -->
                 <div id="templatesSection" class="card mb-4" style="display: none;">
-                    <div class="card-header bg-dark-purple">
+                    <div class="card-header bg-dark-purple d-flex justify-content-between align-items-center py-2">
                         <h5 class="card-title mb-0">Available Templates</h5>
+                        <!-- Multi-select controls - compact version -->
+                        <div id="compactControls" class="d-flex align-items-center" style="display: none !important;">
+                            <div class="form-check form-switch me-3 mb-0">
+                                <input class="form-check-input" type="checkbox" id="enhanceCheck">
+                                <label class="form-check-label small" for="enhanceCheck">Auto Enhance</label>
+                            </div>
+                            <button id="processSelectedBtn" class="btn btn-sm btn-primary">
+                                <i class="fas fa-magic me-1"></i> Process Selected
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
+                        <!-- Template Selection Controls -->
+                        <div id="multiSelectControls" class="mb-3 d-flex justify-content-between align-items-center" style="display: none;">
+                            <div>
+                                <button id="selectAllBtn" class="btn btn-outline-primary btn-sm me-1">
+                                    <i class="fas fa-check-square"></i> All
+                                </button>
+                                <button id="deselectAllBtn" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-square"></i> None
+                                </button>
+                            </div>
+                            <div class="form-check form-switch d-inline-block me-3 mb-0">
+                                <input class="form-check-input" type="checkbox" id="enhanceCheck">
+                                <label class="form-check-label small" for="enhanceCheck">Auto Enhance</label>
+                            </div>
+                            <button id="processSelectedBtn" class="btn btn-sm btn-primary">
+                                <i class="fas fa-magic me-1"></i> Process Selected
+                            </button>
+                        </div>
+                        
+                        <!-- Image Viewer for Selected Template -->
+                        <div id="templateViewerSection" class="mb-3" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-8 mx-auto text-center">
+                                    <div class="card mb-2">
+                                        <img id="selectedTemplateImage" class="img-fluid" style="max-height: 500px; object-fit: contain;" src="">
+                                        <div class="card-body p-2">
+                                            <p id="selectedTemplateName" class="small mb-0"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Templates Grid Container -->
                         <div id="templatesContainer" class="row">
                             <div class="text-center p-5">
                                 <div class="spinner-border text-purple" role="status">
@@ -345,38 +389,36 @@
                                 <p class="mt-2">Loading templates...</p>
                             </div>
                         </div>
-                        
-                        <!-- Multi-select controls -->
-                        <div id="multiSelectControls" class="mt-4 text-center" style="display: none;">
-                            <div class="mb-3">
-                                <button id="selectAllBtn" class="btn btn-outline-primary btn-sm me-2">
-                                    <i class="fas fa-check-square me-1"></i> Select All
-                                </button>
-                                <button id="deselectAllBtn" class="btn btn-outline-secondary btn-sm">
-                                    <i class="fas fa-square me-1"></i> Deselect All
-                                </button>
-                            </div>
-                            
-                            <div class="form-check form-switch d-inline-block me-3 mb-3">
-                                <input class="form-check-input" type="checkbox" id="enhanceCheck">
-                                <label class="form-check-label" for="enhanceCheck">
-                                    Auto Enhance faces
-                                </label>
-                            </div>
-                            
-                            <button id="processSelectedBtn" class="btn btn-lg btn-primary">
-                                <i class="fas fa-magic me-1"></i> Process Selected Templates
-                            </button>
-                        </div>
                     </div>
                 </div>
                 
                 <!-- Results Section - Hidden until processing is done -->
                 <div id="resultsSection" class="card mb-4" style="display: none;">
-                    <div class="card-header bg-dark-purple">
+                    <div class="card-header bg-dark-purple d-flex justify-content-between align-items-center py-2">
                         <h5 class="card-title mb-0">Results</h5>
+                        <button id="downloadAllBtn" class="btn btn-sm btn-outline-light" style="display: none;">
+                            <i class="fas fa-download me-1"></i> Download All
+                        </button>
                     </div>
                     <div class="card-body">
+                        <!-- Main Result Viewer -->
+                        <div id="resultViewerSection" class="mb-3" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-8 mx-auto text-center">
+                                    <div class="card mb-2">
+                                        <img id="selectedResultImage" class="img-fluid" style="max-height: 500px; object-fit: contain;" src="">
+                                        <div class="card-body p-2 d-flex justify-content-between align-items-center">
+                                            <span id="selectedResultName" class="small"></span>
+                                            <a id="selectedResultDownload" href="#" class="btn btn-sm btn-outline-primary" download>
+                                                <i class="fas fa-download"></i> Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Results Grid -->
                         <div id="resultsContainer" class="row">
                             <!-- Results will be added here dynamically -->
                         </div>
@@ -597,19 +639,21 @@
                                 
                                 col.innerHTML = `
                                     <div class="card h-100">
-                                        <img src="${template.url}" class="card-img-top template-preview" alt="${template.id}">
-                                        <div class="card-body text-center">
-                                            <div class="form-check mb-2">
-                                                <input class="form-check-input template-checkbox" type="checkbox" 
-                                                    value="${template.path}" id="check_${template.id}" data-template-id="${template.id}">
-                                                <label class="form-check-label" for="check_${template.id}">
-                                                    Select
-                                                </label>
+                                        <div class="position-relative">
+                                            <img src="${template.url}" class="card-img-top template-preview" alt="${template.id}" 
+                                                data-template-path="${template.path}" data-template-name="${template.id}">
+                                            <div class="position-absolute top-0 start-0 p-1">
+                                                <div class="form-check m-0">
+                                                    <input class="form-check-input template-checkbox" type="checkbox" 
+                                                        value="${template.path}" id="check_${template.id}" data-template-id="${template.id}">
+                                                </div>
                                             </div>
-                                            <button class="btn btn-sm btn-primary select-template-btn" 
-                                                data-template-path="${template.path}">
-                                                Swap Now
-                                            </button>
+                                            <div class="position-absolute bottom-0 end-0 p-1">
+                                                <button class="btn btn-sm btn-primary btn-sm select-template-btn" 
+                                                    data-template-path="${template.path}">
+                                                    <i class="fas fa-exchange-alt"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 `;
@@ -620,10 +664,37 @@
                             // Show the multi-select controls
                             document.getElementById('multiSelectControls').style.display = 'block';
                             
+                            // Add event listeners for the template images to view in larger viewer
+                            document.querySelectorAll('.template-preview').forEach(img => {
+                                img.addEventListener('click', e => {
+                                    e.preventDefault();
+                                    const templatePath = e.target.dataset.templatePath;
+                                    const templateName = e.target.dataset.templateName || 'Template';
+                                    
+                                    // Show and populate the template viewer
+                                    const viewerSection = document.getElementById('templateViewerSection');
+                                    viewerSection.style.display = 'block';
+                                    
+                                    const viewerImg = document.getElementById('selectedTemplateImage');
+                                    viewerImg.src = e.target.src;
+                                    
+                                    document.getElementById('selectedTemplateName').textContent = templateName;
+                                    
+                                    // Scroll to viewer
+                                    viewerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                });
+                            });
+                            
                             // Add event listeners to select template buttons (single template processing)
                             document.querySelectorAll('.select-template-btn').forEach(btn => {
                                 btn.addEventListener('click', event => {
-                                    const templatePath = event.target.dataset.templatePath;
+                                    // Get the templatePath (may be from button or closest img)
+                                    let templatePath;
+                                    if (event.target.tagName === 'I') {
+                                        templatePath = event.target.closest('button').dataset.templatePath;
+                                    } else {
+                                        templatePath = event.target.dataset.templatePath;
+                                    }
                                     
                                     if (!sourceFile) {
                                         alert('Please upload a source image first');
@@ -768,19 +839,70 @@
                                         if (resultData.success) {
                                             // Add the result to the results container
                                             const resultCol = document.createElement('div');
-                                            resultCol.className = 'col-md-6 col-lg-4 mb-3';
+                                            resultCol.className = 'col-md-4 col-lg-3 mb-3';
+                                            
+                                            // Get filename from path for display
+                                            const filename = resultData.result_path.split('/').pop();
+                                            
                                             resultCol.innerHTML = `
                                                 <div class="card h-100">
-                                                    <img src="${resultData.result_path}" class="card-img-top" alt="Result ${index + 1}">
-                                                    <div class="card-body text-center">
-                                                        <a href="${resultData.result_path}" class="btn btn-outline-primary" download>
-                                                            <i class="fas fa-download me-1"></i> Download
+                                                    <img src="${resultData.result_path}" class="card-img-top result-image" 
+                                                        alt="Result ${index + 1}" 
+                                                        data-result-path="${resultData.result_path}"
+                                                        data-result-name="Result ${index + 1} - ${filename}">
+                                                    <div class="position-absolute bottom-0 end-0 p-1">
+                                                        <a href="${resultData.result_path}" class="btn btn-sm btn-outline-light" download>
+                                                            <i class="fas fa-download"></i>
                                                         </a>
                                                     </div>
                                                 </div>
                                             `;
                                             
                                             resultsContainer.appendChild(resultCol);
+                                            
+                                            // Show download all button after first result
+                                            document.getElementById('downloadAllBtn').style.display = 'block';
+                                            
+                                            // If this is the first result, show it in the viewer
+                                            if (index === 0) {
+                                                // Show and populate the result viewer
+                                                const viewerSection = document.getElementById('resultViewerSection');
+                                                viewerSection.style.display = 'block';
+                                                
+                                                const viewerImg = document.getElementById('selectedResultImage');
+                                                viewerImg.src = resultData.result_path;
+                                                
+                                                document.getElementById('selectedResultName').textContent = `Result ${index + 1} - ${filename}`;
+                                                
+                                                const downloadLink = document.getElementById('selectedResultDownload');
+                                                downloadLink.href = resultData.result_path;
+                                            }
+                                            
+                                            // Add event listener to the result image
+                                            setTimeout(() => {
+                                                document.querySelectorAll('.result-image').forEach(img => {
+                                                    img.addEventListener('click', e => {
+                                                        e.preventDefault();
+                                                        const resultPath = e.target.dataset.resultPath;
+                                                        const resultName = e.target.dataset.resultName || 'Result';
+                                                        
+                                                        // Show and populate the result viewer
+                                                        const viewerSection = document.getElementById('resultViewerSection');
+                                                        viewerSection.style.display = 'block';
+                                                        
+                                                        const viewerImg = document.getElementById('selectedResultImage');
+                                                        viewerImg.src = resultPath;
+                                                        
+                                                        document.getElementById('selectedResultName').textContent = resultName;
+                                                        
+                                                        const downloadLink = document.getElementById('selectedResultDownload');
+                                                        downloadLink.href = resultPath;
+                                                        
+                                                        // Scroll to viewer
+                                                        viewerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                    });
+                                                });
+                                            }, 100);
                                             
                                             // Scroll to show new results
                                             document.getElementById('resultsSection').scrollIntoView({
