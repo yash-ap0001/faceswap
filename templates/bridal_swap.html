@@ -1847,9 +1847,21 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // We now have direct event listeners on each checkbox, but keep this for any dynamically added checkboxes
     document.addEventListener('click', function(e) {
-        if (isSelectionMode && e.target.closest('.template-card') && !e.target.classList.contains('template-checkbox') && !e.target.closest('.template-checkbox-container')) {
+        // Ensure e.target exists before trying to access properties
+        if (!e.target) return;
+        
+        // Check if we're in selection mode and we clicked on a template card (not on the checkbox itself)
+        if (isSelectionMode && 
+            e.target.closest('.template-card') && 
+            e.target.classList && 
+            !e.target.classList.contains('template-checkbox') && 
+            !e.target.closest('.template-checkbox-container')) {
+                
             // When in selection mode, clicking on the card toggles the checkbox
             const card = e.target.closest('.template-card');
+            // Safety check for card
+            if (!card) return;
+            
             const checkbox = card.querySelector('.template-checkbox');
             if (checkbox) {
                 checkbox.checked = !checkbox.checked;
@@ -2476,8 +2488,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     card.addEventListener('click', function(e) {
                         console.log('Card clicked, selection mode:', isSelectionMode);
                         
+                        // Safety check for e.target
+                        if (!e.target) {
+                            console.log('No e.target found - ignoring');
+                            return;
+                        }
+                        
                         // Don't trigger if clicking on a checkbox or its container
-                        if (e.target.classList.contains('template-checkbox') || 
+                        if ((e.target.classList && e.target.classList.contains('template-checkbox')) || 
                             e.target.closest('.template-checkbox-container')) {
                             console.log('Clicked on checkbox or its container - ignoring');
                             return;
@@ -2520,8 +2538,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         // Also listen for clicks on the card when in selection mode
                         card.addEventListener('click', function(e) {
+                            // Safety check for e.target
+                            if (!e.target) {
+                                console.log('No e.target found in card click - ignoring');
+                                return;
+                            }
+                            
                             // Only handle clicks in selection mode and not on the checkbox or its container
                             if (isSelectionMode && 
+                                e.target.classList && 
                                 !e.target.classList.contains('template-checkbox') && 
                                 !e.target.closest('.template-checkbox-container')) {
                                 checkbox.checked = !checkbox.checked;
