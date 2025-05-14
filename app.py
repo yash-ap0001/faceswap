@@ -1377,6 +1377,9 @@ def process_template():
         # Create results directory if it doesn't exist
         os.makedirs(os.path.dirname(result_path), exist_ok=True)
         
+        # Debug logging
+        app.logger.info(f"Saving result to: {result_path}")
+        
         # Save the result
         cv2.imwrite(result_path, result_img)
         
@@ -1384,12 +1387,16 @@ def process_template():
         # Make the path directly usable by the browser
         result_url = f"/static/results/{os.path.basename(result_filename)}"
         
-        return jsonify({
+        response_data = {
             'success': True,
             'result_path': result_url,
             'enhanced': enhanced,
             'enhance_method': enhance_method if enhanced else None
-        })
+        }
+        
+        app.logger.info(f"Returning response: {response_data}")
+        
+        return jsonify(response_data)
         
     except Exception as e:
         app.logger.error(f"Error processing template: {str(e)}")

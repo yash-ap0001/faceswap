@@ -143,13 +143,18 @@ const BridalSwapPage = () => {
       
       const result = await response.json();
       
+      // Debug logging for response
+      console.log('Process template response:', result);
+      
       if (result.success) {
-        setResults([{
+        const resultItem = {
           template_path: template.path,
           result_path: result.result_path,
           enhanced: result.enhanced,
           enhance_method: result.enhance_method
-        }]);
+        };
+        console.log('Setting result item:', resultItem);
+        setResults([resultItem]);
       } else {
         alert(result.message || 'Error processing template');
       }
