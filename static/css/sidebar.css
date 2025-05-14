@@ -1,0 +1,195 @@
+/* Custom Sidebar Styling */
+:root {
+    --sidebar-width: 280px;
+    --sidebar-collapsed-width: 0;
+    --sidebar-gradient-start: #6a1b9a;
+    --sidebar-gradient-end: #4a148c;
+    --sidebar-text-color: #ffffff;
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.1);
+    --sidebar-active-bg: rgba(255, 255, 255, 0.15);
+    --sidebar-toggle-size: 48px;
+    --sidebar-toggle-radius: 24px;
+    --sidebar-toggle-border: 2px solid #6a1b9a;
+}
+
+/* Main sidebar container */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: linear-gradient(135deg, var(--sidebar-gradient-start), var(--sidebar-gradient-end));
+    color: var(--sidebar-text-color);
+    z-index: 1030;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+/* Sidebar header */
+.sidebar-header {
+    padding: 1.5rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: linear-gradient(45deg, #e4b5ff, #ffffff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Sidebar content */
+.sidebar-content {
+    padding: 1rem 0;
+}
+
+/* Menu items */
+.sidebar .accordion-button {
+    background: transparent;
+    color: var(--sidebar-text-color);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.sidebar .accordion-button:not(.collapsed) {
+    background-color: var(--sidebar-active-bg);
+    box-shadow: none;
+    color: var(--sidebar-text-color);
+}
+
+.sidebar .accordion-button:focus {
+    box-shadow: none;
+    border-color: transparent;
+}
+
+.sidebar .accordion-button::after {
+    display: none;
+}
+
+/* Custom submenu indicators - small circles */
+.sidebar .submenu-indicator {
+    width: 8px;
+    height: 8px;
+    background-color: var(--sidebar-text-color);
+    border-radius: 50%;
+    margin-left: auto;
+    transition: transform 0.2s ease;
+}
+
+.sidebar .accordion-button.collapsed .submenu-indicator {
+    transform: rotate(0deg);
+}
+
+.sidebar .accordion-button:not(.collapsed) .submenu-indicator {
+    transform: scale(1.2);
+}
+
+/* Menu links */
+.sidebar .accordion-body {
+    background-color: rgba(0, 0, 0, 0.15);
+    padding: 0;
+}
+
+.sidebar .accordion-body a {
+    display: block;
+    padding: 0.6rem 1rem 0.6rem 3rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.sidebar .accordion-body a:hover {
+    background-color: var(--sidebar-hover-bg);
+    color: var(--sidebar-text-color);
+}
+
+.sidebar .accordion-body a.active {
+    background-color: var(--sidebar-active-bg);
+    color: var(--sidebar-text-color);
+    border-left: 3px solid white;
+}
+
+/* Perfect semicircle toggle button */
+.sidebar-toggle {
+    position: fixed;
+    top: 50%;
+    left: var(--sidebar-width);
+    width: var(--sidebar-toggle-size);
+    height: var(--sidebar-toggle-size);
+    background-color: white;
+    border-radius: 0 var(--sidebar-toggle-radius) var(--sidebar-toggle-radius) 0;
+    border: var(--sidebar-toggle-border);
+    border-left: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1031;
+    transform: translateY(-50%);
+    box-shadow: 3px 0 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.sidebar-toggle i {
+    color: var(--sidebar-gradient-start);
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+/* Sidebar collapsed state */
+.sidebar.sidebar-collapsed {
+    width: var(--sidebar-collapsed-width);
+    transform: translateX(-100%);
+}
+
+/* Adjust toggle button position when sidebar is collapsed */
+.sidebar.sidebar-collapsed + .sidebar-toggle {
+    left: 0;
+}
+
+/* Adjust margin for main content to accommodate sidebar */
+main {
+    margin-left: var(--sidebar-width);
+    transition: margin 0.3s ease;
+}
+
+main.expanded {
+    margin-left: 0;
+}
+
+/* Menu icons */
+.sidebar .menu-icon {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Media query for smaller screens */
+@media (max-width: 992px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar-toggle {
+        left: 0;
+    }
+    
+    main {
+        margin-left: 0;
+    }
+    
+    .sidebar:not(.sidebar-collapsed) {
+        transform: translateX(0);
+    }
+}

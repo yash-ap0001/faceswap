@@ -13,6 +13,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
     <style>
         :root {
             --primary-purple: #9c27b0;
@@ -706,11 +707,12 @@
                 <!-- Bride Section -->
                 <div class="accordion-item bg-transparent border-0 mb-2">
                     <h6 class="accordion-header" id="headingBride">
-                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
+                        <button class="accordion-button shadow-none collapsed" 
                                 type="button" data-bs-toggle="collapse" 
                                 data-bs-target="#collapseBride" aria-expanded="false" 
                                 aria-controls="collapseBride">
-                            <i class="fas fa-gem me-3"></i>Bride
+                            <i class="fas fa-gem menu-icon"></i>Bride
+                            <span class="submenu-indicator ms-auto"></span>
                         </button>
                     </h6>
                     <div id="collapseBride" class="accordion-collapse collapse" 
@@ -753,11 +755,12 @@
                 <!-- Services Section -->
                 <div class="accordion-item bg-transparent border-0 mb-2">
                     <h6 class="accordion-header" id="headingServices">
-                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
+                        <button class="accordion-button shadow-none collapsed" 
                                 type="button" data-bs-toggle="collapse" 
                                 data-bs-target="#collapseServices" aria-expanded="false" 
                                 aria-controls="collapseServices">
-                            <i class="fas fa-concierge-bell me-3"></i>Services
+                            <i class="fas fa-concierge-bell menu-icon"></i>Services
+                            <span class="submenu-indicator ms-auto"></span>
                         </button>
                     </h6>
                     <div id="collapseServices" class="accordion-collapse collapse" 
