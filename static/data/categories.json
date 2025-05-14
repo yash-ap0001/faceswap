@@ -1,0 +1,241 @@
+{
+  "categories": [
+    {
+      "id": "bride",
+      "name": "Bride",
+      "icon": "female",
+      "subcategories": [
+        {
+          "id": "ceremony",
+          "name": "Ceremony-specific",
+          "items": [
+            {"id": "haldi", "name": "Haldi"},
+            {"id": "mehendi", "name": "Mehendi"},
+            {"id": "sangeeth", "name": "Sangeet"},
+            {"id": "wedding_north", "name": "Wedding (North Indian)"},
+            {"id": "wedding_south", "name": "Wedding (South Indian)"},
+            {"id": "wedding_bengali", "name": "Wedding (Bengali)"},
+            {"id": "wedding_gujarati", "name": "Wedding (Gujarati)"},
+            {"id": "wedding_punjabi", "name": "Wedding (Punjabi)"},
+            {"id": "reception_contemp", "name": "Reception (Contemporary)"},
+            {"id": "reception_trad", "name": "Reception (Traditional)"}
+          ]
+        },
+        {
+          "id": "accessories",
+          "name": "Accessories by Event",
+          "items": [
+            {"id": "complete_sets", "name": "Complete Jewelry Sets"},
+            {"id": "head_pieces", "name": "Head Pieces"},
+            {"id": "hand_jewelry", "name": "Hand Jewelry"},
+            {"id": "necklaces", "name": "Necklaces"},
+            {"id": "footwear", "name": "Footwear"}
+          ]
+        },
+        {
+          "id": "makeup",
+          "name": "Makeup Styles",
+          "items": [
+            {"id": "dramatic", "name": "Dramatic Evening"},
+            {"id": "natural", "name": "Natural Day"},
+            {"id": "hd_ready", "name": "HD/Photoshoot Ready"},
+            {"id": "north_indian", "name": "North Indian Style"},
+            {"id": "south_indian", "name": "South Indian Style"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "groom",
+      "name": "Groom",
+      "icon": "male",
+      "subcategories": [
+        {
+          "id": "traditional",
+          "name": "Traditional Wear by Region",
+          "items": [
+            {"id": "north_indian", "name": "North Indian (Sherwani, Achkan)"},
+            {"id": "south_indian", "name": "South Indian (Veshti)"},
+            {"id": "bengali", "name": "Bengali (Dhoti Kurta)"},
+            {"id": "rajasthani", "name": "Rajasthani (Bandhgala)"},
+            {"id": "punjabi", "name": "Punjabi (Kurta with Turban)"}
+          ]
+        },
+        {
+          "id": "modern",
+          "name": "Modern Options",
+          "items": [
+            {"id": "indo_western", "name": "Indo-Western Fusion"},
+            {"id": "contemp_suits", "name": "Contemporary Suits"},
+            {"id": "designer", "name": "Designer Collections"},
+            {"id": "themed", "name": "Theme-based Outfits"}
+          ]
+        },
+        {
+          "id": "accessories",
+          "name": "Accessories",
+          "items": [
+            {"id": "turbans", "name": "Turbans/Pagri"},
+            {"id": "jewelry", "name": "Traditional Jewelry"},
+            {"id": "footwear", "name": "Footwear (Mojris, Juttis)"},
+            {"id": "stoles", "name": "Stoles/Dupattas"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "women",
+      "name": "Women/Girls Fashion",
+      "icon": "female",
+      "subcategories": [
+        {
+          "id": "occasion",
+          "name": "Occasion-specific",
+          "items": [
+            {"id": "wedding_guest", "name": "Wedding Guest Outfits"},
+            {"id": "festival", "name": "Festival Wear"},
+            {"id": "party", "name": "Party Wear"},
+            {"id": "vacation", "name": "Vacation Styles"}
+          ]
+        },
+        {
+          "id": "age_specific",
+          "name": "Age-specific Collections",
+          "items": [
+            {"id": "girls", "name": "Young Girls (5-12)"},
+            {"id": "teenagers", "name": "Teenagers (13-19)"},
+            {"id": "young_adult", "name": "Young Adult (20-35)"},
+            {"id": "mature", "name": "Mature Styles (35+)"}
+          ]
+        },
+        {
+          "id": "regional",
+          "name": "Regional Styles",
+          "items": [
+            {"id": "north_indian", "name": "North Indian"},
+            {"id": "south_indian", "name": "South Indian"},
+            {"id": "eastern", "name": "Eastern"},
+            {"id": "western_india", "name": "Western India"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "men",
+      "name": "Men's Fashion",
+      "icon": "male",
+      "subcategories": [
+        {
+          "id": "occasion",
+          "name": "Occasion-specific",
+          "items": [
+            {"id": "wedding_guest", "name": "Wedding Guest Outfits"},
+            {"id": "festival", "name": "Festival Wear"},
+            {"id": "business", "name": "Business Attire"},
+            {"id": "casual", "name": "Casual Everyday"}
+          ]
+        },
+        {
+          "id": "age_specific",
+          "name": "Age-specific Collections",
+          "items": [
+            {"id": "boys", "name": "Boys (5-12)"},
+            {"id": "teenagers", "name": "Teenagers (13-19)"},
+            {"id": "young_adult", "name": "Young Adult (20-35)"},
+            {"id": "mature", "name": "Mature Styles (35+)"}
+          ]
+        },
+        {
+          "id": "special",
+          "name": "Special Collections",
+          "items": [
+            {"id": "designer", "name": "Designer Clothing"},
+            {"id": "celebrity", "name": "Celebrity-inspired"},
+            {"id": "trad_modern", "name": "Traditional with Modern Twist"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "women_salon",
+      "name": "Women's Salon & Beauty",
+      "icon": "cut",
+      "subcategories": [
+        {
+          "id": "hair",
+          "name": "Hair",
+          "items": [
+            {"id": "short", "name": "Short Hair Styles"},
+            {"id": "medium", "name": "Medium Hair Styles"},
+            {"id": "long", "name": "Long Hair Styles"},
+            {"id": "bridal", "name": "Bridal Hairstyles"},
+            {"id": "party", "name": "Party Hairstyles"},
+            {"id": "updos", "name": "Updos & Buns"},
+            {"id": "extensions", "name": "With Extensions"}
+          ]
+        },
+        {
+          "id": "makeup",
+          "name": "Makeup",
+          "items": [
+            {"id": "fair", "name": "For Fair Skin"},
+            {"id": "medium", "name": "For Medium Skin"},
+            {"id": "dark", "name": "For Dark Skin"},
+            {"id": "bridal", "name": "Bridal Makeup"},
+            {"id": "party", "name": "Party Makeup"},
+            {"id": "natural", "name": "Natural Everyday"},
+            {"id": "eye_focused", "name": "Eye-focused Looks"},
+            {"id": "lip_focused", "name": "Lip-focused Looks"}
+          ]
+        },
+        {
+          "id": "full_looks",
+          "name": "Full Looks",
+          "items": [
+            {"id": "complete", "name": "Complete Transformations"},
+            {"id": "before_after", "name": "Before/After Comparisons"},
+            {"id": "age_makeover", "name": "Age-appropriate Makeovers"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "men_salon",
+      "name": "Men's Salon & Grooming",
+      "icon": "cut",
+      "subcategories": [
+        {
+          "id": "hair",
+          "name": "Hair",
+          "items": [
+            {"id": "modern", "name": "Modern Cuts"},
+            {"id": "fades", "name": "Fades & Undercuts"},
+            {"id": "classic", "name": "Classic Styles"},
+            {"id": "trending", "name": "Trending Styles"},
+            {"id": "regional", "name": "Regional Variations"}
+          ]
+        },
+        {
+          "id": "facial_hair",
+          "name": "Facial Hair",
+          "items": [
+            {"id": "full_beard", "name": "Full Beard Styles"},
+            {"id": "mustache", "name": "Mustache Variations"},
+            {"id": "stubble", "name": "Stubble & Light Beards"},
+            {"id": "clean", "name": "Clean Shaven Looks"}
+          ]
+        },
+        {
+          "id": "grooming",
+          "name": "Grooming Packages",
+          "items": [
+            {"id": "wedding", "name": "Wedding Preparation"},
+            {"id": "professional", "name": "Interview/Professional"},
+            {"id": "special", "name": "Special Occasion"},
+            {"id": "everyday", "name": "Everyday Maintenance"}
+          ]
+        }
+      ]
+    }
+  ]
+}

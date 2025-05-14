@@ -3,6 +3,7 @@ React application routes and API endpoints.
 These routes serve the React application and provide API endpoints for it.
 """
 
+import json
 from flask import Blueprint, render_template, jsonify, request
 
 # Create a blueprint for React app routes
@@ -219,3 +220,18 @@ def api_content(page_id):
     
     # Return content for requested page or default content
     return jsonify(content_map.get(page_id, default_content))
+
+@api_bp.route('/categories')
+def api_categories():
+    """
+    API endpoint to get the full categories structure.
+    Returns a JSON object with all categories, subcategories, and items.
+    """
+    try:
+        with open('static/data/categories.json', 'r') as f:
+            categories_data = json.load(f)
+        return jsonify(categories_data)
+    except FileNotFoundError:
+        return jsonify({"error": "Categories data not found", "success": False}), 404
+    except Exception as e:
+        return jsonify({"error": str(e), "success": False}), 500
