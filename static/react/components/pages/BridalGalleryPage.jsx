@@ -267,31 +267,31 @@ const BridalGalleryPage = () => {
           cursor: pointer;
           overflow: hidden;
           transition: transform 0.3s ease;
-          height: 400px;
+          height: 330px;
           display: flex;
           align-items: center;
           justify-content: center;
-          margin-bottom: 4px;
+          margin-bottom: 5px;
           background-color: #000;
           border-radius: 0;
         }
         
         .gallery-item img {
           width: 100%;
-          height: 400px;
+          height: 330px;
           object-fit: cover;
           background-color: #000;
         }
         
         .row {
-          margin-right: -2px;
-          margin-left: -2px;
+          margin-right: -3px;
+          margin-left: -3px;
           background-color: #000;
         }
         
         .col-md-3, .col-sm-4, .col-6 {
-          padding-right: 2px;
-          padding-left: 2px;
+          padding-right: 3px;
+          padding-left: 3px;
         }
 
         .gallery-container {
@@ -301,11 +301,11 @@ const BridalGalleryPage = () => {
         
         @media (max-width: 576px) {
           .gallery-item, .gallery-item img {
-            height: 250px;
+            height: 220px;
           }
           
           .col-6 {
-            padding: 2px;
+            padding: 3px;
           }
           
           .gallery-item img {
@@ -313,8 +313,8 @@ const BridalGalleryPage = () => {
           }
           
           .row {
-            margin-right: -2px;
-            margin-left: -2px;
+            margin-right: -3px;
+            margin-left: -3px;
           }
         }
         
