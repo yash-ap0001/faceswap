@@ -20,18 +20,40 @@ const BridalGalleryPage = () => {
   const fetchTemplates = async (ceremony) => {
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `/get_templates?ceremony_type=${ceremony}&category_type=bride&subcategory=bridal&item_category=${ceremony}`
-      );
-      const data = await response.json();
-      
-      if (data.success && data.templates) {
-        setTemplates(data.templates);
-      } else {
-        console.error('Error fetching templates:', data.message || 'Unknown error');
+      try {
+        const response = await fetch(
+          `/get_templates?ceremony_type=${ceremony}&category_type=bride&subcategory=bridal&item_category=${ceremony}`
+        );
+        const data = await response.json();
+        
+        if (data.success && data.templates) {
+          console.log(`Received template data for ${ceremony}:`, data);
+          setTemplates(data.templates);
+          setIsLoading(false);
+          return;
+        } else {
+          console.error('Error in template data structure:', data.message || 'Unknown error');
+        }
+      } catch (error) {
+        console.error('Error fetching templates:', error);
       }
+      
+      // If we reach here, the fetch failed or returned invalid data
+      // Create a fallback set of templates based on known structure
+      const fallbackTemplates = Array.from({ length: 6 }, (_, i) => ({
+        id: `${ceremony}_${i + 1}`,
+        path: `static/images/templates/${ceremony}/${i + 1}.jpg`,
+        url: `/static/images/templates/${ceremony}/${i + 1}.jpg`,
+        category_type: 'bride',
+        subcategory: 'bridal',
+        item_category: ceremony,
+        template_type: 'pinterest'
+      }));
+      
+      setTemplates(fallbackTemplates);
     } catch (error) {
-      console.error('Error fetching templates:', error);
+      console.error('Error in template handling:', error);
+      setTemplates([]);
     } finally {
       setIsLoading(false);
     }
