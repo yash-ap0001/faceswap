@@ -42,6 +42,7 @@ def api_menu():
             "title": "Universal",
             "icon": "fa-magic",
             "subItems": [
+                {"id": "universal-page", "label": "Universal Categories", "link": "/react/universal"},
                 {"id": "universal_face_swap", "label": "Universal Face Swap", "link": "/universal-face-swap"}
             ]
         },
@@ -237,11 +238,13 @@ def api_content(page_id):
     return jsonify(content_map.get(page_id, default_content))
 
 @api_bp.route('/categories')
+@react_bp.route('/api/categories')
 def api_categories():
     """
     API endpoint to get the full categories structure.
     Returns a JSON object with all categories, subcategories, and items.
     """
+    print("API categories endpoint called")
     try:
         with open('static/data/categories.json', 'r') as f:
             categories_data = json.load(f)
