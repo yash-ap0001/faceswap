@@ -960,8 +960,8 @@
                                 const resultsContainer = document.getElementById('resultsContainer');
                                 resultsContainer.innerHTML = '';
                                 
-                                // Get enhancement setting
-                                const enhance = document.getElementById('enhanceCheck').checked;
+                                // Enhancement disabled by default
+                                const enhance = false;
                                 
                                 // Process each selected template
                                 let processedCount = 0;
@@ -1238,7 +1238,7 @@
                     const formData = new FormData();
                     formData.append('source', sourceFile);
                     formData.append('template_path', templatePath);
-                    formData.append('enhance', document.getElementById('enhanceCheck').checked);
+                    formData.append('enhance', false); // Enhancement disabled by default
                     
                     fetch('/process_template', {
                         method: 'POST',
