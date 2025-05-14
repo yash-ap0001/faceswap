@@ -418,8 +418,7 @@ def allowed_file(filename):
 
 @app.route('/')
 def index():
-    # Use the new modern 3D home page
-    return render_template('modern_home.html')
+    return render_template('index.html')
 
 @app.route('/bridal-gallery')
 def bridal_gallery():
