@@ -13,15 +13,37 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // Track which accordion section is open (default to "bride")
-  const [openSection, setOpenSection] = useState('bride');
+  // Track which accordion section is open (default to "universal")
+  const [openSection, setOpenSection] = useState('universal');
   
   // Fetch menu data from API
   useEffect(() => {
     const fetchMenuData = async () => {
       try {
         setLoading(true);
-        // Use hardcoded menu structure without Home item
+        
+        // Actually fetch menu from API instead of using hardcoded values
+        const response = await fetch('/api/menu');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch menu: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Menu data from API:', data);
+        
+        if (data && data.menu && Array.isArray(data.menu)) {
+          setMenuItems(data.menu);
+        } else {
+          throw new Error('Invalid menu data format from API');
+        }
+        
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching menu data:', err);
+        setError('Failed to load menu data. Please try again later.');
+        
+        // Fallback to hardcoded menu if API fails
         const defaultMenu = [
           {
             id: 'universal',
@@ -54,37 +76,9 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
               { id: 'modern-suits', label: 'Modern Suits', link: '/react#modern-suits' },
               { id: 'groom-accessories', label: 'Accessories', link: '/react#groom-accessories' }
             ]
-          },
-          {
-            id: 'saloons',
-            title: 'Saloons',
-            icon: 'fa-cut',
-            subItems: [
-              { id: 'bride-saloons', label: 'Bride Saloons', link: '/react#bride-saloons' },
-              { id: 'groom-saloons', label: 'Groom Saloons', link: '/react#groom-saloons' },
-              { id: 'makeup-artists', label: 'Makeup Artists', link: '/react#makeup-artists' },
-              { id: 'saloon-packages', label: 'Saloon Packages', link: '/react#saloon-packages' }
-            ]
-          },
-          {
-            id: 'services',
-            title: 'Services',
-            icon: 'fa-concierge-bell',
-            subItems: [
-              { id: 'venue-search', label: 'Venue Search', link: '/react#venue-search' },
-              { id: 'catering-list', label: 'Catering List', link: '/react#catering-list' },
-              { id: 'event-managers', label: 'Event Managers', link: '/react#event-managers' },
-              { id: 'photographers', label: 'Photographers', link: '/react#photographers' }
-            ]
           }
         ];
-        
         setMenuItems(defaultMenu);
-        setError(null);
-      } catch (err) {
-        console.error('Error setting menu data:', err);
-        setError('Failed to load menu data. Please try again later.');
-        // Menu already set above, no need for fallback
       } finally {
         setLoading(false);
       }
@@ -97,12 +91,18 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
   const handleItemClick = (id, link) => {
     onNavigation(id);
     
-    // Use history API for navigation without page reload
-    window.history.pushState({}, '', link);
-    
-    // Dispatch a custom event to notify about route change
-    const event = new CustomEvent('routeChange', { detail: { path: link } });
-    window.dispatchEvent(event);
+    // Check if the link is a direct URL (not a hash route)
+    if (link.includes('/react/') && !link.includes('#')) {
+      // For direct links like /react/universal, use regular navigation
+      window.location.href = link;
+    } else {
+      // For hash routes, use history API for navigation without page reload
+      window.history.pushState({}, '', link);
+      
+      // Dispatch a custom event to notify about route change
+      const event = new CustomEvent('routeChange', { detail: { path: link } });
+      window.dispatchEvent(event);
+    }
   };
   
   // Toggle accordion section
