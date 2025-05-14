@@ -340,13 +340,22 @@
                         <div class="row">
                             <!-- Left Column - Upload -->
                             <div class="col-md-4">
-                                <div class="upload-area mb-3" id="uploadArea" style="min-height: 160px; padding: 15px;">
-                                    <i class="fas fa-cloud-upload-alt fa-2x text-light-purple"></i>
-                                    <p class="mt-1 small">Drop your photo here or click to browse</p>
-                                    <input type="file" id="fileInput" accept="image/*">
-                                </div>
-                                <div class="text-center">
-                                    <img id="sourcePreview" class="source-preview" style="display: none; max-height: 160px; margin: 0 auto;">
+                                <div class="d-flex flex-column h-100">
+                                    <div class="upload-area mb-2" id="uploadArea" style="min-height: 100px; padding: 10px; position: relative;">
+                                        <i class="fas fa-cloud-upload-alt fa-lg text-light-purple"></i>
+                                        <p class="mt-1 mb-1 small">Drop photo or click to browse</p>
+                                        <input type="file" id="fileInput" accept="image/*">
+                                    </div>
+                                    <div class="text-center position-relative">
+                                        <div id="previewContainer" style="display: none;">
+                                            <img id="sourcePreview" class="source-preview" style="max-height: 100px; margin: 0 auto; object-fit: contain;">
+                                            <div class="position-absolute top-0 end-0">
+                                                <button type="button" id="changePhotoBtn" class="btn btn-sm btn-light rounded-circle" style="width: 24px; height: 24px; padding: 0; font-size: 12px;">
+                                                    <i class="fas fa-redo"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -598,7 +607,10 @@
                     reader.onload = (e) => {
                         // Show the preview
                         sourcePreview.src = e.target.result;
-                        sourcePreview.style.display = 'block';
+                        document.getElementById('previewContainer').style.display = 'block';
+                        
+                        // Hide the upload area when preview is shown
+                        document.getElementById('uploadArea').style.display = 'none';
                         
                         // Update UI to indicate photo is ready
                         document.getElementById('optionsInfo').innerHTML = '<p class="mb-1"><i class="fas fa-check-circle text-success me-1"></i> Photo uploaded, please select categories</p>';
