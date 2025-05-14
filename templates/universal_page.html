@@ -211,9 +211,47 @@
             font-size: 0.8rem;
             color: #bbbbbb;
         }
+        
+        /* Image Zoom Viewer */
+        .image-zoom-container {
+            overflow: hidden;
+            position: relative;
+        }
+        
+        #zoomImage {
+            transform-origin: center;
+            transition: transform 0.2s ease;
+            cursor: move;
+        }
     </style>
 </head>
 <body>
+    <!-- Image Viewer Modal -->
+    <div class="modal fade" id="imageViewerModal" tabindex="-1" aria-labelledby="imageViewerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-white" id="imageViewerModalLabel">Image Viewer</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-0 position-relative">
+                    <div class="image-zoom-container" style="height: 75vh; overflow: hidden; position: relative;">
+                        <img id="zoomImage" src="" alt="Zoomed Image" style="max-height: 100%; max-width: 100%; position: relative;">
+                    </div>
+                    <div class="position-absolute bottom-0 start-0 end-0 p-3 d-flex justify-content-center bg-dark bg-opacity-75">
+                        <div class="btn-group" role="group">
+                            <button id="zoomInBtn" class="btn btn-light rounded-start"><i class="fas fa-search-plus"></i></button>
+                            <button id="zoomOutBtn" class="btn btn-light"><i class="fas fa-search-minus"></i></button>
+                            <button id="resetZoomBtn" class="btn btn-light rounded-end"><i class="fas fa-sync-alt"></i></button>
+                        </div>
+                        <a id="downloadImageBtn" href="#" download class="btn btn-primary ms-2">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="app-container">
         <!-- Sidebar -->
         <div class="sidebar">
