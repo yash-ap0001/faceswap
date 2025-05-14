@@ -134,7 +134,7 @@ const BridalSwapPage = () => {
     const formData = new FormData();
     formData.append('source', sourceImage);
     
-    selectedTemplates.forEach((template, index) => {
+    selectedTemplates.forEach((template) => {
       formData.append(`templates[]`, template.path);
     });
     
@@ -182,7 +182,7 @@ const BridalSwapPage = () => {
       </div>
       
       <div className="row g-2">
-        <div className="col-md-4">
+        <div className="col-md-3">
           <div className="mb-3">
             <div className="d-flex mb-2 align-items-center">
               <small className="text-muted me-2">Your photo:</small>
@@ -232,7 +232,7 @@ const BridalSwapPage = () => {
                 </select>
               )}
             </div>
-              
+            
             {isMultiSelectMode && selectedTemplates.length > 0 && (
               <button 
                 className="btn btn-primary btn-sm mt-3 w-100"
@@ -242,135 +242,154 @@ const BridalSwapPage = () => {
                 {isLoading ? 'Processing...' : `Process ${selectedTemplates.length} Templates`}
               </button>
             )}
-              </div>
-            </div>
           </div>
           
           {isMultiSelectMode && selectedTemplates.length > 0 && (
-            <div className="card mb-4">
-              <div className="card-body">
-                <h5 className="card-title">Selected Templates ({selectedTemplates.length})</h5>
-                <div className="row g-2">
-                  {selectedTemplates.map((template, index) => (
-                    <div className="col-4" key={`selected-${template.id}`}>
-                      <div className="position-relative">
-                        <img 
-                          src={template.url} 
-                          className="img-fluid rounded" 
-                          alt={`Template ${index + 1}`} 
-                        />
-                        <button 
-                          className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                          onClick={() => toggleTemplateSelection(template)}
-                        >
-                          <i className="fas fa-times"></i>
-                        </button>
-                      </div>
+            <div className="mb-3">
+              <div className="d-flex align-items-center mb-2">
+                <small className="text-muted me-2">Selected Templates ({selectedTemplates.length})</small>
+              </div>
+              <div className="row g-1">
+                {selectedTemplates.map((template, index) => (
+                  <div className="col-4" key={`selected-${template.id}`}>
+                    <div className="position-relative mb-1">
+                      <img 
+                        src={template.url} 
+                        className="img-fluid rounded shadow-sm" 
+                        alt={`Template ${index + 1}`} 
+                      />
+                      <button 
+                        className="btn btn-sm btn-danger position-absolute top-0 end-0 p-0"
+                        style={{width: '18px', height: '18px', fontSize: '10px'}}
+                        onClick={() => toggleTemplateSelection(template)}
+                      >
+                        <i className="fas fa-times"></i>
+                      </button>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
         </div>
         
-        <div className="col-md-8">
-          <div className="card mb-4">
-            <div className="card-body">
-              <h5 className="card-title">Select Ceremony</h5>
-              <div className="d-flex justify-content-center mb-3">
-                <div className="btn-group" role="group">
-                  {['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'].map(ceremony => (
-                    <button
-                      key={ceremony}
-                      type="button"
-                      className={`btn ${ceremonyType === ceremony ? 'btn-primary' : 'btn-outline-primary'}`}
-                      onClick={() => setCeremonyType(ceremony)}
-                    >
-                      {ceremony.charAt(0).toUpperCase() + ceremony.slice(1)}
-                    </button>
-                  ))}
-                </div>
+        <div className="col-md-9">
+          <div className="mb-3">
+            <div className="d-flex align-items-center mb-2">
+              <div className="btn-group btn-group-sm me-2" role="group">
+                {['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'].map(ceremony => (
+                  <button
+                    key={ceremony}
+                    type="button"
+                    className={`btn ${ceremonyType === ceremony ? 'btn-primary' : 'btn-outline-primary'}`}
+                    onClick={() => setCeremonyType(ceremony)}
+                  >
+                    {ceremony.charAt(0).toUpperCase() + ceremony.slice(1)}
+                  </button>
+                ))}
               </div>
               
-              <div className="row g-3">
-                {isLoading && templates.length === 0 ? (
-                  <div className="col-12 text-center">
-                    <div className="spinner-border text-primary" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
-                  </div>
-                ) : templates.length > 0 ? (
-                  templates.map(template => (
-                    <div className="col-md-4" key={template.id}>
-                      <div 
-                        className={`position-relative template-card ${selectedTemplates.some(t => t.path === template.path) ? 'selected' : ''}`}
-                        onClick={() => toggleTemplateSelection(template)}
-                      >
-                        <img 
-                          src={template.url} 
-                          className="img-fluid rounded" 
-                          alt={template.id} 
-                        />
-                        {isMultiSelectMode && (
-                          <div className="position-absolute top-0 end-0 p-2">
-                            <div className={`form-check ${selectedTemplates.some(t => t.path === template.path) ? 'checked' : ''}`}>
-                              <input 
-                                className="form-check-input" 
-                                type="checkbox" 
-                                checked={selectedTemplates.some(t => t.path === template.path)}
-                                readOnly
-                              />
-                            </div>
+              {isLoading && (
+                <div className="spinner-border spinner-border-sm text-primary ms-2" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="row g-2">
+              {templates.length > 0 ? (
+                templates.map(template => (
+                  <div className="col-6 col-sm-4 col-md-3 col-lg-2" key={template.id}>
+                    <div 
+                      className={`position-relative template-card ${selectedTemplates.some(t => t.path === template.path) ? 'selected' : ''}`}
+                      onClick={() => toggleTemplateSelection(template)}
+                    >
+                      <img 
+                        src={template.url} 
+                        className="img-fluid rounded shadow-sm" 
+                        alt={template.id} 
+                      />
+                      {isMultiSelectMode && (
+                        <div className="position-absolute top-0 end-0 p-1">
+                          <div className={`form-check ${selectedTemplates.some(t => t.path === template.path) ? 'checked' : ''}`}>
+                            <input 
+                              className="form-check-input" 
+                              type="checkbox" 
+                              checked={selectedTemplates.some(t => t.path === template.path)}
+                              readOnly
+                            />
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
-                  ))
-                ) : (
-                  <div className="col-12 text-center">
-                    <p>No templates available for this ceremony type.</p>
                   </div>
-                )}
-              </div>
+                ))
+              ) : (
+                <div className="col-12 text-center py-2">
+                  <small>No templates available for this ceremony type.</small>
+                </div>
+              )}
             </div>
           </div>
           
           {results.length > 0 && (
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title">Results</h5>
-                <div className="row g-3">
-                  {results.map((result, index) => (
-                    <div className="col-md-4" key={`result-${index}`}>
-                      <div className="position-relative">
-                        <img 
-                          src={`/${result.result_path}?t=${Date.now()}`} 
-                          className="img-fluid rounded" 
-                          alt={`Result ${index + 1}`} 
-                        />
-                        {result.enhanced && (
-                          <span className="position-absolute top-0 start-0 badge bg-info m-2">
-                            Enhanced ({result.enhance_method})
-                          </span>
-                        )}
-                        <a 
-                          href={`/${result.result_path}?t=${Date.now()}`} 
-                          className="btn btn-sm btn-primary position-absolute bottom-0 end-0 m-2"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <i className="fas fa-download"></i>
-                        </a>
-                      </div>
+            <div className="mt-3">
+              <div className="d-flex align-items-center mb-2">
+                <small className="text-muted me-2">Results</small>
+              </div>
+              <div className="row g-2">
+                {results.map((result, index) => (
+                  <div className="col-6 col-sm-4 col-md-3 col-lg-2" key={`result-${index}`}>
+                    <div className="position-relative">
+                      <img 
+                        src={`/${result.result_path}?t=${Date.now()}`} 
+                        className="img-fluid rounded shadow-sm" 
+                        alt={`Result ${index + 1}`} 
+                      />
+                      {result.enhanced && (
+                        <span className="position-absolute top-0 start-0 badge bg-info m-1" style={{fontSize: '0.65rem'}}>
+                          {result.enhance_method}
+                        </span>
+                      )}
+                      <a 
+                        href={`/${result.result_path}?t=${Date.now()}`} 
+                        className="btn btn-sm btn-primary position-absolute bottom-0 end-0 m-1 p-0"
+                        style={{width: '24px', height: '24px', fontSize: '12px'}}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <i className="fas fa-download"></i>
+                      </a>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
         </div>
       </div>
+      
+      <style jsx>{`
+        .template-card {
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border-radius: 0.25rem;
+        }
+        
+        .template-card:hover {
+          transform: scale(1.02);
+          box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+        }
+        
+        .template-card.selected {
+          border: 2px solid #0d6efd;
+        }
+        
+        .form-check.checked .form-check-input {
+          background-color: #0d6efd;
+          border-color: #0d6efd;
+        }
+      `}</style>
     </div>
   );
 };
