@@ -836,7 +836,9 @@
     <!-- No toggle button here anymore -->
 
     <main class="my-4">
-        {% block content %}{% endblock %}
+        <div id="dynamic-content">
+            {% block content %}{% endblock %}
+        </div>
     </main>
 
     <footer class="py-3 mt-5">
@@ -856,6 +858,8 @@
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/accordion.js') }}"></script>
+    <!-- SPA Functionality -->
+    <script src="{{ url_for('static', filename='js/spa.js') }}"></script>
     
     <script>
         // Sidebar functionality
