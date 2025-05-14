@@ -25,8 +25,20 @@ function initSidebar() {
         console.log("Nav sidebar toggle button:", navSidebarToggleBtn);
         console.log("Close button:", closeBtn);
         
-        // Initialize sidebar state
-        console.log("Initializing sidebar in open state");
+        // Initialize sidebar to closed state
+        if (sidebar && document.body) {
+            // Check if the sidebar is already initialized
+            if (!document.body.classList.contains('sidebar-closed') && !sidebar.classList.contains('closed')) {
+                // Add closed classes to start with a closed sidebar
+                document.body.classList.add('sidebar-closed');
+                sidebar.classList.add('closed');
+                console.log("Initializing sidebar in closed state");
+            } else {
+                console.log("Sidebar already initialized");
+            }
+        } else {
+            console.log("Cannot initialize sidebar - elements not found");
+        }
         
         // Add event listener to menu toggle button (the new semicircle toggle)
         if (menuToggleBtn) {
@@ -85,12 +97,27 @@ function toggleSidebar() {
     console.log("Toggle sidebar called");
     try {
         console.log("Toggling sidebar class");
-        if (document.body) {
-            document.body.classList.toggle('sidebar-closed');
-        }
         const sidebar = document.querySelector('.sidebar');
-        if (sidebar) {
-            sidebar.classList.toggle('closed');
+        const body = document.body;
+        
+        if (sidebar && body) {
+            // Get current state
+            const isClosed = sidebar.classList.contains('closed');
+            
+            // Toggle classes based on current state
+            if (isClosed) {
+                // If closed, open it
+                body.classList.remove('sidebar-closed');
+                sidebar.classList.remove('closed');
+                console.log("Opening sidebar");
+            } else {
+                // If open, close it
+                body.classList.add('sidebar-closed');
+                sidebar.classList.add('closed');
+                console.log("Closing sidebar");
+            }
+        } else {
+            console.error("Sidebar or body element not found");
         }
     } catch (error) {
         console.error("Error toggling sidebar:", error);
