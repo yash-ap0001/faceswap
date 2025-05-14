@@ -428,11 +428,15 @@ def allowed_file(filename):
 
 @app.route('/')
 def index():
-    # Redirect to the React application
-    return redirect(url_for('react.react_app'))
+    # Render the React application directly
+    return render_template('layout.html')
 
-# Since we're using the react_bp blueprint, this route is no longer needed 
-# as it's defined in react_routes.py
+# Add route for direct React access without requiring the /react prefix
+@app.route('/react')
+@app.route('/react/<path:path>')
+def react_direct(path=None):
+    """Direct renderer for react routes"""
+    return render_template('layout.html')
     
 @app.route('/get_templates')
 def get_templates_route():
