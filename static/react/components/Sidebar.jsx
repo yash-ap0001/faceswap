@@ -24,6 +24,14 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
         // Use hardcoded menu structure without Home item
         const defaultMenu = [
           {
+            id: 'universal',
+            title: 'Universal',
+            icon: 'fa-magic',
+            subItems: [
+              { id: 'universal-categories', label: 'All Categories', link: '/react#universal-categories' }
+            ]
+          },
+          {
             id: 'bride',
             title: 'Bride',
             icon: 'fa-female',
