@@ -172,7 +172,7 @@
         .template-preview {
             height: 200px;
             object-fit: cover;
-            object-position: top;
+            object-position: center 30%; /* Position shifted upward to center faces */
             border-radius: 6px 6px 0 0;
             transition: transform 0.2s ease;
             width: 100%;
@@ -182,6 +182,16 @@
         .template-preview:hover {
             transform: scale(1.03);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        /* Result image styling for face-centering */
+        .result-image {
+            height: 200px;
+            object-fit: cover;
+            object-position: center 30%; /* Position shifted upward to center faces */
+            border-radius: 6px 6px 0 0;
+            width: 100%;
+            cursor: pointer;
         }
         
         .select-template-btn {
