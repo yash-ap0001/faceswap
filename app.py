@@ -525,6 +525,7 @@ def api_menu():
             "title": "Universal",
             "icon": "fa-magic",
             "subItems": [
+                {"id": "universal-page", "label": "Universal Categories", "link": "/react/universal"},
                 {"id": "universal_face_swap", "label": "Universal Face Swap", "link": "/universal-face-swap"}
             ]
         },
