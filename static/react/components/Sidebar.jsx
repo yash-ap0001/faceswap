@@ -26,7 +26,11 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
         }
         
         const data = await response.json();
-        setMenuItems(data);
+        if (data && data.menu) {
+          setMenuItems(data.menu);
+        } else {
+          throw new Error('Invalid menu data structure');
+        }
         setError(null);
       } catch (err) {
         console.error('Error fetching menu data:', err);

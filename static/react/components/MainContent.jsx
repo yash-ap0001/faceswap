@@ -51,7 +51,7 @@ const MainContent = ({ currentPage }) => {
           <div class="alert alert-danger" role="alert">
             <h4 class="alert-heading">Error Loading Content</h4>
             <p>Failed to load page content. Please try again later.</p>
-            <hr>
+            <hr />
             <p class="mb-0">Error details: ${error.message}</p>
           </div>
         `);
