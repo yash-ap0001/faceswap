@@ -14,6 +14,9 @@ const BridalSwapPage = () => {
   const [enhanceEnabled, setEnhanceEnabled] = useState(true);
   const [enhanceMethod, setEnhanceMethod] = useState('auto');
   const [results, setResults] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   // Fetch templates when ceremony type changes
   useEffect(() => {
@@ -119,6 +122,81 @@ const BridalSwapPage = () => {
       processTemplate(template);
     }
   };
+  
+  // Open image in modal
+  const openImageModal = (result) => {
+    setSelectedImage(result);
+    setIsModalOpen(true);
+    setZoomLevel(1); // Reset zoom level
+  };
+  
+  // Close modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage(null);
+  };
+  
+  // Navigate to next image
+  const nextImage = () => {
+    if (!selectedImage) return;
+    
+    const currentIndex = results.findIndex(r => r.result_path === selectedImage.result_path);
+    if (currentIndex < results.length - 1) {
+      setSelectedImage(results[currentIndex + 1]);
+      setZoomLevel(1); // Reset zoom level
+    }
+  };
+  
+  // Navigate to previous image
+  const prevImage = () => {
+    if (!selectedImage) return;
+    
+    const currentIndex = results.findIndex(r => r.result_path === selectedImage.result_path);
+    if (currentIndex > 0) {
+      setSelectedImage(results[currentIndex - 1]);
+      setZoomLevel(1); // Reset zoom level
+    }
+  };
+  
+  // Zoom in
+  const zoomIn = () => {
+    setZoomLevel(prev => Math.min(prev + 0.25, 3));
+  };
+  
+  // Zoom out
+  const zoomOut = () => {
+    setZoomLevel(prev => Math.max(prev - 0.25, 0.5));
+  };
+  
+  // Handle keyboard navigation for modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!isModalOpen) return;
+      
+      switch (e.key) {
+        case 'ArrowRight':
+          nextImage();
+          break;
+        case 'ArrowLeft':
+          prevImage();
+          break;
+        case 'Escape':
+          closeModal();
+          break;
+        case '+':
+          zoomIn();
+          break;
+        case '-':
+          zoomOut();
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isModalOpen, selectedImage]);
 
   // Process a single template
   const processTemplate = async (template) => {
@@ -397,11 +475,18 @@ const BridalSwapPage = () => {
                         src={`${result.result_path}?t=${Date.now()}`} 
                         className="img-fluid rounded shadow-sm result-image" 
                         alt={`Result ${index + 1}`} 
+                        onClick={() => openImageModal(result)}
+                        style={{ cursor: 'pointer' }}
                         onError={(e) => {
                           console.error(`Failed to load image: ${result.result_path}`);
                           e.target.src = "/static/images/error-placeholder.jpg";
                         }}
                       />
+                      <div className="overlay" onClick={() => openImageModal(result)}>
+                        <div className="zoom-icon">
+                          <i className="fas fa-search-plus"></i>
+                        </div>
+                      </div>
                       {result.enhanced && (
                         <span className="position-absolute top-0 start-0 badge bg-info m-1" style={{fontSize: '0.65rem'}}>
                           {result.enhance_method}
@@ -450,6 +535,30 @@ const BridalSwapPage = () => {
           justify-content: center;
           overflow: hidden;
           border-radius: 0.25rem;
+          position: relative;
+        }
+        
+        .result-container .overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        
+        .result-container:hover .overlay {
+          opacity: 1;
+        }
+        
+        .zoom-icon {
+          color: white;
+          font-size: 2rem;
         }
 
         @media (max-width: 576px) {
