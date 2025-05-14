@@ -718,14 +718,14 @@
                 <!-- Bride Section -->
                 <div class="accordion-item bg-transparent border-0 mb-2">
                     <h6 class="accordion-header" id="headingBride">
-                        <button class="accordion-button bg-transparent text-white shadow-none" 
+                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
                                 type="button" data-bs-toggle="collapse" 
-                                data-bs-target="#collapseBride" aria-expanded="true" 
+                                data-bs-target="#collapseBride" aria-expanded="false" 
                                 aria-controls="collapseBride">
                             <i class="fas fa-female me-2"></i>Bride
                         </button>
                     </h6>
-                    <div id="collapseBride" class="accordion-collapse collapse show" 
+                    <div id="collapseBride" class="accordion-collapse collapse" 
                          aria-labelledby="headingBride" data-bs-parent="#sidebarAccordion">
                         <div class="accordion-body p-0 pt-2">
                             <ul class="sidebar-menu">
@@ -872,11 +872,11 @@
             
             const themeSwitch = document.getElementById('themeSwitch');
             
-            // Initialize sidebar in open state by default
+            // Initialize sidebar in closed state by default
             if (sidebar) {
-                console.log("Initializing sidebar in open state");
-                sidebar.classList.remove('closed');
-                document.body.classList.remove('sidebar-closed');
+                console.log("Initializing sidebar in closed state");
+                sidebar.classList.add('closed');
+                document.body.classList.add('sidebar-closed');
             }
             
             // Function to toggle sidebar
