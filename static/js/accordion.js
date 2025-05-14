@@ -1,6 +1,12 @@
 // Bootstrap sidebar functionality
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM content loaded");
+    console.log("DOM content loaded - initializing sidebar");
+    initSidebar();
+});
+
+// Also initialize sidebar when SPA content is loaded
+document.addEventListener('spaContentLoaded', function(event) {
+    console.log("SPA content loaded - reinitializing sidebar for:", event.detail.url);
     initSidebar();
 });
 
@@ -10,9 +16,11 @@ function initSidebar() {
         const sidebar = document.querySelector('.sidebar');
         const sidebarToggleBtn = document.querySelector('.sidebar-toggle');
         const navSidebarToggleBtn = document.querySelector('.nav-sidebar-toggle');
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
         const closeBtn = document.querySelector('.close-sidebar');
         
         console.log("Sidebar element:", sidebar);
+        console.log("Menu toggle button:", menuToggleBtn);
         console.log("Sidebar toggle button:", sidebarToggleBtn);
         console.log("Nav sidebar toggle button:", navSidebarToggleBtn);
         console.log("Close button:", closeBtn);
@@ -20,7 +28,22 @@ function initSidebar() {
         // Initialize sidebar state
         console.log("Initializing sidebar in open state");
         
-        // Add event listener to sidebar toggle button
+        // Add event listener to menu toggle button (the new semicircle toggle)
+        if (menuToggleBtn) {
+            // Remove existing event listeners (to prevent duplicates in SPA context)
+            const newMenuToggleBtn = menuToggleBtn.cloneNode(true);
+            if (menuToggleBtn.parentNode) {
+                menuToggleBtn.parentNode.replaceChild(newMenuToggleBtn, menuToggleBtn);
+            }
+            
+            console.log("Adding event listener to menu toggle button");
+            newMenuToggleBtn.addEventListener('click', function() {
+                console.log("Menu toggle button clicked");
+                toggleSidebar();
+            });
+        }
+        
+        // Add event listener to sidebar toggle button (old one, keep for compatibility)
         if (sidebarToggleBtn) {
             console.log("Adding event listener to sidebar toggle button");
             sidebarToggleBtn.addEventListener('click', function() {
@@ -29,7 +52,7 @@ function initSidebar() {
             });
         }
         
-        // Add event listener to nav sidebar toggle button
+        // Add event listener to nav sidebar toggle button (old one, keep for compatibility)
         if (navSidebarToggleBtn) {
             console.log("Adding event listener to nav sidebar toggle button");
             navSidebarToggleBtn.addEventListener('click', function() {

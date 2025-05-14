@@ -205,6 +205,16 @@ function executeScripts(contentArea) {
             }
         }
         
+        // Initialize template functionality if exists (for template pages)
+        if (typeof initializeTemplates === 'function') {
+            try {
+                console.log('Re-initializing template functionality');
+                initializeTemplates();
+            } catch (e) {
+                console.error('Error re-initializing templates:', e);
+            }
+        }
+        
         // Re-initialize Bootstrap components
         if (typeof bootstrap !== 'undefined') {
             try {
