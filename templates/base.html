@@ -191,17 +191,17 @@
             transform: translateY(-2px);
         }
         
-        /* Deep Purple Sidebar */
+        /* Transparent Sidebar */
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
             width: 250px;
             height: 100vh;
-            background: #4a148c;
+            background-color: rgba(30, 30, 30, 0.92);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            /* border-right: 2px solid #9c27b0; */
+            border-right: 2px solid var(--primary-purple);
             z-index: 1050;
             padding: 20px;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -226,9 +226,13 @@
         
         .sidebar-header h5 {
             margin: 0;
-            color: white;
+            color: var(--text-primary);
             font-size: 1.4rem;
             font-weight: 600;
+            background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
         
         .close-sidebar {
@@ -284,7 +288,7 @@
         .category-title {
             font-size: 1.1rem;
             margin-bottom: 0;
-            color: white;
+            color: var(--light-purple);
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -318,15 +322,15 @@
         /* Custom accordion styling */
         .accordion-button {
             font-size: 1.1rem;
-            color: white !important;
+            color: var(--light-purple) !important;
             font-weight: 600;
             padding: 10px;
             border-radius: 0.35rem;
-            background-color: #4a148c !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
         }
         
         .accordion-button:not(.collapsed) {
-            background-color: #5e1f9e !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;
             color: white !important;
         }
         
@@ -336,12 +340,11 @@
         }
         
         .accordion-button::after {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%239c4dcc'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
         }
         
         .accordion-button:not(.collapsed)::after {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-            transform: rotate(180deg);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
         }
         
         .sidebar-menu {
@@ -360,36 +363,35 @@
         }
         
         .sidebar-menu a {
-            color: white;
+            color: var(--text-secondary);
             text-decoration: none;
             display: block;
             padding: 8px 15px;
             border-radius: 6px;
             transition: all 0.3s ease;
-            background-color: #4a148c;
+            background-color: rgba(255, 255, 255, 0.03);
         }
         
         .sidebar-menu a:hover {
-            color: white;
-            background-color: #5e1f9e;
+            color: var(--text-primary);
+            background-color: rgba(126, 87, 194, 0.15);
         }
         
         /* Style for active/selected menu item */
         .sidebar-menu a.active {
-            color: white;
-            background-color: #5e1f9e;
-            border-left: 4px solid white;
+            color: var(--text-primary);
+            background-color: rgba(126, 87, 194, 0.25);
+            border-left: 4px solid var(--light-purple);
             padding-left: 11px; /* Compensate for the border */
             font-weight: 500;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         
         .setting-item {
-            background-color: #4a148c;
+            background-color: rgba(255, 255, 255, 0.05);
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 15px;
-            color: white;
         }
         
         .theme-switcher {
@@ -681,13 +683,34 @@
         <i class="fas fa-chevron-left"></i>
     </div>
     
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
 
+            
+            <a class="navbar-brand" href="/">
+                <span class="brand-name">VOWBRIDE</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/" title="Home">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
     
     
     <!-- Transparent Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h5 class="text-white">Menu</h5>
+            <h5>Menu</h5>
         </div>
         <div class="sidebar-content">
             <!-- Bootstrap Accordion -->
@@ -695,11 +718,11 @@
                 <!-- Bride Section -->
                 <div class="accordion-item bg-transparent border-0 mb-2">
                     <h6 class="accordion-header" id="headingBride">
-                        <button class="accordion-button text-white shadow-none collapsed" 
+                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
                                 type="button" data-bs-toggle="collapse" 
                                 data-bs-target="#collapseBride" aria-expanded="false" 
                                 aria-controls="collapseBride">
-                            <i class="fas fa-female me-2 text-white"></i>Bride
+                            <i class="fas fa-female me-2"></i>Bride
                         </button>
                     </h6>
                     <div id="collapseBride" class="accordion-collapse collapse" 
@@ -719,11 +742,11 @@
                 <!-- Groom Section -->
                 <div class="accordion-item bg-transparent border-0 mb-2">
                     <h6 class="accordion-header" id="headingGroom">
-                        <button class="accordion-button text-white shadow-none collapsed" 
+                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
                                 type="button" data-bs-toggle="collapse" 
                                 data-bs-target="#collapseGroom" aria-expanded="false" 
                                 aria-controls="collapseGroom">
-                            <i class="fas fa-male me-2 text-white"></i>Groom
+                            <i class="fas fa-male me-2"></i>Groom
                         </button>
                     </h6>
                     <div id="collapseGroom" class="accordion-collapse collapse" 
@@ -742,11 +765,11 @@
                 <!-- Services Section -->
                 <div class="accordion-item bg-transparent border-0 mb-2">
                     <h6 class="accordion-header" id="headingServices">
-                        <button class="accordion-button text-white shadow-none collapsed" 
+                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
                                 type="button" data-bs-toggle="collapse" 
                                 data-bs-target="#collapseServices" aria-expanded="false" 
                                 aria-controls="collapseServices">
-                            <i class="fas fa-concierge-bell me-2 text-white"></i>Services
+                            <i class="fas fa-concierge-bell me-2"></i>Services
                         </button>
                     </h6>
                     <div id="collapseServices" class="accordion-collapse collapse" 
@@ -757,8 +780,8 @@
                                 <li><a href="{{ url_for('event_managers') }}"><i class="fas fa-user-tie me-2"></i>Event Managers</a></li>
                                 <li><a href="{{ url_for('venue_search') }}"><i class="fas fa-building me-2"></i>Venues</a></li>
                                 <li><a href="{{ url_for('saloons') }}"><i class="fas fa-cut me-2"></i>Saloons</a></li>
-                                <li><a href="#" data-no-spa onclick="alert('Photography services coming soon');return false;"><i class="fas fa-camera me-2"></i>Photography</a></li>
-                                <li><a href="#" data-no-spa onclick="alert('Catering services coming soon');return false;"><i class="fas fa-utensils me-2"></i>Catering</a></li>
+                                <li><a href="#" onclick="alert('Photography services coming soon')"><i class="fas fa-camera me-2"></i>Photography</a></li>
+                                <li><a href="#" onclick="alert('Catering services coming soon')"><i class="fas fa-utensils me-2"></i>Catering</a></li>
                             </ul>
                         </div>
                     </div>
@@ -767,11 +790,11 @@
                 <!-- Settings Section -->
                 <div class="accordion-item bg-transparent border-0 mb-2">
                     <h6 class="accordion-header" id="headingSettings">
-                        <button class="accordion-button text-white shadow-none collapsed" 
+                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
                                 type="button" data-bs-toggle="collapse" 
                                 data-bs-target="#collapseSettings" aria-expanded="false" 
                                 aria-controls="collapseSettings">
-                            <i class="fas fa-cog me-2 text-white"></i>Settings
+                            <i class="fas fa-cog me-2"></i>Settings
                         </button>
                     </h6>
                     <div id="collapseSettings" class="accordion-collapse collapse" 
@@ -860,17 +883,70 @@
                 document.body.classList.add('sidebar-closed');
             }
             
-            // We will use the external toggleSidebar function from accordion.js
-            // This ensures we don't have multiple implementations of the same functionality
-            // The toggleSidebar function is defined in accordion.js and handles all sidebar toggling
+            // Function to toggle sidebar
+            window.toggleSidebar = function() {
+                console.log("Toggle sidebar called");
+                if (sidebar) {
+                    console.log("Toggling sidebar class");
+                    const isClosed = sidebar.classList.contains('closed');
+                    
+                    if (isClosed) {
+                        // If it's closed, open it
+                        sidebar.classList.remove('closed');
+                        document.body.classList.remove('sidebar-closed');
+                    } else {
+                        // If it's open, close it
+                        sidebar.classList.add('closed');
+                        document.body.classList.add('sidebar-closed');
+                    }
+                    
+                    // Update our new menu toggle button icon
+                    const menuToggleBtn = document.getElementById('menuToggleBtn');
+                    if (menuToggleBtn) {
+                        const menuIcon = menuToggleBtn.querySelector('i');
+                        if (menuIcon) {
+                            if (sidebar.classList.contains('closed')) {
+                                menuIcon.classList.remove('fa-chevron-left');
+                                menuIcon.classList.add('fa-chevron-right');
+                            } else {
+                                menuIcon.classList.remove('fa-chevron-right');
+                                menuIcon.classList.add('fa-chevron-left');
+                            }
+                        }
+                    }
+                } else {
+                    console.error("Sidebar element not found");
+                }
+            };
             
-            // We're not adding click event to menu toggle button here
-            // All toggle button event listeners are handled in accordion.js
+            // Add click event to menu toggle button
+            if (menuToggleBtn) {
+                console.log("Adding event listener to menu toggle button");
+                menuToggleBtn.addEventListener('click', function(e) {
+                    console.log("Menu toggle button clicked");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleSidebar();
+                });
+            } else {
+                console.log("Menu toggle button not found");
+            }
             
             // Only using the menu toggle button for sidebar controls
             
-            // Note: Close sidebar when clicking outside functionality is 
-            // now handled in accordion.js to avoid conflicts
+            // Close sidebar when clicking outside
+            document.addEventListener('click', function(event) {
+                if (sidebar) {
+                    const isClickInside = 
+                        sidebar.contains(event.target) || 
+                        (menuToggleBtn && menuToggleBtn.contains(event.target));
+                    
+                    if (!isClickInside && !sidebar.classList.contains('closed')) {
+                        // Use the toggleSidebar function for consistency
+                        toggleSidebar();
+                    }
+                }
+            });
             
             // Theme switcher - already using dark purple theme
             if (themeSwitch) {
@@ -938,8 +1014,7 @@
                 
                 // Open sidebar on notification click
                 notification.querySelector('.notification-content').addEventListener('click', function() {
-                    // Call the global toggleSidebar function from accordion.js
-                    window.toggleSidebar();
+                    toggleSidebar();
                     notification.classList.remove('show');
                     setTimeout(() => notification.remove(), 300);
                 });

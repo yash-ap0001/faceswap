@@ -1,316 +1,208 @@
 /**
- * SPA (Single Page Application) functionality for the wedding app
- * Handles navigation without full page reloads
+ * SPA (Single Page Application) Functionality
+ * Handles routing and content loading without full page reloads
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize SPA functionality
     initSPA();
 });
 
-/**
- * Initialize SPA functionality
- */
 function initSPA() {
-    console.log('Initializing SPA functionality');
+    // Set up event listeners for all sidebar links
+    setupSidebarLinks();
     
-    try {
-        // Intercept all internal link clicks
-        document.addEventListener('click', function(event) {
-            try {
-                // Find closest anchor tag if the click was on a child element
-                const link = event.target.closest('a');
-                
-                // If not a link, don't intercept
-                if (!link) {
-                    return;
-                }
-                
-                // Get href attribute and check if it exists
-                const href = link.getAttribute('href');
-                if (!href) {
-                    return;
-                }
-                
-                // Special cases - don't intercept these
-                if (href.startsWith('http') ||      // External links
-                    href.startsWith('#') ||         // Anchor links
-                    href === '' ||                  // Empty links
-                    href.includes('logout') ||      // Logout links (needs full reload)
-                    href.includes('login') ||       // Login links (needs full reload)
-                    href.includes('upload_file') || // File upload endpoints
-                    link.getAttribute('target') === '_blank' || // New window links
-                    link.getAttribute('download') || // Download links
-                    link.hasAttribute('data-no-spa') || // Explicitly marked to avoid SPA
-                    link.hasAttribute('onclick'))   // Has onclick handler
-                {
-                    console.log('Not intercepting link:', href);
-                    return;
-                }
+    // Store the current page for browser history
+    window.currentPage = window.location.pathname;
+    
+    // Set up browser back/forward button handling
+    window.addEventListener('popstate', function(event) {
+        if (event.state && event.state.url) {
+            loadContent(event.state.url, false);
+        }
+    });
+}
 
-                // Debug info
-                console.log('Intercepting link click:', href);
-                
-                // Prevent default anchor click behavior
-                event.preventDefault();
-                
-                // Navigate to the link using our SPA loader
-                navigateTo(href);
-            } catch (error) {
-                console.error('Error in click handler:', error);
-            }
-        });
-
-        // Handle browser history navigation (back/forward buttons)
-        window.addEventListener('popstate', function(event) {
-            try {
-                if (event.state && event.state.path) {
-                    loadContent(event.state.path, false);
-                }
-            } catch (error) {
-                console.error('Error in popstate handler:', error);
-            }
-        });
+function setupSidebarLinks() {
+    // Get all sidebar menu links
+    const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
+    
+    sidebarLinks.forEach(link => {
+        // Skip links with onclick handlers (they already have custom behavior)
+        if (link.hasAttribute('onclick')) {
+            return;
+        }
         
-        console.log('SPA initialization complete');
-    } catch (error) {
-        console.error('Error initializing SPA:', error);
-    }
+        // Get the href attribute
+        const href = link.getAttribute('href');
+        
+        // If it's an external link or anchor, skip it
+        if (!href || href.startsWith('http') || href.startsWith('#')) {
+            return;
+        }
+        
+        // Add click event listener
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            
+            // Update URL in the address bar without reloading
+            const currentUrl = window.location.pathname;
+            const newUrl = this.getAttribute('href');
+            
+            // Don't reload if we're already on the same page
+            if (currentUrl === newUrl) {
+                return;
+            }
+            
+            // Load content
+            loadContent(newUrl, true);
+            
+            // Update active state in sidebar
+            updateActiveSidebarItem(this);
+        });
+    });
 }
 
-/**
- * Navigate to a new URL without page reload
- * @param {string} url - The URL to navigate to
- */
-function navigateTo(url) {
-    console.log(`Navigating to: ${url}`);
-    
-    // Update browser history and load content
-    window.history.pushState({ path: url }, '', url);
-    loadContent(url, true);
-}
-
-/**
- * Load content from the server and update the page
- * @param {string} url - The URL to load content from
- * @param {boolean} updateActiveState - Whether to update the active state in the sidebar
- */
-function loadContent(url, updateActiveState = true) {
+function loadContent(url, pushState = true) {
     console.log(`Loading content from: ${url}`);
     
     // Show loading indicator
-    const contentArea = document.querySelector('main');
-    if (contentArea) {
-        contentArea.innerHTML = '<div class="container"><div class="text-center p-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div></div>';
-    } else {
-        console.error('Main content area not found');
-        return;
-    }
+    showLoading();
     
-    // Fetch the HTML content from the server
+    // Fetch the content
     fetch(url)
         .then(response => {
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.text();
         })
         .then(html => {
-            try {
-                // Create a temporary element to parse the HTML
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
+            // Parse the HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Extract just the content section
+            const newContent = doc.querySelector('#dynamic-content');
+            
+            if (newContent) {
+                // Update the content
+                document.getElementById('dynamic-content').innerHTML = newContent.innerHTML;
                 
-                // Extract the main content from the loaded page
-                const newContent = doc.querySelector('main');
-                
-                // Update the page content if content area found
-                if (newContent) {
-                    // Only update the inner content of main
-                    contentArea.innerHTML = newContent.innerHTML;
-                    
-                    // Update page title
-                    const newTitle = doc.querySelector('title');
-                    if (newTitle) {
-                        document.title = newTitle.textContent;
-                    }
-                    
-                    // Execute any scripts in the new content
-                    executeScripts(contentArea);
-                    
-                    // Update active state in sidebar if needed
-                    if (updateActiveState) {
-                        updateActiveSidebarItem(url);
-                    }
-                    
-                    // Scroll to top
-                    window.scrollTo(0, 0);
-                } else {
-                    console.error('Could not find main content in loaded page');
-                    // If content area not found, redirect to the page (fallback)
-                    window.location.href = url;
+                // Update the page title
+                const newTitle = doc.querySelector('title');
+                if (newTitle) {
+                    document.title = newTitle.textContent;
                 }
-            } catch (error) {
-                console.error('Error processing HTML:', error);
-                window.location.href = url;
+                
+                // Update browser history
+                if (pushState) {
+                    window.history.pushState({url: url}, document.title, url);
+                    window.currentPage = url;
+                }
+                
+                // Initialize any scripts in the new content
+                initContentScripts();
+            } else {
+                console.error('Content element not found in fetched page');
             }
+            
+            // Hide loading indicator
+            hideLoading();
         })
         .catch(error => {
             console.error('Error fetching content:', error);
-            // On error, redirect to the page (fallback)
+            hideLoading();
+            // Fallback to traditional page load on error
             window.location.href = url;
         });
 }
 
-/**
- * Execute scripts found in content area and also re-initialize common functionality
- * @param {HTMLElement} contentArea - The content area element
- */
-function executeScripts(contentArea) {
-    try {
-        // First execute inline scripts
-        const scripts = contentArea.querySelectorAll('script');
-        scripts.forEach(oldScript => {
-            try {
-                const newScript = document.createElement('script');
-                
-                // Copy all attributes from the old script to the new one
-                if (oldScript.attributes) {
-                    Array.from(oldScript.attributes).forEach(attr => {
-                        newScript.setAttribute(attr.name, attr.value);
-                    });
-                }
-                
-                // Copy the content of the script
-                newScript.textContent = oldScript.textContent;
-                
-                // Replace the old script with the new one
-                if (oldScript.parentNode) {
-                    oldScript.parentNode.replaceChild(newScript, oldScript);
-                }
-            } catch (error) {
-                console.error('Error executing individual script:', error);
-            }
-        });
-        
-        // Call common initialization functions that are normally called on DOMContentLoaded
-        // This will re-initialize components that were loaded via SPA
-        
-        // Initialize accordion functionality if exists
-        if (typeof initializeAccordion === 'function') {
-            try {
-                console.log('Re-initializing accordion functionality');
-                initializeAccordion();
-            } catch (e) {
-                console.error('Error re-initializing accordion:', e);
-            }
+function updateActiveSidebarItem(activeLink) {
+    // Remove active class from all menu items
+    document.querySelectorAll('.sidebar-menu a').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Add active class to the clicked link
+    activeLink.classList.add('active');
+    
+    // Ensure the parent accordion is open
+    const accordionItem = activeLink.closest('.accordion-collapse');
+    if (accordionItem && !accordionItem.classList.contains('show')) {
+        const accordionId = accordionItem.getAttribute('id');
+        const accordionButton = document.querySelector(`[data-bs-target="#${accordionId}"]`);
+        if (accordionButton) {
+            accordionButton.click();
         }
-        
-        // Initialize template functionality if exists (for template pages)
-        if (typeof initializeTemplates === 'function') {
-            try {
-                console.log('Re-initializing template functionality');
-                initializeTemplates();
-            } catch (e) {
-                console.error('Error re-initializing templates:', e);
-            }
-        }
-        
-        // Re-initialize Bootstrap components
-        if (typeof bootstrap !== 'undefined') {
-            try {
-                console.log('Re-initializing Bootstrap components');
-                
-                // Tooltips
-                const tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                tooltips.forEach(el => {
-                    try { new bootstrap.Tooltip(el); } catch(e) { console.error('Tooltip init error:', e); }
-                });
-                
-                // Popovers
-                const popovers = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-                popovers.forEach(el => {
-                    try { new bootstrap.Popover(el); } catch(e) { console.error('Popover init error:', e); }
-                });
-                
-                // Initialize any modals if needed
-                const modals = [].slice.call(document.querySelectorAll('.modal'));
-                modals.forEach(modalEl => {
-                    try { new bootstrap.Modal(modalEl); } catch(e) { console.error('Modal init error:', e); }
-                });
-                
-            } catch (e) {
-                console.error('Error re-initializing Bootstrap components:', e);
-            }
-        }
-        
-        // Trigger a custom event that page-specific scripts can listen for
-        document.dispatchEvent(new CustomEvent('spaContentLoaded', {
-            detail: { url: window.location.pathname }
-        }));
-        
-        console.log('SPA content scripts executed successfully');
-    } catch (error) {
-        console.error('Error executing scripts:', error);
     }
 }
 
-/**
- * Update the active state in the sidebar based on current URL
- * @param {string} url - The current URL
- */
-function updateActiveSidebarItem(url) {
-    try {
-        console.log('Updating active sidebar item for URL:', url);
+function showLoading() {
+    // Check if loading overlay already exists
+    let loadingOverlay = document.getElementById('spa-loading-overlay');
+    
+    if (!loadingOverlay) {
+        // Create loading overlay
+        loadingOverlay = document.createElement('div');
+        loadingOverlay.id = 'spa-loading-overlay';
+        loadingOverlay.innerHTML = `
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        `;
         
-        // Remove active class from all sidebar items
-        const allLinks = document.querySelectorAll('.accordion-body a');
-        allLinks.forEach(link => {
-            try {
-                link.classList.remove('active');
-            } catch (e) {
-                console.error('Error removing active class:', e);
-            }
+        // Add styles
+        loadingOverlay.style.position = 'fixed';
+        loadingOverlay.style.top = '0';
+        loadingOverlay.style.left = '0';
+        loadingOverlay.style.width = '100%';
+        loadingOverlay.style.height = '100%';
+        loadingOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        loadingOverlay.style.display = 'flex';
+        loadingOverlay.style.justifyContent = 'center';
+        loadingOverlay.style.alignItems = 'center';
+        loadingOverlay.style.zIndex = '9999';
+        
+        // Add to body
+        document.body.appendChild(loadingOverlay);
+    } else {
+        // Show existing overlay
+        loadingOverlay.style.display = 'flex';
+    }
+}
+
+function hideLoading() {
+    const loadingOverlay = document.getElementById('spa-loading-overlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+    }
+}
+
+function initContentScripts() {
+    // Initialize any scripts that need to run when new content is loaded
+    // For example, you might need to set up event handlers for elements in the new content
+    
+    // This would initialize image galleries, if any
+    if (typeof initializeGallery === 'function') {
+        initializeGallery();
+    }
+    
+    // This would initialize template selection, if any
+    if (typeof refreshTemplates === 'function') {
+        refreshTemplates();
+    }
+    
+    // This would initialize any file upload previews, if any
+    if (typeof setupImagePreviews === 'function') {
+        setupImagePreviews();
+    }
+    
+    // This would initialize any accordion components, if any
+    const accordionElements = document.querySelectorAll('.accordion');
+    if (accordionElements.length > 0) {
+        accordionElements.forEach(accordion => {
+            new bootstrap.Accordion(accordion);
         });
-        
-        // Find the matching sidebar item and make it active
-        let foundMatch = false;
-        allLinks.forEach(link => {
-            try {
-                const linkHref = link.getAttribute('href');
-                if (!linkHref) return;
-                
-                // Check for exact match or if the URL ends with the link href
-                if (linkHref === url || url.endsWith(linkHref)) {
-                    console.log('Found matching sidebar link:', linkHref);
-                    link.classList.add('active');
-                    foundMatch = true;
-                    
-                    // Open the parent accordion if it's closed
-                    const accordionItem = link.closest('.accordion-collapse');
-                    if (accordionItem && !accordionItem.classList.contains('show')) {
-                        const accordionId = accordionItem.getAttribute('id');
-                        if (accordionId) {
-                            const accordionButton = document.querySelector(`[data-bs-target="#${accordionId}"]`);
-                            if (accordionButton && typeof bootstrap !== 'undefined') {
-                                try {
-                                    const bsCollapse = new bootstrap.Collapse(accordionItem);
-                                    bsCollapse.show();
-                                } catch (error) {
-                                    console.error('Error showing accordion:', error);
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (e) {
-                console.error('Error processing sidebar link:', e);
-            }
-        });
-        
-        if (!foundMatch) {
-            console.log('No matching sidebar item found for:', url);
-        }
-    } catch (error) {
-        console.error('Error updating active sidebar item:', error);
     }
 }

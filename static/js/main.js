@@ -1,5 +1,4 @@
-// Function to initialize page elements and event handlers
-function initializePage() {
+document.addEventListener('DOMContentLoaded', function() {
     // DOM Elements - use defensive programming to check if elements exist before using them
     const uploadForm = document.getElementById('upload-form');
     const sourceInput = document.getElementById('source-input');
@@ -265,13 +264,4 @@ function initializePage() {
                 }
             });
     }
-}
-
-// Call the initialization function when the DOM is loaded
-document.addEventListener('DOMContentLoaded', initializePage);
-
-// Also listen for SPA content loaded events to reinitialize the page
-document.addEventListener('spaContentLoaded', function(event) {
-    console.log('SPA content loaded, reinitializing page:', event.detail.url);
-    initializePage();
 });

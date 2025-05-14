@@ -1,16 +1,5 @@
 /* Custom styles for the Face Swap App */
 
-/* Adjust main padding to account for no header */
-main {
-    padding-top: 1rem;
-}
-
-/* Ensure sidebar is at the proper height without header */
-.sidebar {
-    top: 0;
-    height: 100vh;
-}
-
 .image-preview-container {
     height: 200px;
     border: 2px dashed var(--bs-secondary);
