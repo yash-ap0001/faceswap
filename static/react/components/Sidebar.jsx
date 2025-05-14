@@ -114,12 +114,18 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
   const handleItemClick = (id, link) => {
     onNavigation(id);
     
+    console.log('DEBUG: Menu item clicked:', id, 'link:', link);
+    
     // Check if the link is a direct URL (not a hash route)
-    if (link.includes('/react/') && !link.includes('#')) {
-      // For direct links like /react/universal, use regular navigation
+    if ((link.includes('/react/') && !link.includes('#')) || 
+        link.startsWith('/universal-face-swap') || 
+        link.startsWith('/universal_face_swap')) {
+      // For direct links like /react/universal or non-React endpoints, use regular navigation
+      console.log('DEBUG: Navigating to direct URL:', link);
       window.location.href = link;
     } else {
       // For hash routes, use history API for navigation without page reload
+      console.log('DEBUG: Using history API for hash route:', link);
       window.history.pushState({}, '', link);
       
       // Dispatch a custom event to notify about route change
