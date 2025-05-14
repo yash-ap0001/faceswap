@@ -25,10 +25,11 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
         console.log('DEBUG: About to fetch menu data from API');
         
         // Actually fetch menu from API instead of using hardcoded values
-        const response = await fetch('/api/menu', {
+        console.log('DEBUG: Fetching from /api/menu with timestamp:', new Date().getTime());
+        const response = await fetch('/api/menu?t=' + new Date().getTime(), {
           headers: {
             'Accept': 'application/json',
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
           }
         });
         
