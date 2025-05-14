@@ -1172,6 +1172,22 @@
                 });
             });
             
+            // Toggle Templates Button (Show/Hide templates section)
+            document.getElementById('toggleTemplatesBtn').addEventListener('click', () => {
+                const templatesSection = document.getElementById('templatesSection');
+                const toggleBtn = document.getElementById('toggleTemplatesBtn');
+                
+                if (templatesSection.style.display === 'none') {
+                    // Show templates
+                    templatesSection.style.display = 'block';
+                    toggleBtn.innerHTML = '<i class="fas fa-images me-1"></i> Hide Templates';
+                } else {
+                    // Hide templates
+                    templatesSection.style.display = 'none';
+                    toggleBtn.innerHTML = '<i class="fas fa-images me-1"></i> Show Templates';
+                }
+            });
+            
             // Handle the "Use This Template" button in the template viewer
             document.addEventListener('click', (e) => {
                 if (e.target.closest('#processViewedTemplateBtn')) {
