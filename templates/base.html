@@ -318,15 +318,15 @@
         /* Custom accordion styling */
         .accordion-button {
             font-size: 1.1rem;
-            color: var(--light-purple) !important;
+            color: white !important;
             font-weight: 600;
             padding: 10px;
             border-radius: 0.35rem;
-            background-color: rgba(255, 255, 255, 0.05) !important;
+            background-color: #4a148c !important;
         }
         
         .accordion-button:not(.collapsed) {
-            background-color: rgba(255, 255, 255, 0.1) !important;
+            background-color: #5e1f9e !important;
             color: white !important;
         }
         
@@ -336,11 +336,12 @@
         }
         
         .accordion-button::after {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%239c4dcc'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
         }
         
         .accordion-button:not(.collapsed)::after {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+            transform: rotate(180deg);
         }
         
         .sidebar-menu {
@@ -697,7 +698,7 @@
                                 type="button" data-bs-toggle="collapse" 
                                 data-bs-target="#collapseBride" aria-expanded="false" 
                                 aria-controls="collapseBride">
-                            <i class="fas fa-female me-2"></i>Bride
+                            <i class="fas fa-female me-2 text-white"></i>Bride
                         </button>
                     </h6>
                     <div id="collapseBride" class="accordion-collapse collapse" 
@@ -721,7 +722,7 @@
                                 type="button" data-bs-toggle="collapse" 
                                 data-bs-target="#collapseGroom" aria-expanded="false" 
                                 aria-controls="collapseGroom">
-                            <i class="fas fa-male me-2"></i>Groom
+                            <i class="fas fa-male me-2 text-white"></i>Groom
                         </button>
                     </h6>
                     <div id="collapseGroom" class="accordion-collapse collapse" 
