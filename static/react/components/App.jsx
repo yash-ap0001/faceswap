@@ -5,7 +5,6 @@ import HomePage from './pages/HomePage';
 import BridalSwapPage from './pages/BridalSwapPage';
 import BridalGalleryPage from './pages/BridalGalleryPage';
 import UniversalSwapPage from './pages/UniversalSwapPage';
-import UniversalPage from './pages/UniversalPage';
 
 /**
  * Main App component that manages the application layout and state
