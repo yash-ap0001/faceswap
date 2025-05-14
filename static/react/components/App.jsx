@@ -81,7 +81,9 @@ const App = () => {
       case 'makeup-artists':
         return <UniversalSwapPage category="bride-saloon" />;
       case 'universal-categories':
-        return <UniversalPage />;
+        // Redirect to the server-side universal template page
+        window.location.href = '/universal';
+        return null;
       default:
         // For pages that don't have dedicated components yet
         return <MainContent currentPage={currentPage} />;

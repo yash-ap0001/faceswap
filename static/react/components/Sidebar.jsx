@@ -28,7 +28,7 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Universal',
             icon: 'fa-magic',
             subItems: [
-              { id: 'universal-categories', label: 'All Categories', link: '/react#universal-categories' }
+              { id: 'universal-categories', label: 'All Categories', link: '/universal', directLink: true }
             ]
           },
           {
