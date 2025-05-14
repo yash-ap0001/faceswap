@@ -170,31 +170,28 @@
     color: rgba(255, 255, 255, 0.9);
 }
 
-/* Perfect semicircle toggle button */
+/* Original toggle button */
 .sidebar-toggle {
     position: fixed;
-    top: 50%;
-    left: var(--sidebar-width);
-    width: var(--sidebar-toggle-size);
-    height: var(--sidebar-toggle-size);
-    background-color: white;
-    border-radius: 0 var(--sidebar-toggle-radius) var(--sidebar-toggle-radius) 0;
-    border: var(--sidebar-toggle-border);
-    border-left: none;
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    background-color: var(--sidebar-gradient-start);
+    border-radius: 5px;
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 1031;
-    transform: translateY(-50%);
-    box-shadow: 3px 0 8px rgba(0, 0, 0, 0.1);
+    z-index: 1040;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
 }
 
 .sidebar-toggle i {
-    color: var(--sidebar-gradient-start);
+    color: white;
     font-size: 1.2rem;
-    transition: transform 0.3s ease;
 }
 
 /* Sidebar collapsed state */
@@ -203,9 +200,9 @@
     transform: translateX(-100%);
 }
 
-/* Adjust toggle button position when sidebar is collapsed */
-.sidebar.sidebar-collapsed + .sidebar-toggle {
-    left: 0;
+/* Toggle button position is fixed regardless of sidebar state */
+.sidebar-toggle {
+    left: 10px;
 }
 
 /* Adjust margin for main content to accommodate sidebar */

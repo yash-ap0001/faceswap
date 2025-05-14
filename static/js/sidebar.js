@@ -2,48 +2,53 @@
  * JavaScript for managing the sidebar behavior
  */
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM content loaded");
+    
     // Elements
-    const menuToggleBtn = document.getElementById('menuToggleBtn');
     const sidebar = document.getElementById('sidebar');
+    console.log("Sidebar element:", sidebar);
+    
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    console.log("Sidebar toggle button:", menuToggleBtn);
+    
     const mainContent = document.querySelector('main');
     
-    // Check for stored sidebar state
-    const sidebarState = localStorage.getItem('sidebarState');
-    if (sidebarState === 'closed') {
-        sidebar.classList.add('sidebar-collapsed');
-        mainContent.classList.add('expanded');
-    }
-    
-    // Toggle sidebar function
+    // Simple sidebar toggle function
     function toggleSidebar() {
+        console.log("Toggle sidebar called");
+        console.log("Toggling sidebar class");
         sidebar.classList.toggle('sidebar-collapsed');
-        mainContent.classList.toggle('expanded');
-        
-        // Store sidebar state
-        if (sidebar.classList.contains('sidebar-collapsed')) {
-            localStorage.setItem('sidebarState', 'closed');
-            menuToggleBtn.querySelector('i').classList.remove('fa-chevron-left');
-            menuToggleBtn.querySelector('i').classList.add('fa-chevron-right');
-        } else {
-            localStorage.setItem('sidebarState', 'open');
-            menuToggleBtn.querySelector('i').classList.remove('fa-chevron-right');
-            menuToggleBtn.querySelector('i').classList.add('fa-chevron-left');
+        if(mainContent) {
+            mainContent.classList.toggle('expanded');
         }
     }
     
-    // Toggle sidebar when the toggle button is clicked
-    if (menuToggleBtn) {
-        menuToggleBtn.addEventListener('click', toggleSidebar);
+    // Initialize sidebar based on stored state
+    const sidebarState = localStorage.getItem('sidebarState');
+    if (sidebarState === 'closed') {
+        console.log("Initializing sidebar in closed state");
+        sidebar.classList.add('sidebar-collapsed');
+        if(mainContent) {
+            mainContent.classList.add('expanded');
+        }
+    } else {
+        console.log("Initializing sidebar in open state");
     }
     
-    // Update icon orientation based on current state
-    if (sidebar.classList.contains('sidebar-collapsed')) {
-        menuToggleBtn.querySelector('i').classList.remove('fa-chevron-left');
-        menuToggleBtn.querySelector('i').classList.add('fa-chevron-right');
+    // Add click event to toggle button
+    if (menuToggleBtn) {
+        console.log("Adding event listener to sidebar toggle button");
+        menuToggleBtn.addEventListener('click', function() {
+            console.log("Sidebar toggle button clicked");
+            toggleSidebar();
+            console.log("Menu toggle button clicked");
+        });
+        console.log("Menu toggle button:", menuToggleBtn);
     }
     
     // Add active class to current menu item
     const currentPath = window.location.pathname;
+    console.log("Current path:", currentPath);
     document.querySelectorAll('.sidebar-menu a').forEach(link => {
         if (link.getAttribute('href') === currentPath) {
             link.classList.add('active');
