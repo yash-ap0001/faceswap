@@ -1467,11 +1467,16 @@ def process_template():
         # Make the path directly usable by the browser
         result_url = f"/static/results/{os.path.basename(result_filename)}"
         
+        # Get template information from path for display purposes
+        template_id = os.path.basename(template_path).split('.')[0]
+        
         response_data = {
             'success': True,
             'result_path': result_url,
             'enhanced': enhanced,
-            'enhance_method': enhance_method if enhanced else None
+            'enhance_method': enhance_method if enhanced else None,
+            'template_path': template_path,
+            'template_id': template_id
         }
         
         app.logger.info(f"Returning response: {response_data}")
