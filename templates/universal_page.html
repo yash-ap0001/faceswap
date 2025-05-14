@@ -670,8 +670,8 @@
                                                 </div>
                                             </div>
                                             <div class="position-absolute top-0 end-0 p-2">
-                                                <button class="btn btn-sm btn-light rounded-circle shadow-sm" 
-                                                    onclick="window.open('${template.url}', '_blank')" 
+                                                <button class="btn btn-sm btn-light rounded-circle shadow-sm view-image-btn" 
+                                                    data-img-src="${template.url}" 
                                                     title="View full size">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
@@ -892,10 +892,10 @@
                                                             data-result-name="Result ${index + 1} - ${filename}"
                                                             style="height: 220px; object-fit: cover; cursor: pointer; border-radius: 6px 6px 0 0;">
                                                         <div class="position-absolute top-0 end-0 p-2">
-                                                            <button class="btn btn-sm btn-light rounded-circle shadow-sm" 
-                                                                onclick="window.open('${resultData.result_path}', '_blank')" 
-                                                                title="Open in new tab">
-                                                                <i class="fas fa-external-link-alt"></i>
+                                                            <button class="btn btn-sm btn-light rounded-circle shadow-sm view-image-btn" 
+                                                                data-img-src="${resultData.result_path}" 
+                                                                title="View full size">
+                                                                <i class="fas fa-eye"></i>
                                                             </button>
                                                         </div>
                                                         <div class="position-absolute bottom-0 start-0 p-2">
@@ -1081,10 +1081,10 @@
                                             data-result-name="Result - ${filename}"
                                             style="height: 220px; object-fit: cover; cursor: pointer; border-radius: 6px 6px 0 0;">
                                         <div class="position-absolute top-0 end-0 p-2">
-                                            <button class="btn btn-sm btn-light rounded-circle shadow-sm" 
-                                                onclick="window.open('${resultData.result_path}', '_blank')" 
-                                                title="Open in new tab">
-                                                <i class="fas fa-external-link-alt"></i>
+                                            <button class="btn btn-sm btn-light rounded-circle shadow-sm view-image-btn" 
+                                                data-img-src="${resultData.result_path}" 
+                                                title="View full size">
+                                                <i class="fas fa-eye"></i>
                                             </button>
                                         </div>
                                         <div class="position-absolute bottom-0 start-0 p-2">
