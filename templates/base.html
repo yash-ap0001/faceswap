@@ -860,70 +860,17 @@
                 document.body.classList.add('sidebar-closed');
             }
             
-            // Function to toggle sidebar
-            window.toggleSidebar = function() {
-                console.log("Toggle sidebar called");
-                if (sidebar) {
-                    console.log("Toggling sidebar class");
-                    const isClosed = sidebar.classList.contains('closed');
-                    
-                    if (isClosed) {
-                        // If it's closed, open it
-                        sidebar.classList.remove('closed');
-                        document.body.classList.remove('sidebar-closed');
-                    } else {
-                        // If it's open, close it
-                        sidebar.classList.add('closed');
-                        document.body.classList.add('sidebar-closed');
-                    }
-                    
-                    // Update our new menu toggle button icon
-                    const menuToggleBtn = document.getElementById('menuToggleBtn');
-                    if (menuToggleBtn) {
-                        const menuIcon = menuToggleBtn.querySelector('i');
-                        if (menuIcon) {
-                            if (sidebar.classList.contains('closed')) {
-                                menuIcon.classList.remove('fa-chevron-left');
-                                menuIcon.classList.add('fa-chevron-right');
-                            } else {
-                                menuIcon.classList.remove('fa-chevron-right');
-                                menuIcon.classList.add('fa-chevron-left');
-                            }
-                        }
-                    }
-                } else {
-                    console.error("Sidebar element not found");
-                }
-            };
+            // We will use the external toggleSidebar function from accordion.js
+            // This ensures we don't have multiple implementations of the same functionality
+            // The toggleSidebar function is defined in accordion.js and handles all sidebar toggling
             
-            // Add click event to menu toggle button
-            if (menuToggleBtn) {
-                console.log("Adding event listener to menu toggle button");
-                menuToggleBtn.addEventListener('click', function(e) {
-                    console.log("Menu toggle button clicked");
-                    e.preventDefault();
-                    e.stopPropagation();
-                    toggleSidebar();
-                });
-            } else {
-                console.log("Menu toggle button not found");
-            }
+            // We're not adding click event to menu toggle button here
+            // All toggle button event listeners are handled in accordion.js
             
             // Only using the menu toggle button for sidebar controls
             
-            // Close sidebar when clicking outside
-            document.addEventListener('click', function(event) {
-                if (sidebar) {
-                    const isClickInside = 
-                        sidebar.contains(event.target) || 
-                        (menuToggleBtn && menuToggleBtn.contains(event.target));
-                    
-                    if (!isClickInside && !sidebar.classList.contains('closed')) {
-                        // Use the toggleSidebar function for consistency
-                        toggleSidebar();
-                    }
-                }
-            });
+            // Note: Close sidebar when clicking outside functionality is 
+            // now handled in accordion.js to avoid conflicts
             
             // Theme switcher - already using dark purple theme
             if (themeSwitch) {
