@@ -50,6 +50,18 @@
             font-weight: 900;
             margin: 0;
             padding: 0;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .logo-text::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
         }
         
         .app-header {
@@ -67,6 +79,35 @@
         .app-header .logo-container {
             display: flex;
             align-items: center;
+        }
+        
+        .navigation {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-item {
+            color: #f8f9fa;
+            text-decoration: none;
+            padding: 8px 15px;
+            margin: 0 5px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            border: 1px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background-color: rgba(138, 43, 226, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-item.active {
+            background-color: rgba(138, 43, 226, 0.2);
+            font-weight: 600;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            box-shadow: 0 2px 4px rgba(138, 43, 226, 0.2);
         }
         
         .main-container {
@@ -279,65 +320,19 @@
         </div>
     </div>
     <div class="app-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h1 class="logo-text brand-name">VOWBRIDE</h1>
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-container">
+                <h1 class="logo-text brand-name">VOW-BRIDE</h1>
             </div>
-            <div class="sidebar-content">
-                <div class="section-header">
-                    <i class="fas fa-magic me-2"></i>
-                    <span>Universal</span>
-                </div>
-                <ul class="menu-items">
-                    <li class="active">
-                        <a href="/universal" class="text-decoration-none text-white">All Categories</a>
-                    </li>
-                </ul>
-                
-                <div class="section-header">
-                    <i class="fas fa-female me-2"></i>
-                    <span>Bride</span>
-                </div>
-                <ul class="menu-items">
-                    <li>
-                        <a href="/bridal-gallery" class="text-decoration-none text-white">Bridal Gallery</a>
-                    </li>
-                    <li>
-                        <a href="/bridal-swap" class="text-decoration-none text-white">Create Bride Look</a>
-                    </li>
-                    <li>
-                        <a href="/outfits-for-girls" class="text-decoration-none text-white">Outfits for Girls</a>
-                    </li>
-                </ul>
-                
-                <div class="section-header">
-                    <i class="fas fa-male me-2"></i>
-                    <span>Groom</span>
-                </div>
-                <ul class="menu-items">
-                    <li>
-                        <a href="/groom-face-swap" class="text-decoration-none text-white">Create Groom Look</a>
-                    </li>
-                    <li>
-                        <a href="/traditional-wear" class="text-decoration-none text-white">Traditional Wear</a>
-                    </li>
-                </ul>
-                
-                <div class="section-header">
-                    <i class="fas fa-cut me-2"></i>
-                    <span>Saloons</span>
-                </div>
-                <ul class="menu-items">
-                    <li>
-                        <a href="/bride-saloons" class="text-decoration-none text-white">Bride Saloons</a>
-                    </li>
-                    <li>
-                        <a href="/groom-saloons" class="text-decoration-none text-white">Groom Saloons</a>
-                    </li>
-                </ul>
+            <div class="navigation">
+                <a href="/universal" class="nav-item active"><i class="fas fa-magic me-1"></i> All Categories</a>
+                <a href="/bridal-gallery" class="nav-item"><i class="fas fa-female me-1"></i> Bridal Gallery</a>
+                <a href="/bridal-swap" class="nav-item"><i class="fas fa-exchange-alt me-1"></i> Create Bride Look</a>
+                <a href="/groom-face-swap" class="nav-item"><i class="fas fa-male me-1"></i> Create Groom Look</a>
+                <a href="/bride-saloons" class="nav-item"><i class="fas fa-cut me-1"></i> Saloons</a>
             </div>
-        </div>
+        </header>
         
         <!-- Main Content -->
         <div class="main-container">
