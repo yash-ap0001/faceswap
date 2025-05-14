@@ -590,7 +590,94 @@ const BridalSwapPage = () => {
           background-color: #0d6efd;
           border-color: #0d6efd;
         }
+        
+        /* Modal styles */
+        .modal-backdrop {
+          opacity: 0.85;
+        }
+        
+        .modal-fullscreen {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+        
+        .modal-content {
+          height: 100%;
+          border: 0;
+          border-radius: 0;
+        }
       `}</style>
+      
+      {/* Image Modal */}
+      {isModalOpen && selectedImage && (
+        <div className="modal fade show" tabIndex="-1" role="dialog" style={{display: 'block'}}>
+          <div className="modal-backdrop fade show" style={{ 
+            backdropFilter: 'blur(5px)',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)'
+          }} onClick={closeModal}></div>
+          <div className="modal-dialog modal-fullscreen modal-dialog-centered">
+            <div className="modal-content bg-transparent border-0">
+              <div className="d-flex justify-content-between align-items-center p-2">
+                <div>
+                  <button className="btn btn-sm btn-dark me-2" onClick={prevImage} disabled={results.findIndex(r => r.result_path === selectedImage.result_path) === 0}>
+                    <i className="fas fa-chevron-left"></i>
+                  </button>
+                  <button className="btn btn-sm btn-dark" onClick={nextImage} disabled={results.findIndex(r => r.result_path === selectedImage.result_path) === results.length - 1}>
+                    <i className="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+                <div className="text-center text-white">
+                  {results.findIndex(r => r.result_path === selectedImage.result_path) + 1} / {results.length}
+                </div>
+                <div>
+                  <button className="btn btn-sm btn-dark me-2" onClick={zoomOut}>
+                    <i className="fas fa-search-minus"></i>
+                  </button>
+                  <button className="btn btn-sm btn-dark me-2" onClick={zoomIn}>
+                    <i className="fas fa-search-plus"></i>
+                  </button>
+                  <button className="btn btn-sm btn-dark" onClick={closeModal}>
+                    <i className="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <div className="modal-body d-flex justify-content-center align-items-center overflow-hidden">
+                <div style={{ 
+                  overflow: 'auto', 
+                  height: '100%', 
+                  width: '100%', 
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
+                  <img 
+                    src={`${selectedImage.result_path}?t=${Date.now()}`} 
+                    className="img-fluid" 
+                    alt="Result image"
+                    style={{ 
+                      transform: `scale(${zoomLevel})`,
+                      transformOrigin: 'center',
+                      transition: 'transform 0.3s ease'
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="position-absolute bottom-0 end-0 p-3">
+                <div className="btn-group">
+                  <button className="btn btn-sm btn-dark" onClick={zoomOut}>
+                    <i className="fas fa-search-minus"></i>
+                  </button>
+                  <button className="btn btn-sm btn-dark" onClick={zoomIn}>
+                    <i className="fas fa-search-plus"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
