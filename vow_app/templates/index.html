@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOW-BRIDE - Face Swap</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <!-- Image Viewer Modal with Pure Black Glass Effect and No Header -->
+    <div class="modal fade" id="imageViewerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen modal-dialog-centered p-2" style="max-width: 98vw; max-height: 98vh;">
+            <div class="modal-content bg-black" style="backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: none; border-radius: 0; background-color: rgba(0,0,0,0.9);">
+                <!-- Close button -->
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                
+                <!-- Navigation Info -->
+                <span class="text-white-50 position-absolute top-0 start-50 translate-middle-x mt-3 z-3" id="imageNavInfo">Image 1 of 1</span>
+                
+                <div class="modal-body p-0 position-relative d-flex align-items-center justify-content-center" style="min-height: 95vh;">
+                    <!-- Left Navigation Button -->
+                    <button id="prevImageBtn" class="carousel-nav-btn position-absolute start-0 top-50 translate-middle-y btn btn-dark text-white rounded-circle p-3 mx-4" style="z-index: 10; opacity: 0.8; border: 1px solid rgba(255,255,255,0.2); background-color: rgba(0,0,0,0.7);">
+                        <i class="fas fa-chevron-left fa-2x"></i>
+                    </button>
+                    
+                    <div class="image-zoom-container d-flex align-items-center justify-content-center" style="height: 90vh; width: 100%; overflow: hidden; position: relative;">
+                        <img id="zoomImage" src="" alt="Zoomed Image" style="max-height: 95%; max-width: 95%; position: relative; object-fit: contain;">
+                    </div>
+                    
+                    <!-- Right Navigation Button -->
+                    <button id="nextImageBtn" class="carousel-nav-btn position-absolute end-0 top-50 translate-middle-y btn btn-dark text-white rounded-circle p-3 mx-4" style="z-index: 10; opacity: 0.8; border: 1px solid rgba(255,255,255,0.2); background-color: rgba(0,0,0,0.7);">
+                        <i class="fas fa-chevron-right fa-2x"></i>
+                    </button>
+                    
+                    <!-- Controls Bar -->
+                    <div class="position-absolute bottom-0 start-0 end-0 py-3 px-4 d-flex justify-content-between align-items-center" style="background: rgba(0,0,0,0.8);">
+                        <div class="btn-group" role="group">
+                            <button id="zoomInBtn" class="btn btn-dark rounded-start border-secondary"><i class="fas fa-search-plus"></i></button>
+                            <button id="zoomOutBtn" class="btn btn-dark border-secondary"><i class="fas fa-search-minus"></i></button>
+                            <button id="resetZoomBtn" class="btn btn-dark rounded-end border-secondary"><i class="fas fa-sync-alt"></i></button>
+                        </div>
+                        
+                        <a id="downloadImageBtn" href="#" download class="btn btn-primary">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-container">
+                <h1 class="logo-text brand-name">VOW-BRIDE</h1>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <div class="main-container">
+            <div class="content-container">
+                <!-- Combined Upload and Options Card -->
+                <div class="card mb-3">
+                    <div class="card-header bg-dark-purple d-flex justify-content-between align-items-center py-2">
+                        <h5 class="card-title mb-0">Face Swap Selection</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Left Column - Upload -->
+                            <div class="col-md-4">
+                                <div class="d-flex flex-column h-100">
+                                    <div class="upload-area mb-2" id="uploadArea" style="min-height: 100px; padding: 10px; position: relative;">
+                                        <i class="fas fa-cloud-upload-alt fa-lg text-light-purple"></i>
+                                        <p class="mt-1 mb-1 small">Drop photo or click to browse</p>
+                                        <input type="file" id="fileInput" accept="image/*">
+                                    </div>
+                                    <div class="text-center position-relative">
+                                        <div id="previewContainer" style="display: none;">
+                                            <img id="sourcePreview" class="source-preview" style="max-height: 100px; margin: 0 auto; object-fit: contain;">
+                                            <div class="position-absolute top-0 end-0">
+                                                <button type="button" id="changePhotoBtn" class="btn btn-sm btn-light rounded-circle" style="width: 24px; height: 24px; padding: 0; font-size: 12px;">
+                                                    <i class="fas fa-redo"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Right Column - Dropdowns -->
+                            <div class="col-md-8">
+                                <div class="row g-2">
+                                    <!-- Category Dropdown -->
+                                    <div class="col-md-4 mb-2">
+                                        <label for="categorySelect" class="form-label small">Category</label>
+                                        <select class="form-select form-select-sm" id="categorySelect">
+                                            <option value="" selected disabled>Select Category</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Subcategory Dropdown -->
+                                    <div class="col-md-4 mb-2">
+                                        <label for="subcategorySelect" class="form-label small">Subcategory</label>
+                                        <select class="form-select form-select-sm" id="subcategorySelect" disabled>
+                                            <option value="" selected disabled>Select Subcategory</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Item Dropdown -->
+                                    <div class="col-md-4 mb-2">
+                                        <label for="itemSelect" class="form-label small">Style/Item</label>
+                                        <select class="form-select form-select-sm" id="itemSelect" disabled>
+                                            <option value="" selected disabled>Select Style/Item</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-2">
+                                    <div class="col-md-6">
+                                        <!-- Options -->
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="multiSelectToggle">
+                                            <label class="form-check-label small" for="multiSelectToggle">
+                                                Allow multiple template selection
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="enhanceToggle">
+                                            <label class="form-check-label small" for="enhanceToggle">
+                                                Auto-enhance results
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button type="button" id="loadTemplatesBtn" class="btn btn-primary btn-sm w-100" disabled>
+                                            <i class="fas fa-search me-1"></i> Load Templates
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Templates Section -->
+                <div id="templatesSection" class="mb-4" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">Available Templates</h5>
+                        <div class="btn-group">
+                            <button id="processSelectedBtn" class="btn btn-primary btn-sm" disabled>
+                                <i class="fas fa-magic me-1"></i> Process Selected
+                            </button>
+                            <button id="processAllBtn" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-magic me-1"></i> Process All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="templatesContainer" class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
+                        <!-- Templates will be loaded here -->
+                        <div class="col template-loading">
+                            <div class="card h-100 p-2 text-center">
+                                <div class="d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                                <div class="card-body p-2">
+                                    <p class="card-text small text-secondary">Loading templates...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Results Section -->
+                <div id="resultsSection" class="mb-4" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">Face Swap Results</h5>
+                        <div class="btn-group">
+                            <button id="showTemplatesBtn" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-eye me-1"></i> Show Templates
+                            </button>
+                            <button id="hideTemplatesBtn" class="btn btn-outline-secondary btn-sm" style="display: none;">
+                                <i class="fas fa-eye-slash me-1"></i> Hide Templates
+                            </button>
+                            <button id="downloadAllBtn" class="btn btn-success btn-sm">
+                                <i class="fas fa-download me-1"></i> Download All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="resultsContainer" class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
+                        <!-- Results will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Loading Indicator -->
+                <div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background-color: rgba(0,0,0,0.7); z-index: 1050; display: none;">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <h5 class="text-white" id="loadingText">Processing templates...</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="app-footer py-3">
+            <div class="container text-center">
+                <p class="mb-1 text-light">© 2025 VOW-BRIDE | All rights reserved</p>
+                <p class="small text-secondary mb-0">Transform your wedding look with AI-powered face swapping</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Bootstrap and jQuery JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
