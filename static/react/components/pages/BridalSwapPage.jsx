@@ -198,8 +198,11 @@ const BridalSwapPage = () => {
       
       const result = await response.json();
       
-      if (result.success) {
+      console.log("Multi-swap API response:", result);
+      
+      if (result.success && result.results && Array.isArray(result.results)) {
         setResults(result.results);
+        setIsMultiSelectMode(false); // Switch back to single view mode after processing
       } else {
         alert(result.message || 'Error processing templates');
       }

@@ -15,6 +15,9 @@ import traceback
 import logging
 from flask_login import LoginManager
 
+# Import face enhancer
+from face_enhancer import FaceEnhancer
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -1221,25 +1224,95 @@ def multi_face_swap():
     if not template_paths:
         return jsonify({'success': False, 'error': 'No templates selected'})
     
+    # Get enhancement options
+    enhance = request.form.get('enhance', 'false').lower() == 'true'
+    enhance_method = request.form.get('enhance_method', 'auto')
+    
     try:
-        # Save the source image
+        # Save the source image to a temporary location
         source_filename = secure_filename(source_file.filename)
-        source_path = os.path.join(app.config['UPLOAD_FOLDER'], source_filename)
+        source_path = os.path.join(app.config['UPLOAD_FOLDER'], 'sources', source_filename)
+        os.makedirs(os.path.dirname(source_path), exist_ok=True)
         source_file.save(source_path)
         
-        # Store paths in session for the results page
-        session['source_path'] = source_path
-        session['template_paths'] = template_paths
+        # Load the source image and detect faces
+        source_img = cv2.imread(source_path)
+        if source_img is None:
+            return jsonify({'success': False, 'error': 'Could not load source image'})
+            
+        source_faces = faceapp.get(source_img)
+        if not source_faces:
+            return jsonify({'success': False, 'error': 'No face detected in source image'})
+            
+        # Process each template
+        results = []
         
-        # Redirect to results page
+        for template_path in template_paths:
+            try:
+                # Load the template image and detect faces
+                template_img = cv2.imread(template_path)
+                if template_img is None:
+                    continue
+                    
+                target_faces = faceapp.get(template_img)
+                if not target_faces:
+                    continue
+                    
+                # Perform face swap
+                result_img = swapper.get(template_img, target_faces[0], source_faces[0], paste_back=True)
+                
+                # Apply face enhancement if requested
+                enhanced = False
+                if enhance:
+                    try:
+                        app.logger.info(f"Applying face enhancement with method: {enhance_method}")
+                        result_img, enhanced = enhancer.enhance_face(result_img, method=enhance_method)
+                        if enhanced:
+                            app.logger.info("Face enhancement applied successfully")
+                    except Exception as e:
+                        app.logger.error(f"Face enhancement failed: {str(e)}")
+                        # Continue with the unenhanced result
+                
+                # Save result
+                timestamp = int(time.time())
+                result_filename = f"result_{timestamp}_{os.path.basename(template_path)}"
+                
+                # Save to static folder for direct web access
+                result_path = os.path.join('static/results', result_filename)
+                
+                # Create results directory if it doesn't exist
+                os.makedirs(os.path.dirname(result_path), exist_ok=True)
+                
+                # Debug logging
+                app.logger.info(f"Saving multi-swap result to: {result_path}")
+                
+                # Save the result
+                cv2.imwrite(result_path, result_img)
+                
+                # Add to results
+                results.append({
+                    'template_path': template_path,
+                    'result_path': f"/static/results/{os.path.basename(result_filename)}",
+                    'enhanced': enhanced,
+                    'enhance_method': enhance_method if enhanced else None
+                })
+            except Exception as template_error:
+                app.logger.error(f"Error processing template {template_path}: {str(template_error)}")
+                # Continue with next template
+        
+        app.logger.info(f"Multi-swap completed with {len(results)} successful results")
+        
+        # Return all results
         return jsonify({
-            'success': True, 
-            'redirect_url': '/bridal_results',
-            'message': f'Processing {len(template_paths)} templates'
+            'success': True,
+            'results': results,
+            'message': f'Processed {len(results)} templates successfully'
         })
         
     except Exception as e:
         app.logger.error(f"Error in multi-face swap: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/bridal_results')
