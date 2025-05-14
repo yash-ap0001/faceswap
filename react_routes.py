@@ -30,21 +30,13 @@ def api_menu():
     """
     menu = [
         {
-            "id": "home",
-            "title": "Home",
-            "icon": "fa-home",
-            "subItems": [
-                {"id": "home", "label": "Home", "link": "/react"}
-            ]
-        },
-        {
             "id": "bride",
             "title": "Bride",
             "icon": "fa-female",
             "subItems": [
                 {"id": "bridal-gallery", "label": "Bridal Gallery", "link": "/react#bridal-gallery"},
                 {"id": "bridal-swap", "label": "Create Bride Look", "link": "/react#bridal-swap"},
-                {"id": "bridal-outfits", "label": "Bridal Outfits", "link": "/react#bridal-outfits"},
+                {"id": "outfits-for-girls", "label": "Outfits for Girls", "link": "/react#outfits-for-girls"},
                 {"id": "jewelry-collections", "label": "Jewelry Collections", "link": "/react#jewelry-collections"},
                 {"id": "makeup-styles", "label": "Makeup Styles", "link": "/react#makeup-styles"}
             ]
@@ -61,16 +53,25 @@ def api_menu():
             ]
         },
         {
+            "id": "saloons",
+            "title": "Saloons",
+            "icon": "fa-cut",
+            "subItems": [
+                {"id": "bride-saloons", "label": "Bride Saloons", "link": "/react#bride-saloons"},
+                {"id": "groom-saloons", "label": "Groom Saloons", "link": "/react#groom-saloons"},
+                {"id": "makeup-artists", "label": "Makeup Artists", "link": "/react#makeup-artists"},
+                {"id": "saloon-packages", "label": "Saloon Packages", "link": "/react#saloon-packages"}
+            ]
+        },
+        {
             "id": "services",
             "title": "Services",
             "icon": "fa-concierge-bell",
             "subItems": [
                 {"id": "venue-search", "label": "Venue Search", "link": "/react#venue-search"},
-                {"id": "hall-comparison", "label": "Hall Comparison", "link": "/react#hall-comparison"},
-                {"id": "virtual-tours", "label": "Virtual Tours", "link": "/react#virtual-tours"},
-                {"id": "booking-management", "label": "Booking Management", "link": "/react#booking-management"},
-                {"id": "saloons", "label": "Saloons", "link": "/react#saloons"},
-                {"id": "event-managers", "label": "Event Managers", "link": "/react#event-managers"}
+                {"id": "catering-list", "label": "Catering List", "link": "/react#catering-list"},
+                {"id": "event-managers", "label": "Event Managers", "link": "/react#event-managers"},
+                {"id": "photographers", "label": "Photographers", "link": "/react#photographers"}
             ]
         }
     ]
@@ -152,9 +153,9 @@ def api_content(page_id):
             "content": "<p>Transform your wedding planning experience with our AI-powered platform.</p>",
             "cta": {"text": "Start Exploring", "link": "/react#bridal-gallery"}
         },
-        "bridal-outfits": {
-            "title": "Bridal Outfits",
-            "content": "<p>Browse our collection of modern and traditional bridal outfits.</p>"
+        "outfits-for-girls": {
+            "title": "Outfits for Girls",
+            "content": "<p>Browse our collection of modern and traditional outfits for girls.</p>"
         },
         "jewelry-collections": {
             "title": "Jewelry Collections",
@@ -180,25 +181,33 @@ def api_content(page_id):
             "title": "Venue Search",
             "content": "<p>Find the perfect venue for your wedding.</p>"
         },
-        "hall-comparison": {
-            "title": "Hall Comparison",
-            "content": "<p>Compare different wedding halls side by side.</p>"
+        "catering-list": {
+            "title": "Catering List",
+            "content": "<p>Explore top catering services for your wedding.</p>"
         },
-        "virtual-tours": {
-            "title": "Virtual Tours",
-            "content": "<p>Take virtual tours of wedding venues.</p>"
-        },
-        "booking-management": {
-            "title": "Booking Management",
-            "content": "<p>Manage your venue bookings.</p>"
-        },
-        "saloons": {
-            "title": "Saloons",
-            "content": "<p>Browse saloons and makeup artists for wedding preparation.</p>"
+        "photographers": {
+            "title": "Photographers",
+            "content": "<p>Find professional photographers for your wedding.</p>"
         },
         "event-managers": {
             "title": "Event Managers",
             "content": "<p>Find event managers for your wedding.</p>"
+        },
+        "bride-saloons": {
+            "title": "Bride Saloons",
+            "content": "<p>Browse saloons specializing in bridal makeup and styling.</p>"
+        },
+        "groom-saloons": {
+            "title": "Groom Saloons",
+            "content": "<p>Browse saloons specializing in groom styling and grooming.</p>"
+        },
+        "makeup-artists": {
+            "title": "Makeup Artists",
+            "content": "<p>Find professional makeup artists for your wedding.</p>"
+        },
+        "saloon-packages": {
+            "title": "Saloon Packages",
+            "content": "<p>Explore comprehensive saloon packages for the bride and groom.</p>"
         }
     }
     

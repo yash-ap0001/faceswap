@@ -30,7 +30,7 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             subItems: [
               { id: 'bridal-gallery', label: 'Bridal Gallery', link: '/react#bridal-gallery' },
               { id: 'bridal-swap', label: 'Create Bride Look', link: '/react#bridal-swap' },
-              { id: 'bridal-outfits', label: 'Bridal Outfits', link: '/react#bridal-outfits' },
+              { id: 'outfits-for-girls', label: 'Outfits for Girls', link: '/react#outfits-for-girls' },
               { id: 'jewelry-collections', label: 'Jewelry Collections', link: '/react#jewelry-collections' },
               { id: 'makeup-styles', label: 'Makeup Styles', link: '/react#makeup-styles' }
             ]
@@ -47,16 +47,25 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             ]
           },
           {
+            id: 'saloons',
+            title: 'Saloons',
+            icon: 'fa-cut',
+            subItems: [
+              { id: 'bride-saloons', label: 'Bride Saloons', link: '/react#bride-saloons' },
+              { id: 'groom-saloons', label: 'Groom Saloons', link: '/react#groom-saloons' },
+              { id: 'makeup-artists', label: 'Makeup Artists', link: '/react#makeup-artists' },
+              { id: 'saloon-packages', label: 'Saloon Packages', link: '/react#saloon-packages' }
+            ]
+          },
+          {
             id: 'services',
             title: 'Services',
             icon: 'fa-concierge-bell',
             subItems: [
               { id: 'venue-search', label: 'Venue Search', link: '/react#venue-search' },
-              { id: 'hall-comparison', label: 'Hall Comparison', link: '/react#hall-comparison' },
-              { id: 'virtual-tours', label: 'Virtual Tours', link: '/react#virtual-tours' },
-              { id: 'booking-management', label: 'Booking Management', link: '/react#booking-management' },
-              { id: 'saloons', label: 'Saloons', link: '/react#saloons' },
-              { id: 'event-managers', label: 'Event Managers', link: '/react#event-managers' }
+              { id: 'catering-list', label: 'Catering List', link: '/react#catering-list' },
+              { id: 'event-managers', label: 'Event Managers', link: '/react#event-managers' },
+              { id: 'photographers', label: 'Photographers', link: '/react#photographers' }
             ]
           }
         ];
