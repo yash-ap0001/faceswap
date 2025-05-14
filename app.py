@@ -2591,6 +2591,17 @@ def universal_face_swap():
 
 
 # Import React routes from separate file
+# Universal page route (a direct HTML version that doesn't require React build)
+@app.route('/universal')
+def universal_page():
+    """Render the universal categories page with a direct HTML template."""
+    return render_template('universal_page.html')
+
+@app.route('/universal-swap')
+def universal_swap_page():
+    """Render the universal face swap page with a direct HTML template."""
+    return render_template('universal_swap.html')
+
 from react_routes import react_bp, api_bp
 
 # Register React blueprints

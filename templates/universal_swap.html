@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOWBRIDE - Universal Face Swap</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom styles -->
+    <style>
+        :root {
+            --primary-color: #8a2be2;
+            --primary-light: #9d4edd;
+            --primary-dark: #6a0dad;
+            --text-light-purple: #d8bfd8;
+            --text-dark-purple: #9370db;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #121212;
+            color: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .brand-name {
+            background: linear-gradient(90deg, #8a2be2, #9d4edd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 250px;
+            background-color: #1a1a1a;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .main-container {
+            flex: 1;
+            margin-left: 250px;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        .content-container {
+            padding: 20px;
+        }
+        
+        .source-preview {
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 8px;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .template-preview {
+            height: 200px;
+            object-fit: cover;
+            object-position: top;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .template-preview:hover {
+            transform: scale(1.05);
+        }
+        
+        .result-img {
+            height: 200px;
+            object-fit: cover;
+            object-position: top;
+            border-radius: 8px;
+        }
+        
+        .upload-area {
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .upload-area:hover {
+            background-color: rgba(138, 43, 226, 0.1);
+        }
+        
+        .upload-label {
+            display: block;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .progress-container {
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            background-color: var(--primary-color);
+        }
+        
+        .results-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo-text brand-name">VOWBRIDE</h1>
+            </div>
+            <div class="sidebar-content">
+                <div class="section-header">
+                    <i class="fas fa-magic me-2"></i>
+                    <span>Universal</span>
+                </div>
+                <ul class="menu-items">
+                    <li>
+                        <a href="/universal" class="text-decoration-none text-white">All Categories</a>
+                    </li>
+                </ul>
+                
+                <div class="section-header">
+                    <i class="fas fa-female me-2"></i>
+                    <span>Bride</span>
+                </div>
+                <ul class="menu-items">
+                    <li>
+                        <a href="/bridal-gallery" class="text-decoration-none text-white">Bridal Gallery</a>
+                    </li>
+                    <li>
+                        <a href="/bridal-swap" class="text-decoration-none text-white">Create Bride Look</a>
+                    </li>
+                    <li>
+                        <a href="/outfits-for-girls" class="text-decoration-none text-white">Outfits for Girls</a>
+                    </li>
+                </ul>
+                
+                <div class="section-header">
+                    <i class="fas fa-male me-2"></i>
+                    <span>Groom</span>
+                </div>
+                <ul class="menu-items">
+                    <li>
+                        <a href="/groom-face-swap" class="text-decoration-none text-white">Create Groom Look</a>
+                    </li>
+                    <li>
+                        <a href="/traditional-wear" class="text-decoration-none text-white">Traditional Wear</a>
+                    </li>
+                </ul>
+                
+                <div class="section-header">
+                    <i class="fas fa-cut me-2"></i>
+                    <span>Saloons</span>
+                </div>
+                <ul class="menu-items">
+                    <li>
+                        <a href="/bride-saloons" class="text-decoration-none text-white">Bride Saloons</a>
+                    </li>
+                    <li>
+                        <a href="/groom-saloons" class="text-decoration-none text-white">Groom Saloons</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-container">
+            <div class="content-container">
+                <h2 class="mb-4">Universal Face Swap</h2>
+                
+                <div class="alert alert-info">
+                    <strong>Category:</strong> <span id="selected-category"></span> | 
+                    <strong>Type:</strong> <span id="selected-subcategory"></span> | 
+                    <strong>Style:</strong> <span id="selected-item"></span>
+                </div>
+                
+                <div class="row">
+                    <!-- Source Image Upload -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-dark-purple">
+                                <h5 class="card-title mb-0">Upload Your Photo</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="upload-area" id="uploadArea">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-light-purple"></i>
+                                    <p class="mt-2">Drag & drop your image here, or click to browse</p>
+                                    <input type="file" id="fileInput" accept="image/*">
+                                </div>
+                                
+                                <div class="text-center mt-3">
+                                    <img id="sourcePreview" class="source-preview" style="display: none;">
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="enhanceCheck">
+                                        <label class="form-check-label" for="enhanceCheck">
+                                            Enhance face after swapping
+                                        </label>
+                                    </div>
+                                    
+                                    <div id="enhanceOptions" style="display: none;">
+                                        <label class="mt-2">Enhancement Method</label>
+                                        <select class="form-select" id="enhanceMethod">
+                                            <option value="auto">Auto (Best method)</option>
+                                            <option value="gfpgan">GFPGAN</option>
+                                            <option value="codeformer">CodeFormer</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <button id="processBtn" class="btn btn-primary" disabled>
+                                        Process Templates
+                                    </button>
+                                    <button id="resetBtn" class="btn btn-outline-secondary ms-2">
+                                        Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Templates -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-dark-purple">
+                                <h5 class="card-title mb-0">Available Templates</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="templatesContainer" class="row">
+                                    <div class="text-center p-5">
+                                        <div class="spinner-border text-purple" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2">Loading templates...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="loading-spinner">
+                    <div class="spinner-border text-purple" role="status">
+                        <span class="visually-hidden">Processing...</span>
+                    </div>
+                    <p class="mt-2">Processing face swap. This may take a moment...</p>
+                    <div class="progress-container">
+                        <div class="progress" style="height: 5px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Results -->
+                <div id="resultsContainer" class="results-container">
+                    <div class="card">
+                        <div class="card-header bg-dark-purple">
+                            <h5 class="card-title mb-0">Your Results</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="resultsGrid" class="row"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get query parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryType = urlParams.get('category_type') || 'bride';
+            const subcategory = urlParams.get('subcategory') || 'bridal';
+            const itemCategory = urlParams.get('item_category') || 'haldi';
+            
+            // Update UI with selected options
+            document.getElementById('selected-category').textContent = categoryType;
+            document.getElementById('selected-subcategory').textContent = subcategory;
+            document.getElementById('selected-item').textContent = itemCategory;
+            
+            // Elements
+            const fileInput = document.getElementById('fileInput');
+            const uploadArea = document.getElementById('uploadArea');
+            const sourcePreview = document.getElementById('sourcePreview');
+            const processBtn = document.getElementById('processBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const enhanceCheck = document.getElementById('enhanceCheck');
+            const enhanceOptions = document.getElementById('enhanceOptions');
+            const enhanceMethod = document.getElementById('enhanceMethod');
+            const templatesContainer = document.getElementById('templatesContainer');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const resultsGrid = document.getElementById('resultsGrid');
+            const progressBar = document.querySelector('.progress-bar');
+            
+            // State
+            let sourceFile = null;
+            let templates = [];
+            
+            // Fetch templates
+            const fetchTemplates = async () => {
+                try {
+                    const url = `/get_templates?category_type=${categoryType}&subcategory=${subcategory}&item_category=${itemCategory}`;
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch templates: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log('Received template data:', data);
+                    
+                    if (data.success && data.templates.length > 0) {
+                        templates = data.templates;
+                        renderTemplates(templates);
+                    } else {
+                        templatesContainer.innerHTML = `
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    No templates available for this selection. Please try another category or style.
+                                </div>
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    console.error('Error fetching templates:', error);
+                    templatesContainer.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-danger">
+                                Failed to load templates. Please try again later.
+                            </div>
+                        </div>
+                    `;
+                }
+            };
+            
+            // Render templates
+            const renderTemplates = (templateList) => {
+                templatesContainer.innerHTML = '';
+                
+                templateList.forEach(template => {
+                    const col = document.createElement('div');
+                    col.className = 'col-6 col-md-4 mb-3';
+                    
+                    col.innerHTML = `
+                        <img src="${template.url}" alt="${template.id}" class="template-preview w-100" data-template-path="${template.path}">
+                    `;
+                    
+                    templatesContainer.appendChild(col);
+                });
+            };
+            
+            // Handle file upload
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    sourceFile = e.target.files[0];
+                    const reader = new FileReader();
+                    
+                    reader.onload = (e) => {
+                        sourcePreview.src = e.target.result;
+                        sourcePreview.style.display = 'block';
+                        processBtn.disabled = false;
+                    };
+                    
+                    reader.readAsDataURL(sourceFile);
+                }
+            });
+            
+            // Drag and drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+            
+            uploadArea.addEventListener('dragenter', () => {
+                uploadArea.classList.add('bg-dark');
+            }, false);
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('bg-dark');
+            }, false);
+            
+            uploadArea.addEventListener('drop', (e) => {
+                uploadArea.classList.remove('bg-dark');
+                const files = e.dataTransfer.files;
+                
+                if (files && files[0]) {
+                    sourceFile = files[0];
+                    fileInput.files = files;
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        sourcePreview.src = e.target.result;
+                        sourcePreview.style.display = 'block';
+                        processBtn.disabled = false;
+                    };
+                    
+                    reader.readAsDataURL(sourceFile);
+                }
+            }, false);
+            
+            // Enhancement options
+            enhanceCheck.addEventListener('change', () => {
+                enhanceOptions.style.display = enhanceCheck.checked ? 'block' : 'none';
+            });
+            
+            // Process button
+            processBtn.addEventListener('click', async () => {
+                if (!sourceFile || templates.length === 0) {
+                    alert('Please select a source image and ensure templates are loaded');
+                    return;
+                }
+                
+                try {
+                    // Show loading spinner
+                    loadingSpinner.style.display = 'block';
+                    resultsContainer.style.display = 'none';
+                    
+                    // Prepare form data
+                    const formData = new FormData();
+                    formData.append('source', sourceFile);
+                    formData.append('category', categoryType);
+                    formData.append('enhance', enhanceCheck.checked);
+                    formData.append('enhance_method', enhanceMethod.value);
+                    
+                    // Simulate progress
+                    let progress = 0;
+                    const progressInterval = setInterval(() => {
+                        progress += 5;
+                        if (progress > 90) {
+                            clearInterval(progressInterval);
+                        }
+                        progressBar.style.width = `${progress}%`;
+                    }, 500);
+                    
+                    // Submit the form
+                    const response = await fetch('/universal_face_swap', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    // Clear interval and set to 100%
+                    clearInterval(progressInterval);
+                    progressBar.style.width = '100%';
+                    
+                    if (!response.ok) {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        renderResults(data.results);
+                    } else {
+                        throw new Error(data.message || 'Unknown error occurred');
+                    }
+                } catch (error) {
+                    console.error('Error processing templates:', error);
+                    alert(`Face swap failed: ${error.message}`);
+                } finally {
+                    loadingSpinner.style.display = 'none';
+                }
+            });
+            
+            // Render results
+            const renderResults = (results) => {
+                resultsGrid.innerHTML = '';
+                
+                if (results.length === 0) {
+                    resultsGrid.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                No results were generated. Please try again with a different image.
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                results.forEach(result => {
+                    const col = document.createElement('div');
+                    col.className = 'col-6 col-md-4 col-lg-3 mb-3';
+                    
+                    col.innerHTML = `
+                        <div class="card h-100">
+                            <img src="${result.url}" alt="Result" class="result-img">
+                            <div class="card-body">
+                                <a href="${result.url}" download class="btn btn-sm btn-outline-primary w-100">
+                                    <i class="fas fa-download me-1"></i> Download
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    
+                    resultsGrid.appendChild(col);
+                });
+                
+                resultsContainer.style.display = 'block';
+                window.scrollTo({ top: resultsContainer.offsetTop, behavior: 'smooth' });
+            };
+            
+            // Reset button
+            resetBtn.addEventListener('click', () => {
+                sourceFile = null;
+                fileInput.value = '';
+                sourcePreview.style.display = 'none';
+                processBtn.disabled = true;
+                resultsContainer.style.display = 'none';
+                enhanceCheck.checked = false;
+                enhanceOptions.style.display = 'none';
+                progressBar.style.width = '0%';
+            });
+            
+            // Initial fetch
+            fetchTemplates();
+        });
+    </script>
+</body>
+</html>

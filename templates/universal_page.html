@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOWBRIDE - Universal Categories</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom styles -->
+    <style>
+        :root {
+            --primary-color: #8a2be2;
+            --primary-light: #9d4edd;
+            --primary-dark: #6a0dad;
+            --text-light-purple: #d8bfd8;
+            --text-dark-purple: #9370db;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #121212;
+            color: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .brand-name {
+            background: linear-gradient(90deg, #8a2be2, #9d4edd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 250px;
+            background-color: #1a1a1a;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .main-container {
+            flex: 1;
+            margin-left: 250px;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        .content-container {
+            padding: 20px;
+        }
+        
+        .category-card {
+            background-color: #252525;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .category-card .card-header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .subcategory-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .subcategory-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .subcategory-item:hover {
+            background-color: #333;
+        }
+        
+        .subcategory-item h5 {
+            margin-bottom: 5px;
+            color: var(--text-light-purple);
+        }
+        
+        .item-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .item-card {
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .item-card:hover {
+            transform: scale(1.05);
+            background-color: #333;
+        }
+        
+        .item-card h6 {
+            margin-bottom: 5px;
+            color: white;
+        }
+        
+        .item-card p {
+            font-size: 0.8rem;
+            color: #bbbbbb;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo-text brand-name">VOWBRIDE</h1>
+            </div>
+            <div class="sidebar-content">
+                <div class="section-header">
+                    <i class="fas fa-magic me-2"></i>
+                    <span>Universal</span>
+                </div>
+                <ul class="menu-items">
+                    <li class="active">
+                        <a href="/universal" class="text-decoration-none text-white">All Categories</a>
+                    </li>
+                </ul>
+                
+                <div class="section-header">
+                    <i class="fas fa-female me-2"></i>
+                    <span>Bride</span>
+                </div>
+                <ul class="menu-items">
+                    <li>
+                        <a href="/bridal-gallery" class="text-decoration-none text-white">Bridal Gallery</a>
+                    </li>
+                    <li>
+                        <a href="/bridal-swap" class="text-decoration-none text-white">Create Bride Look</a>
+                    </li>
+                    <li>
+                        <a href="/outfits-for-girls" class="text-decoration-none text-white">Outfits for Girls</a>
+                    </li>
+                </ul>
+                
+                <div class="section-header">
+                    <i class="fas fa-male me-2"></i>
+                    <span>Groom</span>
+                </div>
+                <ul class="menu-items">
+                    <li>
+                        <a href="/groom-face-swap" class="text-decoration-none text-white">Create Groom Look</a>
+                    </li>
+                    <li>
+                        <a href="/traditional-wear" class="text-decoration-none text-white">Traditional Wear</a>
+                    </li>
+                </ul>
+                
+                <div class="section-header">
+                    <i class="fas fa-cut me-2"></i>
+                    <span>Saloons</span>
+                </div>
+                <ul class="menu-items">
+                    <li>
+                        <a href="/bride-saloons" class="text-decoration-none text-white">Bride Saloons</a>
+                    </li>
+                    <li>
+                        <a href="/groom-saloons" class="text-decoration-none text-white">Groom Saloons</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-container">
+            <div class="content-container">
+                <h2 class="mb-4">Universal Categories</h2>
+                
+                <div class="row" id="categories-container">
+                    <div class="text-center p-5">
+                        <div class="spinner-border text-purple" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading categories...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fetch categories from API
+            fetch('/api/categories')
+                .then(response => response.json())
+                .then(data => {
+                    const categoriesContainer = document.getElementById('categories-container');
+                    categoriesContainer.innerHTML = '';
+                    
+                    if (data.categories && data.categories.length > 0) {
+                        data.categories.forEach(category => {
+                            const categoryCol = document.createElement('div');
+                            categoryCol.className = 'col-md-6 col-lg-4 mb-4';
+                            
+                            const categoryCard = document.createElement('div');
+                            categoryCard.className = 'category-card';
+                            
+                            const cardHeader = document.createElement('div');
+                            cardHeader.className = 'card-header py-3';
+                            cardHeader.innerHTML = `
+                                <h4 class="mb-0">
+                                    <i class="fas fa-${category.icon} me-2"></i>
+                                    ${category.name}
+                                </h4>
+                            `;
+                            
+                            const cardBody = document.createElement('div');
+                            cardBody.className = 'card-body';
+                            
+                            const subcategoryList = document.createElement('ul');
+                            subcategoryList.className = 'subcategory-list';
+                            
+                            if (category.subcategories && category.subcategories.length > 0) {
+                                category.subcategories.forEach(subcategory => {
+                                    const subcategoryItem = document.createElement('li');
+                                    subcategoryItem.className = 'subcategory-item';
+                                    
+                                    subcategoryItem.innerHTML = `
+                                        <h5>${subcategory.name}</h5>
+                                        <p>${subcategory.description}</p>
+                                    `;
+                                    
+                                    // Create item grid if there are items
+                                    if (subcategory.items && subcategory.items.length > 0) {
+                                        const itemList = document.createElement('div');
+                                        itemList.className = 'item-list';
+                                        
+                                        subcategory.items.forEach(item => {
+                                            const itemCard = document.createElement('div');
+                                            itemCard.className = 'item-card';
+                                            itemCard.innerHTML = `
+                                                <h6>${item.name}</h6>
+                                                <p>${item.description}</p>
+                                            `;
+                                            
+                                            // Add click event to navigate to templates
+                                            itemCard.addEventListener('click', () => {
+                                                window.location.href = `/universal-swap?category_type=${category.id}&subcategory=${subcategory.id}&item_category=${item.id}`;
+                                            });
+                                            
+                                            itemList.appendChild(itemCard);
+                                        });
+                                        
+                                        subcategoryItem.appendChild(itemList);
+                                    }
+                                    
+                                    subcategoryList.appendChild(subcategoryItem);
+                                });
+                            }
+                            
+                            cardBody.appendChild(subcategoryList);
+                            categoryCard.appendChild(cardHeader);
+                            categoryCard.appendChild(cardBody);
+                            categoryCol.appendChild(categoryCard);
+                            categoriesContainer.appendChild(categoryCol);
+                        });
+                    } else {
+                        categoriesContainer.innerHTML = `
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    No categories found. Please try again later.
+                                </div>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching categories:', error);
+                    const categoriesContainer = document.getElementById('categories-container');
+                    categoriesContainer.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-danger">
+                                Failed to load categories. Please try again later.
+                            </div>
+                        </div>
+                    `;
+                });
+        });
+    </script>
+</body>
+</html>
