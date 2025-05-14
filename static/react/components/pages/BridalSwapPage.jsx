@@ -646,7 +646,7 @@ const BridalSwapPage = () => {
               <div className="modal-body d-flex justify-content-center align-items-center overflow-hidden">
                 <div style={{ 
                   overflow: 'auto', 
-                  height: '100%', 
+                  height: '85vh', 
                   width: '100%', 
                   display: 'flex',
                   justifyContent: 'center',
@@ -660,7 +660,7 @@ const BridalSwapPage = () => {
                       transform: `scale(${zoomLevel})`,
                       transformOrigin: 'center',
                       transition: 'transform 0.3s ease',
-                      maxHeight: '90vh',
+                      maxHeight: '95vh',
                       maxWidth: '100%',
                       objectFit: 'contain'
                     }}
