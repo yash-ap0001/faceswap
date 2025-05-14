@@ -226,38 +226,40 @@
     </style>
 </head>
 <body>
-    <!-- Image Viewer Modal with Frosted Glass Effect -->
-    <div class="modal fade" id="imageViewerModal" tabindex="-1" aria-labelledby="imageViewerModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen modal-dialog-centered" style="max-width: 95vw; max-height: 95vh; margin: 2.5vh auto;">
-            <div class="modal-content bg-black bg-opacity-75" style="backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px;">
-                <div class="modal-header border-secondary">
-                    <h5 class="modal-title text-white" id="imageViewerModalLabel">Image Viewer</h5>
-                    <span class="text-white-50 ms-2" id="imageNavInfo">Image 1 of 1</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-0 position-relative d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+    <!-- Image Viewer Modal with Pure Black Glass Effect and No Header -->
+    <div class="modal fade" id="imageViewerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen modal-dialog-centered p-2" style="max-width: 98vw; max-height: 98vh;">
+            <div class="modal-content bg-black" style="backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: none; border-radius: 0; background-color: rgba(0,0,0,0.9);">
+                <!-- Close button -->
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                
+                <!-- Navigation Info -->
+                <span class="text-white-50 position-absolute top-0 start-50 translate-middle-x mt-3 z-3" id="imageNavInfo">Image 1 of 1</span>
+                
+                <div class="modal-body p-0 position-relative d-flex align-items-center justify-content-center" style="min-height: 95vh;">
                     <!-- Left Navigation Button -->
-                    <button id="prevImageBtn" class="carousel-nav-btn position-absolute start-0 top-50 translate-middle-y btn btn-dark bg-black bg-opacity-50 text-white rounded-circle p-2 mx-3" style="z-index: 10; display: none;">
+                    <button id="prevImageBtn" class="carousel-nav-btn position-absolute start-0 top-50 translate-middle-y btn btn-dark text-white rounded-circle p-3 mx-4" style="z-index: 10; opacity: 0.8; border: 1px solid rgba(255,255,255,0.2); background-color: rgba(0,0,0,0.7);">
                         <i class="fas fa-chevron-left fa-2x"></i>
                     </button>
                     
-                    <div class="image-zoom-container d-flex align-items-center justify-content-center" style="height: 80vh; width: 100%; overflow: hidden; position: relative;">
-                        <img id="zoomImage" src="" alt="Zoomed Image" style="max-height: 90%; max-width: 90%; position: relative; object-fit: contain;">
+                    <div class="image-zoom-container d-flex align-items-center justify-content-center" style="height: 90vh; width: 100%; overflow: hidden; position: relative;">
+                        <img id="zoomImage" src="" alt="Zoomed Image" style="max-height: 95%; max-width: 95%; position: relative; object-fit: contain;">
                     </div>
                     
                     <!-- Right Navigation Button -->
-                    <button id="nextImageBtn" class="carousel-nav-btn position-absolute end-0 top-50 translate-middle-y btn btn-dark bg-black bg-opacity-50 text-white rounded-circle p-2 mx-3" style="z-index: 10; display: none;">
+                    <button id="nextImageBtn" class="carousel-nav-btn position-absolute end-0 top-50 translate-middle-y btn btn-dark text-white rounded-circle p-3 mx-4" style="z-index: 10; opacity: 0.8; border: 1px solid rgba(255,255,255,0.2); background-color: rgba(0,0,0,0.7);">
                         <i class="fas fa-chevron-right fa-2x"></i>
                     </button>
                     
                     <!-- Controls Bar -->
-                    <div class="position-absolute bottom-0 start-0 end-0 p-3 d-flex justify-content-center" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);">
+                    <div class="position-absolute bottom-0 start-0 end-0 py-3 px-4 d-flex justify-content-between align-items-center" style="background: rgba(0,0,0,0.8);">
                         <div class="btn-group" role="group">
                             <button id="zoomInBtn" class="btn btn-dark rounded-start border-secondary"><i class="fas fa-search-plus"></i></button>
                             <button id="zoomOutBtn" class="btn btn-dark border-secondary"><i class="fas fa-search-minus"></i></button>
                             <button id="resetZoomBtn" class="btn btn-dark rounded-end border-secondary"><i class="fas fa-sync-alt"></i></button>
                         </div>
-                        <a id="downloadImageBtn" href="#" download class="btn btn-primary ms-2">
+                        
+                        <a id="downloadImageBtn" href="#" download class="btn btn-primary">
                             <i class="fas fa-download"></i> Download
                         </a>
                     </div>
@@ -1294,9 +1296,23 @@
                 // Update navigation info text
                 imageNavInfo.textContent = `Image ${currentImageIndex + 1} of ${galleryImages.length}`;
                 
-                // Show/hide navigation buttons
-                prevImageBtn.style.display = currentImageIndex > 0 ? 'block' : 'none';
-                nextImageBtn.style.display = currentImageIndex < galleryImages.length - 1 ? 'block' : 'none';
+                // Show/hide navigation buttons but keep them showing if there's more than one image
+                if (galleryImages.length > 1) {
+                    prevImageBtn.style.display = 'block';
+                    nextImageBtn.style.display = 'block';
+                    
+                    // Enable/disable based on position
+                    prevImageBtn.disabled = currentImageIndex <= 0;
+                    nextImageBtn.disabled = currentImageIndex >= galleryImages.length - 1;
+                    
+                    // Update opacity for visual disabled state
+                    prevImageBtn.style.opacity = currentImageIndex <= 0 ? "0.3" : "0.8";
+                    nextImageBtn.style.opacity = currentImageIndex >= galleryImages.length - 1 ? "0.3" : "0.8";
+                } else {
+                    // Hide if only one image
+                    prevImageBtn.style.display = 'none';
+                    nextImageBtn.style.display = 'none';
+                }
             }
             
             // Navigate to previous image
