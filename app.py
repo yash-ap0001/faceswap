@@ -2178,3 +2178,10 @@ def upload_model():
             return render_template('upload_model.html', error=f"Error saving model: {str(e)}")
     
     return render_template('upload_model.html')
+
+# Import React routes from separate file
+from react_routes import react_bp, api_bp
+
+# Register React blueprints
+app.register_blueprint(react_bp)
+app.register_blueprint(api_bp)
