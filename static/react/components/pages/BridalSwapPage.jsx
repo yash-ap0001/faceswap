@@ -386,9 +386,13 @@ const BridalSwapPage = () => {
                   <div className="col-6 col-sm-4 col-md-3 col-lg-2" key={`result-${index}`}>
                     <div className="position-relative">
                       <img 
-                        src={`/${result.result_path}?t=${Date.now()}`} 
+                        src={`${result.result_path}?t=${Date.now()}`} 
                         className="img-fluid rounded shadow-sm" 
                         alt={`Result ${index + 1}`} 
+                        onError={(e) => {
+                          console.error(`Failed to load image: ${result.result_path}`);
+                          e.target.src = "/static/images/error-placeholder.jpg";
+                        }}
                       />
                       {result.enhanced && (
                         <span className="position-absolute top-0 start-0 badge bg-info m-1" style={{fontSize: '0.65rem'}}>
@@ -396,7 +400,7 @@ const BridalSwapPage = () => {
                         </span>
                       )}
                       <a 
-                        href={`/${result.result_path}?t=${Date.now()}`} 
+                        href={`${result.result_path}?t=${Date.now()}`} 
                         className="btn btn-sm btn-primary position-absolute bottom-0 end-0 m-1 p-0"
                         style={{width: '24px', height: '24px', fontSize: '12px'}}
                         target="_blank"
