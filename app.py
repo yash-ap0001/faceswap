@@ -2425,6 +2425,7 @@ def resize_image_if_needed(image, max_size=1280):
 
 # Universal face swap endpoint to work across groom and saloon categories
 @app.route('/universal-face-swap', methods=['POST'])
+@app.route('/universal_face_swap', methods=['POST'])
 def universal_face_swap():
     """
     Process a face swap across multiple template categories (Groom, Saloon) with a single API call.
