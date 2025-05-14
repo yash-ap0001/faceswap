@@ -649,19 +649,31 @@
                                 col.className = 'col-md-4 col-lg-3 mb-3';
                                 
                                 col.innerHTML = `
-                                    <div class="card h-100">
+                                    <div class="card h-100 shadow-sm">
                                         <div class="position-relative">
                                             <img src="${template.url}" class="card-img-top template-preview" alt="${template.id}" 
                                                 data-template-path="${template.path}" data-template-name="${template.id}">
-                                            <div class="position-absolute top-0 start-0 p-1">
+                                            <div class="position-absolute top-0 start-0 p-2">
                                                 <div class="form-check m-0">
                                                     <input class="form-check-input template-checkbox" type="checkbox" 
                                                         value="${template.path}" id="check_${template.id}" data-template-id="${template.id}">
                                                 </div>
                                             </div>
-                                            <div class="position-absolute bottom-0 end-0 p-1">
-                                                <button class="btn btn-sm btn-primary btn-sm select-template-btn" 
-                                                    data-template-path="${template.path}">
+                                            <div class="position-absolute top-0 end-0 p-2">
+                                                <button class="btn btn-sm btn-light rounded-circle shadow-sm" 
+                                                    onclick="window.open('${template.url}', '_blank')" 
+                                                    title="View full size">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="position-absolute bottom-0 start-0 p-2">
+                                                <span class="badge bg-dark text-white">
+                                                    ${template.item_category || template.id}
+                                                </span>
+                                            </div>
+                                            <div class="position-absolute bottom-0 end-0 p-2">
+                                                <button class="btn btn-sm btn-primary rounded-circle shadow-sm select-template-btn" 
+                                                    data-template-path="${template.path}" title="Use this template">
                                                     <i class="fas fa-exchange-alt"></i>
                                                 </button>
                                             </div>
@@ -856,15 +868,30 @@
                                             const filename = resultData.result_path.split('/').pop();
                                             
                                             resultCol.innerHTML = `
-                                                <div class="card h-100">
-                                                    <img src="${resultData.result_path}" class="card-img-top result-image" 
-                                                        alt="Result ${index + 1}" 
-                                                        data-result-path="${resultData.result_path}"
-                                                        data-result-name="Result ${index + 1} - ${filename}">
-                                                    <div class="position-absolute bottom-0 end-0 p-1">
-                                                        <a href="${resultData.result_path}" class="btn btn-sm btn-outline-light" download>
-                                                            <i class="fas fa-download"></i>
-                                                        </a>
+                                                <div class="card h-100 shadow-sm">
+                                                    <div class="position-relative">
+                                                        <img src="${resultData.result_path}" class="card-img-top result-image" 
+                                                            alt="Result ${index + 1}" 
+                                                            data-result-path="${resultData.result_path}"
+                                                            data-result-name="Result ${index + 1} - ${filename}"
+                                                            style="height: 220px; object-fit: cover; cursor: pointer; border-radius: 6px 6px 0 0;">
+                                                        <div class="position-absolute top-0 end-0 p-2">
+                                                            <button class="btn btn-sm btn-light rounded-circle shadow-sm" 
+                                                                onclick="window.open('${resultData.result_path}', '_blank')" 
+                                                                title="Open in new tab">
+                                                                <i class="fas fa-external-link-alt"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="position-absolute bottom-0 start-0 p-2">
+                                                            <span class="badge bg-dark text-white">
+                                                                Result ${index + 1}
+                                                            </span>
+                                                        </div>
+                                                        <div class="position-absolute bottom-0 end-0 p-2">
+                                                            <a href="${resultData.result_path}" class="btn btn-sm btn-primary rounded-circle shadow-sm" download title="Download">
+                                                                <i class="fas fa-download"></i>
+                                                            </a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             `;
