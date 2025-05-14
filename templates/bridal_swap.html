@@ -2550,9 +2550,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Register event listener for fullscreen modal closing
-    document.getElementById('fullImageModal').addEventListener('hidden.bs.modal', function() {
-        document.removeEventListener('keydown', handleModalKeyNavigation);
-    });
+    const fullImageModal = document.getElementById('fullImageModal');
+    if (fullImageModal) {
+        fullImageModal.addEventListener('hidden.bs.modal', function() {
+            document.removeEventListener('keydown', handleModalKeyNavigation);
+        });
+    }
 });
 </script>
 {% endblock %}
