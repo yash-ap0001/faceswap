@@ -151,6 +151,32 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
         <h5>Menu</h5>
       </div>
       <div className="sidebar-content">
+        {/* Direct Universal Face Swap link - Always visible */}
+        <div className="menu-section universal-shortcut mb-3">
+          <a 
+            href="/universal-face-swap" 
+            className="d-block p-3 rounded text-center text-white" 
+            style={{
+              background: 'linear-gradient(45deg, #6a11cb, #2575fc)',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.3s ease',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+            }}
+          >
+            <i className="fas fa-magic me-2"></i>
+            <strong>Universal Face Swap</strong>
+            <span className="badge bg-warning text-dark ms-2">New!</span>
+          </a>
+        </div>
+        
         {menuItems.length > 0 ? (
           menuItems.map((section) => (
             <div key={section.id} className="menu-section accordion-item border-0">
