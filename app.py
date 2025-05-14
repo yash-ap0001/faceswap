@@ -520,6 +520,14 @@ def api_menu():
     """
     menu = [
         {
+            "id": "universal",
+            "title": "Universal",
+            "icon": "fa-magic",
+            "subItems": [
+                {"id": "universal_face_swap", "label": "Universal Face Swap", "link": "/universal-face-swap"}
+            ]
+        },
+        {
             "id": "bride",
             "title": "Bride",
             "icon": "fa-female",
