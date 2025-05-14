@@ -2,14 +2,14 @@
 :root {
     --sidebar-width: 280px;
     --sidebar-collapsed-width: 0;
-    --sidebar-gradient-start: #8e24aa;
-    --sidebar-gradient-end: #4a148c;
+    --sidebar-gradient-start: hsl(271.4, 81.3%, 55.9%);
+    --sidebar-gradient-end: hsl(271.4, 81.3%, 40%);
     --sidebar-text-color: #ffffff;
     --sidebar-hover-bg: rgba(255, 255, 255, 0.1);
     --sidebar-active-bg: rgba(255, 255, 255, 0.15);
     --sidebar-toggle-size: 48px;
     --sidebar-toggle-radius: 24px;
-    --sidebar-toggle-border: 2px solid #8e24aa;
+    --sidebar-toggle-border: 2px solid hsl(271.4, 81.3%, 55.9%);
 }
 
 /* Main sidebar container */
