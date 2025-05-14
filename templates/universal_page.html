@@ -839,23 +839,64 @@
                                             document.getElementById('resultsSection').style.display = 'block';
                                             const resultsContainer = document.getElementById('resultsContainer');
                                             
+                                            // Hide templates section when results are shown
+                                            document.getElementById('templatesSection').style.display = 'none';
+                                            
+                                            // Show the toggle templates button
+                                            document.getElementById('toggleTemplatesBtn').style.display = 'block';
+                                            
+                                            // Get filename from path for display
+                                            const filename = resultData.result_path.split('/').pop();
+                                            
                                             const resultCol = document.createElement('div');
-                                            resultCol.className = 'col-md-6 col-lg-4 mb-3';
+                                            resultCol.className = 'col-md-4 col-lg-3 mb-3';
                                             resultCol.innerHTML = `
-                                                <div class="card h-100">
-                                                    <img src="${resultData.result_path}" class="card-img-top" alt="Result">
-                                                    <div class="card-body text-center">
-                                                        <a href="${resultData.result_path}" class="btn btn-outline-primary" download>
-                                                            <i class="fas fa-download me-1"></i> Download
-                                                        </a>
+                                                <div class="card h-100 shadow-sm">
+                                                    <div class="position-relative">
+                                                        <img src="${resultData.result_path}" class="card-img-top result-image" 
+                                                            alt="Result" 
+                                                            data-result-path="${resultData.result_path}"
+                                                            data-result-name="${filename}"
+                                                            style="height: 220px; object-fit: cover; cursor: pointer; border-radius: 6px 6px 0 0;">
+                                                        <div class="position-absolute top-0 end-0 p-2">
+                                                            <button class="btn btn-sm btn-light rounded-circle shadow-sm view-image-btn" 
+                                                                data-img-src="${resultData.result_path}" 
+                                                                title="View full size">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="position-absolute bottom-0 start-0 p-2">
+                                                            <span class="badge bg-dark text-white">
+                                                                Result
+                                                            </span>
+                                                        </div>
+                                                        <div class="position-absolute bottom-0 end-0 p-2">
+                                                            <a href="${resultData.result_path}" class="btn btn-sm btn-primary rounded-circle shadow-sm" download title="Download">
+                                                                <i class="fas fa-download"></i>
+                                                            </a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             `;
                                             
                                             resultsContainer.appendChild(resultCol);
                                             
+                                            // Add event listener to the view image button
+                                            resultCol.querySelector('.view-image-btn').addEventListener('click', function() {
+                                                const imgSrc = this.dataset.imgSrc;
+                                                document.getElementById('selectedResultImage').src = imgSrc;
+                                                document.getElementById('selectedResultName').textContent = filename;
+                                                document.getElementById('selectedResultDownload').href = imgSrc;
+                                                document.getElementById('resultViewerSection').style.display = 'block';
+                                            });
+                                            
                                             // Scroll to results
                                             document.getElementById('resultsSection').scrollIntoView({behavior: 'smooth'});
+                                            
+                                            // Enable download all button if there's more than one result
+                                            if (document.querySelectorAll('.result-image').length > 1) {
+                                                document.getElementById('downloadAllBtn').style.display = 'block';
+                                            }
                                             
                                             // Re-enable the button
                                             event.target.disabled = false;
