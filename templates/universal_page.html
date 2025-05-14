@@ -118,12 +118,18 @@
         
         /* Template styles */
         .template-preview {
-            height: 180px;
+            height: 200px;
             object-fit: cover;
             object-position: top;
             border-radius: 6px 6px 0 0;
             transition: transform 0.2s ease;
             width: 100%;
+            cursor: pointer;
+        }
+        
+        .template-preview:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         
         .select-template-btn {
@@ -404,14 +410,19 @@
                         <!-- Main Result Viewer -->
                         <div id="resultViewerSection" class="mb-3" style="display: none;">
                             <div class="row">
-                                <div class="col-md-8 mx-auto text-center">
+                                <div class="col-lg-10 mx-auto text-center">
                                     <div class="card mb-2">
-                                        <img id="selectedResultImage" class="img-fluid" style="max-height: 500px; object-fit: contain;" src="">
+                                        <img id="selectedResultImage" class="img-fluid" style="max-height: 650px; object-fit: contain; border-radius: 8px 8px 0 0;" src="">
                                         <div class="card-body p-2 d-flex justify-content-between align-items-center">
                                             <span id="selectedResultName" class="small"></span>
-                                            <a id="selectedResultDownload" href="#" class="btn btn-sm btn-outline-primary" download>
-                                                <i class="fas fa-download"></i> Download
-                                            </a>
+                                            <div>
+                                                <a id="selectedResultDownload" href="#" class="btn btn-sm btn-outline-primary me-2" download>
+                                                    <i class="fas fa-download"></i> Download
+                                                </a>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('selectedResultImage').requestFullscreen();">
+                                                    <i class="fas fa-expand"></i> Full Screen
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -946,6 +957,27 @@
                             </div>
                         `;
                     });
+            });
+            
+            // Handle "Download All" button for batch downloading results
+            document.getElementById('downloadAllBtn').addEventListener('click', () => {
+                const resultImages = document.querySelectorAll('.result-image');
+                if (resultImages.length === 0) return;
+                
+                // For each result, create a temporary link and click it
+                resultImages.forEach((img, index) => {
+                    const path = img.dataset.resultPath;
+                    if (!path) return;
+                    
+                    setTimeout(() => {
+                        const link = document.createElement('a');
+                        link.href = path;
+                        link.download = `result_${index+1}.jpg`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }, index * 300); // Add delay between downloads
+                });
             });
         });
     </script>
