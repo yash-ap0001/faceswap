@@ -427,6 +427,73 @@ def react_app():
     This serves as the entry point for the SPA (Single Page Application).
     """
     return render_template('layout.html')
+    
+@app.route('/get_templates')
+def get_templates_route():
+    """
+    API endpoint to get available templates for a specific category.
+    This is a simplified version that directly serves templates from the filesystem.
+    
+    Query parameters:
+    - ceremony_type: For bridal ceremonies
+    - category_type: 'bride' or 'groom'
+    - subcategory: e.g., 'bridal', 'outfits', 'jewelry' 
+    - item_category: Specific item category, e.g., 'haldi', 'casual', etc.
+    """
+    # Get query parameters
+    ceremony_type = request.args.get('ceremony_type')
+    category_type = request.args.get('category_type', 'bride')
+    subcategory = request.args.get('subcategory', 'bridal')
+    item_category = request.args.get('item_category', ceremony_type)
+    
+    # For compatibility with older code
+    if ceremony_type and not item_category:
+        item_category = ceremony_type
+    
+    if not item_category:
+        return jsonify({'success': False, 'message': 'Missing required category parameter'}), 400
+    
+    # Create path to template directory
+    template_dir = os.path.join('static', 'images', 'templates', item_category)
+    
+    # Check if directory exists
+    if not os.path.exists(template_dir):
+        return jsonify({
+            'success': False, 
+            'message': f'No templates found for {item_category}',
+            'templates': []
+        }), 404
+    
+    # Get all jpg files in the directory
+    template_files = [f for f in os.listdir(template_dir) 
+                     if f.lower().endswith('.jpg') and os.path.isfile(os.path.join(template_dir, f))]
+    
+    # Create template objects
+    templates = []
+    for i, filename in enumerate(template_files):
+        template_path = os.path.join('static', 'images', 'templates', item_category, filename)
+        template_url = f"/{template_path}"
+        
+        templates.append({
+            "id": f"{item_category}_{i+1}",
+            "path": template_path,
+            "url": template_url,
+            "category_type": category_type,
+            "subcategory": subcategory,
+            "item_category": item_category,
+            "template_type": "filesystem"
+        })
+    
+    # Return results
+    return jsonify({
+        'success': True,
+        'templates': templates,
+        'count': len(templates),
+        'has_templates': len(templates) > 0,
+        'category_type': category_type,
+        'subcategory': subcategory,
+        'item_category': item_category
+    })
 
 @app.route('/api/menu')
 def api_menu():
