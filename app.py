@@ -432,7 +432,7 @@ def react_app():
 def get_templates_route():
     """
     API endpoint to get available templates for a specific category.
-    This is a simplified version that directly serves templates from the filesystem.
+    This is a simplified version that directly serves templates from the Pinterest folder.
     
     Query parameters:
     - ceremony_type: For bridal ceremonies
@@ -453,25 +453,32 @@ def get_templates_route():
     if not item_category:
         return jsonify({'success': False, 'message': 'Missing required category parameter'}), 400
     
-    # Create path to template directory
-    template_dir = os.path.join('static', 'images', 'templates', item_category)
+    # Create path to Pinterest template directory as specified by user
+    template_dir = os.path.join('uploads', 'templates', 'pinterest', item_category)
     
     # Check if directory exists
     if not os.path.exists(template_dir):
-        return jsonify({
-            'success': False, 
-            'message': f'No templates found for {item_category}',
-            'templates': []
-        }), 404
+        # Fallback to static directory if Pinterest templates don't exist
+        template_dir = os.path.join('static', 'images', 'templates', item_category)
+        
+        if not os.path.exists(template_dir):
+            return jsonify({
+                'success': False, 
+                'message': f'No templates found for {item_category}',
+                'templates': []
+            }), 404
     
     # Get all jpg files in the directory
     template_files = [f for f in os.listdir(template_dir) 
                      if f.lower().endswith('.jpg') and os.path.isfile(os.path.join(template_dir, f))]
     
+    # Limit to 6 files for consistency
+    template_files = template_files[:6]
+    
     # Create template objects
     templates = []
     for i, filename in enumerate(template_files):
-        template_path = os.path.join('static', 'images', 'templates', item_category, filename)
+        template_path = os.path.join(template_dir, filename)
         template_url = f"/{template_path}"
         
         templates.append({
@@ -481,7 +488,7 @@ def get_templates_route():
             "category_type": category_type,
             "subcategory": subcategory,
             "item_category": item_category,
-            "template_type": "filesystem"
+            "template_type": "pinterest"
         })
     
     # Return results
