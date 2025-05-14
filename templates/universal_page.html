@@ -691,6 +691,10 @@
                             // Clear container
                             templatesContainer.innerHTML = '';
                             
+                            // Show multi-select controls when templates are loaded
+                            document.getElementById('multiSelectControls').style.display = 'flex';
+                            document.getElementById('compactControls').style.display = 'flex';
+                            
                             // Add templates to the container
                             data.templates.forEach(template => {
                                 const col = document.createElement('div');
@@ -1026,6 +1030,10 @@
                                     </div>
                                 </div>
                             `;
+                            
+                            // Hide multi-select controls when no templates are available
+                            document.getElementById('multiSelectControls').style.display = 'none';
+                            document.getElementById('compactControls').style.display = 'none';
                         }
                     })
                     .catch(error => {
@@ -1037,6 +1045,10 @@
                                 </div>
                             </div>
                         `;
+                        
+                        // Hide multi-select controls when error occurs
+                        document.getElementById('multiSelectControls').style.display = 'none';
+                        document.getElementById('compactControls').style.display = 'none';
                     });
             });
             
