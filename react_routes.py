@@ -3,7 +3,7 @@ React application routes and API endpoints.
 These routes serve the React application and provide API endpoints for it.
 """
 
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, request
 
 # Create a blueprint for React app routes
 react_bp = Blueprint('react', __name__, url_prefix='/react')
@@ -13,10 +13,12 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 @react_bp.route('/')
 @react_bp.route('')
-def react_app():
+@react_bp.route('/<path:path>')  # Catch-all route for all React routes
+def react_app(path=None):
     """
     Render the React application using the layout template.
     This serves as the entry point for the SPA (Single Page Application).
+    The catch-all route ensures all React routes are handled by the SPA.
     """
     return render_template('layout.html')
 
@@ -74,6 +76,62 @@ def api_menu():
     ]
     
     return jsonify({"menu": menu})
+
+@api_bp.route('/fallback/templates')
+def fallback_templates():
+    """
+    API endpoint to provide fallback templates when the main template
+    fetching mechanism fails. This ensures the React app has content
+    to display during development and testing.
+    
+    Query parameters:
+    - ceremony_type: Type of ceremony (haldi, mehendi, sangeeth, wedding, reception)
+    - category_type: Type of category (bride, groom)
+    - subcategory: Subcategory (bridal, outfits, etc.)
+    - item_category: Specific item category
+    """
+    # Get query parameters
+    ceremony_type = request.args.get('ceremony_type')
+    category_type = request.args.get('category_type', 'bride')
+    subcategory = request.args.get('subcategory', 'bridal')
+    item_category = request.args.get('item_category', ceremony_type)
+    
+    # If no ceremony or item category specified, return error
+    if not (ceremony_type or item_category):
+        return jsonify({'success': False, 'message': 'No ceremony or item category specified'}), 400
+    
+    # Use ceremony type as item category if not specified
+    item_category = item_category or ceremony_type
+    
+    # Create fallback templates based on static files in static/images/templates
+    fallback_templates = []
+    
+    # Generate 6 placeholder templates
+    for i in range(1, 7):
+        template_id = f"{item_category}_{i}"
+        template_path = f"static/images/templates/{item_category}/{i}.jpg"
+        template_url = f"/static/images/templates/{item_category}/{i}.jpg"
+        
+        fallback_templates.append({
+            "id": template_id,
+            "path": template_path,
+            "url": template_url,
+            "category_type": category_type,
+            "subcategory": subcategory,
+            "item_category": item_category,
+            "template_type": "fallback"
+        })
+    
+    # Return the fallback templates
+    return jsonify({
+        "success": True,
+        "templates": fallback_templates,
+        "count": len(fallback_templates),
+        "has_templates": len(fallback_templates) > 0,
+        "category_type": category_type,
+        "subcategory": subcategory,
+        "item_category": item_category
+    })
 
 @api_bp.route('/content/<page_id>')
 def api_content(page_id):
