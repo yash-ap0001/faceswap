@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOWBRIDE - Indian Bridal Face Swap</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css for animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- React App CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/react-app.css') }}">
+    <!-- Custom inline styles from the original template -->
+    <style>
+        :root {
+            --primary-purple: #4a148c;
+            --secondary-purple: #6a1b9a;
+            --dark-purple: #38006b;
+            --light-purple: #9c4dcc;
+            --dark-surface: #121212;
+            --card-surface: #1e1e1e;
+            --border-color: #333333;
+            --text-primary: #f5f5f5;
+            --text-secondary: #bdbdbd;
+            --glass-bg: rgba(18, 18, 18, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            background-color: var(--dark-surface);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        .brand-gradient {
+            background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: bold;
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Loading Container */
+        .initial-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--dark-surface);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(106, 27, 154, 0.2);
+            border-top-color: #6a1b9a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Initial loading spinner -->
+    <div class="initial-loading" id="initial-loading">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <!-- React application root -->
+    <div id="react-root"></div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- React application bundle -->
+    <script src="{{ url_for('static', filename='dist/bundle.js') }}"></script>
+    
+    <script>
+        // Hide loading spinner once React app is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const loadingElement = document.getElementById('initial-loading');
+                if (loadingElement) {
+                    loadingElement.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingElement.style.display = 'none';
+                    }, 300);
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>
