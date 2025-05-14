@@ -1370,7 +1370,9 @@ def process_template():
         # Save result
         timestamp = int(time.time())
         result_filename = f"result_{timestamp}_{os.path.basename(template_path)}"
-        result_path = os.path.join(app.config['UPLOAD_FOLDER'], 'results', result_filename)
+        
+        # Save to static folder for direct web access
+        result_path = os.path.join('static/results', result_filename)
         
         # Create results directory if it doesn't exist
         os.makedirs(os.path.dirname(result_path), exist_ok=True)
@@ -1379,9 +1381,12 @@ def process_template():
         cv2.imwrite(result_path, result_img)
         
         # Return the result path for display
+        # Make the path directly usable by the browser
+        result_url = f"/static/results/{os.path.basename(result_filename)}"
+        
         return jsonify({
             'success': True,
-            'result_path': f"/uploads/results/{result_filename}",
+            'result_path': result_url,
             'enhanced': enhanced,
             'enhance_method': enhance_method if enhanced else None
         })
