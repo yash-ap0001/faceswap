@@ -183,7 +183,7 @@ const BridalGalleryPage = () => {
               </div>
             ) : templates.length > 0 ? (
               templates.map(template => (
-                <div className="col-6 col-sm-4 col-md-3" key={template.id}>
+                <div className="col-6 col-sm-4 col-md-4 col-lg-3" key={template.id}>
                   <div 
                     className="gallery-item"
                     onClick={() => openImageModal(template)}
@@ -267,31 +267,31 @@ const BridalGalleryPage = () => {
           cursor: pointer;
           overflow: hidden;
           transition: transform 0.3s ease;
-          height: 330px;
+          height: 310px;
           display: flex;
           align-items: center;
           justify-content: center;
-          margin-bottom: 5px;
+          margin-bottom: 8px;
           background-color: #000;
           border-radius: 0;
         }
         
         .gallery-item img {
           width: 100%;
-          height: 330px;
+          height: 310px;
           object-fit: cover;
           background-color: #000;
         }
         
         .row {
-          margin-right: -3px;
-          margin-left: -3px;
+          margin-right: -5px;
+          margin-left: -5px;
           background-color: #000;
         }
         
-        .col-md-3, .col-sm-4, .col-6 {
-          padding-right: 3px;
-          padding-left: 3px;
+        .col-md-4, .col-lg-3, .col-sm-4, .col-6 {
+          padding-right: 5px;
+          padding-left: 5px;
         }
 
         .gallery-container {
@@ -301,11 +301,11 @@ const BridalGalleryPage = () => {
         
         @media (max-width: 576px) {
           .gallery-item, .gallery-item img {
-            height: 220px;
+            height: 200px;
           }
           
           .col-6 {
-            padding: 3px;
+            padding: 4px;
           }
           
           .gallery-item img {
@@ -313,8 +313,12 @@ const BridalGalleryPage = () => {
           }
           
           .row {
-            margin-right: -3px;
-            margin-left: -3px;
+            margin-right: -4px;
+            margin-left: -4px;
+          }
+          
+          .gallery-item {
+            margin-bottom: 8px;
           }
         }
         
