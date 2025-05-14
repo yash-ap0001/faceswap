@@ -172,9 +172,9 @@ const BridalGalleryPage = () => {
         </div>
       </div>
       
-      <div className="mb-3">
-        <div className="container-fluid p-0">
-          <div className="row g-2">
+      <div className="mb-0" style={{ backgroundColor: '#000' }}>
+        <div className="container-fluid p-0 gallery-container">
+          <div className="row g-0">
             {isLoading ? (
               <div className="col-12 text-center py-3">
                 <div className="spinner-border spinner-border-sm text-primary" role="status">
@@ -183,21 +183,16 @@ const BridalGalleryPage = () => {
               </div>
             ) : templates.length > 0 ? (
               templates.map(template => (
-                <div className="col-6 col-sm-4 col-md-3 col-lg-2" key={template.id}>
+                <div className="col-6 col-sm-4 col-md-3" key={template.id}>
                   <div 
                     className="gallery-item"
                     onClick={() => openImageModal(template)}
                   >
                     <img 
                       src={template.url} 
-                      className="img-fluid rounded shadow-sm" 
+                      className="img-fluid" 
                       alt={template.id}
                     />
-                    <div className="overlay">
-                      <div className="zoom-icon">
-                        <i className="fas fa-search-plus"></i>
-                      </div>
-                    </div>
                   </div>
                 </div>
               ))
@@ -272,46 +267,54 @@ const BridalGalleryPage = () => {
           cursor: pointer;
           overflow: hidden;
           transition: transform 0.3s ease;
-          height: 230px;
+          height: 280px;
           display: flex;
           align-items: center;
           justify-content: center;
-          margin-bottom: 8px;
+          margin-bottom: 2px;
+          background-color: #000;
+          border-radius: 0;
         }
         
         .gallery-item img {
           width: 100%;
-          height: 230px;
-          object-fit: contain;
-          background-color: rgba(0, 0, 0, 0.03);
+          height: 280px;
+          object-fit: cover;
+          background-color: #000;
         }
         
         .row {
-          margin-right: -5px;
-          margin-left: -5px;
+          margin-right: -1px;
+          margin-left: -1px;
+          background-color: #000;
         }
         
         .col-md-3, .col-sm-4, .col-6 {
-          padding-right: 5px;
-          padding-left: 5px;
+          padding-right: 1px;
+          padding-left: 1px;
+        }
+
+        .gallery-container {
+          background-color: #000;
+          padding: 0;
         }
         
         @media (max-width: 576px) {
           .gallery-item, .gallery-item img {
-            height: 180px;
+            height: 200px;
           }
           
           .col-6 {
-            padding: 3px;
+            padding: 1px;
           }
           
           .gallery-item img {
-            object-fit: contain; /* Ensure consistent image display on mobile */
+            object-fit: cover;
           }
           
           .row {
-            margin-right: -3px;
-            margin-left: -3px;
+            margin-right: -1px;
+            margin-left: -1px;
           }
         }
         
