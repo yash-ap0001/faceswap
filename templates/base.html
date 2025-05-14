@@ -336,7 +336,10 @@
         }
         
         .accordion-button::after {
-            filter: brightness(5);
+            filter: brightness(5) contrast(0.8);
+            opacity: 0.8;
+            width: 16px;
+            height: 16px;
         }
         
         .accordion-button:focus {
@@ -355,39 +358,39 @@
         .sidebar-menu {
             list-style: none;
             padding: 0;
-            margin: 0 0 0 10px;
+            margin: 5px 0 0 10px;
         }
         
         .sidebar-menu li {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             transition: all 0.3s ease;
         }
         
         .sidebar-menu li:hover {
-            transform: translateX(5px);
+            transform: translateX(3px);
         }
         
         .sidebar-menu a {
-            color: white;
+            color: rgba(255, 255, 255, 0.9);
             text-decoration: none;
             display: block;
-            padding: 8px 15px;
+            padding: 10px 15px;
             border-radius: 6px;
             transition: all 0.3s ease;
-            background-color: rgba(255, 255, 255, 0.08);
+            background-color: rgba(255, 255, 255, 0.05);
+            font-weight: 400;
+            font-size: 0.95rem;
         }
         
         .sidebar-menu a:hover {
             color: white;
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.1);
         }
         
         /* Style for active/selected menu item */
         .sidebar-menu a.active {
             color: white;
-            background-color: rgba(255, 255, 255, 0.25);
-            border-left: 4px solid white;
-            padding-left: 11px; /* Compensate for the border */
+            background-color: rgba(255, 255, 255, 0.15);
             font-weight: 500;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
@@ -706,7 +709,7 @@
                                 type="button" data-bs-toggle="collapse" 
                                 data-bs-target="#collapseBride" aria-expanded="false" 
                                 aria-controls="collapseBride">
-                            <i class="fas fa-female me-2"></i>Bride
+                            <i class="fas fa-gem me-3"></i>Bride
                         </button>
                     </h6>
                     <div id="collapseBride" class="accordion-collapse collapse" 
@@ -730,7 +733,7 @@
                                 type="button" data-bs-toggle="collapse" 
                                 data-bs-target="#collapseGroom" aria-expanded="false" 
                                 aria-controls="collapseGroom">
-                            <i class="fas fa-male me-2"></i>Groom
+                            <i class="fas fa-user-tie me-3"></i>Groom
                         </button>
                     </h6>
                     <div id="collapseGroom" class="accordion-collapse collapse" 
