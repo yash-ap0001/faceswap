@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
     <style>
         :root {
             --primary-purple: #9c27b0;
@@ -686,8 +687,8 @@
     {% block style %}{% endblock %}
 </head>
 <body>
-    <!-- Fixed position menu toggle button -->
-    <div class="menu-toggle-btn" id="menuToggleBtn">
+    <!-- Perfect semicircle sidebar toggle button at exact edge position -->
+    <div class="sidebar-toggle" id="menuToggleBtn">
         <i class="fas fa-chevron-left"></i>
     </div>
     
@@ -697,7 +698,7 @@
     <!-- Transparent Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h5>VOWBRIDE</h5>
+            <h3 class="animate__animated animate__fadeIn">VOWBRIDE</h3>
         </div>
         <div class="sidebar-content">
             <!-- Bootstrap Accordion -->

@@ -1,0 +1,201 @@
+/* Custom CSS for the VOWBRIDE application */
+
+/* Sidebar with purple gradient background */
+.sidebar {
+    background: linear-gradient(135deg, #9c27b0, #6a0dad);
+    min-height: 100vh;
+    transition: all 0.3s;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+/* VOWBRIDE logo styling */
+.sidebar-header {
+    padding: 1.5rem;
+}
+
+.sidebar-header h3 {
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+/* Accordion styling */
+.sidebar .accordion-item {
+    background: transparent;
+    border: none;
+}
+
+.sidebar .accordion-button {
+    padding: 0.75rem 1.5rem;
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    font-size: 1rem;
+    border-radius: 0;
+    transition: all 0.2s;
+}
+
+.sidebar .accordion-button:not(.collapsed) {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white !important;
+}
+
+.sidebar .accordion-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .accordion-button::after {
+    filter: brightness(300%);
+}
+
+/* Menu items styling */
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    margin-bottom: 0.25rem;
+}
+
+.sidebar-menu li a {
+    display: block;
+    padding: 0.5rem 1.5rem 0.5rem 3rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.sidebar-menu li a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.sidebar-menu li a i {
+    opacity: 0.8;
+}
+
+/* Sidebar toggle button */
+.sidebar-toggle {
+    position: absolute;
+    right: -18px;
+    top: 20px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #9c27b0, #6a0dad);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+/* Switch styling */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #fff;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #fff;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+    background-color: #9c27b0;
+}
+
+.slider.round {
+    border-radius: 24px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* Sidebar collapsed state */
+.sidebar-collapsed {
+    margin-left: -250px;
+}
+
+/* Settings section styling */
+.setting-item {
+    padding: 0 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Active menu item */
+.sidebar-menu li a.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-weight: 500;
+}
+
+/* Main content area styling */
+.content {
+    transition: all 0.3s;
+}
+
+/* Media queries for responsive sidebar */
+@media (max-width: 768px) {
+    .sidebar {
+        margin-left: -250px;
+    }
+    
+    .sidebar.active {
+        margin-left: 0;
+    }
+    
+    .sidebar-toggle {
+        visibility: visible;
+        opacity: 1;
+    }
+}
+
+/* Improve font rendering */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
