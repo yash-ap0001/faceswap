@@ -2394,6 +2394,201 @@ def upload_model():
     
     return render_template('upload_model.html')
 
+# Helper function to resize large images for face detection
+def resize_image_if_needed(image, max_size=1280):
+    """
+    Resize an image if it's larger than max_size while maintaining aspect ratio.
+    
+    Args:
+        image: OpenCV image
+        max_size: Maximum dimension (width or height)
+        
+    Returns:
+        Resized image
+    """
+    h, w = image.shape[:2]
+    
+    # If image is already smaller than max_size, return as is
+    if h <= max_size and w <= max_size:
+        return image
+    
+    # Calculate new dimensions
+    if h > w:
+        new_h = max_size
+        new_w = int(w * (max_size / h))
+    else:
+        new_w = max_size
+        new_h = int(h * (max_size / w))
+    
+    # Resize image
+    return cv2.resize(image, (new_w, new_h))
+
+# Universal face swap endpoint to work across groom and saloon categories
+@app.route('/universal-face-swap', methods=['POST'])
+def universal_face_swap():
+    """
+    Process a face swap across multiple template categories (Groom, Saloon) with a single API call.
+    Designed for minimal UI requiring only two clicks: upload and swap.
+    
+    Accepts:
+    - source: Uploaded source image file
+    - category: Optional category to specify target templates (groom, bride-saloon, groom-saloon, auto)
+    - process_all: Boolean flag to process all available templates across categories
+    
+    Returns:
+    - JSON with result paths or error
+    """
+    if not faceapp or not swapper:
+        return jsonify({'success': False, 'message': 'Face models not loaded properly'}), 500
+    
+    if 'source' not in request.files:
+        return jsonify({'success': False, 'message': 'No source file found'}), 400
+    
+    source_file = request.files['source']
+    if source_file.filename == '':
+        return jsonify({'success': False, 'message': 'Empty source filename'}), 400
+    
+    if not allowed_file(source_file.filename):
+        return jsonify({'success': False, 'message': 'Invalid file type'}), 400
+    
+    # Get category parameter 
+    category = request.form.get('category', 'auto')
+    process_all = request.form.get('process_all', 'false').lower() == 'true'
+    
+    # Determine which template categories to use
+    template_categories = []
+    
+    if category == 'groom' or category == 'auto' or process_all:
+        template_categories.append({
+            'category_type': 'groom',
+            'subcategories': [
+                {'subcategory': 'traditional', 'items': ['wedding', 'formal']},
+                {'subcategory': 'modern', 'items': ['casual', 'formal']},
+                {'subcategory': 'accessories', 'items': ['turban', 'jewelry']}
+            ]
+        })
+    
+    if category == 'bride-saloon' or category == 'auto' or process_all:
+        template_categories.append({
+            'category_type': 'bride',
+            'subcategories': [
+                {'subcategory': 'makeup', 'items': ['natural', 'glamour']},
+                {'subcategory': 'hair', 'items': ['updo', 'open']}
+            ]
+        })
+    
+    if category == 'groom-saloon' or category == 'auto' or process_all:
+        template_categories.append({
+            'category_type': 'groom',
+            'subcategories': [
+                {'subcategory': 'saloon', 'items': ['hair', 'beard', 'formal']}
+            ]
+        })
+    
+    # Save source file temporarily
+    source_filename = secure_filename(source_file.filename)
+    source_path = os.path.join(app.config['UPLOAD_FOLDER'], 'source_' + source_filename)
+    source_file.save(source_path)
+    
+    try:
+        # Read source image and detect face
+        source_img = cv2.imread(source_path)
+        source_img = resize_image_if_needed(source_img)
+        source_faces = faceapp.get(source_img)
+        
+        if len(source_faces) == 0:
+            os.remove(source_path)
+            return jsonify({'success': False, 'message': 'No face detected in source image'}), 400
+        
+        results = []
+        
+        # Process templates from each category
+        for cat in template_categories:
+            for subcat in cat['subcategories']:
+                for item in subcat['items']:
+                    # Get templates for this category
+                    templates = []
+                    target_dir = None
+                    
+                    if cat['category_type'] == 'bride':
+                        if subcat['subcategory'] == 'makeup' or subcat['subcategory'] == 'hair':
+                            # Use bridal templates for now
+                            target_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates', 'pinterest', item)
+                    else:  # groom
+                        target_dir = os.path.join(app.static_folder, 'templates', 'groom', subcat['subcategory'], item)
+                    
+                    if not target_dir or not os.path.exists(target_dir):
+                        # Skip this category if directory doesn't exist
+                        continue
+                    
+                    # Find template images in directory
+                    template_paths = []
+                    for file in os.listdir(target_dir):
+                        if file.lower().endswith(('.jpg', '.jpeg', '.png')):
+                            template_paths.append(os.path.join(target_dir, file))
+                    
+                    # Sort and limit to max 2 templates per category to avoid too many results
+                    template_paths = sorted(template_paths)[:2]
+                    
+                    # Process each template
+                    for template_path in template_paths:
+                        try:
+                            # Read template image
+                            target_img = cv2.imread(template_path)
+                            target_img = resize_image_if_needed(target_img)
+                            target_faces = faceapp.get(target_img)
+                            
+                            if len(target_faces) == 0:
+                                continue  # Skip if no face in template
+                            
+                            # Perform face swap
+                            result_img = swapper.get(target_img, target_faces[0], source_faces[0], paste_back=True)
+                            
+                            # Apply face enhancement if face enhancer is available
+                            if face_enhancer and request.form.get('enhance', 'false').lower() == 'true':
+                                enhance_method = request.form.get('enhance_method', 'auto')
+                                result_img = face_enhancer.enhance_face(result_img, target_faces[0], method=enhance_method)
+                            
+                            # Save result
+                            result_filename = f"result_{cat['category_type']}_{subcat['subcategory']}_{item}_{os.path.basename(template_path)}"
+                            result_path = os.path.join(app.config['UPLOAD_FOLDER'], result_filename)
+                            cv2.imwrite(result_path, result_img)
+                            
+                            # Add to results
+                            results.append({
+                                'category_type': cat['category_type'],
+                                'subcategory': subcat['subcategory'],
+                                'item_category': item,
+                                'template_path': template_path,
+                                'result_path': result_path,
+                                'result_url': f"/uploads/{result_filename}",
+                                'category': f"{subcat['subcategory'].capitalize()} {item.capitalize()}"
+                            })
+                        except Exception as e:
+                            app.logger.error(f"Error processing template {template_path}: {str(e)}")
+                            # Continue with next template
+        
+        # Clean up source file
+        os.remove(source_path)
+        
+        return jsonify({
+            'success': True,
+            'results': results,
+            'count': len(results),
+            'detected_category': category if category != 'auto' else template_categories[0]['category_type']
+        })
+    
+    except Exception as e:
+        app.logger.error(f"Error in universal_face_swap: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        
+        # Clean up files
+        if os.path.exists(source_path):
+            os.remove(source_path)
+        
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
 # Import React routes from separate file
 from react_routes import react_bp, api_bp
 

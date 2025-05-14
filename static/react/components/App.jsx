@@ -4,6 +4,7 @@ import MainContent from './MainContent';
 import HomePage from './pages/HomePage';
 import BridalSwapPage from './pages/BridalSwapPage';
 import BridalGalleryPage from './pages/BridalGalleryPage';
+import UniversalSwapPage from './pages/UniversalSwapPage';
 
 /**
  * Main App component that manages the application layout and state
@@ -71,6 +72,14 @@ const App = () => {
         return <BridalSwapPage />;
       case 'bridal-gallery':
         return <BridalGalleryPage />;
+      case 'groom-face-swap':
+        return <UniversalSwapPage category="groom" />;
+      case 'bride-saloons':
+        return <UniversalSwapPage category="bride-saloon" />;
+      case 'groom-saloons':
+        return <UniversalSwapPage category="groom-saloon" />;
+      case 'makeup-artists':
+        return <UniversalSwapPage category="bride-saloon" />;
       default:
         // For pages that don't have dedicated components yet
         return <MainContent currentPage={currentPage} />;
