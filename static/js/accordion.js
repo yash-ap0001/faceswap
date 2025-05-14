@@ -4,6 +4,23 @@ document.addEventListener('DOMContentLoaded', function() {
     initSidebar();
 });
 
+// Define the outside click handler function that will close the sidebar when clicking outside
+function outsideClickHandler(event) {
+    const sidebar = document.querySelector('.sidebar');
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    
+    if (sidebar) {
+        const isClickInside = 
+            sidebar.contains(event.target) || 
+            (menuToggleBtn && menuToggleBtn.contains(event.target));
+        
+        if (!isClickInside && !sidebar.classList.contains('closed')) {
+            // Use the toggleSidebar function for consistency
+            window.toggleSidebar();
+        }
+    }
+}
+
 // Also initialize sidebar when SPA content is loaded
 document.addEventListener('spaContentLoaded', function(event) {
     console.log("SPA content loaded - reinitializing sidebar for:", event.detail.url);
@@ -88,12 +105,18 @@ function initSidebar() {
         // Bootstrap 5 accordion is handled automatically via data attributes
         // No need for manual JavaScript for the accordion functionality
         
+        // Add outside click handler to close sidebar when clicking outside
+        // First remove any existing click handlers to avoid duplicates
+        document.removeEventListener('click', outsideClickHandler);
+        document.addEventListener('click', outsideClickHandler);
+        
     } catch (error) {
         console.error("Error initializing sidebar:", error);
     }
 }
 
-function toggleSidebar() {
+// Make toggleSidebar function global so it can be called from anywhere
+window.toggleSidebar = function() {
     console.log("Toggle sidebar called");
     try {
         console.log("Toggling sidebar class");
@@ -110,11 +133,31 @@ function toggleSidebar() {
                 body.classList.remove('sidebar-closed');
                 sidebar.classList.remove('closed');
                 console.log("Opening sidebar");
+                
+                // Update toggle button icon if it exists
+                const menuToggleBtn = document.getElementById('menuToggleBtn');
+                if (menuToggleBtn) {
+                    const menuIcon = menuToggleBtn.querySelector('i');
+                    if (menuIcon) {
+                        menuIcon.classList.remove('fa-chevron-right');
+                        menuIcon.classList.add('fa-chevron-left');
+                    }
+                }
             } else {
                 // If open, close it
                 body.classList.add('sidebar-closed');
                 sidebar.classList.add('closed');
                 console.log("Closing sidebar");
+                
+                // Update toggle button icon if it exists
+                const menuToggleBtn = document.getElementById('menuToggleBtn');
+                if (menuToggleBtn) {
+                    const menuIcon = menuToggleBtn.querySelector('i');
+                    if (menuIcon) {
+                        menuIcon.classList.remove('fa-chevron-left');
+                        menuIcon.classList.add('fa-chevron-right');
+                    }
+                }
             }
         } else {
             console.error("Sidebar or body element not found");

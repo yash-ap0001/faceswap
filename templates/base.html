@@ -938,7 +938,8 @@
                 
                 // Open sidebar on notification click
                 notification.querySelector('.notification-content').addEventListener('click', function() {
-                    toggleSidebar();
+                    // Call the global toggleSidebar function from accordion.js
+                    window.toggleSidebar();
                     notification.classList.remove('show');
                     setTimeout(() => notification.remove(), 300);
                 });
