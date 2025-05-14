@@ -377,6 +377,16 @@
             background-color: rgba(126, 87, 194, 0.15);
         }
         
+        /* Style for active/selected menu item */
+        .sidebar-menu a.active {
+            color: var(--text-primary);
+            background-color: rgba(126, 87, 194, 0.25);
+            border-left: 4px solid var(--light-purple);
+            padding-left: 11px; /* Compensate for the border */
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
         .setting-item {
             background-color: rgba(255, 255, 255, 0.05);
             padding: 15px;
@@ -1013,7 +1023,66 @@
                     }
                 }, 6000);
             }, 1500);
+            
+            // Set active menu item based on current page
+            highlightCurrentPage();
+            
+            // Add click event listeners to menu items
+            addMenuClickListeners();
         });
+        
+        // Function to highlight the active menu item based on current URL
+        function highlightCurrentPage() {
+            // Get current page URL path
+            const currentPath = window.location.pathname;
+            console.log("Current path:", currentPath);
+            
+            // Remove active class from all menu items
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Find and highlight the matching menu item
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                const linkPath = link.getAttribute('href');
+                if (linkPath && currentPath === linkPath) {
+                    link.classList.add('active');
+                    
+                    // Open the parent accordion if it's closed
+                    const accordionItem = link.closest('.accordion-collapse');
+                    if (accordionItem && !accordionItem.classList.contains('show')) {
+                        const accordionId = accordionItem.getAttribute('id');
+                        const accordionButton = document.querySelector(`[data-bs-target="#${accordionId}"]`);
+                        if (accordionButton) {
+                            accordionButton.click();
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Function to add click listeners to all menu items
+        function addMenuClickListeners() {
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.addEventListener('click', function(event) {
+                    // Skip for links that have special onclick handlers
+                    if (this.hasAttribute('onclick')) {
+                        return;
+                    }
+                    
+                    // Remove active class from all items
+                    document.querySelectorAll('.sidebar-menu a').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Store the active path in localStorage
+                    localStorage.setItem('activeMenuPath', this.getAttribute('href'));
+                });
+            });
+        }
     </script>
     
     {% block scripts %}{% endblock %}
