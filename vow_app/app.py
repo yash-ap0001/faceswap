@@ -4,24 +4,37 @@ import numpy as np
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 from werkzeug.utils import secure_filename
 import sys
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Add parent directory to path so we can import from the main app
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+main_app = sys.modules['app'] if 'app' in sys.modules else __import__('app')
+faceapp = main_app.faceapp
+swapper = main_app.swapper
+allowed_file = main_app.allowed_file
+resize_image_if_needed = main_app.resize_image_if_needed
 
-# Import necessary components from the main app
-from app import faceapp, swapper, allowed_file, resize_image_if_needed, TEMPLATE_DIRS
+# Import configuration
+from config import *
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "vow_bride_app_secret")
+app.secret_key = SECRET_KEY
 
 # Flask configuration
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
-app.config['RESULTS_FOLDER'] = 'static/results'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
+app.config['RESULTS_FOLDER'] = RESULTS_FOLDER
 
 # Create folders if they don't exist
 os.makedirs(os.path.join(app.root_path, app.config['UPLOAD_FOLDER']), exist_ok=True)
 os.makedirs(os.path.join(app.root_path, app.config['RESULTS_FOLDER']), exist_ok=True)
+
+logger.info(f"VOW-BRIDE standalone app initialized")
 
 @app.route('/')
 def index():
