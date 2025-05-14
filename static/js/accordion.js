@@ -62,8 +62,13 @@ function toggleSidebar() {
     console.log("Toggle sidebar called");
     try {
         console.log("Toggling sidebar class");
-        document.body.classList.toggle('sidebar-closed');
-        document.querySelector('.sidebar').classList.toggle('closed');
+        if (document.body) {
+            document.body.classList.toggle('sidebar-closed');
+        }
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar) {
+            sidebar.classList.toggle('closed');
+        }
     } catch (error) {
         console.error("Error toggling sidebar:", error);
     }
