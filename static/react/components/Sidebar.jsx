@@ -28,7 +28,7 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Universal',
             icon: 'fa-magic',
             subItems: [
-              { id: 'universal-categories', label: 'All Categories', link: '/universal', directLink: true }
+              { id: 'universal-categories', label: 'All Categories', link: '/react#universal-categories' }
             ]
           },
           {
@@ -93,14 +93,7 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
   }, []);
 
   // Handle menu item click
-  const handleItemClick = (id, link, directLink) => {
-    // For direct links, navigate directly to the URL
-    if (directLink) {
-      window.location.href = link;
-      return;
-    }
-    
-    // For react router links
+  const handleItemClick = (id, link) => {
     onNavigation(id);
     
     // Use history API for navigation without page reload
@@ -178,7 +171,7 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
                     <li 
                       key={item.id} 
                       className={activeItem === item.id ? 'active' : ''}
-                      onClick={() => handleItemClick(item.id, item.link, item.directLink)}
+                      onClick={() => handleItemClick(item.id, item.link)}
                     >
                       <span>{item.label}</span>
                     </li>
