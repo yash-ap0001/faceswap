@@ -16,17 +16,55 @@ const MainContent = ({ currentPage }) => {
 
   // Effect to handle page changes
   useEffect(() => {
-    setLoading(true);
+    const fetchPageContent = async () => {
+      setLoading(true);
+      
+      try {
+        // First, try to find existing content in the DOM
+        const contentElement = document.querySelector('.page-content');
+        if (contentElement) {
+          setPageContent(contentElement.innerHTML);
+          setLoading(false);
+          return;
+        }
+        
+        // If not found in DOM, fetch from API
+        const response = await fetch(`/api/content/${currentPage}`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch page content: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Create HTML content from API response
+        const htmlContent = `
+          <div class="page-header">
+            <h1>${data.title}</h1>
+          </div>
+          <div class="page-body">
+            ${data.content}
+          </div>
+        `;
+        
+        setPageContent(htmlContent);
+      } catch (error) {
+        console.error('Error fetching page content:', error);
+        setPageContent(`
+          <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error Loading Content</h4>
+            <p>Failed to load page content. Please try again later.</p>
+            <hr>
+            <p class="mb-0">Error details: ${error.message}</p>
+          </div>
+        `);
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    // Simulating page content loading
-    setTimeout(() => {
-      setLoading(false);
-    }, 300);
-    
-    // Load existing page content if available
-    const contentElement = document.querySelector('.page-content');
-    if (contentElement) {
-      setPageContent(contentElement.innerHTML);
+    if (currentPage) {
+      fetchPageContent();
     }
   }, [currentPage]);
 

@@ -420,6 +420,80 @@ def allowed_file(filename):
 def index():
     return render_template('index.html')
 
+@app.route('/react')
+def react_app():
+    """
+    Render the React application using the layout template.
+    This serves as the entry point for the SPA (Single Page Application).
+    """
+    return render_template('layout.html')
+
+@app.route('/api/menu')
+def api_menu():
+    """
+    API endpoint to get the menu structure for the React sidebar.
+    Returns a JSON object with the menu structure.
+    """
+    menu = [
+        {
+            "id": "bride",
+            "title": "Bride",
+            "icon": "fa-female",
+            "subItems": [
+                {"id": "bridal_gallery", "label": "Bridal Gallery", "link": "/bridal-gallery"},
+                {"id": "bridal_swap", "label": "Create Bride Look", "link": "/bridal-swap"},
+                {"id": "bridal_outfits", "label": "Bridal Outfits", "link": "/bridal-outfits"},
+                {"id": "jewelry_collections", "label": "Jewelry Collections", "link": "/jewelry-collections"},
+                {"id": "makeup_styles", "label": "Makeup Styles", "link": "/makeup-styles"}
+            ]
+        },
+        {
+            "id": "groom",
+            "title": "Groom",
+            "icon": "fa-male",
+            "subItems": [
+                {"id": "groom_face_swap", "label": "Create Groom Look", "link": "/groom-face-swap"},
+                {"id": "traditional_wear", "label": "Traditional Wear", "link": "/traditional-wear"},
+                {"id": "modern_suits", "label": "Modern Suits", "link": "/modern-suits"},
+                {"id": "groom_accessories", "label": "Accessories", "link": "/groom-accessories"}
+            ]
+        },
+        {
+            "id": "services",
+            "title": "Services",
+            "icon": "fa-concierge-bell",
+            "subItems": [
+                {"id": "venue_search", "label": "Venue Search", "link": "/venue-search"},
+                {"id": "hall_comparison", "label": "Hall Comparison", "link": "/hall-comparison"},
+                {"id": "virtual_tours", "label": "Virtual Tours", "link": "/virtual-tours"},
+                {"id": "booking_management", "label": "Booking Management", "link": "/booking-management"},
+                {"id": "saloons", "label": "Saloons", "link": "/saloons"},
+                {"id": "event_managers", "label": "Event Managers", "link": "/event-managers"}
+            ]
+        }
+    ]
+    
+    return jsonify(menu)
+
+@app.route('/api/content/<path:page_id>')
+def api_content(page_id):
+    """
+    API endpoint to get the content for a specific page.
+    This allows the React app to fetch page content without full page reloads.
+    
+    Args:
+        page_id: The ID of the page to fetch
+        
+    Returns:
+        JSON object with the page content
+    """
+    # For now, just return a simple message
+    # Later, we can implement actual content fetching based on page_id
+    return jsonify({
+        "title": page_id.replace('_', ' ').title(),
+        "content": f"Content for {page_id} will be loaded here."
+    })
+
 @app.route('/bridal-gallery')
 def bridal_gallery():
     # Get all template images organized by ceremony type
