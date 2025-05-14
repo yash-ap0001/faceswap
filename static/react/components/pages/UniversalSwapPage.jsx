@@ -1,119 +1,81 @@
-import React, { useState, useRef, useEffect } from 'react';
-import LoadingIndicator from '../common/LoadingIndicator';
+import React, { useState, useRef } from 'react';
 
 /**
- * Universal Face Swap component that works across multiple categories (Groom, Saloon) with minimal clicks
- * This provides a streamlined face swap experience requiring only photo upload and swap action
+ * UniversalSwapPage - A streamlined face swap component for quick and easy face swapping
+ * across multiple categories with minimal user interaction (just upload and view results)
+ * 
+ * @param {string} category - The category to filter templates (groom, bride-saloon, groom-saloon)
  */
 const UniversalSwapPage = ({ category = 'auto' }) => {
-  // State for selected image file
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null);
-  
-  // State for results
+  const [sourceImage, setSourceImage] = useState(null);
+  const [sourcePreview, setSourcePreview] = useState(null);
   const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  
-  // State for auto-detected or user-selected category
-  const [activeCategory, setActiveCategory] = useState(category);
-  
-  // Reference to file input
+  const [enhance, setEnhance] = useState(false);
+  const [enhanceMethod, setEnhanceMethod] = useState('auto');
+  const [detectedCategory, setDetectedCategory] = useState(category);
+  const [successMessage, setSuccessMessage] = useState('');
   const fileInputRef = useRef(null);
   
-  // Available categories and their template types
-  const categories = {
-    'groom': {
-      name: 'Groom Styles',
-      templateTypes: ['traditional', 'modern', 'accessories']
-    },
-    'bride-saloon': {
-      name: 'Bride Saloon Styles',
-      templateTypes: ['makeup', 'hair', 'full']
-    },
-    'groom-saloon': {
-      name: 'Groom Saloon Styles',
-      templateTypes: ['hair', 'beard', 'full']
-    }
+  const categoryLabels = {
+    'groom': 'Create Groom Look',
+    'bride-saloon': 'Makeup & Hair',
+    'groom-saloon': 'Groom Salon',
+    'auto': 'Universal Face Swap'
   };
   
-  // Handle file selection
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    
-    if (file) {
-      setSelectedFile(file);
+  // Handle file upload
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSourceImage(file);
       
       // Create preview
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreviewImage(e.target.result);
+      reader.onloadend = () => {
+        setSourcePreview(reader.result);
       };
       reader.readAsDataURL(file);
       
-      // Auto process if we're in ultra-minimal mode
-      processSwap(file);
+      // Automatically process the face swap when a file is selected
+      handleSubmit(file);
     }
   };
   
-  // Handle category change
-  const handleCategoryChange = (category) => {
-    setActiveCategory(category);
-    
-    // If we already have a file, process it with the new category
-    if (selectedFile) {
-      processSwap(selectedFile, category);
-    }
-  };
-  
-  // Process face swap
-  const processSwap = async (file, category = activeCategory) => {
-    if (!file) return;
-    
-    setLoading(true);
+  // Process the face swap
+  const handleSubmit = (file) => {
+    setIsLoading(true);
     setError(null);
     setResults([]);
+    setSuccessMessage('');
     
-    try {
-      // Create form data
-      const formData = new FormData();
-      formData.append('source', file);
-      formData.append('category', category);
-      
-      // Add category-specific data
-      if (category === 'auto') {
-        // In auto mode, we'll try all categories
-        formData.append('process_all', 'true');
-      }
-      
-      // Send the request
-      const response = await fetch('/universal-face-swap', {
-        method: 'POST',
-        body: formData
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
+    const formData = new FormData();
+    formData.append('source', file || sourceImage);
+    formData.append('category', category);
+    formData.append('enhance', enhance);
+    formData.append('enhance_method', enhanceMethod);
+    
+    fetch('/universal-face-swap', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      setIsLoading(false);
       if (data.success) {
         setResults(data.results);
-        
-        // If category was auto, set it to the detected category
-        if (category === 'auto' && data.detected_category) {
-          setActiveCategory(data.detected_category);
-        }
+        setDetectedCategory(data.detected_category);
+        setSuccessMessage(`Generated ${data.count} face swap images successfully!`);
       } else {
-        setError(data.message || 'Failed to process face swap');
+        setError(data.message || 'Error processing face swap');
       }
-    } catch (err) {
-      console.error('Error processing face swap:', err);
-      setError('Failed to process face swap. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    })
+    .catch(err => {
+      setIsLoading(false);
+      setError('Network error: ' + err.message);
+      console.error('Error:', err);
+    });
   };
   
   // Trigger file input click
@@ -121,167 +83,131 @@ const UniversalSwapPage = ({ category = 'auto' }) => {
     fileInputRef.current.click();
   };
   
-  // Open result image in modal/new tab
-  const viewFullImage = (imageUrl) => {
-    // Open in modal or new tab
-    window.open(imageUrl, '_blank');
-  };
+  // Group results by category for display
+  const groupedResults = results.reduce((groups, item) => {
+    const key = item.category;
+    if (!groups[key]) {
+      groups[key] = [];
+    }
+    groups[key].push(item);
+    return groups;
+  }, {});
   
   return (
-    <div className="universal-swap-container">
-      {/* Minimal Header */}
-      <div className="swap-header text-center mb-3">
-        <h4 className="mb-0">Universal Face Swap</h4>
-        <small className="text-muted">Upload your photo to see yourself in multiple styles</small>
+    <div className="universal-swap-container container">
+      <div className="row mb-4">
+        <div className="col-12">
+          <h4 className="text-center">{categoryLabels[category] || 'Universal Face Swap'}</h4>
+          <p className="text-center text-muted smaller-text mb-4">
+            Simply upload your photo and see yourself in various styles
+          </p>
+        </div>
       </div>
       
-      {/* Main content area */}
-      <div className="swap-content">
-        {/* Upload Area - Only shown if no file selected or explicitly in upload mode */}
-        {!previewImage && (
-          <div className="upload-area text-center p-5 border rounded mb-4">
-            <input
-              type="file"
+      <div className="row mb-4 justify-content-center">
+        <div className="col-md-6 col-lg-4 text-center">
+          <div className="upload-area mb-3" onClick={triggerFileInput}>
+            {sourcePreview ? (
+              <img 
+                src={sourcePreview} 
+                alt="Your uploaded face" 
+                className="img-fluid mb-2 source-preview" 
+                style={{ maxHeight: '250px', cursor: 'pointer' }}
+              />
+            ) : (
+              <div className="upload-placeholder" style={{ cursor: 'pointer' }}>
+                <i className="bi bi-cloud-arrow-up fs-1"></i>
+                <p>Click to upload your photo</p>
+              </div>
+            )}
+            <input 
+              type="file" 
               ref={fileInputRef}
               onChange={handleFileChange}
-              accept="image/*"
-              className="d-none"
+              accept="image/*" 
+              className="d-none" 
             />
-            
-            <div className="upload-placeholder">
-              <i className="fas fa-cloud-upload-alt fa-3x mb-3"></i>
-              <h5>Upload Your Photo</h5>
-              <p className="text-muted small">Click to select or drag an image here</p>
-              <button
-                className="btn btn-primary mt-2"
-                onClick={triggerFileInput}
-              >
-                Select Photo
-              </button>
-            </div>
           </div>
-        )}
-        
-        {/* Preview & Quick Actions - Only shown when file is selected */}
-        {previewImage && (
-          <div className="user-preview d-flex align-items-center justify-content-between mb-4">
-            <div className="preview-image-container me-3">
-              <img
-                src={previewImage}
-                alt="Your uploaded photo"
-                className="preview-image rounded"
-                style={{ maxHeight: '150px', maxWidth: '150px', objectFit: 'cover' }}
-              />
+          
+          <div className="form-check mb-2 text-start">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="enhanceCheck"
+              checked={enhance}
+              onChange={(e) => setEnhance(e.target.checked)}
+            />
+            <label className="form-check-label" htmlFor="enhanceCheck">
+              Enhance face quality
+            </label>
+          </div>
+          
+          {enhance && (
+            <div className="mb-3">
+              <select 
+                className="form-select"
+                value={enhanceMethod}
+                onChange={(e) => setEnhanceMethod(e.target.value)}
+              >
+                <option value="auto">Auto enhancement</option>
+                <option value="gfpgan">GFPGAN (better for details)</option>
+                <option value="codeformer">CodeFormer (smoother results)</option>
+              </select>
             </div>
-            
-            <div className="preview-actions flex-grow-1">
-              <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <h5 className="mb-1">Your Photo</h5>
-                  <p className="text-muted mb-2 small">
-                    {selectedFile?.name || 'Image selected'}
-                  </p>
-                </div>
-                
-                <div>
-                  <button
-                    className="btn btn-sm btn-outline-secondary me-2"
-                    onClick={triggerFileInput}
-                  >
-                    Change Photo
-                  </button>
-                  
-                  <button 
-                    className="btn btn-sm btn-primary"
-                    onClick={() => processSwap(selectedFile)}
-                    disabled={loading}
-                  >
-                    {loading ? 'Processing...' : 'Generate All Styles'}
-                  </button>
-                </div>
-              </div>
-              
-              {/* Category selector - Optional, can be hidden for ultra-minimal UI */}
-              <div className="category-selector mt-3 d-flex overflow-auto">
-                {Object.keys(categories).map((cat) => (
-                  <div 
-                    key={cat}
-                    className={`category-option me-2 p-2 border rounded ${activeCategory === cat ? 'border-primary' : ''}`}
-                    onClick={() => handleCategoryChange(cat)}
-                    style={{ cursor: 'pointer', minWidth: '120px', textAlign: 'center' }}
-                  >
-                    <small>{categories[cat].name}</small>
+          )}
+          
+          <button
+            className="btn btn-primary"
+            onClick={() => sourceImage && handleSubmit()}
+            disabled={!sourceImage || isLoading}
+          >
+            {isLoading ? (
+              <span>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Processing...
+              </span>
+            ) : (
+              'Try with new photo'
+            )}
+          </button>
+        </div>
+      </div>
+      
+      {error && (
+        <div className="alert alert-danger">
+          {error}
+        </div>
+      )}
+      
+      {successMessage && (
+        <div className="alert alert-success">
+          {successMessage}
+        </div>
+      )}
+      
+      {Object.keys(groupedResults).length > 0 && (
+        <div className="results-container">
+          {Object.entries(groupedResults).map(([category, items]) => (
+            <div key={category} className="category-results mb-4">
+              <h5 className="category-title">{category}</h5>
+              <div className="row">
+                {items.map((result, index) => (
+                  <div key={index} className="col-md-4 col-sm-6 mb-3">
+                    <div className="result-card">
+                      <img 
+                        src={result.result_url} 
+                        alt={`Result ${index + 1}`} 
+                        className="img-fluid rounded swap-result" 
+                        style={{ width: '100%', height: '350px', objectFit: 'cover', objectPosition: 'top' }}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
-        )}
-        
-        {/* Error message */}
-        {error && (
-          <div className="alert alert-danger">
-            <i className="fas fa-exclamation-triangle me-2"></i>
-            {error}
-          </div>
-        )}
-        
-        {/* Results Grid - Responsive grid of results */}
-        {loading ? (
-          <div className="text-center py-5">
-            <LoadingIndicator />
-            <p className="mt-3">Processing your face with multiple templates...</p>
-          </div>
-        ) : (
-          <>
-            {results.length > 0 && (
-              <div className="results-container mt-4">
-                <h5 className="mb-3">Results ({results.length})</h5>
-                
-                <div className="results-grid row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
-                  {results.map((result, index) => (
-                    <div key={index} className="col">
-                      <div className="result-card h-100 border-0">
-                        <div 
-                          className="result-image-container position-relative"
-                          onClick={() => viewFullImage(result.result_url)}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <img
-                            src={result.result_url}
-                            alt={`Face swap result ${index + 1}`}
-                            className="result-image img-fluid rounded"
-                            style={{ 
-                              width: '100%', 
-                              height: '300px', 
-                              objectFit: 'cover',
-                              objectPosition: 'top'
-                            }}
-                          />
-                          
-                          {/* Optional category label */}
-                          <div className="image-tag position-absolute bottom-0 start-0 m-2">
-                            <span className="badge bg-dark bg-opacity-75 small">
-                              {result.category || 'Style ' + (index + 1)}
-                            </span>
-                          </div>
-                          
-                          {/* View full icon */}
-                          <div className="image-action position-absolute top-0 end-0 m-2">
-                            <span className="badge bg-primary bg-opacity-75">
-                              <i className="fas fa-expand-alt"></i>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
