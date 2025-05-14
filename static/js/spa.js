@@ -162,11 +162,12 @@ function loadContent(url, updateActiveState = true) {
 }
 
 /**
- * Execute scripts found in content area
+ * Execute scripts found in content area and also re-initialize common functionality
  * @param {HTMLElement} contentArea - The content area element
  */
 function executeScripts(contentArea) {
     try {
+        // First execute inline scripts
         const scripts = contentArea.querySelectorAll('script');
         scripts.forEach(oldScript => {
             try {
@@ -190,6 +191,54 @@ function executeScripts(contentArea) {
                 console.error('Error executing individual script:', error);
             }
         });
+        
+        // Call common initialization functions that are normally called on DOMContentLoaded
+        // This will re-initialize components that were loaded via SPA
+        
+        // Initialize accordion functionality if exists
+        if (typeof initializeAccordion === 'function') {
+            try {
+                console.log('Re-initializing accordion functionality');
+                initializeAccordion();
+            } catch (e) {
+                console.error('Error re-initializing accordion:', e);
+            }
+        }
+        
+        // Re-initialize Bootstrap components
+        if (typeof bootstrap !== 'undefined') {
+            try {
+                console.log('Re-initializing Bootstrap components');
+                
+                // Tooltips
+                const tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltips.forEach(el => {
+                    try { new bootstrap.Tooltip(el); } catch(e) { console.error('Tooltip init error:', e); }
+                });
+                
+                // Popovers
+                const popovers = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+                popovers.forEach(el => {
+                    try { new bootstrap.Popover(el); } catch(e) { console.error('Popover init error:', e); }
+                });
+                
+                // Initialize any modals if needed
+                const modals = [].slice.call(document.querySelectorAll('.modal'));
+                modals.forEach(modalEl => {
+                    try { new bootstrap.Modal(modalEl); } catch(e) { console.error('Modal init error:', e); }
+                });
+                
+            } catch (e) {
+                console.error('Error re-initializing Bootstrap components:', e);
+            }
+        }
+        
+        // Trigger a custom event that page-specific scripts can listen for
+        document.dispatchEvent(new CustomEvent('spaContentLoaded', {
+            detail: { url: window.location.pathname }
+        }));
+        
+        console.log('SPA content scripts executed successfully');
     } catch (error) {
         console.error('Error executing scripts:', error);
     }

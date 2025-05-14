@@ -1,4 +1,5 @@
-document.addEventListener('DOMContentLoaded', function() {
+// Function to initialize page elements and event handlers
+function initializePage() {
     // DOM Elements - use defensive programming to check if elements exist before using them
     const uploadForm = document.getElementById('upload-form');
     const sourceInput = document.getElementById('source-input');
