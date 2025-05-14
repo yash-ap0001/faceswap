@@ -465,7 +465,7 @@
                     <div class="card-header bg-dark-purple d-flex justify-content-between align-items-center py-2">
                         <h5 class="card-title mb-0">Results</h5>
                         <div class="d-flex">
-                            <button id="toggleTemplatesBtn" class="btn btn-sm btn-outline-light me-2">
+                            <button id="toggleTemplatesBtn" class="btn btn-sm btn-outline-light me-2" style="display: none;">
                                 <i class="fas fa-images me-1"></i> Show Templates
                             </button>
                             <button id="downloadAllBtn" class="btn btn-sm btn-outline-light" style="display: none;">
@@ -474,6 +474,11 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <!-- Processing Status Message -->
+                        <div id="processingStatus" class="alert alert-info text-center" style="display: none;">
+                            Processing template... <i class="fas fa-spinner fa-spin ms-2"></i>
+                        </div>
+
                         <!-- Main Result Viewer -->
                         <div id="resultViewerSection" class="mb-3" style="display: none;">
                             <div class="row">
