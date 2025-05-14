@@ -21,6 +21,12 @@ def react_app(path=None):
     This serves as the entry point for the SPA (Single Page Application).
     The catch-all route ensures all React routes are handled by the SPA.
     """
+    # Special case for universal page
+    if path == 'universal':
+        return render_template('universal_page.html')
+    elif path == 'universal-swap':
+        return render_template('universal_swap.html')
+    
     return render_template('layout.html')
 
 @api_bp.route('/menu')
@@ -30,6 +36,15 @@ def api_menu():
     Returns a JSON object with the menu structure.
     """
     menu = [
+        {
+            "id": "universal",
+            "title": "Universal",
+            "icon": "fa-magic",
+            "subItems": [
+                {"id": "universal-page", "label": "Universal Categories", "link": "/react/universal"},
+                {"id": "universal-swap", "label": "Universal Face Swap", "link": "/react/universal-swap"}
+            ]
+        },
         {
             "id": "bride",
             "title": "Bride",
