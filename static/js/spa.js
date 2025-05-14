@@ -25,7 +25,7 @@ function initSPA() {
 
 function setupSidebarLinks() {
     // Get all sidebar menu links
-    const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
+    const sidebarLinks = document.querySelectorAll('.sidebar-menu li a');
     
     sidebarLinks.forEach(link => {
         // Skip links with onclick handlers (they already have custom behavior)
@@ -59,6 +59,14 @@ function setupSidebarLinks() {
             
             // Update active state in sidebar
             updateActiveSidebarItem(this);
+            
+            // Close sidebar on mobile
+            if (window.innerWidth < 992) {
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar && !sidebar.classList.contains('closed')) {
+                    window.toggleSidebar();
+                }
+            }
         });
     });
 }
@@ -120,12 +128,21 @@ function loadContent(url, pushState = true) {
 
 function updateActiveSidebarItem(activeLink) {
     // Remove active class from all menu items
-    document.querySelectorAll('.sidebar-menu a').forEach(link => {
+    document.querySelectorAll('.sidebar-menu li a').forEach(link => {
         link.classList.remove('active');
     });
     
     // Add active class to the clicked link
     activeLink.classList.add('active');
+    
+    // Add active class to parent list item
+    const parentLi = activeLink.closest('li');
+    if (parentLi) {
+        document.querySelectorAll('.sidebar-menu li').forEach(li => {
+            li.classList.remove('active-item');
+        });
+        parentLi.classList.add('active-item');
+    }
     
     // Ensure the parent accordion is open
     const accordionItem = activeLink.closest('.accordion-collapse');
@@ -133,7 +150,28 @@ function updateActiveSidebarItem(activeLink) {
         const accordionId = accordionItem.getAttribute('id');
         const accordionButton = document.querySelector(`[data-bs-target="#${accordionId}"]`);
         if (accordionButton) {
-            accordionButton.click();
+            // Use Bootstrap's API to open the accordion
+            const bsCollapse = new bootstrap.Collapse(accordionItem, {
+                toggle: false
+            });
+            bsCollapse.show();
+            
+            // Update the accordion button's aria-expanded attribute
+            accordionButton.setAttribute('aria-expanded', 'true');
+            accordionButton.classList.remove('collapsed');
+        }
+    }
+    
+    // Mark the corresponding accordion header as active
+    const accordionHeaders = document.querySelectorAll('.accordion-button');
+    accordionHeaders.forEach(header => {
+        header.classList.remove('active-section');
+    });
+    
+    if (accordionItem) {
+        const header = document.querySelector(`[data-bs-target="#${accordionItem.id}"]`);
+        if (header) {
+            header.classList.add('active-section');
         }
     }
 }
