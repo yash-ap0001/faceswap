@@ -35,14 +35,14 @@ def api_menu():
     API endpoint to get the menu structure for the React sidebar.
     Returns a JSON object with the menu structure.
     """
+    print("React routes API menu endpoint called")
     menu = [
         {
             "id": "universal",
             "title": "Universal",
             "icon": "fa-magic",
             "subItems": [
-                {"id": "universal-page", "label": "Universal Categories", "link": "/react/universal"},
-                {"id": "universal-swap", "label": "Universal Face Swap", "link": "/react/universal-swap"}
+                {"id": "universal_face_swap", "label": "Universal Face Swap", "link": "/universal-face-swap"}
             ]
         },
         {
