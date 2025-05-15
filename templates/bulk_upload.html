@@ -454,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Set localStorage flags for cross-page notifications
                 const timestamp = Date.now().toString();
                 localStorage.setItem('refreshTemplates', 'true');
-                localStorage.setItem('lastUpdatedCeremony', ceremonyType);
+                localStorage.setItem('lastUpdatedCeremony', itemCategory);
                 localStorage.setItem('updateTimestamp', timestamp);
                 
                 // Hide upload status after delay
@@ -472,7 +472,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Re-enable form controls on error
             uploadSelectedButton.disabled = false;
-            document.getElementById('ceremonyType').disabled = false;
+            categoryTypeSelect.disabled = false;
+            subcategorySelect.disabled = false;
+            itemCategorySelect.disabled = false;
             imageInput.disabled = false;
         });
     }
