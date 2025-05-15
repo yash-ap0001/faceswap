@@ -1971,8 +1971,8 @@ def get_templates():
         main_path = os.path.join(template_dir, f"{item_category}_{template_type}.jpg")
         if os.path.exists(main_path):
             app.logger.info(f"Found main template: {main_path}")
-            # Calculate the URL relative to the uploads directory
-            url_path = main_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
+            # Calculate the URL relative to the templates directory
+            url_path = main_path.replace(app.config['UPLOAD_FOLDER'], '/templates')
             templates.append({
                 'id': f"{item_category}_{template_type}_{template_id}",
                 'template_type': template_type,
@@ -1988,8 +1988,8 @@ def get_templates():
         subdir_path = os.path.join(template_dir, template_type, f"{item_category}.jpg")
         if os.path.exists(subdir_path):
             app.logger.info(f"Found subdir template: {subdir_path}")
-            # Calculate the URL relative to the uploads directory
-            url_path = subdir_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
+            # Calculate the URL relative to the templates directory
+            url_path = subdir_path.replace(app.config['UPLOAD_FOLDER'], '/templates')
             templates.append({
                 'id': f"{item_category}_{template_type}_{template_id}",
                 'template_type': template_type,
@@ -2012,8 +2012,8 @@ def get_templates():
                         template_id_str = f"{item_category}_{template_type}_{template_id}"
                         app.logger.info(f"Found additional {template_type} template: {file_path}")
                         
-                        # Calculate the URL relative to the uploads directory
-                        url_path = file_path.replace(app.config['UPLOAD_FOLDER'], '/uploads')
+                        # Calculate the URL relative to the templates directory
+                        url_path = file_path.replace(app.config['UPLOAD_FOLDER'], '/templates')
                         templates.append({
                             'id': template_id_str,
                             'template_type': template_type,
