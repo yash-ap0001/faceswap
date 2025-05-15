@@ -639,7 +639,7 @@ const UniversalPageNew = () => {
                                 style={{
                                   height: '200px',
                                   objectFit: 'cover',
-                                  objectPosition: 'center 30%',
+                                  objectPosition: 'center 20%', /* Adjusted to better center on faces */
                                   borderRadius: '6px 6px 0 0',
                                   transition: 'transform 0.2s ease',
                                   width: '100%'
@@ -715,7 +715,7 @@ const UniversalPageNew = () => {
                               style={{
                                 height: '200px',
                                 objectFit: 'cover',
-                                objectPosition: 'center 30%',
+                                objectPosition: 'center 20%', /* Adjusted to better center on faces */
                                 borderRadius: '6px 6px 0 0',
                                 width: '100%',
                                 cursor: 'pointer'
