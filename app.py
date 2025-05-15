@@ -1030,6 +1030,157 @@ def groom_accessories():
     
     return render_template('groom/accessories.html', categories=accessories_categories)
 
+# Celebrity section routes
+@app.route('/celebrity-men')
+def celebrity_men():
+    """Browse men celebrity templates."""
+    # Get available templates organized by category
+    men_categories = {
+        "actors": {"name": "Actors", "templates": []},
+        "singers": {"name": "Singers", "templates": []},
+        "sports": {"name": "Sports Stars", "templates": []},
+        "models": {"name": "Models", "templates": []}
+    }
+    
+    men_dir = os.path.join(app.static_folder, 'templates', 'celebrity', 'men')
+    os.makedirs(men_dir, exist_ok=True)
+    
+    # Scan for template images in each category directory
+    for category in men_categories:
+        category_dir = os.path.join(men_dir, category)
+        os.makedirs(category_dir, exist_ok=True)
+        
+        if os.path.exists(category_dir):
+            for file in os.listdir(category_dir):
+                if allowed_file(file):
+                    template_path = os.path.join('templates', 'celebrity', 'men', category, file)
+                    men_categories[category]["templates"].append({
+                        "path": template_path,
+                        "url": url_for('static', filename=template_path)
+                    })
+    
+    return render_template('celebrity/men.html', categories=men_categories)
+
+@app.route('/celebrity-women')
+def celebrity_women():
+    """Browse women celebrity templates."""
+    # Get available templates organized by category
+    women_categories = {
+        "actresses": {"name": "Actresses", "templates": []},
+        "singers": {"name": "Singers", "templates": []},
+        "models": {"name": "Models", "templates": []},
+        "sports": {"name": "Sports Stars", "templates": []}
+    }
+    
+    women_dir = os.path.join(app.static_folder, 'templates', 'celebrity', 'women')
+    os.makedirs(women_dir, exist_ok=True)
+    
+    # Scan for template images in each category directory
+    for category in women_categories:
+        category_dir = os.path.join(women_dir, category)
+        os.makedirs(category_dir, exist_ok=True)
+        
+        if os.path.exists(category_dir):
+            for file in os.listdir(category_dir):
+                if allowed_file(file):
+                    template_path = os.path.join('templates', 'celebrity', 'women', category, file)
+                    women_categories[category]["templates"].append({
+                        "path": template_path,
+                        "url": url_for('static', filename=template_path)
+                    })
+    
+    return render_template('celebrity/women.html', categories=women_categories)
+
+@app.route('/celebrity-tollywood')
+def celebrity_tollywood():
+    """Browse Tollywood celebrity templates."""
+    # Get available templates organized by category
+    tollywood_categories = {
+        "actors": {"name": "Actors", "templates": []},
+        "actresses": {"name": "Actresses", "templates": []},
+        "classic": {"name": "Classic Stars", "templates": []},
+        "new-gen": {"name": "New Generation", "templates": []}
+    }
+    
+    tollywood_dir = os.path.join(app.static_folder, 'templates', 'celebrity', 'tollywood')
+    os.makedirs(tollywood_dir, exist_ok=True)
+    
+    # Scan for template images in each category directory
+    for category in tollywood_categories:
+        category_dir = os.path.join(tollywood_dir, category)
+        os.makedirs(category_dir, exist_ok=True)
+        
+        if os.path.exists(category_dir):
+            for file in os.listdir(category_dir):
+                if allowed_file(file):
+                    template_path = os.path.join('templates', 'celebrity', 'tollywood', category, file)
+                    tollywood_categories[category]["templates"].append({
+                        "path": template_path,
+                        "url": url_for('static', filename=template_path)
+                    })
+    
+    return render_template('celebrity/tollywood.html', categories=tollywood_categories)
+
+@app.route('/celebrity-bollywood')
+def celebrity_bollywood():
+    """Browse Bollywood celebrity templates."""
+    # Get available templates organized by category
+    bollywood_categories = {
+        "actors": {"name": "Actors", "templates": []},
+        "actresses": {"name": "Actresses", "templates": []},
+        "classic": {"name": "Classic Stars", "templates": []},
+        "new-gen": {"name": "New Generation", "templates": []}
+    }
+    
+    bollywood_dir = os.path.join(app.static_folder, 'templates', 'celebrity', 'bollywood')
+    os.makedirs(bollywood_dir, exist_ok=True)
+    
+    # Scan for template images in each category directory
+    for category in bollywood_categories:
+        category_dir = os.path.join(bollywood_dir, category)
+        os.makedirs(category_dir, exist_ok=True)
+        
+        if os.path.exists(category_dir):
+            for file in os.listdir(category_dir):
+                if allowed_file(file):
+                    template_path = os.path.join('templates', 'celebrity', 'bollywood', category, file)
+                    bollywood_categories[category]["templates"].append({
+                        "path": template_path,
+                        "url": url_for('static', filename=template_path)
+                    })
+    
+    return render_template('celebrity/bollywood.html', categories=bollywood_categories)
+
+@app.route('/celebrity-item')
+def celebrity_item():
+    """Browse item celebrity templates."""
+    # Get available templates organized by category
+    item_categories = {
+        "international": {"name": "International", "templates": []},
+        "influencers": {"name": "Influencers", "templates": []},
+        "trending": {"name": "Trending", "templates": []},
+        "historical": {"name": "Historical", "templates": []}
+    }
+    
+    item_dir = os.path.join(app.static_folder, 'templates', 'celebrity', 'item')
+    os.makedirs(item_dir, exist_ok=True)
+    
+    # Scan for template images in each category directory
+    for category in item_categories:
+        category_dir = os.path.join(item_dir, category)
+        os.makedirs(category_dir, exist_ok=True)
+        
+        if os.path.exists(category_dir):
+            for file in os.listdir(category_dir):
+                if allowed_file(file):
+                    template_path = os.path.join('templates', 'celebrity', 'item', category, file)
+                    item_categories[category]["templates"].append({
+                        "path": template_path,
+                        "url": url_for('static', filename=template_path)
+                    })
+    
+    return render_template('celebrity/item.html', categories=item_categories)
+
 # Convention halls section routes
 @app.route('/venue-search')
 def venue_search():
