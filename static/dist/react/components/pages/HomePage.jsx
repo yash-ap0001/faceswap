@@ -44,10 +44,10 @@ const HomePage = () => {
 
   // Ceremony titles
   const ceremonyTitles = {
-    haldi: 'Haldi Ceremony',
-    mehendi: 'Mehendi Ceremony',
-    wedding: 'Wedding Ceremony',
-    reception: 'Reception Ceremony'
+    haldi: 'Haldi',
+    mehendi: 'Mehendi',
+    wedding: 'Wedding',
+    reception: 'Reception'
   };
 
   // Order of ceremonies
