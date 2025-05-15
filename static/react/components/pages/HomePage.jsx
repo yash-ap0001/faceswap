@@ -17,28 +17,28 @@ const HomePage = () => {
   // Define template images grouped by ceremony using the pinterest directory
   const ceremonyImages = {
     haldi: [
-      '/static/images/haldi_2.jpg',
-      '/static/images/haldi_3.jpg',
-      '/static/images/haldi_10.jpg',
-      '/static/images/haldi_11.jpg'
+      '/uploads/templates/pinterest/haldi/haldi_2.jpg',
+      '/uploads/templates/pinterest/haldi/haldi_3.jpg',
+      '/uploads/templates/pinterest/haldi/haldi_10.jpg',
+      '/uploads/templates/pinterest/haldi/haldi_11.jpg'
     ],
     mehendi: [
-      '/static/images/mehendi_1.jpg',
-      '/static/images/mehendi_2.jpg',
-      '/static/images/mehendi_3.jpg',
-      '/static/images/mehendi_4.jpg'
+      '/uploads/templates/pinterest/mehendi/mehendi_1.jpg',
+      '/uploads/templates/pinterest/mehendi/mehendi_2.jpg',
+      '/uploads/templates/pinterest/mehendi/mehendi_3.jpg',
+      '/uploads/templates/pinterest/mehendi/mehendi_4.jpg'
     ],
     wedding: [
-      '/static/images/wedding_1.jpg',
-      '/static/images/wedding_3.jpg',
-      '/static/images/wedding_4.jpg',
-      '/static/images/wedding_5.jpg'
+      '/uploads/templates/pinterest/wedding/wedding_1.jpg',
+      '/uploads/templates/pinterest/wedding/wedding_3.jpg',
+      '/uploads/templates/pinterest/wedding/wedding_4.jpg',
+      '/uploads/templates/pinterest/wedding/wedding_5.jpg'
     ],
     reception: [
-      '/static/images/reception_1.jpg',
-      '/static/images/reception_2.jpg',
-      '/static/images/reception_3.jpg',
-      '/static/images/reception_4.jpg'
+      '/uploads/templates/pinterest/reception/reception_1.jpg',
+      '/uploads/templates/pinterest/reception/reception_2.jpg',
+      '/uploads/templates/pinterest/reception/reception_3.jpg',
+      '/uploads/templates/pinterest/reception/reception_4.jpg'
     ]
   };
 
