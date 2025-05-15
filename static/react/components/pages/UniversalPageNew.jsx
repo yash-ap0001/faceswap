@@ -652,18 +652,15 @@ const UniversalPageNew = () => {
                               />
                               <div className="card-body p-2">
                                 <div className="d-flex justify-content-between align-items-center">
-                                  <div className="form-check">
+                                  <div className="d-flex align-items-center">
                                     <input 
-                                      className="form-check-input" 
+                                      className="form-check-input me-2" 
                                       type="checkbox" 
                                       checked={selectedTemplates.some(t => t.path === template.path)}
                                       onChange={() => handleTemplateSelection(template)}
                                       onClick={(e) => e.stopPropagation()}
                                       id={`template-check-${index}`} 
                                     />
-                                    <label className="form-check-label" htmlFor={`template-check-${index}`}>
-                                      Select
-                                    </label>
                                   </div>
                                   <button 
                                     className="btn btn-sm btn-outline-secondary" 
@@ -750,93 +747,108 @@ const UniversalPageNew = () => {
         </div>
       </div>
       
-      {/* Image Viewer Modal */}
+      {/* Image Viewer Modal with Pure Black Background */}
       <div className="modal fade" id="imageViewerModal" tabIndex="-1" aria-hidden="true">
-        <div className="modal-dialog modal-fullscreen">
-          <div className="modal-content bg-black bg-opacity-90">
+        <div className="modal-dialog modal-fullscreen modal-dialog-centered p-2" style={{ maxWidth: '98vw', maxHeight: '98vh' }}>
+          <div className="modal-content" style={{ backgroundColor: '#000000', backdropFilter: 'blur(15px)', WebkitBackdropFilter: 'blur(15px)', border: 'none', borderRadius: 0 }}>
             <div className="modal-body d-flex flex-column justify-content-center align-items-center p-0 position-relative">
               {/* Close button */}
               <button 
                 type="button" 
-                className="btn-close btn-close-white position-absolute top-0 end-0 m-4" 
+                className="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" 
                 data-bs-dismiss="modal" 
                 aria-label="Close"
               ></button>
               
+              {/* Navigation Info */}
+              <span className="text-white-50 position-absolute top-0 start-50 translate-middle-x mt-3 z-3" id="imageNavInfo">
+                Image 1 of 1
+              </span>
+              
               {viewerImages.length > 0 && (
                 <div 
-                  className="image-container" 
-                  style={{ 
-                    height: '90vh', 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center',
-                    cursor: 'move',
-                    overflow: 'hidden',
-                    width: '100%'
-                  }}
+                  className="modal-body p-0 position-relative d-flex align-items-center justify-content-center"
+                  style={{ minHeight: '95vh' }}
                 >
-                  <img 
-                    src={viewerImages[currentImageIndex]} 
-                    alt={`Viewer image ${currentImageIndex + 1}`}
-                    style={{ 
-                      maxHeight: '90vh', 
-                      maxWidth: '100%', 
-                      objectFit: 'contain',
-                      transform: `scale(${zoomLevel})`,
-                      transition: 'transform 0.2s ease'
-                    }} 
-                  />
-                </div>
-              )}
-              
-              {/* Controls */}
-              <div className="controls position-absolute bottom-0 w-100 p-3 d-flex justify-content-center">
-                <div className="bg-dark bg-opacity-75 rounded-pill px-4 py-2 d-flex gap-3">
+                  {/* Left Navigation Button */}
                   {viewerImages.length > 1 && (
                     <button 
-                      className="btn btn-outline-light" 
-                      onClick={() => setCurrentImageIndex(
-                        (prev) => (prev - 1 + viewerImages.length) % viewerImages.length
-                      )}
+                      id="prevImageBtn"
+                      className="carousel-nav-btn position-absolute start-0 top-50 translate-middle-y btn btn-dark text-white rounded-circle p-3 mx-4"
+                      style={{ zIndex: 10, opacity: 0.8, border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.7)' }}
+                      onClick={handlePrevImage}
                     >
-                      <i className="fas fa-arrow-left"></i>
+                      <i className="fas fa-chevron-left fa-2x"></i>
                     </button>
                   )}
                   
+                  {/* Image container with zoom */}
+                  <div 
+                    className="image-container d-flex justify-content-center align-items-center"
+                    style={{ 
+                      height: '90vh', 
+                      width: '100%',
+                      cursor: 'move',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <img
+                      id="zoomImage" 
+                      src={viewerImages[currentImageIndex]} 
+                      alt={`Viewer image ${currentImageIndex + 1}`}
+                      style={{ 
+                        maxHeight: '90vh', 
+                        maxWidth: '100%', 
+                        objectFit: 'contain',
+                        transform: `scale(${zoomLevel})`,
+                        transition: 'transform 0.2s ease'
+                      }} 
+                    />
+                  </div>
+                  
+                  {/* Right Navigation Button */}
+                  {viewerImages.length > 1 && (
+                    <button 
+                      id="nextImageBtn"
+                      className="carousel-nav-btn position-absolute end-0 top-50 translate-middle-y btn btn-dark text-white rounded-circle p-3 mx-4"
+                      style={{ zIndex: 10, opacity: 0.8, border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(0,0,0,0.7)' }}
+                      onClick={handleNextImage}
+                    >
+                      <i className="fas fa-chevron-right fa-2x"></i>
+                    </button>
+                  )}
+                </div>
+              )}
+              
+              {/* Controls - Zoom and Download */}
+              <div className="controls position-absolute bottom-0 w-100 p-3 d-flex justify-content-center">
+                <div className="bg-dark bg-opacity-75 rounded-pill px-4 py-2 d-flex gap-3">
                   <button 
+                    id="zoomOutBtn"
                     className="btn btn-outline-light" 
-                    onClick={() => setZoomLevel(prev => Math.max(0.5, prev - 0.1))}
+                    onClick={handleZoomOut}
                   >
                     <i className="fas fa-search-minus"></i>
                   </button>
                   
                   <button 
+                    id="resetZoomBtn"
                     className="btn btn-outline-light" 
-                    onClick={() => setZoomLevel(1.0)}
+                    onClick={handleResetZoom}
                   >
                     <i className="fas fa-sync-alt"></i>
                   </button>
                   
                   <button 
+                    id="zoomInBtn"
                     className="btn btn-outline-light" 
-                    onClick={() => setZoomLevel(prev => Math.min(3, prev + 0.1))}
+                    onClick={handleZoomIn}
                   >
                     <i className="fas fa-search-plus"></i>
                   </button>
                   
-                  {viewerImages.length > 1 && (
-                    <button 
-                      className="btn btn-outline-light" 
-                      onClick={() => setCurrentImageIndex(
-                        (prev) => (prev + 1) % viewerImages.length
-                      )}
-                    >
-                      <i className="fas fa-arrow-right"></i>
-                    </button>
-                  )}
-                  
                   <a 
+                    id="downloadImageBtn"
                     className="btn btn-outline-light" 
                     href={viewerImages[currentImageIndex]} 
                     download
