@@ -28,7 +28,7 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Face Swap',
             icon: 'fa-exchange-alt',
             subItems: [
-              { id: 'face-swap-page', label: 'Face Swap', link: '/universal' }
+              { id: 'face-swap-page', label: 'Face Swap', link: '/react#face-swap-page' }
             ]
           },
           {
