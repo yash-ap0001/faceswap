@@ -115,14 +115,14 @@ const App = () => {
   
   // Calculate main container styles based on sidebar state
   const mainContainerStyle = {
-    marginLeft: sidebarOpen ? '250px' : '0',
-    width: sidebarOpen ? 'calc(100% - 250px)' : '100%',
+    marginLeft: sidebarOpen ? '230px' : '0',
+    width: sidebarOpen ? 'calc(100% - 230px)' : '100%',
     transition: 'margin-left 0.3s ease, width 0.3s ease',
   };
 
   return (
     <div className="app-container">
-      <div className="sidebar-wrapper" style={{ width: sidebarOpen ? '250px' : '0', overflow: 'hidden' }}>
+      <div className="sidebar-wrapper" style={{ width: sidebarOpen ? '230px' : '0', overflow: 'hidden' }}>
         <Sidebar 
           isOpen={sidebarOpen} 
           activeItem={activeItem}
@@ -150,7 +150,7 @@ const App = () => {
             height: 100vh;
             position: relative;
             background-color: #2b1744;
-            width: 250px;
+            width: 230px;
           }
           
           .sidebar-content {

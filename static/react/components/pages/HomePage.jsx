@@ -88,7 +88,7 @@ const HomePage = () => {
           boxShadow: `0 4px 20px rgba(0,0,0,0.3)`
         }}>
           <div style={{
-            height: '350px',
+            height: '450px',
             overflow: 'hidden',
             position: 'relative'
           }}>
