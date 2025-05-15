@@ -1,329 +1,389 @@
 import React from 'react';
 
 /**
- * Home page component with simplified visual design for faster building
+ * Home page component with very clean and minimal design
+ * Using template images and dark purple theme
  */
 const HomePage = () => {
+  // Define the dark purple theme colors
+  const colors = {
+    darkPurple: '#6a0dad',
+    mediumPurple: '#8a2be2',
+    lightPurple: '#9d4edd',
+    darkBg: '#1a1a1a',
+    cardBg: '#212121'
+  };
+
   return (
-    <div className="home-page">
-      {/* Hero section with gradient background and CTA */}
-      <div className="jumbotron" style={{
-        background: 'linear-gradient(135deg, #8a2be2 0%, #6a0dad 100%)',
-        borderRadius: '15px',
-        padding: '4rem 2rem',
-        marginBottom: '3rem',
+    <div className="home-page" style={{backgroundColor: '#121212', padding: '20px 0'}}>
+      {/* Simple header with logo */}
+      <div style={{
+        backgroundColor: colors.darkPurple,
+        padding: '2rem',
+        marginBottom: '2rem',
         textAlign: 'center',
-        color: 'white',
-        boxShadow: '0 8px 20px rgba(0,0,0,0.2)'
+        borderRadius: '8px'
       }}>
-        <h1 className="display-4 mb-3" style={{
+        <h1 style={{
           fontWeight: '700',
-          textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'
+          color: 'white',
+          margin: 0
         }}>
-          <span className="brand-name">VOW</span>BRIDE
+          VOW<span style={{fontWeight: '300'}}>BRIDE</span>
         </h1>
-        <p className="lead mb-4" style={{fontSize: '1.3rem', maxWidth: '800px', margin: '0 auto'}}>
-          Create your dream wedding look with our AI-powered face swap technology
+        <p style={{
+          color: 'rgba(255,255,255,0.8)',
+          margin: '0.5rem 0 0'
+        }}>
+          AI-Powered Face Swap
         </p>
-        <div className="mt-4">
-          <a href="/react#universal-page" className="btn btn-light me-3 px-4 py-2">
-            <i className="fas fa-magic me-2"></i> Try Face Swap
-          </a>
-          <a href="/react#universal-categories" className="btn btn-outline-light px-4 py-2">
-            <i className="fas fa-th-large me-2"></i> All Categories
-          </a>
-        </div>
       </div>
 
-      {/* Wedding ceremonies section */}
-      <h2 className="text-center mb-4">Wedding Ceremonies</h2>
-      <div className="row mb-5">
-        {/* Haldi */}
-        <div className="col-md-4 mb-4">
-          <div className="card h-100 border-0 shadow" style={{
-            overflow: 'hidden', 
-            borderRadius: '10px',
-            transition: 'transform 0.3s ease'
-          }}>
-            <div style={{
-              height: '200px', 
-              background: 'linear-gradient(135deg, #FFA500, #FFD700)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <i className="fas fa-sun fa-4x" style={{color: 'rgba(255,255,255,0.7)'}}></i>
-            </div>
-            <div className="card-body text-center">
-              <h4 className="card-title brand-name">Haldi</h4>
-              <p className="card-text">Pre-wedding turmeric ceremony</p>
-              <a href="/react#bridal-swap" className="btn btn-outline-primary btn-sm">
-                Try Haldi Look
-              </a>
-            </div>
-          </div>
-        </div>
+      {/* Template grid - Clean, minimal layout */}
+      <div className="container px-4">
+        <h3 style={{
+          textAlign: 'center', 
+          marginBottom: '1.5rem',
+          color: colors.lightPurple,
+          fontWeight: '300'
+        }}>
+          Wedding Templates
+        </h3>
         
-        {/* Wedding */}
-        <div className="col-md-4 mb-4">
-          <div className="card h-100 border-0 shadow" style={{
-            overflow: 'hidden', 
-            borderRadius: '10px',
-            transition: 'transform 0.3s ease'
-          }}>
-            <div style={{
-              height: '200px', 
-              background: 'linear-gradient(135deg, #FF416C, #FF4B2B)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <i className="fas fa-heart fa-4x" style={{color: 'rgba(255,255,255,0.7)'}}></i>
-            </div>
-            <div className="card-body text-center">
-              <h4 className="card-title brand-name">Wedding</h4>
-              <p className="card-text">The main wedding ceremony</p>
-              <a href="/react#bridal-swap" className="btn btn-outline-primary btn-sm">
-                Try Wedding Look
-              </a>
-            </div>
-          </div>
-        </div>
-        
-        {/* Reception */}
-        <div className="col-md-4 mb-4">
-          <div className="card h-100 border-0 shadow" style={{
-            overflow: 'hidden', 
-            borderRadius: '10px',
-            transition: 'transform 0.3s ease'
-          }}>
-            <div style={{
-              height: '200px', 
-              background: 'linear-gradient(135deg, #614385, #516395)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <i className="fas fa-glass-cheers fa-4x" style={{color: 'rgba(255,255,255,0.7)'}}></i>
-            </div>
-            <div className="card-body text-center">
-              <h4 className="card-title brand-name">Reception</h4>
-              <p className="card-text">Post-wedding celebration</p>
-              <a href="/react#bridal-swap" className="btn btn-outline-primary btn-sm">
-                Try Reception Look
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main categories */}
-      <h2 className="text-center mb-4">Explore Categories</h2>
-      <div className="row">
-        {/* Bride */}
-        <div className="col-md-6 col-lg-3 mb-4">
-          <div className="card h-100 category-card border-0" style={{
-            borderRadius: '12px',
-            overflow: 'hidden',
-            boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-          }}>
-            <div style={{
-              height: '150px', 
-              background: 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <i className="fas fa-female fa-4x" style={{color: 'rgba(255,255,255,0.7)'}}></i>
-            </div>
-            <div className="card-body text-center">
-              <h4 className="card-title mb-2">Bride</h4>
-              <p className="card-text small mb-3">Create your perfect bridal look for each ceremony</p>
-              <a href="/react#bridal-swap" className="btn btn-sm btn-primary">
-                Explore Bride
-              </a>
-            </div>
-          </div>
-        </div>
-        
-        {/* Groom */}
-        <div className="col-md-6 col-lg-3 mb-4">
-          <div className="card h-100 category-card border-0" style={{
-            borderRadius: '12px',
-            overflow: 'hidden',
-            boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-          }}>
-            <div style={{
-              height: '150px', 
-              background: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <i className="fas fa-male fa-4x" style={{color: 'rgba(255,255,255,0.7)'}}></i>
-            </div>
-            <div className="card-body text-center">
-              <h4 className="card-title mb-2">Groom</h4>
-              <p className="card-text small mb-3">Visualize yourself in traditional and modern groom outfits</p>
-              <a href="/react#groom-face-swap" className="btn btn-sm btn-primary">
-                Explore Groom
-              </a>
-            </div>
-          </div>
-        </div>
-        
-        {/* Saloon */}
-        <div className="col-md-6 col-lg-3 mb-4">
-          <div className="card h-100 category-card border-0" style={{
-            borderRadius: '12px',
-            overflow: 'hidden',
-            boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-          }}>
-            <div style={{
-              height: '150px', 
-              background: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <i className="fas fa-cut fa-4x" style={{color: 'rgba(255,255,255,0.7)'}}></i>
-            </div>
-            <div className="card-body text-center">
-              <h4 className="card-title mb-2">Saloon</h4>
-              <p className="card-text small mb-3">Discover top-rated saloons and try different hairstyles</p>
-              <a href="/react#bride-saloons" className="btn btn-sm btn-primary">
-                Explore Saloon
-              </a>
-            </div>
-          </div>
-        </div>
-        
-        {/* Venues */}
-        <div className="col-md-6 col-lg-3 mb-4">
-          <div className="card h-100 category-card border-0" style={{
-            borderRadius: '12px',
-            overflow: 'hidden',
-            boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-          }}>
-            <div style={{
-              height: '150px', 
-              background: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <i className="fas fa-building fa-4x" style={{color: 'rgba(255,255,255,0.7)'}}></i>
-            </div>
-            <div className="card-body text-center">
-              <h4 className="card-title mb-2">Venues</h4>
-              <p className="card-text small mb-3">Find and compare perfect venues for your wedding</p>
-              <a href="/react#venue-search" className="btn btn-sm btn-primary">
-                Explore Venues
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* How it works section */}
-      <div className="card bg-dark mt-5 mb-5">
-        <div className="card-body p-4">
-          <h3 className="text-center text-light-purple mb-4">How It Works</h3>
-          <div className="row g-4 text-center">
-            <div className="col-md-3">
-              <div className="process-step">
-                <div className="step-icon mb-3">
-                  <i className="fas fa-upload fa-2x text-primary"></i>
-                </div>
-                <h5>1. Upload Photo</h5>
-                <p className="small">Upload your face photo to get started</p>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="process-step">
-                <div className="step-icon mb-3">
-                  <i className="fas fa-list fa-2x text-info"></i>
-                </div>
-                <h5>2. Select Category</h5>
-                <p className="small">Choose from bride, groom or saloon options</p>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="process-step">
-                <div className="step-icon mb-3">
-                  <i className="fas fa-images fa-2x text-warning"></i>
-                </div>
-                <h5>3. Pick Templates</h5>
-                <p className="small">Select one or multiple templates</p>
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="process-step">
-                <div className="step-icon mb-3">
-                  <i className="fas fa-magic fa-2x text-success"></i>
-                </div>
-                <h5>4. Generate Results</h5>
-                <p className="small">View and download your personalized results</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick access links */}
-      <div className="p-4 mb-4" style={{
-        background: 'linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(106, 13, 173, 0.2))',
-        borderRadius: '10px'
-      }}>
-        <h4 className="text-center mb-4">Quick Access</h4>
-        <div className="row g-3 text-center">
+        <div className="row g-4">
+          {/* Haldi Template */}
           <div className="col-6 col-md-3">
-            <a href="/react#bridal-swap" className="btn btn-outline-light w-100">
-              <i className="fas fa-female me-2"></i> Bride
-            </a>
+            <div style={{
+              backgroundColor: colors.cardBg,
+              borderRadius: '8px',
+              overflow: 'hidden',
+              padding: '12px',
+              height: '100%',
+              border: `1px solid ${colors.darkPurple}20`
+            }}>
+              <div style={{
+                height: '180px',
+                overflow: 'hidden',
+                borderRadius: '4px',
+                marginBottom: '12px'
+              }}>
+                <img 
+                  src="/static/results/result_1747231562_haldi_5.jpg" 
+                  alt="Haldi"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'top'
+                  }}
+                />
+              </div>
+              <h5 style={{
+                textAlign: 'center',
+                color: colors.lightPurple,
+                margin: 0,
+                fontSize: '1rem'
+              }}>
+                Haldi
+              </h5>
+            </div>
           </div>
-          <div className="col-6 col-md-3">
-            <a href="/react#groom-face-swap" className="btn btn-outline-light w-100">
-              <i className="fas fa-male me-2"></i> Groom
-            </a>
-          </div>
-          <div className="col-6 col-md-3">
-            <a href="/react#bride-saloons" className="btn btn-outline-light w-100">
-              <i className="fas fa-cut me-2"></i> Saloon
-            </a>
-          </div>
-          <div className="col-6 col-md-3">
-            <a href="/react#universal-page" className="btn btn-outline-light w-100">
-              <i className="fas fa-th me-2"></i> Universal
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* Custom CSS for additional effects */}
-      <style>
-        {`
-          .category-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-          }
           
-          .process-step {
-            padding: 20px 10px;
-            background-color: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            height: 100%;
-          }
+          {/* Wedding Template */}
+          <div className="col-6 col-md-3">
+            <div style={{
+              backgroundColor: colors.cardBg,
+              borderRadius: '8px',
+              overflow: 'hidden',
+              padding: '12px',
+              height: '100%',
+              border: `1px solid ${colors.darkPurple}20`
+            }}>
+              <div style={{
+                height: '180px',
+                overflow: 'hidden',
+                borderRadius: '4px',
+                marginBottom: '12px'
+              }}>
+                <img 
+                  src="/static/results/result_1747229949_wedding_5.jpg" 
+                  alt="Wedding"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'top'
+                  }}
+                />
+              </div>
+              <h5 style={{
+                textAlign: 'center',
+                color: colors.lightPurple,
+                margin: 0,
+                fontSize: '1rem'
+              }}>
+                Wedding
+              </h5>
+            </div>
+          </div>
           
-          .card {
-            overflow: hidden;
-          }
-        `}
-      </style>
+          {/* Reception Template */}
+          <div className="col-6 col-md-3">
+            <div style={{
+              backgroundColor: colors.cardBg,
+              borderRadius: '8px',
+              overflow: 'hidden',
+              padding: '12px',
+              height: '100%',
+              border: `1px solid ${colors.darkPurple}20`
+            }}>
+              <div style={{
+                height: '180px',
+                overflow: 'hidden',
+                borderRadius: '4px',
+                marginBottom: '12px'
+              }}>
+                <img 
+                  src="/static/results/result_1747229942_wedding_3.jpg" 
+                  alt="Reception"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'top'
+                  }}
+                />
+              </div>
+              <h5 style={{
+                textAlign: 'center',
+                color: colors.lightPurple,
+                margin: 0,
+                fontSize: '1rem'
+              }}>
+                Reception
+              </h5>
+            </div>
+          </div>
+          
+          {/* Mehendi Template */}
+          <div className="col-6 col-md-3">
+            <div style={{
+              backgroundColor: colors.cardBg,
+              borderRadius: '8px',
+              overflow: 'hidden',
+              padding: '12px',
+              height: '100%',
+              border: `1px solid ${colors.darkPurple}20`
+            }}>
+              <div style={{
+                height: '180px',
+                overflow: 'hidden',
+                borderRadius: '4px',
+                marginBottom: '12px'
+              }}>
+                <img 
+                  src="/static/templates/bride/makeup/natural/4ea63131c2229217909c0eb9167437cb.jpg" 
+                  alt="Mehendi"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'top'
+                  }}
+                />
+              </div>
+              <h5 style={{
+                textAlign: 'center',
+                color: colors.lightPurple,
+                margin: 0,
+                fontSize: '1rem'
+              }}>
+                Mehendi
+              </h5>
+            </div>
+          </div>
+        </div>
+        
+        {/* Spacer */}
+        <div style={{height: '40px'}}></div>
+        
+        {/* Categories Section */}
+        <h3 style={{
+          textAlign: 'center', 
+          marginBottom: '1.5rem',
+          color: colors.lightPurple,
+          fontWeight: '300'
+        }}>
+          Categories
+        </h3>
+        
+        <div className="row g-4">
+          {/* Bride Category */}
+          <div className="col-6 col-md-3">
+            <div style={{
+              backgroundColor: colors.cardBg,
+              borderRadius: '8px',
+              overflow: 'hidden',
+              padding: '12px',
+              height: '100%',
+              border: `1px solid ${colors.darkPurple}20`
+            }}>
+              <div style={{
+                height: '150px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: colors.darkPurple,
+                borderRadius: '4px',
+                marginBottom: '12px'
+              }}>
+                <i className="fas fa-female fa-3x" style={{color: 'rgba(255,255,255,0.9)'}}></i>
+              </div>
+              <h5 style={{
+                textAlign: 'center',
+                color: colors.lightPurple,
+                margin: 0,
+                fontSize: '1rem'
+              }}>
+                Bride
+              </h5>
+            </div>
+          </div>
+          
+          {/* Groom Category */}
+          <div className="col-6 col-md-3">
+            <div style={{
+              backgroundColor: colors.cardBg,
+              borderRadius: '8px',
+              overflow: 'hidden',
+              padding: '12px',
+              height: '100%',
+              border: `1px solid ${colors.darkPurple}20`
+            }}>
+              <div style={{
+                height: '150px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: colors.darkPurple,
+                borderRadius: '4px',
+                marginBottom: '12px'
+              }}>
+                <i className="fas fa-male fa-3x" style={{color: 'rgba(255,255,255,0.9)'}}></i>
+              </div>
+              <h5 style={{
+                textAlign: 'center',
+                color: colors.lightPurple,
+                margin: 0,
+                fontSize: '1rem'
+              }}>
+                Groom
+              </h5>
+            </div>
+          </div>
+          
+          {/* Saloon Category */}
+          <div className="col-6 col-md-3">
+            <div style={{
+              backgroundColor: colors.cardBg,
+              borderRadius: '8px',
+              overflow: 'hidden',
+              padding: '12px',
+              height: '100%',
+              border: `1px solid ${colors.darkPurple}20`
+            }}>
+              <div style={{
+                height: '150px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: colors.darkPurple,
+                borderRadius: '4px',
+                marginBottom: '12px'
+              }}>
+                <i className="fas fa-cut fa-3x" style={{color: 'rgba(255,255,255,0.9)'}}></i>
+              </div>
+              <h5 style={{
+                textAlign: 'center',
+                color: colors.lightPurple,
+                margin: 0,
+                fontSize: '1rem'
+              }}>
+                Saloon
+              </h5>
+            </div>
+          </div>
+          
+          {/* Venues Category */}
+          <div className="col-6 col-md-3">
+            <div style={{
+              backgroundColor: colors.cardBg,
+              borderRadius: '8px',
+              overflow: 'hidden',
+              padding: '12px',
+              height: '100%',
+              border: `1px solid ${colors.darkPurple}20`
+            }}>
+              <div style={{
+                height: '150px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: colors.darkPurple,
+                borderRadius: '4px',
+                marginBottom: '12px'
+              }}>
+                <i className="fas fa-building fa-3x" style={{color: 'rgba(255,255,255,0.9)'}}></i>
+              </div>
+              <h5 style={{
+                textAlign: 'center',
+                color: colors.lightPurple,
+                margin: 0,
+                fontSize: '1rem'
+              }}>
+                Venues
+              </h5>
+            </div>
+          </div>
+        </div>
+        
+        {/* Simple How It Works Section */}
+        <div style={{
+          backgroundColor: colors.cardBg,
+          borderRadius: '8px',
+          padding: '1.5rem',
+          marginTop: '40px',
+          marginBottom: '20px'
+        }}>
+          <h3 style={{
+            textAlign: 'center',
+            color: colors.lightPurple,
+            marginBottom: '1.5rem',
+            fontWeight: '300'
+          }}>
+            How It Works
+          </h3>
+          
+          <div className="row text-center">
+            <div className="col-3">
+              <i className="fas fa-upload fa-2x" style={{color: colors.lightPurple}}></i>
+              <p style={{color: 'white', marginTop: '10px', fontSize: '0.9rem'}}>Upload</p>
+            </div>
+            <div className="col-3">
+              <i className="fas fa-list fa-2x" style={{color: colors.lightPurple}}></i>
+              <p style={{color: 'white', marginTop: '10px', fontSize: '0.9rem'}}>Select</p>
+            </div>
+            <div className="col-3">
+              <i className="fas fa-images fa-2x" style={{color: colors.lightPurple}}></i>
+              <p style={{color: 'white', marginTop: '10px', fontSize: '0.9rem'}}>Templates</p>
+            </div>
+            <div className="col-3">
+              <i className="fas fa-magic fa-2x" style={{color: colors.lightPurple}}></i>
+              <p style={{color: 'white', marginTop: '10px', fontSize: '0.9rem'}}>Generate</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
