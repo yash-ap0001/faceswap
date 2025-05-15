@@ -103,7 +103,7 @@ const HomePage = () => {
           margin: '0 auto'
         }}>
           <div style={{
-            height: '280px',
+            height: '250px',
             overflow: 'hidden',
             position: 'relative'
           }}>

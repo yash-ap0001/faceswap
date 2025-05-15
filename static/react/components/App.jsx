@@ -122,6 +122,14 @@ const App = () => {
 
   return (
     <div className="app-container">
+      <style dangerouslySetInnerHTML={{__html: `
+        html, body {
+          overflow: hidden !important;
+          height: 100% !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+      `}} />
       <div className="sidebar-wrapper" style={{ width: sidebarOpen ? '250px' : '0', overflow: 'hidden' }}>
         <Sidebar 
           isOpen={sidebarOpen} 
@@ -183,10 +191,20 @@ const App = () => {
           }
           
           .main-container {
-            overflow-y: auto;
+            overflow: hidden;
             padding: 0;
             position: relative;
             height: 100vh;
+            max-height: 100vh;
+            display: flex;
+            flex-direction: column;
+          }
+          
+          .content-container {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
           }
           
           .sidebar-wrapper {
