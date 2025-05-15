@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOWBRIDE - Indian Bridal Face Swap App</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom styles -->
+    <style>
+        :root {
+            --primary-color: #8a2be2;
+            --primary-light: #9d4edd;
+            --primary-dark: #6a0dad;
+            --text-light-purple: #d8bfd8;
+            --text-dark-purple: #9370db;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #121212;
+            color: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .brand-name {
+            background: linear-gradient(90deg, #8a2be2, #9d4edd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .header {
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .subtitle {
+            color: var(--text-light-purple);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .hero-section {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('/static/templates/bride/makeup/natural/4ea63131c2229217909c0eb9167437cb.jpg');
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            padding: 4rem 2rem;
+            margin: 2rem auto;
+            text-align: center;
+            color: white;
+            max-width: 1200px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .category-card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            border: none;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .category-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            object-position: top center;
+            transition: transform 0.5s ease;
+        }
+        
+        .category-card:hover img {
+            transform: scale(1.05);
+        }
+        
+        .category-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.3;
+            z-index: 1;
+        }
+        
+        .category-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+        
+        .ceremony-card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            height: 100%;
+            border: none;
+        }
+        
+        .ceremony-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .ceremony-card img {
+            height: 250px;
+            object-fit: cover;
+        }
+        
+        .process-step {
+            padding: 20px 10px;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            height: 100%;
+            text-align: center;
+        }
+        
+        .step-number {
+            background: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-weight: bold;
+        }
+        
+        .quick-links-section {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(106, 13, 173, 0.2));
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer {
+            background-color: #1a1a1a;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1 class="logo-text">
+            <span class="brand-name">VOW</span>BRIDE
+        </h1>
+        <p class="subtitle">AI-Powered Wedding Planner</p>
+    </header>
+    
+    <main>
+        <!-- Hero section with CTA -->
+        <div class="hero-section">
+            <h1 class="display-4 mb-3" style="font-weight: 700; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">
+                Transform Your Wedding Look
+            </h1>
+            <p class="lead mb-4" style="font-size: 1.3rem; max-width: 800px; margin: 0 auto; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);">
+                Create your dream wedding look with our AI-powered face swap technology
+            </p>
+            <div class="btn-group-lg mt-4">
+                <a href="/universal-page" class="btn btn-primary me-3 rounded-pill px-4 py-2">
+                    <i class="fas fa-magic me-2"></i> Try Face Swap
+                </a>
+                <a href="/universal-categories" class="btn btn-outline-light rounded-pill px-4 py-2">
+                    <i class="fas fa-th-large me-2"></i> All Categories
+                </a>
+            </div>
+        </div>
+        
+        <div class="container">
+            <!-- Wedding ceremonies -->
+            <h2 class="text-center mb-4">Wedding Ceremonies</h2>
+            <div class="row mb-5">
+                <!-- Haldi -->
+                <div class="col-md-4 mb-4">
+                    <div class="card ceremony-card h-100">
+                        <img src="/static/results/result_1747231562_haldi_5.jpg" class="card-img-top" alt="Haldi Ceremony">
+                        <div class="card-body text-center">
+                            <h4 class="card-title brand-name">Haldi</h4>
+                            <p class="card-text">Pre-wedding turmeric ceremony</p>
+                            <a href="/bridal-swap?ceremony=haldi" class="btn btn-outline-primary btn-sm">
+                                Try Haldi Look
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Wedding -->
+                <div class="col-md-4 mb-4">
+                    <div class="card ceremony-card h-100">
+                        <img src="/static/results/result_1747228356_haldi_2.jpg" class="card-img-top" alt="Wedding Ceremony">
+                        <div class="card-body text-center">
+                            <h4 class="card-title brand-name">Wedding</h4>
+                            <p class="card-text">The main wedding ceremony</p>
+                            <a href="/bridal-swap?ceremony=wedding" class="btn btn-outline-primary btn-sm">
+                                Try Wedding Look
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reception -->
+                <div class="col-md-4 mb-4">
+                    <div class="card ceremony-card h-100">
+                        <img src="/static/results/result_1747229942_wedding_3.jpg" class="card-img-top" alt="Reception Ceremony">
+                        <div class="card-body text-center">
+                            <h4 class="card-title brand-name">Reception</h4>
+                            <p class="card-text">Post-wedding celebration</p>
+                            <a href="/bridal-swap?ceremony=reception" class="btn btn-outline-primary btn-sm">
+                                Try Reception Look
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main categories -->
+            <h2 class="text-center mb-4">Explore Categories</h2>
+            <div class="row">
+                <!-- Bride -->
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card category-card">
+                        <div class="position-relative overflow-hidden" style="height: 200px;">
+                            <div class="category-overlay" style="background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);"></div>
+                            <img src="/static/results/result_1747229949_wedding_5.jpg" class="card-img-top" alt="Bride Category">
+                            <div class="category-icon">
+                                <i class="fas fa-female fa-lg" style="color: white;"></i>
+                            </div>
+                        </div>
+                        <div class="card-body text-center">
+                            <h4 class="card-title mb-2">Bride</h4>
+                            <p class="card-text small mb-3">Create your perfect bridal look for each ceremony with AI face swap</p>
+                            <a href="/bridal-swap" class="btn btn-sm btn-primary">
+                                Explore Bride
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Groom -->
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card category-card">
+                        <div class="position-relative overflow-hidden" style="height: 200px;">
+                            <div class="category-overlay" style="background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);"></div>
+                            <img src="/static/results/result_1747229953_wedding_6.jpg" class="card-img-top" alt="Groom Category">
+                            <div class="category-icon">
+                                <i class="fas fa-male fa-lg" style="color: white;"></i>
+                            </div>
+                        </div>
+                        <div class="card-body text-center">
+                            <h4 class="card-title mb-2">Groom</h4>
+                            <p class="card-text small mb-3">Visualize yourself in traditional and modern groom outfits for your special day</p>
+                            <a href="/groom-face-swap" class="btn btn-sm btn-primary">
+                                Explore Groom
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Saloon -->
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card category-card">
+                        <div class="position-relative overflow-hidden" style="height: 200px;">
+                            <div class="category-overlay" style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);"></div>
+                            <img src="/static/images/placeholder_saloon.jpg" class="card-img-top" alt="Saloon Category">
+                            <div class="category-icon">
+                                <i class="fas fa-cut fa-lg" style="color: white;"></i>
+                            </div>
+                        </div>
+                        <div class="card-body text-center">
+                            <h4 class="card-title mb-2">Saloon</h4>
+                            <p class="card-text small mb-3">Discover top-rated saloons and try different hairstyles and makeup looks</p>
+                            <a href="/bride-saloons" class="btn btn-sm btn-primary">
+                                Explore Saloon
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Venues -->
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card category-card">
+                        <div class="position-relative overflow-hidden" style="height: 200px;">
+                            <div class="category-overlay" style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);"></div>
+                            <img src="/static/templates/bride/makeup/natural/39f677a83cef33bddbc009a6b4a4b590.jpg" class="card-img-top" alt="Venues Category">
+                            <div class="category-icon">
+                                <i class="fas fa-building fa-lg" style="color: white;"></i>
+                            </div>
+                        </div>
+                        <div class="card-body text-center">
+                            <h4 class="card-title mb-2">Venues</h4>
+                            <p class="card-text small mb-3">Find and compare perfect venues for your wedding ceremonies</p>
+                            <a href="/venue-search" class="btn btn-sm btn-primary">
+                                Explore Venues
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- How it works -->
+            <div class="card bg-dark mt-5 mb-5">
+                <div class="card-body p-4">
+                    <h3 class="text-center text-light-purple mb-4">How It Works</h3>
+                    <div class="row g-4">
+                        <div class="col-md-3">
+                            <div class="process-step">
+                                <div class="step-number">1</div>
+                                <div class="step-icon mb-3">
+                                    <i class="fas fa-upload fa-2x text-primary"></i>
+                                </div>
+                                <h5>Upload Photo</h5>
+                                <p class="small">Upload your face photo to get started</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="process-step">
+                                <div class="step-number">2</div>
+                                <div class="step-icon mb-3">
+                                    <i class="fas fa-list fa-2x text-info"></i>
+                                </div>
+                                <h5>Select Category</h5>
+                                <p class="small">Choose from bride, groom or saloon options</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="process-step">
+                                <div class="step-number">3</div>
+                                <div class="step-icon mb-3">
+                                    <i class="fas fa-images fa-2x text-warning"></i>
+                                </div>
+                                <h5>Pick Templates</h5>
+                                <p class="small">Select one or multiple templates</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="process-step">
+                                <div class="step-number">4</div>
+                                <div class="step-icon mb-3">
+                                    <i class="fas fa-magic fa-2x text-success"></i>
+                                </div>
+                                <h5>Generate Results</h5>
+                                <p class="small">View and download your personalized results</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick access links -->
+            <div class="quick-links-section">
+                <h4 class="text-center mb-4">Quick Access</h4>
+                <div class="row g-3 text-center">
+                    <div class="col-6 col-md-3">
+                        <a href="/bridal-swap" class="btn btn-outline-light w-100">
+                            <i class="fas fa-female me-2"></i> Bride
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="/groom-face-swap" class="btn btn-outline-light w-100">
+                            <i class="fas fa-male me-2"></i> Groom
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="/bride-saloons" class="btn btn-outline-light w-100">
+                            <i class="fas fa-cut me-2"></i> Saloon
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="/universal-page" class="btn btn-outline-light w-100">
+                            <i class="fas fa-th me-2"></i> Universal
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <div class="container">
+            <p class="brand-name mb-0">VOWBRIDE</p>
+            <p class="small text-muted">AI-Powered Wedding Face Swap & Planner</p>
+            <div class="mt-3">
+                <a href="#" class="btn btn-sm btn-outline-secondary me-2">
+                    <i class="fas fa-info-circle"></i> About
+                </a>
+                <a href="#" class="btn btn-sm btn-outline-secondary me-2">
+                    <i class="fas fa-shield-alt"></i> Privacy
+                </a>
+                <a href="#" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-envelope"></i> Contact
+                </a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
