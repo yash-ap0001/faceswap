@@ -24,11 +24,11 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
         // Use hardcoded menu structure without Home item
         const defaultMenu = [
           {
-            id: 'face-swap',
-            title: 'Face Swap',
-            icon: 'fa-exchange-alt',
+            id: 'universal',
+            title: 'Universal',
+            icon: 'fa-th-large',
             subItems: [
-              { id: 'face-swap-page', label: 'Face Swap', link: '/react#face-swap-page' }
+              { id: 'all-categories', label: 'All Categories', link: '/react#all-categories' }
             ]
           },
           {
