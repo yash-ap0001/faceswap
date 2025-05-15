@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import './UniversalPage.css';
 
 /**
  * UniversalPageNew - React version of the universal_page.html template
@@ -199,11 +200,10 @@ const UniversalPageNew = () => {
     formData.append('enhance', enhance);
     formData.append('enhance_method', enhanceMethod);
     
-    // Add selected templates
-    selectedTemplates.forEach((template, index) => {
-      formData.append(`template_${index}`, template.path);
+    // Add selected templates - using templates[] format which the backend expects
+    selectedTemplates.forEach((template) => {
+      formData.append('templates[]', template.path);
     });
-    formData.append('template_count', selectedTemplates.length);
     
     fetch('/multi_face_swap', {
       method: 'POST',
@@ -211,9 +211,18 @@ const UniversalPageNew = () => {
     })
       .then(response => response.json())
       .then(data => {
+        console.log('Process response:', data);
         setProcessingResults(false);
         if (data.success) {
-          setResults(data.results);
+          // Convert the result paths to proper URLs if needed
+          const formattedResults = data.results.map(result => ({
+            ...result,
+            // Ensure URL starts with a slash
+            url: result.result_path.startsWith('/') ? result.result_path : '/' + result.result_path
+          }));
+          
+          console.log('Formatted results:', formattedResults);
+          setResults(formattedResults);
           setShowResults(true);
           setShowTemplates(false);
         } else {

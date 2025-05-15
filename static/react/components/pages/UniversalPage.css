@@ -1,0 +1,210 @@
+/* UniversalPage.css */
+
+/* Main container styles */
+.app-container {
+  font-family: 'Inter', sans-serif;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header styles */
+.app-header {
+  background: linear-gradient(135deg, #2b1744 0%, #472a75 100%);
+  color: white;
+  padding: 1rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-text {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.brand-name {
+  background: linear-gradient(to right, #e6a7ff, #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 800;
+}
+
+/* Main content styles */
+.main-container {
+  display: flex;
+  flex: 1;
+  padding: 1.5rem;
+}
+
+.content-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Form styles */
+.upload-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.upload-container {
+  width: 100%;
+  max-width: 350px;
+  border: 2px dashed #673ab7;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  background-color: rgba(103, 58, 183, 0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-container:hover {
+  background-color: rgba(103, 58, 183, 0.1);
+}
+
+.preview-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+/* Category selection styles */
+.category-select-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Template styles */
+.template-card {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.template-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.template-preview {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Results styles */
+.result-card {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.result-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.result-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Custom dropdown styles */
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-toggle {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dropdown-toggle:hover {
+  border-color: #adb5bd;
+}
+
+.dropdown-menu {
+  position: absolute;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+  background-color: white;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  margin-top: 0.25rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.dropdown-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* Dark purple theme */
+.bg-dark-purple {
+  background-color: #2b1744;
+  color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .main-container {
+    flex-direction: column;
+  }
+  
+  .upload-section {
+    flex-direction: column;
+  }
+}
+
+/* Image zoom container styles */
+.image-zoom-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#zoomImage {
+  transition: transform 0.2s ease;
+}
