@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VOWBRIDE - Indian Bridal Face Swap</title>
+    <title>Indian Bridal Face Swap</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
     <!-- Font Awesome Icons -->
@@ -28,7 +28,7 @@
         }
         
         body {
-            background-color: var(--dark-surface);
+            background-color: #000000 !important; /* Pure black background */
             color: var(--text-primary);
             font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             overflow-x: hidden;
@@ -730,7 +730,7 @@
 
             
             <a class="navbar-brand" href="/">
-                <span class="brand-name">VOWBRIDE</span>
+                <span class="brand-name">Indian Bridal Face Swap</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -781,53 +781,8 @@
                     </div>
                 </div>
                 
-                <!-- Groom Section (Disabled) -->
-                <div class="accordion-item bg-transparent border-0 mb-2" style="display: none;">
-                    <h6 class="accordion-header" id="headingGroom">
-                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
-                                type="button" data-bs-toggle="collapse" 
-                                data-bs-target="#collapseGroom" aria-expanded="false" 
-                                aria-controls="collapseGroom">
-                            <i class="fas fa-male me-2"></i>Groom
-                        </button>
-                    </h6>
-                    <div id="collapseGroom" class="accordion-collapse collapse" 
-                         aria-labelledby="headingGroom" data-bs-parent="#sidebarAccordion">
-                        <div class="accordion-body p-0 pt-2">
-                            <ul class="sidebar-menu">
-                                <li><a href="{{ url_for('groom_face_swap') }}"><i class="fas fa-angle-right me-2"></i>Groom Face Swap</a></li>
-                                <li><a href="{{ url_for('traditional_wear') }}"><i class="fas fa-angle-right me-2"></i>Traditional Wear</a></li>
-                                <li><a href="{{ url_for('modern_suits') }}"><i class="fas fa-angle-right me-2"></i>Modern Suits</a></li>
-                                <li><a href="{{ url_for('groom_accessories') }}"><i class="fas fa-angle-right me-2"></i>Accessories</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Services Section (Disabled) -->
-                <div class="accordion-item bg-transparent border-0 mb-2" style="display: none;">
-                    <h6 class="accordion-header" id="headingServices">
-                        <button class="accordion-button bg-transparent text-white shadow-none collapsed" 
-                                type="button" data-bs-toggle="collapse" 
-                                data-bs-target="#collapseServices" aria-expanded="false" 
-                                aria-controls="collapseServices">
-                            <i class="fas fa-concierge-bell me-2"></i>Services
-                        </button>
-                    </h6>
-                    <div id="collapseServices" class="accordion-collapse collapse" 
-                         aria-labelledby="headingServices" data-bs-parent="#sidebarAccordion">
-                        <div class="accordion-body p-0 pt-2">
-                            <!-- Service Categories -->
-                            <ul class="sidebar-menu">
-                                <li><a href="{{ url_for('event_managers') }}"><i class="fas fa-user-tie me-2"></i>Event Managers</a></li>
-                                <li><a href="{{ url_for('venue_search') }}"><i class="fas fa-building me-2"></i>Venues</a></li>
-                                <li><a href="{{ url_for('saloons') }}"><i class="fas fa-cut me-2"></i>Saloons</a></li>
-                                <li><a href="#" onclick="alert('Photography services coming soon')"><i class="fas fa-camera me-2"></i>Photography</a></li>
-                                <li><a href="#" onclick="alert('Catering services coming soon')"><i class="fas fa-utensils me-2"></i>Catering</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                <!-- Groom Section (Removed) -->
+                <!-- Services Section (Removed) -->
                 
                 <!-- Settings Section -->
                 <div class="accordion-item bg-transparent border-0 mb-2">
@@ -895,7 +850,7 @@
     <footer class="py-3 mt-5">
         <div class="container text-center">
             <p class="text-light mb-0">
-                <span class="brand-name footer-brand">VOWBRIDE</span> - Indian Bridal Face Swap App | 
+                <span class="brand-name footer-brand">Indian Bridal Face Swap</span> App | 
                 <span class="text-light">Powered by </span>
                 <a href="https://github.com/deepinsight/insightface" target="_blank" rel="noopener" class="text-light">
                     <i class="fab fa-github me-1"></i>InsightFace 0.7.3
