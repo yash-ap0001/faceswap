@@ -177,8 +177,11 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
                     <i className={`fas ${section.icon} me-2`}></i>
                     <span>{section.title}</span>
                   </div>
-                  <span className="chevron-icon">
-                    <i className={`fas fa-chevron-${openSection === section.id ? 'up' : 'down'}`} style={{ fontSize: '12px', opacity: '0.7' }}></i>
+                  <span className="toggle-icon">
+                    {openSection === section.id ? 
+                      <i className="fas fa-minus" style={{ fontSize: '10px' }}></i> : 
+                      <i className="fas fa-plus" style={{ fontSize: '10px' }}></i>
+                    }
                   </span>
                 </div>
               </div>
