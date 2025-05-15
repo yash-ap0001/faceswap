@@ -2171,6 +2171,13 @@ def get_templates():
             'traditional': ['sherwani', 'kurta', 'indo_western', 'dhoti', 'jodhpuri'],
             'suits': ['tuxedos', 'three_piece', 'two_piece', 'blazers', 'casual'],
             'accessories': ['watches', 'cufflinks', 'ties', 'pocket_squares', 'shoes']
+        },
+        'celebrity': {
+            'men': ['actors', 'singers', 'sports', 'models'],
+            'women': ['actresses', 'singers', 'models', 'sports'],
+            'tollywood': ['actors', 'actresses', 'classic', 'new-gen'],
+            'bollywood': ['actors', 'actresses', 'classic', 'new-gen'],
+            'item': ['international', 'influencers', 'trending', 'historical']
         }
     }
     
@@ -2251,8 +2258,10 @@ def get_templates():
         # Determine the appropriate directory based on category type
         if category_type == 'bride':
             target_dir = os.path.join(app.static_folder, 'templates', subcategory, item_category)
-        else:  # groom categories
+        elif category_type == 'groom':
             target_dir = os.path.join(app.static_folder, 'templates', 'groom', subcategory, item_category)
+        elif category_type == 'celebrity':
+            target_dir = os.path.join(app.static_folder, 'templates', 'celebrity', subcategory, item_category)
         
         app.logger.info(f"Scanning category directory: {target_dir}")
         
@@ -2724,6 +2733,18 @@ def universal_face_swap():
                 {'subcategory': 'saloon', 'items': ['hair', 'beard', 'formal']}
             ]
         })
+        
+    if category == 'celebrity' or category == 'auto' or process_all:
+        template_categories.append({
+            'category_type': 'celebrity',
+            'subcategories': [
+                {'subcategory': 'men', 'items': ['actors', 'singers', 'sports', 'models']},
+                {'subcategory': 'women', 'items': ['actresses', 'singers', 'models', 'sports']},
+                {'subcategory': 'tollywood', 'items': ['actors', 'actresses', 'classic', 'new-gen']},
+                {'subcategory': 'bollywood', 'items': ['actors', 'actresses', 'classic', 'new-gen']},
+                {'subcategory': 'item', 'items': ['international', 'influencers', 'trending', 'historical']}
+            ]
+        })
     
     # Save source file temporarily
     source_filename = secure_filename(source_file.filename)
@@ -2754,8 +2775,10 @@ def universal_face_swap():
                         if subcat['subcategory'] == 'makeup' or subcat['subcategory'] == 'hair':
                             # Use bridal templates for now
                             target_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates', 'pinterest', item)
-                    else:  # groom
+                    elif cat['category_type'] == 'groom':
                         target_dir = os.path.join(app.static_folder, 'templates', 'groom', subcat['subcategory'], item)
+                    elif cat['category_type'] == 'celebrity':
+                        target_dir = os.path.join(app.static_folder, 'templates', 'celebrity', subcat['subcategory'], item)
                     
                     if not target_dir or not os.path.exists(target_dir):
                         # Skip this category if directory doesn't exist
