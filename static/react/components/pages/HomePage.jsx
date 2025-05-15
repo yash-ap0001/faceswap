@@ -14,23 +14,23 @@ const HomePage = () => {
     cardBg: '#212121'
   };
 
-  // Define template images for auto-changing
+  // Define template images for auto-changing - one for each ceremony type
   const templateImages = [
     {
       src: '/static/results/result_1747231562_haldi_5.jpg',
       title: 'Haldi Ceremony'
     },
     {
-      src: '/static/results/result_1747229949_wedding_5.jpg',
+      src: '/static/results/result_1747227644_sangeeth.jpg',
+      title: 'Sangeet Ceremony'
+    },
+    {
+      src: '/static/results/result_1747218536_wedding_4.jpg',
       title: 'Wedding Ceremony'
     },
     {
-      src: '/static/results/result_1747229942_wedding_3.jpg',
+      src: '/static/results/result_1747218539_wedding_6.jpg',
       title: 'Reception Ceremony'
-    },
-    {
-      src: '/static/templates/bride/makeup/natural/4ea63131c2229217909c0eb9167437cb.jpg',
-      title: 'Mehendi Ceremony'
     }
   ];
 
