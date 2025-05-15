@@ -47,7 +47,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="home-page" style={{backgroundColor: '#121212', padding: '20px 10px'}}>
+    <div className="home-page" style={{backgroundColor: '#121212', padding: '10px 0px', minHeight: '100vh'}}>
       {/* Brand logo */}
       <div style={{
         textAlign: 'center',
@@ -79,16 +79,17 @@ const HomePage = () => {
       </div>
 
       {/* Large auto-changing template image */}
-      <div className="container px-2">
+      <div className="container px-2" style={{ maxWidth: '800px' }}>
         <div style={{
           backgroundColor: colors.cardBg,
           borderRadius: '12px',
           overflow: 'hidden',
           marginBottom: '30px',
-          boxShadow: `0 4px 20px rgba(0,0,0,0.3)`
+          boxShadow: `0 4px 20px rgba(0,0,0,0.3)`,
+          margin: '0 auto'
         }}>
           <div style={{
-            height: '350px',
+            height: '320px',
             overflow: 'hidden',
             position: 'relative'
           }}>
@@ -168,7 +169,9 @@ const HomePage = () => {
           borderRadius: '8px',
           padding: '1.5rem',
           marginTop: '20px',
-          marginBottom: '20px'
+          marginBottom: '20px',
+          maxWidth: '800px',
+          margin: '20px auto'
         }}>
           <h3 style={{
             textAlign: 'center',
