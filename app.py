@@ -1938,10 +1938,10 @@ def get_templates():
     template_dir = None
     template_type = 'pinterest'  # Default to Pinterest templates
     
-    # Handle bridal ceremony templates (from uploads/templates)
+    # Handle bridal ceremony templates (from uploads/templates/pinterest)
     if category_type == 'bride' and subcategory == 'bridal':
         # Get templates directory for bridal ceremonies
-        template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
+        template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates', 'pinterest')
         
         # Check if template directory exists
         if not os.path.exists(template_dir):
@@ -1967,42 +1967,11 @@ def get_templates():
     
     # Handle bridal ceremony templates
     if category_type == 'bride' and subcategory == 'bridal':
-        # Check in main directory
-        main_path = os.path.join(template_dir, f"{item_category}_{template_type}.jpg")
-        if os.path.exists(main_path):
-            app.logger.info(f"Found main template: {main_path}")
-            # Calculate the URL relative to the templates directory
-            url_path = main_path.replace(app.config['UPLOAD_FOLDER'], '/templates')
-            templates.append({
-                'id': f"{item_category}_{template_type}_{template_id}",
-                'template_type': template_type,
-                'category_type': category_type,
-                'subcategory': subcategory,
-                'item_category': item_category,
-                'path': main_path,
-                'url': f"{url_path}?t={int(time.time())}"
-            })
-            template_id += 1
-            
-        # Check in type subdirectory for standard file
-        subdir_path = os.path.join(template_dir, template_type, f"{item_category}.jpg")
-        if os.path.exists(subdir_path):
-            app.logger.info(f"Found subdir template: {subdir_path}")
-            # Calculate the URL relative to the templates directory
-            url_path = subdir_path.replace(app.config['UPLOAD_FOLDER'], '/templates')
-            templates.append({
-                'id': f"{item_category}_{template_type}_{template_id}",
-                'template_type': template_type,
-                'category_type': category_type,
-                'subcategory': subcategory,
-                'item_category': item_category,
-                'path': subdir_path,
-                'url': f"{url_path}?t={int(time.time())}"
-            })
-            template_id += 1
-            
-        # Check for additional images in the type subdirectory
-        type_dir = os.path.join(template_dir, template_type, item_category)
+        # We'll only check for images directly in the item_category subdirectory
+        # since we're already in the .../templates/pinterest directory
+        
+        # Check for item category directory
+        type_dir = os.path.join(template_dir, item_category)
         if os.path.exists(type_dir) and os.path.isdir(type_dir):
             app.logger.info(f"Scanning additional templates in: {type_dir}")
             for file in sorted(os.listdir(type_dir)):
@@ -2012,8 +1981,8 @@ def get_templates():
                         template_id_str = f"{item_category}_{template_type}_{template_id}"
                         app.logger.info(f"Found additional {template_type} template: {file_path}")
                         
-                        # Calculate the URL relative to the templates directory
-                        url_path = file_path.replace(app.config['UPLOAD_FOLDER'], '/templates')
+                        # Calculate the URL for the template
+                        url_path = f"/templates/uploads/pinterest/{item_category}/{file}"
                         templates.append({
                             'id': template_id_str,
                             'template_type': template_type,
