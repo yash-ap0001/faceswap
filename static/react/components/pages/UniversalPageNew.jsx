@@ -194,10 +194,6 @@ const UniversalPageNew = () => {
     }
   };
   
-  // Open template in viewer
-  const openTemplateInViewer = (template) => {
-    openImageViewer([template.url], 0);
-  };
   
   // Handle process button click
   const handleProcessTemplates = () => {
@@ -280,22 +276,42 @@ const UniversalPageNew = () => {
     const modal = new window.bootstrap.Modal(document.getElementById('imageViewerModal'));
     modal.show();
     
-    // Update navigation info
-    document.getElementById('imageNavInfo').textContent = `Image ${startIndex + 1} of ${images.length}`;
+    // Update navigation info if element exists
+    const navInfoEl = document.getElementById('imageNavInfo');
+    if (navInfoEl) {
+      navInfoEl.textContent = `Image ${startIndex + 1} of ${images.length}`;
+    }
+  };
+  
+  // Function to open a single template in the viewer
+  const openTemplateInViewer = (template) => {
+    // If template is an object with url, use that, otherwise assume it's a URL string
+    const templateUrl = typeof template === 'object' ? template.url : template;
+    openImageViewer([templateUrl], 0);
   };
   
   const handlePrevImage = () => {
     const newIndex = (currentImageIndex - 1 + viewerImages.length) % viewerImages.length;
     setCurrentImageIndex(newIndex);
     setZoomLevel(1);
-    document.getElementById('imageNavInfo').textContent = `Image ${newIndex + 1} of ${viewerImages.length}`;
+    
+    // Update navigation info if element exists
+    const navInfoEl = document.getElementById('imageNavInfo');
+    if (navInfoEl) {
+      navInfoEl.textContent = `Image ${newIndex + 1} of ${viewerImages.length}`;
+    }
   };
   
   const handleNextImage = () => {
     const newIndex = (currentImageIndex + 1) % viewerImages.length;
     setCurrentImageIndex(newIndex);
     setZoomLevel(1);
-    document.getElementById('imageNavInfo').textContent = `Image ${newIndex + 1} of ${viewerImages.length}`;
+    
+    // Update navigation info if element exists
+    const navInfoEl = document.getElementById('imageNavInfo');
+    if (navInfoEl) {
+      navInfoEl.textContent = `Image ${newIndex + 1} of ${viewerImages.length}`;
+    }
   };
   
   const handleZoomIn = () => {
