@@ -617,10 +617,19 @@ const UniversalPageNew = () => {
                         <button 
                           id="processTemplatesBtn"
                           className="btn btn-primary"
-                          disabled={selectedTemplates.length === 0}
+                          disabled={selectedTemplates.length === 0 || processingResults}
                           onClick={handleProcessTemplates}
                         >
-                          <i className="fas fa-magic me-1"></i> Process Selected
+                          {processingResults ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              <i className="fas fa-magic me-1"></i> Process Selected
+                            </>
+                          )}
                         </button>
                       </div>
                       
@@ -632,26 +641,10 @@ const UniversalPageNew = () => {
                               style={{ cursor: 'pointer' }}
                               onClick={() => handleTemplateSelection(template)}
                             >
-                              <img 
-                                src={template.url.startsWith('/') ? template.url : '/' + template.url} 
-                                className="template-preview"
-                                alt={`Template ${index + 1}`}
-                                style={{
-                                  height: '200px',
-                                  objectFit: 'cover',
-                                  objectPosition: 'center 20%', /* Adjusted to better center on faces */
-                                  borderRadius: '6px 6px 0 0',
-                                  transition: 'transform 0.2s ease',
-                                  width: '100%'
-                                }}
-                                onError={(e) => {
-                                  console.log("Image failed to load:", template.url);
-                                  e.target.src = '/static/placeholder.png';
-                                  e.target.style.objectFit = 'contain';
-                                }}
-                              />
-                              <div className="card-body p-2">
-                                <div className="d-flex justify-content-between align-items-center">
+                              <div className="position-relative">
+                                {/* Controls overlay on top of image */}
+                                <div className="position-absolute top-0 start-0 end-0 p-2 d-flex justify-content-between align-items-center" 
+                                     style={{ background: 'rgba(0,0,0,0.5)', zIndex: 2, borderRadius: '6px 6px 0 0' }}>
                                   <div className="d-flex align-items-center">
                                     <input 
                                       className="form-check-input me-2" 
@@ -663,7 +656,7 @@ const UniversalPageNew = () => {
                                     />
                                   </div>
                                   <button 
-                                    className="btn btn-sm btn-outline-secondary" 
+                                    className="btn btn-sm btn-outline-light" 
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       openTemplateInViewer(template);
@@ -672,6 +665,28 @@ const UniversalPageNew = () => {
                                     <i className="fas fa-eye"></i>
                                   </button>
                                 </div>
+                                
+                                <img 
+                                  src={template.url.startsWith('/') ? template.url : '/' + template.url} 
+                                  className="template-preview"
+                                  alt={`Template ${index + 1}`}
+                                  style={{
+                                    height: '200px',
+                                    objectFit: 'cover',
+                                    objectPosition: 'center 20%', /* Adjusted to better center on faces */
+                                    borderRadius: '6px 6px 0 0',
+                                    transition: 'transform 0.2s ease',
+                                    width: '100%'
+                                  }}
+                                  onError={(e) => {
+                                    console.log("Image failed to load:", template.url);
+                                    e.target.src = '/static/placeholder.png';
+                                    e.target.style.objectFit = 'contain';
+                                  }}
+                                />
+                              </div>
+                              <div className="card-body p-2 d-flex justify-content-center">
+                                <small className="text-muted">Template {index + 1}</small>
                               </div>
                             </div>
                           </div>
