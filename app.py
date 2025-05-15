@@ -512,6 +512,157 @@ def get_templates_route():
         'item_category': item_category
     })
 
+@app.route('/api/categories')
+def api_categories():
+    """
+    API endpoint to get the categories structure for the Universal Face Swap page.
+    Returns a JSON with hierarchical category data.
+    """
+    # Define the categories structure
+    categories = [
+        {
+            "id": "bride",
+            "key": "bride",
+            "name": "Bride",
+            "subcategories": [
+                {
+                    "id": "bridal",
+                    "key": "bridal",
+                    "name": "Bridal Ceremonies",
+                    "items": [
+                        {"id": "haldi", "key": "haldi", "name": "Haldi Ceremony"},
+                        {"id": "mehendi", "key": "mehendi", "name": "Mehendi Ceremony"},
+                        {"id": "sangeeth", "key": "sangeeth", "name": "Sangeeth Ceremony"},
+                        {"id": "wedding", "key": "wedding", "name": "Wedding Ceremony"},
+                        {"id": "reception", "key": "reception", "name": "Reception Ceremony"}
+                    ]
+                },
+                {
+                    "id": "outfits",
+                    "key": "outfits",
+                    "name": "Outfit Styles",
+                    "items": [
+                        {"id": "traditional", "key": "traditional", "name": "Traditional"},
+                        {"id": "modern", "key": "modern", "name": "Modern"},
+                        {"id": "fusion", "key": "fusion", "name": "Fusion"},
+                        {"id": "casual", "key": "casual", "name": "Casual"}
+                    ]
+                },
+                {
+                    "id": "jewelry",
+                    "key": "jewelry",
+                    "name": "Jewelry Types",
+                    "items": [
+                        {"id": "necklace", "key": "necklace", "name": "Necklace Sets"},
+                        {"id": "earrings", "key": "earrings", "name": "Earrings"},
+                        {"id": "bangles", "key": "bangles", "name": "Bangles & Bracelets"},
+                        {"id": "mang_tikka", "key": "mang_tikka", "name": "Mang Tikka"}
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "groom",
+            "key": "groom",
+            "name": "Groom",
+            "subcategories": [
+                {
+                    "id": "traditional",
+                    "key": "traditional",
+                    "name": "Traditional Wear",
+                    "items": [
+                        {"id": "sherwani", "key": "sherwani", "name": "Sherwani"},
+                        {"id": "kurta_pajama", "key": "kurta_pajama", "name": "Kurta Pajama"},
+                        {"id": "dhoti", "key": "dhoti", "name": "Dhoti Style"},
+                        {"id": "indo_western", "key": "indo_western", "name": "Indo-Western"}
+                    ]
+                },
+                {
+                    "id": "suits",
+                    "key": "suits",
+                    "name": "Modern Suits",
+                    "items": [
+                        {"id": "tuxedo", "key": "tuxedo", "name": "Tuxedo"},
+                        {"id": "three_piece", "key": "three_piece", "name": "Three Piece Suit"},
+                        {"id": "two_piece", "key": "two_piece", "name": "Two Piece Suit"},
+                        {"id": "blazer", "key": "blazer", "name": "Blazer"}
+                    ]
+                },
+                {
+                    "id": "accessories",
+                    "key": "accessories",
+                    "name": "Accessories",
+                    "items": [
+                        {"id": "turban", "key": "turban", "name": "Turban/Pagdi"},
+                        {"id": "brooch", "key": "brooch", "name": "Brooch & Pins"},
+                        {"id": "cufflinks", "key": "cufflinks", "name": "Cufflinks"},
+                        {"id": "footwear", "key": "footwear", "name": "Traditional Footwear"}
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "bride-saloon",
+            "key": "bride-saloon",
+            "name": "Bride Saloons",
+            "subcategories": [
+                {
+                    "id": "makeup",
+                    "key": "makeup",
+                    "name": "Makeup Styles",
+                    "items": [
+                        {"id": "natural", "key": "natural", "name": "Natural Look"},
+                        {"id": "glamorous", "key": "glamorous", "name": "Glamorous"},
+                        {"id": "traditional", "key": "traditional", "name": "Traditional"},
+                        {"id": "contemporary", "key": "contemporary", "name": "Contemporary"}
+                    ]
+                },
+                {
+                    "id": "hairstyle",
+                    "key": "hairstyle",
+                    "name": "Hairstyles",
+                    "items": [
+                        {"id": "updo", "key": "updo", "name": "Updo Styles"},
+                        {"id": "open_hair", "key": "open_hair", "name": "Open Hair"},
+                        {"id": "braided", "key": "braided", "name": "Braided Styles"},
+                        {"id": "bun", "key": "bun", "name": "Bun Variations"}
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "groom-saloon",
+            "key": "groom-saloon",
+            "name": "Groom Saloons",
+            "subcategories": [
+                {
+                    "id": "grooming",
+                    "key": "grooming",
+                    "name": "Grooming",
+                    "items": [
+                        {"id": "clean_shave", "key": "clean_shave", "name": "Clean Shave"},
+                        {"id": "beard_styles", "key": "beard_styles", "name": "Beard Styles"},
+                        {"id": "mustache", "key": "mustache", "name": "Mustache Styles"},
+                        {"id": "facial", "key": "facial", "name": "Facial & Spa"}
+                    ]
+                },
+                {
+                    "id": "haircut",
+                    "key": "haircut",
+                    "name": "Haircuts",
+                    "items": [
+                        {"id": "classic", "key": "classic", "name": "Classic Cut"},
+                        {"id": "fade", "key": "fade", "name": "Fade Styles"},
+                        {"id": "textured", "key": "textured", "name": "Textured Cut"},
+                        {"id": "pompadour", "key": "pompadour", "name": "Pompadour"}
+                    ]
+                }
+            ]
+        }
+    ]
+    
+    return jsonify({"success": True, "categories": categories})
+
 @app.route('/api/menu')
 def api_menu():
     """
