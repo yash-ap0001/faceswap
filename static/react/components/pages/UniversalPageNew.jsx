@@ -195,6 +195,8 @@ const UniversalPageNew = () => {
     setResults([]);
     setError(null);
     
+    console.log('Selected templates for processing:', selectedTemplates);
+    
     const formData = new FormData();
     formData.append('source', sourceFile);
     formData.append('enhance', enhance);
@@ -202,14 +204,24 @@ const UniversalPageNew = () => {
     
     // Add selected templates - using templates[] format which the backend expects
     selectedTemplates.forEach((template) => {
+      console.log('Adding template path:', template.path);
       formData.append('templates[]', template.path);
     });
+    
+    // Log the form data being sent
+    console.log('FormData entries:');
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ': ' + pair[1]);
+    }
     
     fetch('/multi_face_swap', {
       method: 'POST',
       body: formData
     })
-      .then(response => response.json())
+      .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+      })
       .then(data => {
         console.log('Process response:', data);
         setProcessingResults(false);
@@ -226,7 +238,8 @@ const UniversalPageNew = () => {
           setShowResults(true);
           setShowTemplates(false);
         } else {
-          setError(data.message || 'Error processing face swap');
+          setError(data.error || data.message || 'Error processing face swap');
+          console.error('Error from server:', data.error || data.message);
         }
       })
       .catch(error => {
