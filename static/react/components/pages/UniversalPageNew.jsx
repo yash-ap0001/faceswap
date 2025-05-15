@@ -736,6 +736,108 @@ const UniversalPageNew = () => {
           </div>
         </div>
       </div>
+      
+      {/* Image Viewer Modal */}
+      <div className="modal fade" id="imageViewerModal" tabIndex="-1" aria-hidden="true">
+        <div className="modal-dialog modal-fullscreen">
+          <div className="modal-content bg-black bg-opacity-90">
+            <div className="modal-body d-flex flex-column justify-content-center align-items-center p-0 position-relative">
+              {/* Close button */}
+              <button 
+                type="button" 
+                className="btn-close btn-close-white position-absolute top-0 end-0 m-4" 
+                data-bs-dismiss="modal" 
+                aria-label="Close"
+              ></button>
+              
+              {viewerImages.length > 0 && (
+                <div 
+                  className="image-container" 
+                  style={{ 
+                    height: '90vh', 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center',
+                    cursor: 'move',
+                    overflow: 'hidden',
+                    width: '100%'
+                  }}
+                >
+                  <img 
+                    src={viewerImages[currentImageIndex]} 
+                    alt={`Viewer image ${currentImageIndex + 1}`}
+                    style={{ 
+                      maxHeight: '90vh', 
+                      maxWidth: '100%', 
+                      objectFit: 'contain',
+                      transform: `scale(${zoomLevel})`,
+                      transition: 'transform 0.2s ease'
+                    }} 
+                  />
+                </div>
+              )}
+              
+              {/* Controls */}
+              <div className="controls position-absolute bottom-0 w-100 p-3 d-flex justify-content-center">
+                <div className="bg-dark bg-opacity-75 rounded-pill px-4 py-2 d-flex gap-3">
+                  {viewerImages.length > 1 && (
+                    <button 
+                      className="btn btn-outline-light" 
+                      onClick={() => setCurrentImageIndex(
+                        (prev) => (prev - 1 + viewerImages.length) % viewerImages.length
+                      )}
+                    >
+                      <i className="fas fa-arrow-left"></i>
+                    </button>
+                  )}
+                  
+                  <button 
+                    className="btn btn-outline-light" 
+                    onClick={() => setZoomLevel(prev => Math.max(0.5, prev - 0.1))}
+                  >
+                    <i className="fas fa-search-minus"></i>
+                  </button>
+                  
+                  <button 
+                    className="btn btn-outline-light" 
+                    onClick={() => setZoomLevel(1.0)}
+                  >
+                    <i className="fas fa-sync-alt"></i>
+                  </button>
+                  
+                  <button 
+                    className="btn btn-outline-light" 
+                    onClick={() => setZoomLevel(prev => Math.min(3, prev + 0.1))}
+                  >
+                    <i className="fas fa-search-plus"></i>
+                  </button>
+                  
+                  {viewerImages.length > 1 && (
+                    <button 
+                      className="btn btn-outline-light" 
+                      onClick={() => setCurrentImageIndex(
+                        (prev) => (prev + 1) % viewerImages.length
+                      )}
+                    >
+                      <i className="fas fa-arrow-right"></i>
+                    </button>
+                  )}
+                  
+                  <a 
+                    className="btn btn-outline-light" 
+                    href={viewerImages[currentImageIndex]} 
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <i className="fas fa-download"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

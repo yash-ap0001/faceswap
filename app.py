@@ -1425,15 +1425,15 @@ def multi_face_swap():
                 if enhance:
                     try:
                         app.logger.info(f"Applying face enhancement with method: {enhance_method}")
-                        # Initialize enhancer if not already initialized
-                        global enhancer
-                        if enhancer is None:
+                        # Initialize face_enhancer if not already initialized
+                        global face_enhancer
+                        if face_enhancer is None:
                             from face_enhancer import FaceEnhancer
-                            enhancer = FaceEnhancer()
+                            face_enhancer = FaceEnhancer()
                             app.logger.info("Face enhancer initialized")
                         
-                        if hasattr(enhancer, 'enhance_face'):
-                            result_img, enhanced = enhancer.enhance_face(result_img, method=enhance_method)
+                        if hasattr(face_enhancer, 'enhance_face'):
+                            result_img, enhanced = face_enhancer.enhance_face(result_img, method=enhance_method)
                             if enhanced:
                                 app.logger.info("Face enhancement applied successfully")
                         else:
