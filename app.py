@@ -2311,7 +2311,15 @@ def uploaded_file(filename):
     
 @app.route('/templates/uploads/<path:filename>')
 def template_file(filename):
-    return send_from_directory('templates/uploads', filename)
+    """Serve template files from the templates/uploads directory."""
+    # If the file contains slashes, we need to handle the path components properly
+    if '/' in filename:
+        # Get the relative directory and filename
+        directory, name = os.path.split(filename)
+        return send_from_directory(os.path.join('templates/uploads', directory), name)
+    else:
+        # For simple filenames
+        return send_from_directory('templates/uploads', filename)
 
 @app.route('/check-models')
 def check_models():
