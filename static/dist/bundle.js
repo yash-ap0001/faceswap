@@ -50,7 +50,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   ];
 
-  // Create container 
+  // Create sidebar toggle
+  const sidebarToggle = document.createElement('div');
+  sidebarToggle.className = 'sidebar-toggle';
+  sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+  sidebarToggle.style.position = 'fixed';
+  sidebarToggle.style.left = '0';
+  sidebarToggle.style.top = '50%';
+  sidebarToggle.style.transform = 'translateY(-50%)';
+  sidebarToggle.style.backgroundColor = '#2b1744';
+  sidebarToggle.style.color = 'white';
+  sidebarToggle.style.width = '40px';
+  sidebarToggle.style.height = '80px';
+  sidebarToggle.style.borderRadius = '0 40px 40px 0';
+  sidebarToggle.style.display = 'flex';
+  sidebarToggle.style.alignItems = 'center';
+  sidebarToggle.style.justifyContent = 'center';
+  sidebarToggle.style.cursor = 'pointer';
+  sidebarToggle.style.boxShadow = '2px 0 10px rgba(0,0,0,0.3)';
+  sidebarToggle.style.zIndex = '1000';
+
+  // Create main container
   const container = document.createElement('div');
   container.className = 'home-page';
   container.style.backgroundColor = '#121212';
@@ -222,5 +242,87 @@ document.addEventListener('DOMContentLoaded', () => {
   
   container.appendChild(rowContainer);
   homeContent.innerHTML = '';
+  document.body.appendChild(sidebarToggle);
   homeContent.appendChild(container);
+  
+  // Add sidebar toggle functionality
+  let sidebarOpen = false;
+  const sidebar = document.createElement('div');
+  sidebar.className = 'sidebar';
+  sidebar.style.position = 'fixed';
+  sidebar.style.left = '-230px'; // Start hidden
+  sidebar.style.top = '0';
+  sidebar.style.width = '230px';
+  sidebar.style.height = '100%';
+  sidebar.style.backgroundColor = '#2b1744';
+  sidebar.style.transition = 'left 0.3s ease';
+  sidebar.style.zIndex = '900';
+  sidebar.style.boxShadow = '0 0 15px rgba(0,0,0,0.5)';
+  sidebar.style.padding = '20px 0';
+  sidebar.style.overflowY = 'auto';
+  
+  // Add custom scrollbar to sidebar
+  sidebar.style.scrollbarWidth = 'thin';
+  sidebar.style.scrollbarColor = '#9d4edd #2b1744';
+  
+  // Create sidebar content
+  const sidebarBrand = document.createElement('div');
+  sidebarBrand.style.padding = '10px 20px';
+  sidebarBrand.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+  sidebarBrand.style.marginBottom = '20px';
+  
+  const sidebarLogo = document.createElement('h3');
+  sidebarLogo.innerHTML = '<span style="color: #9d4edd;">VOW</span><span style="color: white; font-style: italic; margin-left: 5px;">BRIDE</span>';
+  sidebarBrand.appendChild(sidebarLogo);
+  sidebar.appendChild(sidebarBrand);
+  
+  // Create sidebar menu categories
+  const categories = [
+    { name: 'Face Swap', icon: 'fa-exchange-alt' },
+    { name: 'Bride', icon: 'fa-female' },
+    { name: 'Groom', icon: 'fa-male' },
+    { name: 'Saloons', icon: 'fa-cut' },
+    { name: 'Services', icon: 'fa-concierge-bell' },
+    { name: 'Settings', icon: 'fa-cog' }
+  ];
+  
+  categories.forEach(category => {
+    const categoryItem = document.createElement('div');
+    categoryItem.className = 'sidebar-category';
+    categoryItem.style.padding = '12px 20px';
+    categoryItem.style.color = 'white';
+    categoryItem.style.display = 'flex';
+    categoryItem.style.alignItems = 'center';
+    categoryItem.style.cursor = 'pointer';
+    categoryItem.style.borderLeft = '4px solid transparent';
+    categoryItem.style.transition = 'all 0.2s ease';
+    
+    categoryItem.innerHTML = `<i class="fas ${category.icon}" style="width: 24px;"></i><span style="margin-left: 10px;">${category.name}</span>`;
+    
+    categoryItem.addEventListener('mouseover', () => {
+      categoryItem.style.backgroundColor = 'rgba(255,255,255,0.1)';
+      categoryItem.style.borderLeftColor = '#9d4edd';
+    });
+    
+    categoryItem.addEventListener('mouseout', () => {
+      categoryItem.style.backgroundColor = '';
+      categoryItem.style.borderLeftColor = 'transparent';
+    });
+    
+    sidebar.appendChild(categoryItem);
+  });
+  
+  document.body.appendChild(sidebar);
+  
+  // Toggle sidebar when clicking on the toggle button
+  sidebarToggle.addEventListener('click', () => {
+    if (sidebarOpen) {
+      sidebar.style.left = '-230px';
+      sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+    } else {
+      sidebar.style.left = '0';
+      sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
+    }
+    sidebarOpen = !sidebarOpen;
+  });
 });
