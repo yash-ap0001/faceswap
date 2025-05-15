@@ -18,11 +18,11 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 @react_bp.route('/<path:path>')  # Catch-all route for all React routes
 def react_app(path=None):
     """
-    Render the React application using the React index template.
+    Render the React application using the layout template.
     This serves as the entry point for the SPA (Single Page Application).
     The catch-all route ensures all React routes are handled by the SPA.
     """
-    return render_template('react/index.html')
+    return render_template('layout.html')
 
 @api_bp.route('/menu')
 def api_menu():

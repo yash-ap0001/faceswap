@@ -1,151 +1,220 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card } from 'react-bootstrap';
 
-const CeremonyCard = ({ name, images }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 3000);
-    
-    return () => clearInterval(interval);
-  }, [images.length]);
-
-  return (
-    <Card className="h-100 shadow" style={{ backgroundColor: '#212121', overflow: 'hidden' }}>
-      <div style={{ height: '280px', position: 'relative', overflow: 'hidden' }}>
-        {images.map((src, index) => (
-          <div 
-            key={index}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              opacity: index === currentImageIndex ? 1 : 0,
-              transition: 'opacity 1s ease-in-out',
-              zIndex: index === currentImageIndex ? 1 : 0,
-            }}
-          >
-            <img 
-              src={src} 
-              alt={`${name} Image ${index + 1}`}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: 'center'
-              }}
-            />
-          </div>
-        ))}
-      </div>
-      <div style={{
-        background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-        padding: '15px',
-        textAlign: 'center',
-        position: 'relative',
-        marginTop: '-50px'
-      }}>
-        <h4 style={{ color: 'white', margin: 0, fontWeight: 400, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-          {name}
-        </h4>
-      </div>
-    </Card>
-  );
-};
-
+/**
+ * Home page component with very clean and minimal design
+ * Using template images and dark purple theme, with auto-changing feature
+ */
 const HomePage = () => {
-  const ceremonies = [
-    { 
-      name: 'Haldi Ceremony', 
-      images: [
-        '/uploads/templates/pinterest/haldi/haldi_2.jpg',
-        '/uploads/templates/pinterest/haldi/haldi_3.jpg',
-        '/uploads/templates/pinterest/haldi/haldi_4.jpg',
-        '/uploads/templates/pinterest/haldi/haldi_5.jpg'
-      ]
-    },
-    { 
-      name: 'Mehendi Ceremony', 
-      images: [
-        '/uploads/templates/pinterest/mehendi/mehendi_1.jpg',
-        '/uploads/templates/pinterest/mehendi/mehendi_2.jpg',
-        '/uploads/templates/pinterest/mehendi/mehendi_3.jpg',
-        '/uploads/templates/pinterest/mehendi/mehendi_4.jpg'
-      ]
-    },
-    { 
-      name: 'Wedding Ceremony', 
-      images: [
-        '/uploads/templates/pinterest/wedding/wedding_1.jpg',
-        '/uploads/templates/pinterest/wedding/wedding_3.jpg',
-        '/uploads/templates/pinterest/wedding/wedding_4.jpg',
-        '/uploads/templates/pinterest/wedding/wedding_5.jpg'
-      ]
-    },
-    { 
-      name: 'Reception Ceremony', 
-      images: [
-        '/uploads/templates/pinterest/reception/reception_1.jpg',
-        '/uploads/templates/pinterest/reception/reception_2.jpg',
-        '/uploads/templates/pinterest/reception/reception_3.jpg',
-        '/uploads/templates/pinterest/reception/reception_4.jpg'
-      ]
-    }
-  ];
+  // Define the dark purple theme colors
+  const colors = {
+    darkPurple: '#6a0dad',
+    mediumPurple: '#8a2be2',
+    lightPurple: '#9d4edd',
+    darkBg: '#1a1a1a',
+    cardBg: '#212121'
+  };
+
+  // Define template images grouped by ceremony using the pinterest directory
+  const ceremonyImages = {
+    haldi: [
+      '/uploads/templates/pinterest/haldi/haldi_2.jpg',
+      '/uploads/templates/pinterest/haldi/haldi_3.jpg',
+      '/uploads/templates/pinterest/haldi/haldi_10.jpg',
+      '/uploads/templates/pinterest/haldi/haldi_11.jpg'
+    ],
+    mehendi: [
+      '/uploads/templates/pinterest/mehendi/mehendi_1.jpg',
+      '/uploads/templates/pinterest/mehendi/mehendi_2.jpg',
+      '/uploads/templates/pinterest/mehendi/mehendi_3.jpg',
+      '/uploads/templates/pinterest/mehendi/mehendi_4.jpg'
+    ],
+    wedding: [
+      '/uploads/templates/pinterest/wedding/wedding_1.jpg',
+      '/uploads/templates/pinterest/wedding/wedding_3.jpg',
+      '/uploads/templates/pinterest/wedding/wedding_4.jpg',
+      '/uploads/templates/pinterest/wedding/wedding_5.jpg'
+    ],
+    reception: [
+      '/uploads/templates/pinterest/reception/reception_1.jpg',
+      '/uploads/templates/pinterest/reception/reception_2.jpg',
+      '/uploads/templates/pinterest/reception/reception_3.jpg',
+      '/uploads/templates/pinterest/reception/reception_4.jpg'
+    ]
+  };
+
+  // Ceremony titles
+  const ceremonyTitles = {
+    haldi: 'Haldi Ceremony',
+    mehendi: 'Mehendi Ceremony',
+    wedding: 'Wedding Ceremony',
+    reception: 'Reception Ceremony'
+  };
+
+  // Order of ceremonies
+  const ceremonyOrder = ['haldi', 'mehendi', 'wedding', 'reception'];
+
+  // State for the current image indices for each ceremony
+  const [currentIndices, setCurrentIndices] = useState({
+    haldi: 0,
+    mehendi: 0,
+    wedding: 0,
+    reception: 0
+  });
+
+  // Effect for auto-changing images
+  useEffect(() => {
+    const intervals = {};
+    
+    // Set interval for each ceremony type
+    Object.keys(ceremonyImages).forEach(ceremony => {
+      intervals[ceremony] = setInterval(() => {
+        setCurrentIndices(prev => ({
+          ...prev,
+          [ceremony]: (prev[ceremony] + 1) % ceremonyImages[ceremony].length
+        }));
+      }, 3000); // Change image every 3 seconds
+    });
+
+    return () => {
+      // Clear all intervals on component unmount
+      Object.values(intervals).forEach(interval => clearInterval(interval));
+    };
+  }, []);
 
   return (
-    <div className="home-page" style={{ backgroundColor: '#121212', padding: '20px 10px' }}>
-      <div style={{ textAlign: 'center', marginBottom: '2rem', padding: '1rem' }}>
-        <h1 style={{ margin: 0, padding: 0, letterSpacing: '2px' }}>
-          <span style={{ color: '#8a2be2', fontWeight: 800, fontSize: '2.2rem' }}>VOW</span>
-          <span style={{ marginLeft: '10px', color: 'white', fontWeight: 700, fontStyle: 'italic', fontSize: '2rem' }}>BRIDE</span>
+    <div className="home-page" style={{backgroundColor: '#121212', padding: '20px 10px'}}>
+      {/* Brand logo */}
+      <div style={{
+        textAlign: 'center',
+        marginBottom: '2rem',
+        padding: '1rem'
+      }}>
+        <h1 style={{
+          margin: 0,
+          padding: 0,
+          letterSpacing: '2px'
+        }}>
+          <span style={{
+            color: colors.mediumPurple,
+            fontWeight: '800',
+            fontSize: '2.2rem'
+          }}>
+            VOW
+          </span>
+          <span style={{
+            marginLeft: '10px',
+            color: 'white',
+            fontWeight: '700',
+            fontStyle: 'italic',
+            fontSize: '2rem'
+          }}>
+            BRIDE
+          </span>
         </h1>
       </div>
 
-      <Container className="px-2">
-        <Row className="g-0">
-          {ceremonies.map((ceremony, index) => (
-            <Col md={3} key={index}>
-              <CeremonyCard name={ceremony.name} images={ceremony.images} />
-            </Col>
+      {/* Row of ceremony images */}
+      <div className="container px-2">
+        <div className="row g-0">
+          {ceremonyOrder.map(ceremony => (
+            <div className="col-md-3" key={ceremony}>
+              <div style={{
+                backgroundColor: colors.cardBg,
+                overflow: 'hidden',
+                boxShadow: `0 4px 20px rgba(0,0,0,0.3)`,
+                height: '100%'
+              }}>
+                <div style={{
+                  height: '280px',
+                  overflow: 'hidden',
+                  position: 'relative'
+                }}>
+                  {ceremonyImages[ceremony].map((src, index) => (
+                    <div 
+                      key={index}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        opacity: index === currentIndices[ceremony] ? 1 : 0,
+                        transition: 'opacity 1s ease-in-out',
+                        zIndex: index === currentIndices[ceremony] ? 1 : 0
+                      }}
+                    >
+                      <img 
+                        src={src} 
+                        alt={`${ceremonyTitles[ceremony]} Image ${index + 1}`}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          objectPosition: 'center'
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div style={{
+                  background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                  padding: '15px',
+                  textAlign: 'center',
+                  position: 'relative',
+                  marginTop: '-50px'
+                }}>
+                  <h4 style={{
+                    color: 'white',
+                    margin: 0,
+                    fontWeight: '400',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                  }}>
+                    {ceremonyTitles[ceremony]}
+                  </h4>
+                </div>
+                {/* Navigation dots hidden as requested */}
+              </div>
+            </div>
           ))}
-        </Row>
-
-        <div style={{ 
-          backgroundColor: '#212121', 
-          borderRadius: '8px', 
-          padding: '1.5rem', 
-          marginTop: '20px', 
-          marginBottom: '20px' 
+        </div>
+        
+        {/* Simple How It Works Section */}
+        <div style={{
+          backgroundColor: colors.cardBg,
+          borderRadius: '8px',
+          padding: '1.5rem',
+          marginTop: '20px',
+          marginBottom: '20px'
         }}>
-          <h3 style={{ 
-            textAlign: 'center', 
-            color: '#9d4edd', 
-            marginBottom: '1.5rem', 
-            fontWeight: 300 
+          <h3 style={{
+            textAlign: 'center',
+            color: colors.lightPurple,
+            marginBottom: '1.5rem',
+            fontWeight: '300'
           }}>
             How It Works
           </h3>
-
-          <Row className="text-center">
-            {[
-              { icon: 'fa-upload', text: 'Upload' },
-              { icon: 'fa-list', text: 'Select' },
-              { icon: 'fa-images', text: 'Templates' },
-              { icon: 'fa-magic', text: 'Generate' }
-            ].map((step, index) => (
-              <Col xs={3} key={index}>
-                <i className={`fas ${step.icon} fa-2x`} style={{ color: '#9d4edd' }}></i>
-                <p style={{ color: 'white', marginTop: '10px', fontSize: '0.9rem' }}>{step.text}</p>
-              </Col>
-            ))}
-          </Row>
+          
+          <div className="row text-center">
+            <div className="col-3">
+              <i className="fas fa-upload fa-2x" style={{color: colors.lightPurple}}></i>
+              <p style={{color: 'white', marginTop: '10px', fontSize: '0.9rem'}}>Upload</p>
+            </div>
+            <div className="col-3">
+              <i className="fas fa-list fa-2x" style={{color: colors.lightPurple}}></i>
+              <p style={{color: 'white', marginTop: '10px', fontSize: '0.9rem'}}>Select</p>
+            </div>
+            <div className="col-3">
+              <i className="fas fa-images fa-2x" style={{color: colors.lightPurple}}></i>
+              <p style={{color: 'white', marginTop: '10px', fontSize: '0.9rem'}}>Templates</p>
+            </div>
+            <div className="col-3">
+              <i className="fas fa-magic fa-2x" style={{color: colors.lightPurple}}></i>
+              <p style={{color: 'white', marginTop: '10px', fontSize: '0.9rem'}}>Generate</p>
+            </div>
+          </div>
         </div>
-      </Container>
+      </div>
     </div>
   );
 };
