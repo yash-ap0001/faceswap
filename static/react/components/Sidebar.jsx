@@ -174,10 +174,10 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
               >
                 <div className="d-flex align-items-center justify-content-between">
                   <div>
-                    <i className={`fas ${section.icon} me-2`}></i>
+                    <i className={`fas ${section.icon} me-2`} style={{ fontSize: '14px' }}></i>
                     <span>{section.title}</span>
                   </div>
-                  <i className={`fas fa-chevron-${openSection === section.id ? 'up' : 'down'} small`}></i>
+                  <i className={`fas fa-chevron-${openSection === section.id ? 'up' : 'down'}`} style={{ fontSize: '11px', marginRight: '5px', opacity: '0.7' }}></i>
                 </div>
               </div>
               <div className={openSection === section.id ? 'show' : 'collapse'}>
