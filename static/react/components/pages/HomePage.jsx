@@ -14,31 +14,31 @@ const HomePage = () => {
     cardBg: '#212121'
   };
 
-  // Define template images grouped by ceremony using available attached assets
+  // Define template images grouped by ceremony using the pinterest directory
   const ceremonyImages = {
     haldi: [
-      '/attached_assets/4b0c9916adbe830099a587b509ab948b.jpg',
-      '/attached_assets/57674da4d219c293ed7d337b96d2340b.jpg',
-      '/attached_assets/7aea94dee550b09410a8b6121d870677.jpg',
-      '/attached_assets/790166a073aee8d6ff2558bd566da6ca.jpg'
+      'uploads/templates/pinterest/haldi/haldi_2.jpg',
+      'uploads/templates/pinterest/haldi/haldi_3.jpg',
+      'uploads/templates/pinterest/haldi/haldi_4.jpg',
+      'uploads/templates/pinterest/haldi/haldi_5.jpg'
     ],
     mehendi: [
-      '/attached_assets/7b5baa7ffa2611a5df26a41e72d6743a.jpg',
-      '/attached_assets/6cf40a2d762750036e2dbf1c630c1905.jpg',
-      '/attached_assets/4ea63131c2229217909c0eb9167437cb.jpg',
-      '/attached_assets/7e2ede05466b43a3b7db02da85af4a27.jpg'
+      'uploads/templates/pinterest/mehendi/mehendi_1.jpg',
+      'uploads/templates/pinterest/mehendi/mehendi_2.jpg',
+      'uploads/templates/pinterest/mehendi/mehendi_3.jpg',
+      'uploads/templates/pinterest/mehendi/mehendi_4.jpg'
     ],
     wedding: [
-      '/attached_assets/2e880f573a680f346badc66495e6bb06.jpg',
-      '/attached_assets/weeding%20saree.jpg',
-      '/attached_assets/39cc08c79dc3335902ff3e10e8fe8b0b.jpg',
-      '/attached_assets/5d51142e411691393d26aebe8beb3357.jpg'
+      'uploads/templates/pinterest/wedding/wedding_1.jpg',
+      'uploads/templates/pinterest/wedding/wedding_3.jpg',
+      'uploads/templates/pinterest/wedding/wedding_4.jpg',
+      'uploads/templates/pinterest/wedding/wedding_5.jpg'
     ],
     reception: [
-      '/attached_assets/a75925c71c6a5f4ce2409419e5a76842.jpg',
-      '/attached_assets/bfaea84eb01d13a28394f1f7e32bed55.jpg',
-      '/attached_assets/8bd582be61573595c3677622e1f7ffe5.jpg',
-      '/attached_assets/6da61532616600e4c34d50f17e1105bb.jpg'
+      'uploads/templates/pinterest/reception/reception_1.jpg',
+      'uploads/templates/pinterest/reception/reception_2.jpg',
+      'uploads/templates/pinterest/reception/reception_3.jpg',
+      'uploads/templates/pinterest/reception/reception_4.jpg'
     ]
   };
 
