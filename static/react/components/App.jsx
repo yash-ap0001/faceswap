@@ -93,23 +93,23 @@ const App = () => {
 
   // Calculate button styles based on sidebar state
   const sidebarButtonStyle = {
-    left: sidebarOpen ? 'calc(280px - 20px)' : '10px',
+    left: sidebarOpen ? '280px' : '0',
     position: 'fixed',
     top: '50%',
     transform: 'translateY(-50%)',
     background: 'linear-gradient(135deg, #5c2a91 0%, #3b1862 100%)',
     border: 'none',
-    borderRadius: '50%',
+    borderRadius: sidebarOpen ? '0 50% 50% 0' : '50% 0 0 50%',
     padding: '0',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
     zIndex: '1031',
-    boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)',
-    width: '40px',
-    height: '40px',
-    transition: 'left 0.3s ease'
+    boxShadow: '2px 0 10px rgba(0, 0, 0, 0.3)',
+    width: '24px',
+    height: '48px',
+    transition: 'left 0.3s ease, border-radius 0.3s ease'
   };
 
   return (
@@ -126,7 +126,7 @@ const App = () => {
           aria-label="Toggle sidebar"
           style={sidebarButtonStyle}
         >
-          <i className={`fas fa-chevron-${sidebarOpen ? 'right' : 'left'}`} style={{ color: 'white' }}></i>
+          <i className={`fas fa-chevron-${sidebarOpen ? 'left' : 'right'}`} style={{ color: 'white' }}></i>
         </button>
       </div>
       <div className="main-container">
