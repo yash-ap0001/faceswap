@@ -417,7 +417,7 @@ const UniversalPageNew = () => {
         {/* Header */}
         <header className="app-header">
           <div className="logo-container">
-            <h1 className="logo-text brand-name">Face Swap App</h1>
+            {/* Logo/branding removed as requested */}
           </div>
         </header>
         
@@ -644,7 +644,7 @@ const UniversalPageNew = () => {
                               <div className="position-relative">
                                 {/* Controls overlay on top of image */}
                                 <div className="position-absolute top-0 start-0 end-0 p-2 d-flex justify-content-between align-items-center" 
-                                     style={{ background: 'rgba(0,0,0,0.5)', zIndex: 2, borderRadius: '6px 6px 0 0' }}>
+                                     style={{ background: 'rgba(0,0,0,0.5)', zIndex: 2, borderRadius: '6px' }}>
                                   <div className="d-flex align-items-center">
                                     <input 
                                       className="form-check-input me-2" 
@@ -669,12 +669,12 @@ const UniversalPageNew = () => {
                                 <img 
                                   src={template.url.startsWith('/') ? template.url : '/' + template.url} 
                                   className="template-preview"
-                                  alt={`Template ${index + 1}`}
+                                  alt={`Template image`}
                                   style={{
-                                    height: '200px',
+                                    height: '220px', /* Increased height to use the space that was taken by the template number */
                                     objectFit: 'cover',
                                     objectPosition: 'center 20%', /* Adjusted to better center on faces */
-                                    borderRadius: '6px 6px 0 0',
+                                    borderRadius: '6px',
                                     transition: 'transform 0.2s ease',
                                     width: '100%'
                                   }}
@@ -684,9 +684,6 @@ const UniversalPageNew = () => {
                                     e.target.style.objectFit = 'contain';
                                   }}
                                 />
-                              </div>
-                              <div className="card-body p-2 d-flex justify-content-center">
-                                <small className="text-muted">Template {index + 1}</small>
                               </div>
                             </div>
                           </div>
