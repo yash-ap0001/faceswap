@@ -583,11 +583,11 @@ const UniversalPageNew = () => {
             {/* Templates Display Card (only visible after selecting options) */}
             {showTemplates && (
               <div className="card">
-                <div className="card-header bg-dark-purple d-flex justify-content-between align-items-center py-2">
-                  <h5 className="card-title mb-0">Available Templates</h5>
-                  <span className="badge bg-primary">{templates.length} templates</span>
-                </div>
-                <div className="card-body">
+                <div className="card-body pt-3">
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h6 className="mb-0">Available Templates</h6>
+                    <span className="badge bg-primary">{templates.length} templates</span>
+                  </div>
                   {loading ? (
                     <div className="text-center py-5" id="loading">
                       <div className="spinner-border text-primary" role="status">
@@ -689,16 +689,16 @@ const UniversalPageNew = () => {
             {/* Results Display Card (only visible after processing) */}
             {showResults && (
               <div className="card">
-                <div className="card-header bg-dark-purple d-flex justify-content-between align-items-center py-2">
-                  <h5 className="card-title mb-0">Results</h5>
-                  <button 
-                    className="btn btn-sm btn-outline-light"
-                    onClick={handleBackToTemplates}
-                  >
-                    <i className="fas fa-arrow-left me-1"></i> Back to Templates
-                  </button>
-                </div>
-                <div className="card-body">
+                <div className="card-body pt-3">
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h6 className="mb-0">Results</h6>
+                    <button 
+                      className="btn btn-sm btn-outline-primary"
+                      onClick={handleBackToTemplates}
+                    >
+                      <i className="fas fa-arrow-left me-1"></i> Back to Templates
+                    </button>
+                  </div>
                   {processingResults ? (
                     <div className="text-center py-5">
                       <div className="spinner-border text-primary" role="status">
