@@ -425,7 +425,7 @@ const UniversalPageNew = () => {
         <div className="main-container">
           <div className="content-container">
             {/* Combined Upload and Options Card */}
-            <div className="card mb-3 bg-dark text-light">
+            <div className="card mb-3 bg-black text-light">
               <div className="card-body pt-3">
                 <div className="row">
                   {/* Left Column - Upload */}
@@ -582,7 +582,7 @@ const UniversalPageNew = () => {
             
             {/* Templates Display Card (only visible after selecting options) */}
             {showTemplates && (
-              <div className="card bg-dark text-light">
+              <div className="card bg-black text-light">
                 <div className="card-body pt-3">
                   <div className="d-flex justify-content-between align-items-center mb-3">
                     <h6 className="mb-0">Available Templates</h6>
@@ -688,7 +688,7 @@ const UniversalPageNew = () => {
             
             {/* Results Display Card (only visible after processing) */}
             {showResults && (
-              <div className="card bg-dark text-light">
+              <div className="card bg-black text-light">
                 <div className="card-body pt-3">
                   <div className="d-flex justify-content-between align-items-center mb-3">
                     <h6 className="mb-0">Results</h6>
