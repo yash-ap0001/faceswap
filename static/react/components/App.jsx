@@ -93,13 +93,13 @@ const App = () => {
 
   // Calculate button styles based on sidebar state
   const sidebarButtonStyle = {
-    left: sidebarOpen ? '280px' : '0',
+    left: sidebarOpen ? '250px' : '0',
     position: 'fixed',
     top: '50%',
     transform: 'translateY(-50%)',
     background: 'linear-gradient(135deg, #5c2a91 0%, #3b1862 100%)',
     border: 'none',
-    borderRadius: sidebarOpen ? '0 50% 50% 0' : '50% 0 0 50%',
+    borderRadius: sidebarOpen ? '0 50px 50px 0' : '0 50px 50px 0',
     padding: '0',
     display: 'flex',
     alignItems: 'center',
@@ -107,21 +107,22 @@ const App = () => {
     cursor: 'pointer',
     zIndex: '1031',
     boxShadow: '3px 0 10px rgba(0, 0, 0, 0.4)',
-    width: '26px',
-    height: '60px',
-    transition: 'left 0.3s ease, border-radius 0.3s ease'
+    width: '28px',
+    height: '56px',
+    transition: 'left 0.3s ease',
+    outline: 'none'
   };
   
   // Calculate main container styles based on sidebar state
   const mainContainerStyle = {
-    marginLeft: sidebarOpen ? '280px' : '0',
-    width: sidebarOpen ? 'calc(100% - 280px)' : '100%',
+    marginLeft: sidebarOpen ? '250px' : '0',
+    width: sidebarOpen ? 'calc(100% - 250px)' : '100%',
     transition: 'margin-left 0.3s ease, width 0.3s ease',
   };
 
   return (
     <div className="app-container">
-      <div className="sidebar-wrapper" style={{ width: sidebarOpen ? '280px' : '0', overflow: 'hidden' }}>
+      <div className="sidebar-wrapper" style={{ width: sidebarOpen ? '250px' : '0', overflow: 'hidden' }}>
         <Sidebar 
           isOpen={sidebarOpen} 
           activeItem={activeItem}
@@ -134,7 +135,7 @@ const App = () => {
         aria-label="Toggle sidebar"
         style={sidebarButtonStyle}
       >
-        <i className={`fas fa-chevron-${sidebarOpen ? 'left' : 'right'}`} style={{ color: 'white' }}></i>
+        <i className={`fas fa-chevron-${sidebarOpen ? 'left' : 'right'}`} style={{ color: 'white', fontSize: '14px', marginLeft: sidebarOpen ? '-2px' : '2px' }}></i>
       </button>
       <div className="main-container" style={mainContainerStyle}>
         <div className="content-container">
