@@ -1466,7 +1466,8 @@ def multi_face_swap():
                 # Add to results
                 results.append({
                     'template_path': template_path,
-                    'result_path': f"/static/results/{os.path.basename(result_filename)}",
+                    'result_path': result_path,
+                    'url': f"/static/results/{result_filename}",
                     'enhanced': enhanced,
                     'enhance_method': enhance_method if enhanced else None
                 })

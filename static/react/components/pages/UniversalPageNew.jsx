@@ -237,11 +237,11 @@ const UniversalPageNew = () => {
         console.log('Process response:', data);
         setProcessingResults(false);
         if (data.success) {
-          // Convert the result paths to proper URLs if needed
+          // Use the URL directly from the backend response
           const formattedResults = data.results.map(result => ({
             ...result,
-            // Ensure URL starts with a slash
-            url: result.result_path.startsWith('/') ? result.result_path : '/' + result.result_path
+            // Ensure URL exists
+            url: result.url || (result.result_path.startsWith('/') ? result.result_path : '/' + result.result_path)
           }));
           
           console.log('Formatted results:', formattedResults);
