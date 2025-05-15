@@ -73,6 +73,8 @@ const App = () => {
         return <BridalSwapPage />;
       case 'bridal-gallery':
         return <BridalGalleryPage />;
+      case 'direct-face-swap':
+        return <UniversalSwapPage category="auto" />;
       case 'groom-face-swap':
         return <UniversalSwapPage category="groom" />;
       case 'bride-saloons':
@@ -81,7 +83,7 @@ const App = () => {
         return <UniversalSwapPage category="groom-saloon" />;
       case 'makeup-artists':
         return <UniversalSwapPage category="bride-saloon" />;
-      case 'universal-categories':
+      case 'all-categories':
         return <UniversalPage />;
       default:
         // For pages that don't have dedicated components yet

@@ -24,11 +24,11 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
         // Use hardcoded menu structure without Home item
         const defaultMenu = [
           {
-            id: 'universal',
-            title: 'Universal',
+            id: 'direct-swap',
+            title: 'Direct Face Swap',
             icon: 'fa-magic',
             subItems: [
-              { id: 'face-swap-selection', label: 'Face Swap Selection', link: '/universal' }
+              { id: 'direct-face-swap', label: 'Direct Face Swap', link: '/universal' }
             ]
           },
           {
@@ -81,7 +81,7 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Settings',
             icon: 'fa-cog',
             subItems: [
-              { id: 'universal-categories', label: 'All Categories', link: '/react#universal-categories' },
+              { id: 'all-categories', label: 'All Categories', link: '/react#all-categories' },
               { id: 'bulk-upload', label: 'Bulk Upload Templates', link: '/bulk-upload' }
             ]
           }
