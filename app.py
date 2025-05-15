@@ -18,6 +18,9 @@ from flask_login import LoginManager
 # Import face enhancer
 from face_enhancer import FaceEnhancer
 
+# Initialize global face enhancer variable
+face_enhancer = None
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -1598,13 +1601,15 @@ def process_template():
         enhanced = False
         if enhance:
             try:
-                from face_enhancer import FaceEnhancer
-                # Initialize the face enhancer
-                enhancer = FaceEnhancer()
+                # Initialize the face enhancer if not already initialized
+                global face_enhancer
+                if face_enhancer is None:
+                    from face_enhancer import FaceEnhancer
+                    face_enhancer = FaceEnhancer()
                 app.logger.info(f"Applying face enhancement with method: {enhance_method}")
                 
                 # Apply face enhancement
-                result_img = enhancer.enhance(result_img, method=enhance_method, strength=0.8)
+                result_img = face_enhancer.enhance(result_img, method=enhance_method, strength=0.8)
                 app.logger.info("Face enhancement applied successfully")
                 enhanced = True
             except Exception as e:
@@ -1978,13 +1983,15 @@ def bridal_swap_multi():
                 enhanced_method = None
                 if enhance:
                     try:
-                        from face_enhancer import FaceEnhancer
-                        # Initialize the face enhancer
-                        enhancer = FaceEnhancer()
+                        # Initialize the face enhancer if not already initialized
+                        global face_enhancer
+                        if face_enhancer is None:
+                            from face_enhancer import FaceEnhancer
+                            face_enhancer = FaceEnhancer()
                         logger.info(f"Applying face enhancement with method: {enhance_method}")
                         
                         # Apply face enhancement
-                        result_img = enhancer.enhance(result_img, method=enhance_method, strength=0.8)
+                        result_img = face_enhancer.enhance(result_img, method=enhance_method, strength=0.8)
                         logger.info("Face enhancement applied successfully")
                         enhanced = True
                         enhanced_method = enhance_method

@@ -297,6 +297,28 @@ class FaceEnhancer:
         except Exception as e:
             logger.error(f"Basic enhancement failed: {str(e)}")
             return img
+    
+    def enhance_face(self, img, face_info=None, method='auto'):
+        """
+        Enhanced interface for face enhancement to maintain compatibility with different calling conventions.
+        This is an alias that calls enhance() with the appropriate parameters.
+        
+        Args:
+            img (np.ndarray): Input image
+            face_info: Optional face information (not used in this implementation, but kept for API compatibility)
+            method (str): Enhancement method - 'codeformer', 'gfpgan', or 'auto'
+            
+        Returns:
+            tuple: (enhanced_image, success_flag) or just the enhanced image depending on the caller's expectation
+        """
+        # Apply the enhancement
+        try:
+            result_img = self.enhance(img, method=method)
+            # Return format compatible with both calling conventions
+            return result_img, True
+        except Exception as e:
+            logger.error(f"Face enhancement failed: {str(e)}")
+            return img, False
 
 # Initialize a global enhancer instance for convenient import
 enhancer = FaceEnhancer()
