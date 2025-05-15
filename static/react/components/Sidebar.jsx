@@ -1,207 +1,116 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-/**
- * Sidebar component with navigation links
- * 
- * @param {Object} props - Component props
- * @param {boolean} props.isOpen - Whether the sidebar is open
- * @param {string} props.activeItem - The currently active menu item
- * @param {Function} props.onNavigation - Handler for navigation changes
- */
-const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
-  // State to store menu data
-  const [menuItems, setMenuItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  // Track which accordion section is open (default to "bride")
-  const [openSection, setOpenSection] = useState('bride');
-  
-  // Fetch menu data from API
-  useEffect(() => {
-    const fetchMenuData = async () => {
-      try {
-        setLoading(true);
-        // Use hardcoded menu structure without Home item
-        const defaultMenu = [
-          {
-            id: 'face-swap',
-            title: 'Face Swap',
-            icon: 'fa-exchange-alt',
-            subItems: [
-              { id: 'face-swap-page', label: 'Face Swap', link: '/universal' }
-            ]
-          },
-          {
-            id: 'bride',
-            title: 'Bride',
-            icon: 'fa-female',
-            subItems: [
-              { id: 'bridal-gallery', label: 'Bridal Gallery', link: '/react#bridal-gallery' },
-              { id: 'bridal-swap', label: 'Create Bride Look', link: '/react#bridal-swap' },
-              { id: 'outfits-for-girls', label: 'Outfits for Girls', link: '/react#outfits-for-girls' },
-              { id: 'jewelry-collections', label: 'Jewelry Collections', link: '/react#jewelry-collections' },
-              { id: 'makeup-styles', label: 'Makeup Styles', link: '/react#makeup-styles' }
-            ]
-          },
-          {
-            id: 'groom',
-            title: 'Groom',
-            icon: 'fa-male',
-            subItems: [
-              { id: 'groom-face-swap', label: 'Create Groom Look', link: '/react#groom-face-swap' },
-              { id: 'traditional-wear', label: 'Traditional Wear', link: '/react#traditional-wear' },
-              { id: 'modern-suits', label: 'Modern Suits', link: '/react#modern-suits' },
-              { id: 'groom-accessories', label: 'Accessories', link: '/react#groom-accessories' }
-            ]
-          },
-          {
-            id: 'saloons',
-            title: 'Saloons',
-            icon: 'fa-cut',
-            subItems: [
-              { id: 'bride-saloons', label: 'Bride Saloons', link: '/react#bride-saloons' },
-              { id: 'groom-saloons', label: 'Groom Saloons', link: '/react#groom-saloons' },
-              { id: 'makeup-artists', label: 'Makeup Artists', link: '/react#makeup-artists' },
-              { id: 'saloon-packages', label: 'Saloon Packages', link: '/react#saloon-packages' }
-            ]
-          },
-          {
-            id: 'services',
-            title: 'Services',
-            icon: 'fa-concierge-bell',
-            subItems: [
-              { id: 'venue-search', label: 'Venue Search', link: '/react#venue-search' },
-              { id: 'catering-list', label: 'Catering List', link: '/react#catering-list' },
-              { id: 'event-managers', label: 'Event Managers', link: '/react#event-managers' },
-              { id: 'photographers', label: 'Photographers', link: '/react#photographers' }
-            ]
-          },
-          {
-            id: 'settings',
-            title: 'Settings',
-            icon: 'fa-cog',
-            subItems: [
-              { id: 'all-categories', label: 'All Categories', link: '/react#all-categories' },
-              { id: 'bulk-upload', label: 'Bulk Upload Templates', link: '/bulk-upload' }
-            ]
-          }
-        ];
-        
-        setMenuItems(defaultMenu);
-        setError(null);
-      } catch (err) {
-        console.error('Error setting menu data:', err);
-        setError('Failed to load menu data. Please try again later.');
-        // Menu already set above, no need for fallback
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchMenuData();
-  }, []);
+const Sidebar = () => {
+  const [isOpen, setIsOpen] = useState(false);
 
-  // Handle menu item click
-  const handleItemClick = (id, link) => {
-    onNavigation(id);
-    
-    // Check if it's an external link (doesn't start with /react)
-    if (!link.startsWith('/react')) {
-      // For external links, redirect the browser
-      window.location.href = link;
-    } else {
-      // Use history API for navigation without page reload for React routes
-      window.history.pushState({}, '', link);
-      
-      // Dispatch a custom event to notify about route change
-      const event = new CustomEvent('routeChange', { detail: { path: link } });
-      window.dispatchEvent(event);
-    }
-  };
-  
-  // Toggle accordion section
-  const toggleSection = (sectionId) => {
-    setOpenSection(prev => prev === sectionId ? null : sectionId);
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
   };
 
-  // Render loading state
-  if (loading) {
-    return (
-      <div className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
-        <div className="sidebar-header">
-          <h5 className="mb-0 text-white">Menu</h5>
-        </div>
-        <div className="sidebar-content text-center py-4">
-          <div className="spinner-border text-light-purple" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <p className="mt-3 text-secondary">Loading menu...</p>
-        </div>
-      </div>
-    );
-  }
+  const menuItems = [
+    { name: 'Face Swap', icon: 'fa-exchange-alt', link: '/universal' },
+    { name: 'Bride', icon: 'fa-female', link: '/react#bride' },
+    { name: 'Groom', icon: 'fa-male', link: '/react#groom' },
+    { name: 'Saloons', icon: 'fa-cut', link: '/react#saloons' },
+    { name: 'Venues', icon: 'fa-building', link: '/react#venues' },
+    { name: 'Services', icon: 'fa-concierge-bell', link: '/react#services' },
+    { name: 'Settings', icon: 'fa-cog', link: '/react#settings' }
+  ];
 
-  // Render error state
-  if (error) {
-    return (
-      <div className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
-        <div className="sidebar-header">
-          <h5 className="mb-0 text-white">Menu</h5>
-        </div>
-        <div className="sidebar-content text-center py-4">
-          <div className="alert alert-danger" role="alert">
-            <i className="fas fa-exclamation-triangle me-2"></i>
-            {error}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Render menu
   return (
-    <div className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
-      <div className="sidebar-header">
-        <h5 className="mb-0 text-white">Menu</h5>
+    <>
+      {/* Sidebar toggle button */}
+      <div 
+        className="sidebar-toggle" 
+        onClick={toggleSidebar}
+        style={{
+          position: 'fixed',
+          top: '50%',
+          left: '0',
+          transform: 'translateY(-50%)',
+          width: '40px',
+          height: '80px',
+          backgroundColor: '#2b1744',
+          borderRadius: '0 40px 40px 0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          zIndex: 1001,
+          boxShadow: '2px 0 5px rgba(0,0,0,0.2)',
+          transition: 'left 0.3s ease-in-out'
+        }}
+      >
+        <i className={`fas ${isOpen ? 'fa-times' : 'fa-bars'}`} style={{ color: 'white' }}></i>
       </div>
-      <div className="sidebar-content">
-        {menuItems.length > 0 ? (
-          menuItems.map((section) => (
-            <div key={section.id} className="menu-section accordion-item border-0">
-              <div 
-                className="section-header" 
-                onClick={() => toggleSection(section.id)}
-              >
-                <div className="d-flex align-items-center justify-content-between">
-                  <div>
-                    <i className={`fas ${section.icon} me-2`} style={{ fontSize: '14px' }}></i>
-                    <span>{section.title}</span>
-                  </div>
-                  <i className={`fas fa-chevron-${openSection === section.id ? 'up' : 'down'}`} style={{ fontSize: '11px', marginRight: '5px', opacity: '0.7' }}></i>
-                </div>
-              </div>
-              <div className={openSection === section.id ? 'show' : 'collapse'}>
-                <ul className="menu-items">
-                  {section.subItems.map((item) => (
-                    <li 
-                      key={item.id} 
-                      className={activeItem === item.id ? 'active' : ''}
-                      onClick={() => handleItemClick(item.id, item.link)}
-                    >
-                      <span>{item.label}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+
+      {/* Sidebar panel */}
+      <div 
+        className="sidebar"
+        style={{
+          position: 'fixed',
+          top: '0',
+          left: isOpen ? '0' : '-230px',
+          width: '230px',
+          height: '100%',
+          backgroundColor: '#2b1744',
+          color: 'white',
+          zIndex: 1000,
+          transition: 'left 0.3s ease-in-out',
+          boxShadow: '2px 0 10px rgba(0,0,0,0.3)',
+          padding: '20px 0',
+          overflowY: 'auto'
+        }}
+      >
+        {/* Sidebar header */}
+        <div style={{
+          textAlign: 'center',
+          padding: '10px 20px 20px',
+          borderBottom: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          <h3 style={{ margin: 0 }}>
+            <span style={{ color: '#9d4edd', fontWeight: 800 }}>VOW</span>
+            <span style={{ color: 'white', fontStyle: 'italic', marginLeft: '5px', fontWeight: 700 }}>BRIDE</span>
+          </h3>
+        </div>
+
+        {/* Menu items */}
+        {menuItems.map((item, index) => (
+          <Link 
+            key={index} 
+            to={item.link} 
+            style={{ textDecoration: 'none', color: 'white' }}
+          >
+            <div 
+              className="sidebar-menu-item"
+              style={{
+                padding: '15px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                borderLeft: '4px solid transparent',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                e.currentTarget.style.borderLeftColor = '#9d4edd';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.borderLeftColor = 'transparent';
+              }}
+            >
+              <i className={`fas ${item.icon}`} style={{ 
+                width: '20px', 
+                color: '#9d4edd',
+                fontSize: '1.1rem'
+              }}></i>
+              <span style={{ marginLeft: '12px', fontSize: '0.95rem' }}>{item.name}</span>
             </div>
-          ))
-        ) : (
-          <p className="text-center text-secondary py-4">No menu items available</p>
-        )}
+          </Link>
+        ))}
       </div>
-      
-      {/* CSS added to App.jsx stylesheet */}
-    </div>
+    </>
   );
 };
 

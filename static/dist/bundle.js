@@ -50,26 +50,132 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   ];
 
-  // Create sidebar toggle
-  const sidebarToggle = document.createElement('div');
-  sidebarToggle.className = 'sidebar-toggle';
-  sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
-  sidebarToggle.style.position = 'fixed';
-  sidebarToggle.style.left = '0';
-  sidebarToggle.style.top = '50%';
-  sidebarToggle.style.transform = 'translateY(-50%)';
-  sidebarToggle.style.backgroundColor = '#2b1744';
-  sidebarToggle.style.color = 'white';
-  sidebarToggle.style.width = '40px';
-  sidebarToggle.style.height = '80px';
-  sidebarToggle.style.borderRadius = '0 40px 40px 0';
-  sidebarToggle.style.display = 'flex';
-  sidebarToggle.style.alignItems = 'center';
-  sidebarToggle.style.justifyContent = 'center';
-  sidebarToggle.style.cursor = 'pointer';
-  sidebarToggle.style.boxShadow = '2px 0 10px rgba(0,0,0,0.3)';
-  sidebarToggle.style.zIndex = '1000';
-
+  // First, create sliding panel and sidebar
+  const sidebar = document.createElement('div');
+  sidebar.className = 'sidebar';
+  sidebar.id = 'sidebar';
+  Object.assign(sidebar.style, {
+    position: 'fixed',
+    top: '0',
+    left: '-230px', 
+    width: '230px',
+    height: '100%',
+    backgroundColor: '#2b1744',
+    color: 'white',
+    zIndex: '1000',
+    transition: 'left 0.3s ease-in-out',
+    boxShadow: '2px 0 10px rgba(0,0,0,0.3)',
+    padding: '20px 0',
+    overflowY: 'auto'
+  });
+  
+  // Create sidebar header
+  const sidebarHeader = document.createElement('div');
+  sidebarHeader.className = 'sidebar-header';
+  sidebarHeader.style.textAlign = 'center';
+  sidebarHeader.style.padding = '10px 20px 20px';
+  sidebarHeader.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+  
+  const brandLogo = document.createElement('h3');
+  brandLogo.style.margin = '0';
+  brandLogo.innerHTML = '<span style="color: #9d4edd; font-weight: 800;">VOW</span><span style="color: white; font-style: italic; margin-left: 5px; font-weight: 700;">BRIDE</span>';
+  sidebarHeader.appendChild(brandLogo);
+  sidebar.appendChild(sidebarHeader);
+  
+  // Create sidebar menu
+  const menuItems = [
+    { name: 'Face Swap', icon: 'fa-exchange-alt' },
+    { name: 'Bride', icon: 'fa-female' },
+    { name: 'Groom', icon: 'fa-male' },
+    { name: 'Saloons', icon: 'fa-cut' },
+    { name: 'Venues', icon: 'fa-building' },
+    { name: 'Services', icon: 'fa-concierge-bell' },
+    { name: 'Settings', icon: 'fa-cog' }
+  ];
+  
+  menuItems.forEach(item => {
+    const menuItem = document.createElement('div');
+    menuItem.className = 'sidebar-menu-item';
+    menuItem.style.padding = '15px 20px';
+    menuItem.style.display = 'flex';
+    menuItem.style.alignItems = 'center';
+    menuItem.style.borderLeft = '4px solid transparent';
+    menuItem.style.transition = 'all 0.2s ease';
+    menuItem.style.cursor = 'pointer';
+    
+    const icon = document.createElement('i');
+    icon.className = `fas ${item.icon}`;
+    icon.style.width = '20px';
+    icon.style.color = '#9d4edd';
+    icon.style.fontSize = '1.1rem';
+    
+    const text = document.createElement('span');
+    text.textContent = item.name;
+    text.style.marginLeft = '12px';
+    text.style.fontSize = '0.95rem';
+    
+    menuItem.appendChild(icon);
+    menuItem.appendChild(text);
+    
+    menuItem.addEventListener('mouseover', () => {
+      menuItem.style.backgroundColor = 'rgba(255,255,255,0.1)';
+      menuItem.style.borderLeftColor = '#9d4edd';
+    });
+    
+    menuItem.addEventListener('mouseout', () => {
+      menuItem.style.backgroundColor = 'transparent';
+      menuItem.style.borderLeftColor = 'transparent';
+    });
+    
+    sidebar.appendChild(menuItem);
+  });
+  
+  document.body.appendChild(sidebar);
+  
+  // Create sidebar toggle button
+  const toggleButton = document.createElement('div');
+  toggleButton.className = 'sidebar-toggle';
+  toggleButton.id = 'sidebarToggle';
+  Object.assign(toggleButton.style, {
+    position: 'fixed',
+    top: '50%',
+    left: '0',
+    transform: 'translateY(-50%)',
+    width: '40px',
+    height: '80px',
+    backgroundColor: '#2b1744',
+    borderRadius: '0 40px 40px 0',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    zIndex: '1001',
+    boxShadow: '2px 0 5px rgba(0,0,0,0.2)',
+    transition: 'left 0.3s ease-in-out'
+  });
+  
+  const toggleIcon = document.createElement('i');
+  toggleIcon.className = 'fas fa-bars';
+  toggleIcon.style.color = 'white';
+  toggleButton.appendChild(toggleIcon);
+  
+  document.body.appendChild(toggleButton);
+  
+  // Set up toggle functionality
+  let sidebarOpen = false;
+  toggleButton.onclick = function() {
+    console.log("Toggle button clicked");
+    sidebarOpen = !sidebarOpen;
+    
+    if (sidebarOpen) {
+      sidebar.style.left = '0';
+      toggleIcon.className = 'fas fa-times';
+    } else {
+      sidebar.style.left = '-230px';
+      toggleIcon.className = 'fas fa-bars';
+    }
+  };
+  
   // Create main container
   const container = document.createElement('div');
   container.className = 'home-page';
@@ -82,10 +188,10 @@ document.addEventListener('DOMContentLoaded', () => {
   brandContainer.style.marginBottom = '2rem';
   brandContainer.style.padding = '1rem';
 
-  const brandLogo = document.createElement('h1');
-  brandLogo.style.margin = '0';
-  brandLogo.style.padding = '0';
-  brandLogo.style.letterSpacing = '2px';
+  const brandLogo2 = document.createElement('h1');
+  brandLogo2.style.margin = '0';
+  brandLogo2.style.padding = '0';
+  brandLogo2.style.letterSpacing = '2px';
 
   const vowText = document.createElement('span');
   vowText.textContent = 'VOW';
@@ -101,9 +207,9 @@ document.addEventListener('DOMContentLoaded', () => {
   brideText.style.fontStyle = 'italic';
   brideText.style.fontSize = '2rem';
 
-  brandLogo.appendChild(vowText);
-  brandLogo.appendChild(brideText);
-  brandContainer.appendChild(brandLogo);
+  brandLogo2.appendChild(vowText);
+  brandLogo2.appendChild(brideText);
+  brandContainer.appendChild(brandLogo2);
   container.appendChild(brandContainer);
 
   // Create row container
@@ -242,87 +348,5 @@ document.addEventListener('DOMContentLoaded', () => {
   
   container.appendChild(rowContainer);
   homeContent.innerHTML = '';
-  document.body.appendChild(sidebarToggle);
   homeContent.appendChild(container);
-  
-  // Add sidebar toggle functionality
-  let sidebarOpen = false;
-  const sidebar = document.createElement('div');
-  sidebar.className = 'sidebar';
-  sidebar.style.position = 'fixed';
-  sidebar.style.left = '-230px'; // Start hidden
-  sidebar.style.top = '0';
-  sidebar.style.width = '230px';
-  sidebar.style.height = '100%';
-  sidebar.style.backgroundColor = '#2b1744';
-  sidebar.style.transition = 'left 0.3s ease';
-  sidebar.style.zIndex = '900';
-  sidebar.style.boxShadow = '0 0 15px rgba(0,0,0,0.5)';
-  sidebar.style.padding = '20px 0';
-  sidebar.style.overflowY = 'auto';
-  
-  // Add custom scrollbar to sidebar
-  sidebar.style.scrollbarWidth = 'thin';
-  sidebar.style.scrollbarColor = '#9d4edd #2b1744';
-  
-  // Create sidebar content
-  const sidebarBrand = document.createElement('div');
-  sidebarBrand.style.padding = '10px 20px';
-  sidebarBrand.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
-  sidebarBrand.style.marginBottom = '20px';
-  
-  const sidebarLogo = document.createElement('h3');
-  sidebarLogo.innerHTML = '<span style="color: #9d4edd;">VOW</span><span style="color: white; font-style: italic; margin-left: 5px;">BRIDE</span>';
-  sidebarBrand.appendChild(sidebarLogo);
-  sidebar.appendChild(sidebarBrand);
-  
-  // Create sidebar menu categories
-  const categories = [
-    { name: 'Face Swap', icon: 'fa-exchange-alt' },
-    { name: 'Bride', icon: 'fa-female' },
-    { name: 'Groom', icon: 'fa-male' },
-    { name: 'Saloons', icon: 'fa-cut' },
-    { name: 'Services', icon: 'fa-concierge-bell' },
-    { name: 'Settings', icon: 'fa-cog' }
-  ];
-  
-  categories.forEach(category => {
-    const categoryItem = document.createElement('div');
-    categoryItem.className = 'sidebar-category';
-    categoryItem.style.padding = '12px 20px';
-    categoryItem.style.color = 'white';
-    categoryItem.style.display = 'flex';
-    categoryItem.style.alignItems = 'center';
-    categoryItem.style.cursor = 'pointer';
-    categoryItem.style.borderLeft = '4px solid transparent';
-    categoryItem.style.transition = 'all 0.2s ease';
-    
-    categoryItem.innerHTML = `<i class="fas ${category.icon}" style="width: 24px;"></i><span style="margin-left: 10px;">${category.name}</span>`;
-    
-    categoryItem.addEventListener('mouseover', () => {
-      categoryItem.style.backgroundColor = 'rgba(255,255,255,0.1)';
-      categoryItem.style.borderLeftColor = '#9d4edd';
-    });
-    
-    categoryItem.addEventListener('mouseout', () => {
-      categoryItem.style.backgroundColor = '';
-      categoryItem.style.borderLeftColor = 'transparent';
-    });
-    
-    sidebar.appendChild(categoryItem);
-  });
-  
-  document.body.appendChild(sidebar);
-  
-  // Toggle sidebar when clicking on the toggle button
-  sidebarToggle.addEventListener('click', () => {
-    if (sidebarOpen) {
-      sidebar.style.left = '-230px';
-      sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
-    } else {
-      sidebar.style.left = '0';
-      sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
-    }
-    sidebarOpen = !sidebarOpen;
-  });
 });
