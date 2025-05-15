@@ -147,14 +147,32 @@ const App = () => {
       <style>
         {`
           .sidebar {
-            max-height: 100vh;
-            overflow-y: auto;
+            height: 100vh;
             position: relative;
+            background-color: #2b1744;
+            width: 250px;
           }
           
           .sidebar-content {
             overflow-y: auto;
             max-height: calc(100vh - 60px);
+            padding-bottom: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: #5c2a91 #2b1744;
+          }
+          
+          .sidebar-content::-webkit-scrollbar {
+            width: 8px;
+          }
+          
+          .sidebar-content::-webkit-scrollbar-track {
+            background: #2b1744;
+          }
+          
+          .sidebar-content::-webkit-scrollbar-thumb {
+            background-color: #5c2a91;
+            border-radius: 20px;
+            border: 2px solid #2b1744;
           }
           
           .app-container {
@@ -178,7 +196,8 @@ const App = () => {
             top: 0;
             z-index: 1030;
             transition: width 0.3s ease;
-            background-color: #1e1e1e;
+            background-color: #2b1744;
+            overflow-x: hidden;
           }
           
           .section-header {
@@ -187,6 +206,13 @@ const App = () => {
             transition: background-color 0.2s ease;
             border-radius: 4px;
             margin-bottom: 2px;
+            background-color: #2b1744;
+          }
+          
+          .sidebar-header {
+            padding: 15px;
+            background-color: #2b1744;
+            border-bottom: 1px solid #3d2161;
           }
           
           .section-header:hover {

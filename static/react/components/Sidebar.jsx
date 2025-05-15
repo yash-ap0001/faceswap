@@ -129,7 +129,7 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
     return (
       <div className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
-          <h5>Menu</h5>
+          <h5 className="mb-0 text-white">Menu</h5>
         </div>
         <div className="sidebar-content text-center py-4">
           <div className="spinner-border text-light-purple" role="status">
@@ -146,7 +146,7 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
     return (
       <div className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
-          <h5>Menu</h5>
+          <h5 className="mb-0 text-white">Menu</h5>
         </div>
         <div className="sidebar-content text-center py-4">
           <div className="alert alert-danger" role="alert">
@@ -162,7 +162,7 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
   return (
     <div className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
       <div className="sidebar-header">
-        <h5>Menu</h5>
+        <h5 className="mb-0 text-white">Menu</h5>
       </div>
       <div className="sidebar-content">
         {menuItems.length > 0 ? (
