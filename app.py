@@ -1035,6 +1035,7 @@ def delete_templates():
         try:
             # Validate the path - ensure it has a valid prefix
             valid_prefixes = [
+                '/templates/uploads/', 'templates/uploads/',
                 '/uploads/templates/', 'uploads/templates/',
                 '/static/templates/', 'static/templates/'
             ]
