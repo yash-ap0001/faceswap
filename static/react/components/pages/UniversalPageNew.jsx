@@ -424,9 +424,8 @@ const UniversalPageNew = () => {
         {/* Main Content */}
         <div className="main-container">
           <div className="content-container">
-            {/* Combined Upload and Options Card */}
-            <div className="card mb-3 bg-black text-light">
-              <div className="card-body pt-3">
+            {/* Main upload and options section (removed card) */}
+            <div className="mb-3 bg-black text-light py-3 px-3">
                 <div className="row">
                   {/* Left Column - Upload */}
                   <div className="col-md-4">
@@ -580,12 +579,10 @@ const UniversalPageNew = () => {
               </div>
             )}
             
-            {/* Templates Display Card (only visible after selecting options) */}
+            {/* Templates Display Section (only visible after selecting options) */}
             {showTemplates && (
-              <div className="card bg-black text-light">
-                <div className="card-body pt-3">
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h6 className="mb-0">Available Templates</h6>
+              <div className="bg-black text-light p-3">
+                  <div className="d-flex justify-content-end align-items-center mb-3">
                     <span className="badge bg-primary">{templates.length} templates</span>
                   </div>
                   {loading ? (
@@ -692,13 +689,11 @@ const UniversalPageNew = () => {
                     </>
                   )}
                 </div>
-              </div>
             )}
             
-            {/* Results Display Card (only visible after processing) */}
+            {/* Results Display Section (only visible after processing) */}
             {showResults && (
-              <div className="card bg-black text-light">
-                <div className="card-body pt-3">
+              <div className="bg-black text-light p-3">
                   <div className="d-flex justify-content-between align-items-center mb-3">
                     <h6 className="mb-0">Results</h6>
                     <button 
@@ -753,7 +748,6 @@ const UniversalPageNew = () => {
                     </div>
                   )}
                 </div>
-              </div>
             )}
           </div>
         </div>
