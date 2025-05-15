@@ -31,6 +31,22 @@ def api_menu():
     """
     menu = [
         {
+            "id": "universal",
+            "title": "Universal",
+            "icon": "fa-magic",
+            "subItems": [
+                {"id": "universal-categories", "label": "All Categories", "link": "/react#universal-categories"}
+            ]
+        },
+        {
+            "id": "settings",
+            "title": "Settings",
+            "icon": "fa-cog",
+            "subItems": [
+                {"id": "face-swap-selection", "label": "Face Swap Selection", "link": "/universal"}
+            ]
+        },
+        {
             "id": "bride",
             "title": "Bride",
             "icon": "fa-female",

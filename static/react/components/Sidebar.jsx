@@ -28,8 +28,15 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Universal',
             icon: 'fa-magic',
             subItems: [
-              { id: 'universal-categories', label: 'All Categories', link: '/react#universal-categories' },
-              { id: 'universal-page', label: 'Face Swap Selection', link: '/universal' }
+              { id: 'universal-categories', label: 'All Categories', link: '/react#universal-categories' }
+            ]
+          },
+          {
+            id: 'settings',
+            title: 'Settings',
+            icon: 'fa-cog',
+            subItems: [
+              { id: 'face-swap-selection', label: 'Face Swap Selection', link: '/universal' }
             ]
           },
           {
