@@ -1475,6 +1475,13 @@ def bulk_upload_page():
             'traditional': ['sherwani', 'kurta', 'indo_western', 'dhoti', 'jodhpuri'],
             'suits': ['tuxedos', 'three_piece', 'two_piece', 'blazers', 'casual'],
             'accessories': ['watches', 'cufflinks', 'ties', 'pocket_squares', 'shoes']
+        },
+        'celebrity': {
+            'men': ['actors', 'singers', 'sports', 'models'],
+            'women': ['actresses', 'singers', 'models', 'sports'],
+            'tollywood': ['actors', 'actresses', 'classic', 'new-gen'],
+            'bollywood': ['actors', 'actresses', 'classic', 'new-gen'],
+            'item': ['international', 'influencers', 'trending', 'historical']
         }
     }
     
@@ -1509,6 +1516,13 @@ def upload_bulk_templates():
             'traditional': ['sherwani', 'kurta', 'indo_western', 'dhoti', 'jodhpuri'],
             'suits': ['tuxedos', 'three_piece', 'two_piece', 'blazers', 'casual'],
             'accessories': ['watches', 'cufflinks', 'ties', 'pocket_squares', 'shoes']
+        },
+        'celebrity': {
+            'men': ['actors', 'singers', 'sports', 'models'],
+            'women': ['actresses', 'singers', 'models', 'sports'],
+            'tollywood': ['actors', 'actresses', 'classic', 'new-gen'],
+            'bollywood': ['actors', 'actresses', 'classic', 'new-gen'],
+            'item': ['international', 'influencers', 'trending', 'historical']
         }
     }
     
@@ -1529,8 +1543,10 @@ def upload_bulk_templates():
         else:
             # Use static templates directory for other bride categories
             target_dir = os.path.join(app.static_folder, 'templates', subcategory, item_category)
-    else:  # groom categories
+    elif category_type == 'groom':  # groom categories
         target_dir = os.path.join(app.static_folder, 'templates', 'groom', subcategory, item_category)
+    elif category_type == 'celebrity':  # celebrity categories
+        target_dir = os.path.join(app.static_folder, 'templates', 'celebrity', subcategory, item_category)
     
     # Ensure the target directory exists
     os.makedirs(target_dir, exist_ok=True)
