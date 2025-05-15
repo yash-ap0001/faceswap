@@ -106,30 +106,37 @@ const App = () => {
     justifyContent: 'center',
     cursor: 'pointer',
     zIndex: '1031',
-    boxShadow: '2px 0 10px rgba(0, 0, 0, 0.3)',
-    width: '24px',
-    height: '48px',
+    boxShadow: '3px 0 10px rgba(0, 0, 0, 0.4)',
+    width: '26px',
+    height: '60px',
     transition: 'left 0.3s ease, border-radius 0.3s ease'
+  };
+  
+  // Calculate main container styles based on sidebar state
+  const mainContainerStyle = {
+    marginLeft: sidebarOpen ? '280px' : '0',
+    width: sidebarOpen ? 'calc(100% - 280px)' : '100%',
+    transition: 'margin-left 0.3s ease, width 0.3s ease',
   };
 
   return (
     <div className="app-container">
-      <div className="sidebar-wrapper">
+      <div className="sidebar-wrapper" style={{ width: sidebarOpen ? '280px' : '0', overflow: 'hidden' }}>
         <Sidebar 
           isOpen={sidebarOpen} 
           activeItem={activeItem}
           onNavigation={handleNavigation}
         />
-        <button 
-          className="sidebar-toggle"
-          onClick={toggleSidebar}
-          aria-label="Toggle sidebar"
-          style={sidebarButtonStyle}
-        >
-          <i className={`fas fa-chevron-${sidebarOpen ? 'left' : 'right'}`} style={{ color: 'white' }}></i>
-        </button>
       </div>
-      <div className="main-container">
+      <button 
+        className="sidebar-toggle"
+        onClick={toggleSidebar}
+        aria-label="Toggle sidebar"
+        style={sidebarButtonStyle}
+      >
+        <i className={`fas fa-chevron-${sidebarOpen ? 'left' : 'right'}`} style={{ color: 'white' }}></i>
+      </button>
+      <div className="main-container" style={mainContainerStyle}>
         <div className="content-container">
           {renderPageContent()}
         </div>
@@ -150,23 +157,27 @@ const App = () => {
           }
           
           .app-container {
-            display: flex;
+            position: relative;
             width: 100%;
             height: 100vh;
             overflow: hidden;
           }
           
           .main-container {
-            flex-grow: 1;
             overflow-y: auto;
             padding: 0;
             position: relative;
+            height: 100vh;
           }
           
           .sidebar-wrapper {
-            position: relative;
+            position: fixed;
             height: 100vh;
-            display: flex;
+            left: 0;
+            top: 0;
+            z-index: 1030;
+            transition: width 0.3s ease;
+            background-color: #1e1e1e;
           }
           
           .section-header {
