@@ -18,27 +18,27 @@ const HomePage = () => {
   const ceremonyImages = {
     haldi: [
       '/static/results/result_1747231562_haldi_5.jpg',
-      '/static/templates/bride/bridal/haldi/790166a073aee8d6ff2558bd566da6ca.jpg',
-      '/static/templates/bride/bridal/haldi/7aea94dee550b09410a8b6121d870677.jpg',
-      '/static/templates/bride/bridal/haldi/5fc9f6236e7bf7a57d05b63f24249b24.jpg'
+      '/static/results/result_1747231551_haldi_2.jpg',
+      '/static/results/result_1747231555_haldi_3.jpg',
+      '/static/results/result_1747231558_haldi_4.jpg'
     ],
     mehendi: [
-      '/static/templates/bride/bridal/mehendi/7b5baa7ffa2611a5df26a41e72d6743a.jpg',
-      '/static/templates/bride/bridal/mehendi/7e2ede05466b43a3b7db02da85af4a27.jpg',
-      '/static/templates/bride/makeup/natural/4ea63131c2229217909c0eb9167437cb.jpg',
-      '/static/templates/bride/bridal/mehendi/6cf40a2d762750036e2dbf1c630c1905.jpg'
+      '/attached_assets/7b5baa7ffa2611a5df26a41e72d6743a.jpg',
+      '/attached_assets/7e2ede05466b43a3b7db02da85af4a27.jpg',
+      '/attached_assets/4ea63131c2229217909c0eb9167437cb.jpg',
+      '/attached_assets/6cf40a2d762750036e2dbf1c630c1905.jpg'
     ],
     wedding: [
       '/static/results/result_1747229949_wedding_5.jpg',
-      '/static/templates/bride/bridal/wedding/a75925c71c6a5f4ce2409419e5a76842.jpg',
-      '/static/templates/bride/bridal/wedding/cc33f9b436b67d7c7d1aa380bf07730b.jpg',
-      '/static/templates/bride/bridal/wedding/bc7324bdbca40cc35f81e2dfdffcba8e.jpg'
+      '/static/results/result_1747229946_wedding_4.jpg',
+      '/static/results/result_1747229942_wedding_3.jpg',
+      '/static/results/result_1747229938_wedding_1.jpg'
     ],
     reception: [
-      '/static/results/result_1747229942_wedding_3.jpg',
-      '/static/templates/bride/bridal/reception/8bd582be61573595c3677622e1f7ffe5.jpg',
-      '/static/templates/bride/bridal/reception/bfaea84eb01d13a28394f1f7e32bed55.jpg',
-      '/static/templates/bride/bridal/reception/6da61532616600e4c34d50f17e1105bb.jpg'
+      '/static/results/result_1747229956_wedding_7.jpg',
+      '/attached_assets/8bd582be61573595c3677622e1f7ffe5.jpg',
+      '/attached_assets/bfaea84eb01d13a28394f1f7e32bed55.jpg',
+      '/attached_assets/6da61532616600e4c34d50f17e1105bb.jpg'
     ]
   };
 
@@ -115,12 +115,11 @@ const HomePage = () => {
 
       {/* Row of ceremony images */}
       <div className="container px-2">
-        <div className="row">
+        <div className="row g-0">
           {ceremonyOrder.map(ceremony => (
-            <div className="col-md-3 mb-4" key={ceremony}>
+            <div className="col-md-3" key={ceremony}>
               <div style={{
                 backgroundColor: colors.cardBg,
-                borderRadius: '12px',
                 overflow: 'hidden',
                 boxShadow: `0 4px 20px rgba(0,0,0,0.3)`,
                 height: '100%'
@@ -173,31 +172,7 @@ const HomePage = () => {
                     {ceremonyTitles[ceremony]}
                   </h4>
                 </div>
-                {/* Image navigation dots */}
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  padding: '5px 0 15px 0'
-                }}>
-                  {ceremonyImages[ceremony].map((_, index) => (
-                    <div 
-                      key={index}
-                      style={{
-                        width: '8px',
-                        height: '8px',
-                        borderRadius: '50%',
-                        backgroundColor: index === currentIndices[ceremony] ? colors.lightPurple : '#444',
-                        margin: '0 3px',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.3s ease'
-                      }}
-                      onClick={() => setCurrentIndices(prev => ({
-                        ...prev,
-                        [ceremony]: index
-                      }))}
-                    />
-                  ))}
-                </div>
+                {/* Navigation dots hidden as requested */}
               </div>
             </div>
           ))}
