@@ -205,8 +205,10 @@ const App = () => {
             cursor: pointer;
             transition: background-color 0.2s ease;
             border-radius: 4px;
-            margin-bottom: 2px;
+            margin: 0 0.5rem 2px 0.5rem;
             background-color: #2b1744;
+            color: white;
+            font-weight: 500;
           }
           
           .sidebar-header {
@@ -229,6 +231,32 @@ const App = () => {
           .menu-section .show {
             display: block;
             height: auto;
+          }
+          
+          .menu-items {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 0.5rem 0;
+          }
+          
+          .menu-items li {
+            padding: 0.5rem 1rem 0.5rem 2rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            border-radius: 4px;
+            margin: 2px 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+          }
+          
+          .menu-items li:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+          }
+          
+          .menu-items li.active {
+            background-color: #5c2a91;
+            color: white;
           }
         `}
       </style>
