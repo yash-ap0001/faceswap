@@ -28,7 +28,7 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Face Swap',
             icon: 'fa-exchange-alt',
             subItems: [
-              { id: 'face-swap-page', label: 'Face Swap', link: '/universal' }
+              { id: 'face-swap-page', label: 'Face Swap', link: '/react#face-swap-page' }
             ]
           },
           {
@@ -107,8 +107,18 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
     
     // Check if it's an external link (doesn't start with /react)
     if (!link.startsWith('/react')) {
-      // For external links, redirect the browser
-      window.location.href = link;
+      // Special case for face-swap-page to handle it in React
+      if (id === 'face-swap-page') {
+        // Redirect to React route instead
+        window.history.pushState({}, '', '/react#face-swap-page');
+        
+        // Dispatch a custom event to notify about route change
+        const event = new CustomEvent('routeChange', { detail: { path: '/react#face-swap-page' } });
+        window.dispatchEvent(event);
+      } else {
+        // For external links, redirect the browser
+        window.location.href = link;
+      }
     } else {
       // Use history API for navigation without page reload for React routes
       window.history.pushState({}, '', link);
