@@ -46,11 +46,11 @@ def get_menu_structure():
     """Helper function to get the menu structure."""
     menu = [
         {
-            "id": "direct-swap",
-            "title": "Direct Face Swap",
-            "icon": "fa-magic",
+            "id": "face-swap",
+            "title": "Face Swap",
+            "icon": "fa-exchange-alt",
             "subItems": [
-                {"id": "direct-face-swap", "label": "Direct Face Swap", "link": "/universal"}
+                {"id": "face-swap-page", "label": "Face Swap", "link": "/universal"}
             ]
         },
         {
