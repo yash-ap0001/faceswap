@@ -177,7 +177,9 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
                     <i className={`fas ${section.icon} me-2`}></i>
                     <span>{section.title}</span>
                   </div>
-                  <i className={`fas fa-chevron-${openSection === section.id ? 'up' : 'down'} small`}></i>
+                  <span className="chevron-icon">
+                    <i className={`fas fa-chevron-${openSection === section.id ? 'up' : 'down'}`} style={{ fontSize: '12px', opacity: '0.7' }}></i>
+                  </span>
                 </div>
               </div>
               <div className={openSection === section.id ? 'show' : 'collapse'}>

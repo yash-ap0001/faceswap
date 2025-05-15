@@ -221,6 +221,16 @@ const App = () => {
             background-color: rgba(255, 255, 255, 0.1);
           }
           
+          .chevron-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+          }
+          
           .menu-section .collapse {
             display: none;
             height: 0;
