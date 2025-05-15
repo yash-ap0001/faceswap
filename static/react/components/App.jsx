@@ -74,7 +74,7 @@ const App = () => {
       case 'bridal-gallery':
         return <BridalGalleryPage />;
       case 'face-swap-page':
-        return <UniversalPage />;
+        return <UniversalSwapPage category="auto" />;
       case 'groom-face-swap':
         return <UniversalSwapPage category="groom" />;
       case 'bride-saloons':
