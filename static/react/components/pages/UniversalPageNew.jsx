@@ -182,6 +182,21 @@ const UniversalPageNew = () => {
     } else {
       setSelectedTemplates([...selectedTemplates, template]);
     }
+    
+    // Enable process button if at least one template is selected
+    const processBtn = document.getElementById('processTemplatesBtn');
+    if (processBtn) {
+      if (selectedTemplates.length > 0 || !selectedTemplates.some(t => t.path === template.path)) {
+        processBtn.disabled = false;
+      } else if (selectedTemplates.length === 1 && selectedTemplates[0].path === template.path) {
+        processBtn.disabled = true;
+      }
+    }
+  };
+  
+  // Open template in viewer
+  const openTemplateInViewer = (template) => {
+    openImageViewer([template.url], 0);
   };
   
   // Handle process button click
@@ -587,6 +602,7 @@ const UniversalPageNew = () => {
                           </button>
                         </div>
                         <button 
+                          id="processTemplatesBtn"
                           className="btn btn-primary"
                           disabled={selectedTemplates.length === 0}
                           onClick={handleProcessTemplates}
@@ -622,17 +638,29 @@ const UniversalPageNew = () => {
                                 }}
                               />
                               <div className="card-body p-2">
-                                <div className="form-check">
-                                  <input 
-                                    className="form-check-input" 
-                                    type="checkbox" 
-                                    checked={selectedTemplates.some(t => t.path === template.path)}
-                                    onChange={() => handleTemplateSelection(template)}
-                                    id={`template-check-${index}`} 
-                                  />
-                                  <label className="form-check-label" htmlFor={`template-check-${index}`}>
-                                    Select
-                                  </label>
+                                <div className="d-flex justify-content-between align-items-center">
+                                  <div className="form-check">
+                                    <input 
+                                      className="form-check-input" 
+                                      type="checkbox" 
+                                      checked={selectedTemplates.some(t => t.path === template.path)}
+                                      onChange={() => handleTemplateSelection(template)}
+                                      onClick={(e) => e.stopPropagation()}
+                                      id={`template-check-${index}`} 
+                                    />
+                                    <label className="form-check-label" htmlFor={`template-check-${index}`}>
+                                      Select
+                                    </label>
+                                  </div>
+                                  <button 
+                                    className="btn btn-sm btn-outline-secondary" 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      openTemplateInViewer(template);
+                                    }}
+                                  >
+                                    <i className="fas fa-eye"></i>
+                                  </button>
                                 </div>
                               </div>
                             </div>
