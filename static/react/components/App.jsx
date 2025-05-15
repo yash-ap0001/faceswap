@@ -91,6 +91,27 @@ const App = () => {
     }
   };
 
+  // Calculate button styles based on sidebar state
+  const sidebarButtonStyle = {
+    left: sidebarOpen ? 'calc(280px - 20px)' : '10px',
+    position: 'fixed',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: 'linear-gradient(135deg, #5c2a91 0%, #3b1862 100%)',
+    border: 'none',
+    borderRadius: '50%',
+    padding: '0',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    zIndex: '1031',
+    boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)',
+    width: '40px',
+    height: '40px',
+    transition: 'left 0.3s ease'
+  };
+
   return (
     <div className="app-container">
       <div className="sidebar-wrapper">
@@ -103,8 +124,9 @@ const App = () => {
           className="sidebar-toggle"
           onClick={toggleSidebar}
           aria-label="Toggle sidebar"
+          style={sidebarButtonStyle}
         >
-          <i className={`fas fa-chevron-${sidebarOpen ? 'right' : 'left'}`} style={{ color: '#a27bdc' }}></i>
+          <i className={`fas fa-chevron-${sidebarOpen ? 'right' : 'left'}`} style={{ color: 'white' }}></i>
         </button>
       </div>
       <div className="main-container">
@@ -145,27 +167,6 @@ const App = () => {
             position: relative;
             height: 100vh;
             display: flex;
-          }
-          
-          .sidebar-toggle {
-            position: absolute;
-            left: calc(100% - 1px);
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: #2e2e2e;
-            border: none;
-            border-top-right-radius: 4px;
-            border-bottom-right-radius: 4px;
-            padding: 10px 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1031;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            border-left: 1px solid #494949;
-            width: 24px;
-            height: 40px;
           }
           
           .section-header {
