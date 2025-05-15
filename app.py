@@ -469,7 +469,7 @@ def get_templates_route():
     # Check if directory exists
     if not os.path.exists(template_dir):
         # Fallback to static directory if Pinterest templates don't exist
-        template_dir = os.path.join('static', 'images', 'templates', item_category)
+        template_dir = os.path.join('static', 'templates', item_category)
         
         if not os.path.exists(template_dir):
             return jsonify({
