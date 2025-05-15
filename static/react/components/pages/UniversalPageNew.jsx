@@ -417,7 +417,7 @@ const UniversalPageNew = () => {
         {/* Header */}
         <header className="app-header">
           <div className="logo-container">
-            <h1 className="logo-text brand-name">VOW-BRIDE</h1>
+            <h1 className="logo-text brand-name">Face Swap App</h1>
           </div>
         </header>
         
@@ -426,10 +426,7 @@ const UniversalPageNew = () => {
           <div className="content-container">
             {/* Combined Upload and Options Card */}
             <div className="card mb-3">
-              <div className="card-header bg-dark-purple d-flex justify-content-between align-items-center py-2">
-                <h5 className="card-title mb-0">Face Swap Selection</h5>
-              </div>
-              <div className="card-body">
+              <div className="card-body pt-3">
                 <div className="row">
                   {/* Left Column - Upload */}
                   <div className="col-md-4">
