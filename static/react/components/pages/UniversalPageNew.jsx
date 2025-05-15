@@ -157,11 +157,13 @@ const UniversalPageNew = () => {
       .then(data => {
         console.log("Received data:", data);
         setLoading(false);
-        if (data.success && data.templates && data.templates.length > 0) {
+        if (data.templates && data.templates.length > 0) {
           console.log("Setting templates with count:", data.templates.length);
           setTemplates(data.templates);
+        } else if (data.success === true && (!data.templates || data.templates.length === 0)) {
+          setError('No templates found for the selected category');
         } else {
-          setError(data.error || 'No templates found for the selected category');
+          setError(data.error || 'Error loading templates');
         }
       })
       .catch(error => {
@@ -580,7 +582,7 @@ const UniversalPageNew = () => {
                               onClick={() => handleTemplateSelection(template)}
                             >
                               <img 
-                                src={template.url} 
+                                src={template.url.startsWith('/') ? template.url : '/' + template.url} 
                                 className="template-preview"
                                 alt={`Template ${index + 1}`}
                                 style={{
@@ -590,6 +592,11 @@ const UniversalPageNew = () => {
                                   borderRadius: '6px 6px 0 0',
                                   transition: 'transform 0.2s ease',
                                   width: '100%'
+                                }}
+                                onError={(e) => {
+                                  console.log("Image failed to load:", template.url);
+                                  e.target.src = '/static/placeholder.png';
+                                  e.target.style.objectFit = 'contain';
                                 }}
                               />
                               <div className="card-body p-2">
