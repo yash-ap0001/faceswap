@@ -464,7 +464,7 @@ def get_templates_route():
         return jsonify({'success': False, 'message': 'Missing required category parameter'}), 400
     
     # Create path to Pinterest template directory as specified by user
-    template_dir = os.path.join('uploads', 'templates', 'pinterest', item_category)
+    template_dir = os.path.join('templates', 'uploads', 'pinterest', item_category)
     
     # Check if directory exists
     if not os.path.exists(template_dir):
@@ -599,7 +599,7 @@ def bridal_gallery():
             for file in os.listdir(pinterest_dir):
                 if file.lower().endswith(('.jpg', '.jpeg', '.png')):
                     all_templates[ceremony].append({
-                        'url': f"/uploads/templates/pinterest/{ceremony}/{file}",
+                        'url': f"/templates/uploads/pinterest/{ceremony}/{file}",
                         'title': f"{ceremony.title()} Style",
                         'description': "Traditional ceremony template"
                     })
