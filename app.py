@@ -661,6 +661,68 @@ def api_categories():
                     ]
                 }
             ]
+        },
+        {
+            "id": "celebrity",
+            "key": "celebrity",
+            "name": "Celebrity",
+            "subcategories": [
+                {
+                    "id": "men",
+                    "key": "men",
+                    "name": "Men",
+                    "items": [
+                        {"id": "actors", "key": "actors", "name": "Actors"},
+                        {"id": "singers", "key": "singers", "name": "Singers"},
+                        {"id": "sports", "key": "sports", "name": "Sports Stars"},
+                        {"id": "models", "key": "models", "name": "Models"}
+                    ]
+                },
+                {
+                    "id": "women",
+                    "key": "women",
+                    "name": "Women",
+                    "items": [
+                        {"id": "actresses", "key": "actresses", "name": "Actresses"},
+                        {"id": "singers", "key": "singers", "name": "Singers"},
+                        {"id": "models", "key": "models", "name": "Models"},
+                        {"id": "sports", "key": "sports", "name": "Sports Stars"}
+                    ]
+                },
+                {
+                    "id": "tollywood",
+                    "key": "tollywood",
+                    "name": "Tollywood",
+                    "items": [
+                        {"id": "actors", "key": "actors", "name": "Actors"},
+                        {"id": "actresses", "key": "actresses", "name": "Actresses"},
+                        {"id": "classic", "key": "classic", "name": "Classic Stars"},
+                        {"id": "new-gen", "key": "new-gen", "name": "New Generation"}
+                    ]
+                },
+                {
+                    "id": "bollywood",
+                    "key": "bollywood",
+                    "name": "Bollywood",
+                    "items": [
+                        {"id": "actors", "key": "actors", "name": "Actors"},
+                        {"id": "actresses", "key": "actresses", "name": "Actresses"},
+                        {"id": "classic", "key": "classic", "name": "Classic Stars"},
+                        {"id": "new-gen", "key": "new-gen", "name": "New Generation"}
+                    ]
+                },
+                {
+                    "id": "item",
+                    "key": "item",
+                    "name": "Item",
+                    "items": [
+                        {"id": "international", "key": "international", "name": "International"},
+                        {"id": "influencers", "key": "influencers", "name": "Influencers"},
+                        {"id": "trending", "key": "trending", "name": "Trending"},
+                        {"id": "historical", "key": "historical", "name": "Historical"}
+                    ]
+                }
+            ]
         }
     ]
     
@@ -694,6 +756,18 @@ def api_menu():
                 {"id": "traditional_wear", "label": "Traditional Wear", "link": "/traditional-wear"},
                 {"id": "modern_suits", "label": "Modern Suits", "link": "/modern-suits"},
                 {"id": "groom_accessories", "label": "Accessories", "link": "/groom-accessories"}
+            ]
+        },
+        {
+            "id": "celebrity",
+            "title": "Celebrity",
+            "icon": "fa-star",
+            "subItems": [
+                {"id": "celebrity_men", "label": "Men", "link": "/celebrity-men"},
+                {"id": "celebrity_women", "label": "Women", "link": "/celebrity-women"},
+                {"id": "celebrity_tollywood", "label": "Tollywood", "link": "/celebrity-tollywood"},
+                {"id": "celebrity_bollywood", "label": "Bollywood", "link": "/celebrity-bollywood"},
+                {"id": "celebrity_item", "label": "Item", "link": "/celebrity-item"}
             ]
         },
         {
