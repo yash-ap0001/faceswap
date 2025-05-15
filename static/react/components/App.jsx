@@ -221,16 +221,6 @@ const App = () => {
             background-color: rgba(255, 255, 255, 0.1);
           }
           
-          .toggle-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-            border-radius: 3px;
-            color: rgba(255, 255, 255, 0.7);
-          }
-          
           .menu-section .collapse {
             display: none;
             height: 0;
