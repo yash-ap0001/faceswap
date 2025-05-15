@@ -93,19 +93,21 @@ const App = () => {
 
   return (
     <div className="app-container">
-      <Sidebar 
-        isOpen={sidebarOpen} 
-        activeItem={activeItem}
-        onNavigation={handleNavigation}
-      />
-      <div className="main-container">
+      <div className="sidebar-wrapper">
+        <Sidebar 
+          isOpen={sidebarOpen} 
+          activeItem={activeItem}
+          onNavigation={handleNavigation}
+        />
         <button 
           className="sidebar-toggle"
           onClick={toggleSidebar}
           aria-label="Toggle sidebar"
         >
-          <i className={`fas fa-chevron-${sidebarOpen ? 'left' : 'right'}`}></i>
+          <i className={`fas fa-chevron-${sidebarOpen ? 'right' : 'left'}`} style={{ color: '#a27bdc' }}></i>
         </button>
+      </div>
+      <div className="main-container">
         <div className="content-container">
           {renderPageContent()}
         </div>
@@ -117,11 +119,53 @@ const App = () => {
           .sidebar {
             max-height: 100vh;
             overflow-y: auto;
+            position: relative;
           }
           
           .sidebar-content {
             overflow-y: auto;
             max-height: calc(100vh - 60px);
+          }
+          
+          .app-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+          }
+          
+          .main-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0;
+            position: relative;
+          }
+          
+          .sidebar-wrapper {
+            position: relative;
+            height: 100vh;
+            display: flex;
+          }
+          
+          .sidebar-toggle {
+            position: absolute;
+            left: calc(100% - 1px);
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #2e2e2e;
+            border: none;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+            padding: 10px 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1031;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            border-left: 1px solid #494949;
+            width: 24px;
+            height: 40px;
           }
           
           .section-header {
