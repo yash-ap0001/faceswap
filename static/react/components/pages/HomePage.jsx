@@ -141,7 +141,7 @@ const HomePage = () => {
   }, [loading, ceremonyImages]);
 
   return (
-    <div className="home-page" style={{backgroundColor: '#121212', padding: '20px 10px'}}>
+    <div className="home-page" style={{ padding: '20px 10px'}}>
       {/* Brand logo */}
       <div style={{
         textAlign: 'center',
