@@ -36,7 +36,8 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Settings',
             icon: 'fa-cog',
             subItems: [
-              { id: 'face-swap-selection', label: 'Face Swap Selection', link: '/universal' }
+              { id: 'face-swap-selection', label: 'Face Swap Selection', link: '/universal' },
+              { id: 'bulk-upload', label: 'Bulk Upload Templates', link: '/bulk-upload' }
             ]
           },
           {

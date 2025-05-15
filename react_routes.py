@@ -4,6 +4,7 @@ These routes serve the React application and provide API endpoints for it.
 """
 
 import json
+import time
 from flask import Blueprint, render_template, jsonify, request
 
 # Create a blueprint for React app routes
@@ -28,7 +29,21 @@ def api_menu():
     """
     API endpoint to get the menu structure for the React sidebar.
     Returns a JSON object with the menu structure.
+    
+    This endpoint includes a cache-busting timestamp to ensure clients always get the latest menu.
     """
+    # Add cache-busting headers
+    response = jsonify({
+        "menu": get_menu_structure(),
+        "timestamp": int(time.time() * 1000)  # Current time in milliseconds
+    })
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+def get_menu_structure():
+    """Helper function to get the menu structure."""
     menu = [
         {
             "id": "universal",
