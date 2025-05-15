@@ -2338,7 +2338,11 @@ def upload_file():
 
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    return send_from_directory(app.config['UPLOAD_FOLDER'].replace('templates/', ''), filename)
+    
+@app.route('/templates/uploads/<path:filename>')
+def template_file(filename):
+    return send_from_directory('templates/uploads', filename)
 
 @app.route('/check-models')
 def check_models():
