@@ -2,44 +2,425 @@
   "categories": [
     {
       "id": "bride",
-      "name": "Bride Categories",
-      "description": "Face swapping and options for brides",
+      "name": "Bride",
+      "description": "Options for brides across different ceremonies and styles",
+      "icon": "woman",
       "subcategories": [
-        {"id": "bridal", "name": "Bridal Ceremonies", "description": "Haldi, Mehendi, Sangeeth, Wedding, Reception"},
-        {"id": "outfits", "name": "Bridal Outfits", "description": "Traditional and modern outfits for different ceremonies"},
-        {"id": "jewelry", "name": "Jewelry Collections", "description": "Necklaces, earrings, head pieces and more"}
+        {
+          "id": "bridal",
+          "name": "Ceremony Looks",
+          "description": "Traditional looks for different wedding ceremonies",
+          "items": [
+            {
+              "id": "haldi",
+              "name": "Haldi",
+              "description": "Yellow-themed outfits for the Haldi ceremony"
+            },
+            {
+              "id": "mehendi",
+              "name": "Mehendi",
+              "description": "Colorful and comfortable outfits for the Mehendi ceremony"
+            },
+            {
+              "id": "sangeeth",
+              "name": "Sangeeth",
+              "description": "Celebratory and dance-friendly outfits for the Sangeeth ceremony"
+            },
+            {
+              "id": "wedding",
+              "name": "Wedding",
+              "description": "Traditional bridal attire for the main wedding ceremony"
+            },
+            {
+              "id": "reception",
+              "name": "Reception",
+              "description": "Elegant attire for the wedding reception"
+            }
+          ]
+        },
+        {
+          "id": "outfits",
+          "name": "General Outfits",
+          "description": "Various outfit styles for different occasions",
+          "items": [
+            {
+              "id": "casual",
+              "name": "Casual",
+              "description": "Comfortable everyday outfits"
+            },
+            {
+              "id": "party",
+              "name": "Party",
+              "description": "Glamorous outfits for celebrations"
+            },
+            {
+              "id": "formal",
+              "name": "Formal",
+              "description": "Sophisticated outfits for formal events"
+            },
+            {
+              "id": "festival",
+              "name": "Festival",
+              "description": "Traditional outfits for festivals"
+            }
+          ]
+        },
+        {
+          "id": "jewelry",
+          "name": "Jewelry",
+          "description": "Jewelry pieces for different occasions",
+          "items": [
+            {
+              "id": "necklaces",
+              "name": "Necklaces",
+              "description": "Statement and subtle neck pieces"
+            },
+            {
+              "id": "earrings",
+              "name": "Earrings",
+              "description": "Various earring styles from studs to chandeliers"
+            },
+            {
+              "id": "bridal-sets",
+              "name": "Bridal Sets",
+              "description": "Complete jewelry sets for wedding ceremonies"
+            },
+            {
+              "id": "bangles",
+              "name": "Bangles & Bracelets",
+              "description": "Wrist adornments ranging from traditional to modern"
+            }
+          ]
+        },
+        {
+          "id": "makeup",
+          "name": "Makeup",
+          "description": "Makeup styles for different occasions and looks",
+          "items": [
+            {
+              "id": "bridal",
+              "name": "Bridal",
+              "description": "Traditional bridal makeup looks"
+            },
+            {
+              "id": "natural",
+              "name": "Natural",
+              "description": "Subtle everyday makeup"
+            },
+            {
+              "id": "glam",
+              "name": "Glam",
+              "description": "Bold and glamorous makeup styles"
+            },
+            {
+              "id": "regional",
+              "name": "Regional",
+              "description": "Region-specific traditional makeup styles"
+            }
+          ]
+        }
       ]
     },
     {
       "id": "groom",
-      "name": "Groom Categories",
-      "description": "Face swapping and options for grooms",
+      "name": "Groom",
+      "description": "Options for grooms across different ceremonies and styles",
+      "icon": "man",
       "subcategories": [
-        {"id": "traditional", "name": "Traditional Wear", "description": "Sherwanis, Kurtas, Dhotis for different ceremonies"},
-        {"id": "suits", "name": "Modern Suits", "description": "Tuxedos, formal suits and western wear"},
-        {"id": "accessories", "name": "Accessories", "description": "Turbans, jewelry, watches and more"}
+        {
+          "id": "traditional",
+          "name": "Traditional Wear",
+          "description": "Traditional outfits for different ceremonies",
+          "items": [
+            {
+              "id": "sherwani",
+              "name": "Sherwani",
+              "description": "Classic sherwani styles for wedding ceremonies"
+            },
+            {
+              "id": "kurta-pajama",
+              "name": "Kurta Pajama",
+              "description": "Comfortable kurta pajama sets for various ceremonies"
+            },
+            {
+              "id": "dhoti",
+              "name": "Dhoti",
+              "description": "Traditional dhoti styles for cultural ceremonies"
+            },
+            {
+              "id": "indo-western",
+              "name": "Indo-Western",
+              "description": "Fusion of traditional and western styles"
+            }
+          ]
+        },
+        {
+          "id": "suits",
+          "name": "Modern Suits",
+          "description": "Contemporary suit styles",
+          "items": [
+            {
+              "id": "formal",
+              "name": "Formal Suits",
+              "description": "Classic formal suits for wedding and reception"
+            },
+            {
+              "id": "tuxedo",
+              "name": "Tuxedo",
+              "description": "Elegant tuxedos for special occasions"
+            },
+            {
+              "id": "business",
+              "name": "Business Suits",
+              "description": "Professional suits for formal settings"
+            },
+            {
+              "id": "casual",
+              "name": "Casual Blazers",
+              "description": "Relaxed blazers for semi-formal events"
+            }
+          ]
+        },
+        {
+          "id": "accessories",
+          "name": "Accessories",
+          "description": "Accessories to complement groom outfits",
+          "items": [
+            {
+              "id": "turbans",
+              "name": "Turbans & Pagdis",
+              "description": "Traditional headwear for ceremonies"
+            },
+            {
+              "id": "jewelry",
+              "name": "Jewelry",
+              "description": "Traditional groom jewelry items"
+            },
+            {
+              "id": "footwear",
+              "name": "Footwear",
+              "description": "Traditional and modern footwear options"
+            },
+            {
+              "id": "other",
+              "name": "Other Accessories",
+              "description": "Additional accessories like cufflinks, broaches, etc."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "salon",
+      "name": "Salon Services",
+      "description": "Beauty and grooming services for wedding preparation",
+      "icon": "cut",
+      "subcategories": [
+        {
+          "id": "bride-salon",
+          "name": "Bride Services",
+          "description": "Beauty services for brides",
+          "items": [
+            {
+              "id": "bridal-makeup",
+              "name": "Bridal Makeup",
+              "description": "Professional makeup services for brides"
+            },
+            {
+              "id": "hair-styling",
+              "name": "Hair Styling",
+              "description": "Hair styling options for different ceremonies"
+            },
+            {
+              "id": "skincare",
+              "name": "Skincare",
+              "description": "Pre-wedding skincare treatments"
+            },
+            {
+              "id": "full-package",
+              "name": "Full Packages",
+              "description": "Complete bridal beauty packages"
+            }
+          ]
+        },
+        {
+          "id": "groom-salon",
+          "name": "Groom Services",
+          "description": "Grooming services for grooms",
+          "items": [
+            {
+              "id": "grooming",
+              "name": "Grooming",
+              "description": "Basic grooming services for grooms"
+            },
+            {
+              "id": "haircut",
+              "name": "Haircut & Styling",
+              "description": "Haircut and styling options for grooms"
+            },
+            {
+              "id": "facial",
+              "name": "Facial & Skincare",
+              "description": "Facial and skincare treatments for grooms"
+            },
+            {
+              "id": "packages",
+              "name": "Groom Packages",
+              "description": "Complete grooming packages for grooms"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "venue",
+      "name": "Venues",
+      "description": "Wedding and event venues",
+      "icon": "building",
+      "subcategories": [
+        {
+          "id": "banquet",
+          "name": "Banquet Halls",
+          "description": "Indoor venues for wedding ceremonies",
+          "items": [
+            {
+              "id": "small",
+              "name": "Small (50-100)",
+              "description": "Intimate banquet halls for smaller gatherings"
+            },
+            {
+              "id": "medium",
+              "name": "Medium (100-300)",
+              "description": "Medium-sized banquet halls for moderate gatherings"
+            },
+            {
+              "id": "large",
+              "name": "Large (300+)",
+              "description": "Large banquet halls for bigger celebrations"
+            },
+            {
+              "id": "luxury",
+              "name": "Luxury Venues",
+              "description": "High-end luxury banquet halls"
+            }
+          ]
+        },
+        {
+          "id": "outdoor",
+          "name": "Outdoor Venues",
+          "description": "Outdoor settings for ceremonies",
+          "items": [
+            {
+              "id": "garden",
+              "name": "Garden Venues",
+              "description": "Lush garden settings for ceremonies"
+            },
+            {
+              "id": "beachside",
+              "name": "Beachside",
+              "description": "Venues near beaches for scenic ceremonies"
+            },
+            {
+              "id": "farmhouse",
+              "name": "Farmhouses",
+              "description": "Spacious farmhouses for wedding events"
+            },
+            {
+              "id": "heritage",
+              "name": "Heritage Sites",
+              "description": "Historical and heritage venues"
+            }
+          ]
+        }
       ]
     },
     {
       "id": "services",
-      "name": "Wedding Services",
-      "description": "Various services for wedding planning",
+      "name": "Other Services",
+      "description": "Additional wedding services",
+      "icon": "bell",
       "subcategories": [
-        {"id": "venues", "name": "Venue Search", "description": "Find the perfect wedding venue"},
-        {"id": "saloons", "name": "Saloons & Makeup", "description": "Professional makeup artists and hair stylists"},
-        {"id": "photographers", "name": "Photography", "description": "Wedding photographers and videographers"}
-      ]
-    },
-    {
-      "id": "templates",
-      "name": "Template Categories",
-      "description": "All available template types for face swapping",
-      "subcategories": [
-        {"id": "haldi", "name": "Haldi Ceremony", "description": "Yellow-themed pre-wedding celebration"},
-        {"id": "mehendi", "name": "Mehendi Ceremony", "description": "Traditional henna application ceremony"},
-        {"id": "sangeeth", "name": "Sangeeth Ceremony", "description": "Music and dance celebration"},
-        {"id": "wedding", "name": "Wedding Day", "description": "Main wedding ceremony templates"},
-        {"id": "reception", "name": "Reception", "description": "Post-wedding celebration templates"}
+        {
+          "id": "catering",
+          "name": "Catering",
+          "description": "Food and beverage services",
+          "items": [
+            {
+              "id": "traditional",
+              "name": "Traditional",
+              "description": "Traditional cuisine for ceremonies"
+            },
+            {
+              "id": "multi-cuisine",
+              "name": "Multi-Cuisine",
+              "description": "Variety of cuisine options"
+            },
+            {
+              "id": "vegetarian",
+              "name": "Vegetarian",
+              "description": "Vegetarian catering options"
+            },
+            {
+              "id": "premium",
+              "name": "Premium",
+              "description": "High-end catering services"
+            }
+          ]
+        },
+        {
+          "id": "photography",
+          "name": "Photography",
+          "description": "Photography and videography services",
+          "items": [
+            {
+              "id": "traditional",
+              "name": "Traditional",
+              "description": "Classic wedding photography"
+            },
+            {
+              "id": "candid",
+              "name": "Candid",
+              "description": "Candid and natural photography"
+            },
+            {
+              "id": "cinematic",
+              "name": "Cinematic",
+              "description": "Cinematic photography and videography"
+            },
+            {
+              "id": "drone",
+              "name": "Drone & Special Effects",
+              "description": "Advanced photography with drone and special effects"
+            }
+          ]
+        },
+        {
+          "id": "decoration",
+          "name": "Decoration",
+          "description": "Venue decoration services",
+          "items": [
+            {
+              "id": "traditional",
+              "name": "Traditional",
+              "description": "Classical and traditional decoration"
+            },
+            {
+              "id": "contemporary",
+              "name": "Contemporary",
+              "description": "Modern and trendy decoration"
+            },
+            {
+              "id": "themed",
+              "name": "Themed",
+              "description": "Custom-themed decoration"
+            },
+            {
+              "id": "premium",
+              "name": "Premium",
+              "description": "Luxury and premium decoration services"
+            }
+          ]
+        }
       ]
     }
   ]
