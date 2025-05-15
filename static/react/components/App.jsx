@@ -225,11 +225,10 @@ const App = () => {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background-color: #5c2a91;
-            color: white;
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            color: rgba(255, 255, 255, 0.7);
           }
           
           .menu-section .collapse {

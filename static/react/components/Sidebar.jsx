@@ -178,10 +178,7 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
                     <span>{section.title}</span>
                   </div>
                   <span className="toggle-icon">
-                    {openSection === section.id ? 
-                      <i className="fas fa-minus" style={{ fontSize: '10px' }}></i> : 
-                      <i className="fas fa-plus" style={{ fontSize: '10px' }}></i>
-                    }
+                    <i className={`fas fa-chevron-${openSection === section.id ? 'down' : 'right'}`} style={{ fontSize: '12px' }}></i>
                   </span>
                 </div>
               </div>
