@@ -28,6 +28,7 @@
                             <option value="" disabled selected>Select category type</option>
                             <option value="bride">Bride</option>
                             <option value="groom">Groom</option>
+                            <option value="celebrity">Celebrity</option>
                         </select>
                     </div>
                     
@@ -98,6 +99,7 @@
                     <select class="form-select form-select-sm bg-dark text-light border-secondary" id="deleteCategoryType">
                         <option value="bride" selected>Bride</option>
                         <option value="groom">Groom</option>
+                        <option value="celebrity">Celebrity</option>
                     </select>
                 </div>
                 
@@ -855,7 +857,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 optEl.textContent = option[1];
                 subcategorySelect.appendChild(optEl);
             });
-        } else {
+        } else if (categoryType === 'groom') {
             // Add groom subcategories
             const groomOptions = [
                 ['traditional', 'Traditional Wear'],
@@ -864,6 +866,22 @@ document.addEventListener('DOMContentLoaded', function() {
             ];
             
             groomOptions.forEach(option => {
+                const optEl = document.createElement('option');
+                optEl.value = option[0];
+                optEl.textContent = option[1];
+                subcategorySelect.appendChild(optEl);
+            });
+        } else if (categoryType === 'celebrity') {
+            // Add celebrity subcategories
+            const celebrityOptions = [
+                ['men', 'Men'],
+                ['women', 'Women'],
+                ['tollywood', 'Tollywood'],
+                ['bollywood', 'Bollywood'],
+                ['item', 'Item']
+            ];
+            
+            celebrityOptions.forEach(option => {
                 const optEl = document.createElement('option');
                 optEl.value = option[0];
                 optEl.textContent = option[1];
