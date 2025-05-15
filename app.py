@@ -2104,7 +2104,7 @@ def get_bridal_template(style, template_type='natural'):
         template_type = 'pinterest'
     
     # Create template directories if they don't exist
-    template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
+    template_dir = os.path.join('templates', 'uploads')
     type_dir = os.path.join(template_dir, template_type)
     os.makedirs(template_dir, exist_ok=True)
     os.makedirs(type_dir, exist_ok=True)
@@ -2206,7 +2206,7 @@ def get_pinterest_template_for_ceremony(ceremony):
         ceremony = 'wedding'
     
     # Path to Pinterest directory for this ceremony
-    template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
+    template_dir = os.path.join('templates', 'uploads')
     pinterest_dir = os.path.join(template_dir, 'pinterest', ceremony)
     
     # Ensure directory exists
