@@ -102,17 +102,20 @@
   overflow: hidden;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background-color: #000000;
 }
 
 .template-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  border-color: #6c5b7b;
 }
 
 .template-preview {
   width: 100%;
   height: 200px;
   object-fit: cover;
+  object-position: center 20%; /* Face-centered positioning */
 }
 
 /* Results styles */
@@ -121,17 +124,20 @@
   overflow: hidden;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   transition: transform 0.2s ease;
+  background-color: #000000;
 }
 
 .result-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  border-color: #6c5b7b;
 }
 
 .result-image {
   width: 100%;
   height: 200px;
   object-fit: cover;
+  object-position: center 20%; /* Face-centered positioning */
 }
 
 /* Custom dropdown styles */
@@ -210,8 +216,52 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background-color: #000000;
 }
 
 #zoomImage {
   transition: transform 0.2s ease;
+}
+
+/* Navigation controls for image viewer */
+.navigation-control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  z-index: 1000;
+}
+
+.navigation-control:hover {
+  background-color: rgba(103, 58, 183, 0.7);
+}
+
+.navigation-control.prev {
+  left: 20px;
+}
+
+.navigation-control.next {
+  right: 20px;
+}
+
+.zoom-controls {
+  position: absolute;
+  bottom: 20px;
+  display: flex;
+  gap: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 20px;
+  z-index: 1000;
 }
