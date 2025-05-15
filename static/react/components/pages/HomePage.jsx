@@ -47,12 +47,19 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="home-page" style={{backgroundColor: '#121212', padding: '10px 0px', minHeight: '100vh'}}>
+    <div className="home-page" style={{
+      backgroundColor: '#121212', 
+      padding: '0', 
+      height: '100vh', 
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
       {/* Brand logo */}
       <div style={{
         textAlign: 'center',
-        marginBottom: '2rem',
-        padding: '1rem'
+        marginBottom: '1rem',
+        padding: '0.5rem'
       }}>
         <h1 style={{
           margin: 0,
@@ -79,7 +86,14 @@ const HomePage = () => {
       </div>
 
       {/* Large auto-changing template image */}
-      <div className="container px-2" style={{ maxWidth: '800px' }}>
+      <div className="container px-2" style={{ 
+        maxWidth: '800px', 
+        flex: '1', 
+        display: 'flex', 
+        flexDirection: 'column',
+        overflowY: 'auto',
+        paddingBottom: '0'
+      }}>
         <div style={{
           backgroundColor: colors.cardBg,
           borderRadius: '12px',
@@ -89,7 +103,7 @@ const HomePage = () => {
           margin: '0 auto'
         }}>
           <div style={{
-            height: '320px',
+            height: '280px',
             overflow: 'hidden',
             position: 'relative'
           }}>
@@ -167,37 +181,37 @@ const HomePage = () => {
         <div style={{
           backgroundColor: colors.cardBg,
           borderRadius: '8px',
-          padding: '1.5rem',
-          marginTop: '20px',
-          marginBottom: '20px',
+          padding: '1rem',
           maxWidth: '800px',
-          margin: '20px auto'
+          margin: '10px auto',
+          flex: '0 0 auto'
         }}>
           <h3 style={{
             textAlign: 'center',
             color: colors.lightPurple,
-            marginBottom: '1.5rem',
-            fontWeight: '300'
+            marginBottom: '1rem',
+            fontWeight: '300',
+            fontSize: '1.2rem'
           }}>
             How It Works
           </h3>
           
           <div className="row text-center">
             <div className="col-3">
-              <i className="fas fa-upload fa-2x" style={{color: colors.lightPurple}}></i>
-              <p style={{color: 'white', marginTop: '10px', fontSize: '0.9rem'}}>Upload</p>
+              <i className="fas fa-upload" style={{color: colors.lightPurple, fontSize: '1.3rem'}}></i>
+              <p style={{color: 'white', marginTop: '5px', fontSize: '0.8rem'}}>Upload</p>
             </div>
             <div className="col-3">
-              <i className="fas fa-list fa-2x" style={{color: colors.lightPurple}}></i>
-              <p style={{color: 'white', marginTop: '10px', fontSize: '0.9rem'}}>Select</p>
+              <i className="fas fa-list" style={{color: colors.lightPurple, fontSize: '1.3rem'}}></i>
+              <p style={{color: 'white', marginTop: '5px', fontSize: '0.8rem'}}>Select</p>
             </div>
             <div className="col-3">
-              <i className="fas fa-images fa-2x" style={{color: colors.lightPurple}}></i>
-              <p style={{color: 'white', marginTop: '10px', fontSize: '0.9rem'}}>Templates</p>
+              <i className="fas fa-images" style={{color: colors.lightPurple, fontSize: '1.3rem'}}></i>
+              <p style={{color: 'white', marginTop: '5px', fontSize: '0.8rem'}}>Templates</p>
             </div>
             <div className="col-3">
-              <i className="fas fa-magic fa-2x" style={{color: colors.lightPurple}}></i>
-              <p style={{color: 'white', marginTop: '10px', fontSize: '0.9rem'}}>Generate</p>
+              <i className="fas fa-magic" style={{color: colors.lightPurple, fontSize: '1.3rem'}}></i>
+              <p style={{color: 'white', marginTop: '5px', fontSize: '0.8rem'}}>Generate</p>
             </div>
           </div>
         </div>
