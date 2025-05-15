@@ -50,16 +50,7 @@ def get_menu_structure():
             "title": "Universal",
             "icon": "fa-magic",
             "subItems": [
-                {"id": "universal-categories", "label": "All Categories", "link": "/react#universal-categories"}
-            ]
-        },
-        {
-            "id": "settings",
-            "title": "Settings",
-            "icon": "fa-cog",
-            "subItems": [
-                {"id": "face-swap-selection", "label": "Face Swap Selection", "link": "/universal"},
-                {"id": "bulk-upload", "label": "Bulk Upload Templates", "link": "/bulk-upload"}
+                {"id": "face-swap-selection", "label": "Face Swap Selection", "link": "/universal"}
             ]
         },
         {
@@ -105,6 +96,15 @@ def get_menu_structure():
                 {"id": "catering-list", "label": "Catering List", "link": "/react#catering-list"},
                 {"id": "event-managers", "label": "Event Managers", "link": "/react#event-managers"},
                 {"id": "photographers", "label": "Photographers", "link": "/react#photographers"}
+            ]
+        },
+        {
+            "id": "settings",
+            "title": "Settings",
+            "icon": "fa-cog",
+            "subItems": [
+                {"id": "universal-categories", "label": "All Categories", "link": "/react#universal-categories"},
+                {"id": "bulk-upload", "label": "Bulk Upload Templates", "link": "/bulk-upload"}
             ]
         }
     ]
