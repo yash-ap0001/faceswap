@@ -2581,8 +2581,8 @@ def universal_face_swap():
 # Universal page route (a direct HTML version that doesn't require React build)
 @app.route('/universal')
 def universal_page():
-    """Render the universal categories page with a direct HTML template."""
-    return render_template('universal_page.html')
+    """Render the universal categories page using React."""
+    return redirect('/react#face-swap-page')
 
 @app.route('/universal-swap')
 def universal_swap_page():

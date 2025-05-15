@@ -6,6 +6,7 @@ import BridalSwapPage from './pages/BridalSwapPage';
 import BridalGalleryPage from './pages/BridalGalleryPage';
 import UniversalSwapPage from './pages/UniversalSwapPage';
 import UniversalPage from './pages/UniversalPage';
+import UniversalPageNew from './pages/UniversalPageNew';
 
 /**
  * Main App component that manages the application layout and state
@@ -74,7 +75,7 @@ const App = () => {
       case 'bridal-gallery':
         return <BridalGalleryPage />;
       case 'face-swap-page':
-        return <UniversalSwapPage category="auto" />;
+        return <UniversalPageNew />;
       case 'groom-face-swap':
         return <UniversalSwapPage category="groom" />;
       case 'bride-saloons':
