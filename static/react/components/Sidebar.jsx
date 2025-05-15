@@ -28,7 +28,8 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Universal',
             icon: 'fa-magic',
             subItems: [
-              { id: 'universal-categories', label: 'All Categories', link: '/react#universal-categories' }
+              { id: 'universal-categories', label: 'All Categories', link: '/react#universal-categories' },
+              { id: 'universal-page', label: 'Face Swap Selection', link: '/universal' }
             ]
           },
           {
@@ -96,12 +97,18 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
   const handleItemClick = (id, link) => {
     onNavigation(id);
     
-    // Use history API for navigation without page reload
-    window.history.pushState({}, '', link);
-    
-    // Dispatch a custom event to notify about route change
-    const event = new CustomEvent('routeChange', { detail: { path: link } });
-    window.dispatchEvent(event);
+    // Check if it's an external link (doesn't start with /react)
+    if (!link.startsWith('/react')) {
+      // For external links, redirect the browser
+      window.location.href = link;
+    } else {
+      // Use history API for navigation without page reload for React routes
+      window.history.pushState({}, '', link);
+      
+      // Dispatch a custom event to notify about route change
+      const event = new CustomEvent('routeChange', { detail: { path: link } });
+      window.dispatchEvent(event);
+    }
   };
   
   // Toggle accordion section
