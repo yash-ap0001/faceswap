@@ -3,45 +3,49 @@ console.log("React app initialized");
 
 // Directly add ceremony images to the page
 document.addEventListener('DOMContentLoaded', () => {
+  console.log("DOM Content loaded - initializing homepage");
   const homeContent = document.getElementById('react-root');
-  if (!homeContent) return;
+  if (!homeContent) {
+    console.error("Could not find react-root element");
+    return;
+  }
   
   // Define the ceremony data
   const ceremonies = [
     { 
       name: 'Haldi Ceremony', 
       images: [
-        'uploads/templates/pinterest/haldi/haldi_2.jpg',
-        'uploads/templates/pinterest/haldi/haldi_3.jpg',
-        'uploads/templates/pinterest/haldi/haldi_4.jpg',
-        'uploads/templates/pinterest/haldi/haldi_5.jpg'
+        '/uploads/templates/pinterest/haldi/haldi_2.jpg',
+        '/uploads/templates/pinterest/haldi/haldi_3.jpg',
+        '/uploads/templates/pinterest/haldi/haldi_4.jpg',
+        '/uploads/templates/pinterest/haldi/haldi_5.jpg'
       ]
     },
     { 
       name: 'Mehendi Ceremony', 
       images: [
-        'uploads/templates/pinterest/mehendi/mehendi_1.jpg',
-        'uploads/templates/pinterest/mehendi/mehendi_2.jpg',
-        'uploads/templates/pinterest/mehendi/mehendi_3.jpg',
-        'uploads/templates/pinterest/mehendi/mehendi_4.jpg'
+        '/uploads/templates/pinterest/mehendi/mehendi_1.jpg',
+        '/uploads/templates/pinterest/mehendi/mehendi_2.jpg',
+        '/uploads/templates/pinterest/mehendi/mehendi_3.jpg',
+        '/uploads/templates/pinterest/mehendi/mehendi_4.jpg'
       ]
     },
     { 
       name: 'Wedding Ceremony', 
       images: [
-        'uploads/templates/pinterest/wedding/wedding_1.jpg',
-        'uploads/templates/pinterest/wedding/wedding_3.jpg',
-        'uploads/templates/pinterest/wedding/wedding_4.jpg',
-        'uploads/templates/pinterest/wedding/wedding_5.jpg'
+        '/uploads/templates/pinterest/wedding/wedding_1.jpg',
+        '/uploads/templates/pinterest/wedding/wedding_3.jpg',
+        '/uploads/templates/pinterest/wedding/wedding_4.jpg',
+        '/uploads/templates/pinterest/wedding/wedding_5.jpg'
       ]
     },
     { 
       name: 'Reception Ceremony', 
       images: [
-        'uploads/templates/pinterest/reception/reception_1.jpg',
-        'uploads/templates/pinterest/reception/reception_2.jpg',
-        'uploads/templates/pinterest/reception/reception_3.jpg',
-        'uploads/templates/pinterest/reception/reception_4.jpg'
+        '/uploads/templates/pinterest/reception/reception_1.jpg',
+        '/uploads/templates/pinterest/reception/reception_2.jpg',
+        '/uploads/templates/pinterest/reception/reception_3.jpg',
+        '/uploads/templates/pinterest/reception/reception_4.jpg'
       ]
     }
   ];
