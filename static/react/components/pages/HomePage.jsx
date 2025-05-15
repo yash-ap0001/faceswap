@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 /**
  * Home page component with very clean and minimal design
- * Using template images and dark purple theme
+ * Using template images and dark purple theme, with auto-changing feature
  */
 const HomePage = () => {
   // Define the dark purple theme colors
@@ -14,337 +14,152 @@ const HomePage = () => {
     cardBg: '#212121'
   };
 
+  // Define template images for auto-changing
+  const templateImages = [
+    {
+      src: '/static/results/result_1747231562_haldi_5.jpg',
+      title: 'Haldi Ceremony'
+    },
+    {
+      src: '/static/results/result_1747229949_wedding_5.jpg',
+      title: 'Wedding Ceremony'
+    },
+    {
+      src: '/static/results/result_1747229942_wedding_3.jpg',
+      title: 'Reception Ceremony'
+    },
+    {
+      src: '/static/templates/bride/makeup/natural/4ea63131c2229217909c0eb9167437cb.jpg',
+      title: 'Mehendi Ceremony'
+    }
+  ];
+
+  // State for the current image
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Effect for auto-changing images
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % templateImages.length);
+    }, 3000); // Change image every 3 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="home-page" style={{backgroundColor: '#121212', padding: '20px 0'}}>
-      {/* Simple header with logo */}
+    <div className="home-page" style={{backgroundColor: '#121212', padding: '20px 10px'}}>
+      {/* Brand logo */}
       <div style={{
-        backgroundColor: colors.darkPurple,
-        padding: '2rem',
-        marginBottom: '2rem',
         textAlign: 'center',
-        borderRadius: '8px'
+        marginBottom: '2rem',
+        padding: '1rem'
       }}>
         <h1 style={{
-          fontWeight: '700',
-          color: 'white',
-          margin: 0
+          margin: 0,
+          padding: 0,
+          letterSpacing: '2px'
         }}>
-          VOW<span style={{fontWeight: '300'}}>BRIDE</span>
+          <span style={{
+            color: colors.mediumPurple,
+            fontWeight: '800',
+            fontSize: '2.2rem'
+          }}>
+            VOW
+          </span>
+          <span style={{
+            marginLeft: '10px',
+            color: 'white',
+            fontWeight: '700',
+            fontStyle: 'italic',
+            fontSize: '2rem'
+          }}>
+            BRIDE
+          </span>
         </h1>
-        <p style={{
-          color: 'rgba(255,255,255,0.8)',
-          margin: '0.5rem 0 0'
-        }}>
-          AI-Powered Face Swap
-        </p>
       </div>
 
-      {/* Template grid - Clean, minimal layout */}
-      <div className="container px-4">
-        <h3 style={{
-          textAlign: 'center', 
-          marginBottom: '1.5rem',
-          color: colors.lightPurple,
-          fontWeight: '300'
+      {/* Large auto-changing template image */}
+      <div className="container px-2">
+        <div style={{
+          backgroundColor: colors.cardBg,
+          borderRadius: '12px',
+          overflow: 'hidden',
+          marginBottom: '30px',
+          boxShadow: `0 4px 20px rgba(0,0,0,0.3)`
         }}>
-          Wedding Templates
-        </h3>
-        
-        <div className="row g-4">
-          {/* Haldi Template */}
-          <div className="col-6 col-md-3">
-            <div style={{
-              backgroundColor: colors.cardBg,
-              borderRadius: '8px',
-              overflow: 'hidden',
-              padding: '12px',
-              height: '100%',
-              border: `1px solid ${colors.darkPurple}20`
-            }}>
-              <div style={{
-                height: '180px',
-                overflow: 'hidden',
-                borderRadius: '4px',
-                marginBottom: '12px'
-              }}>
+          <div style={{
+            height: '350px',
+            overflow: 'hidden',
+            position: 'relative'
+          }}>
+            {templateImages.map((image, index) => (
+              <div 
+                key={index}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  opacity: index === currentImageIndex ? 1 : 0,
+                  transition: 'opacity 1s ease-in-out',
+                  zIndex: index === currentImageIndex ? 1 : 0
+                }}
+              >
                 <img 
-                  src="/static/results/result_1747231562_haldi_5.jpg" 
-                  alt="Haldi"
+                  src={image.src} 
+                  alt={image.title}
                   style={{
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
-                    objectPosition: 'top'
+                    objectPosition: 'center'
                   }}
                 />
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                  padding: '20px 15px',
+                  textAlign: 'center'
+                }}>
+                  <h3 style={{
+                    color: 'white',
+                    margin: 0,
+                    fontWeight: '400',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                  }}>
+                    {image.title}
+                  </h3>
+                </div>
               </div>
-              <h5 style={{
-                textAlign: 'center',
-                color: colors.lightPurple,
-                margin: 0,
-                fontSize: '1rem'
-              }}>
-                Haldi
-              </h5>
-            </div>
-          </div>
-          
-          {/* Wedding Template */}
-          <div className="col-6 col-md-3">
-            <div style={{
-              backgroundColor: colors.cardBg,
-              borderRadius: '8px',
-              overflow: 'hidden',
-              padding: '12px',
-              height: '100%',
-              border: `1px solid ${colors.darkPurple}20`
-            }}>
-              <div style={{
-                height: '180px',
-                overflow: 'hidden',
-                borderRadius: '4px',
-                marginBottom: '12px'
-              }}>
-                <img 
-                  src="/static/results/result_1747229949_wedding_5.jpg" 
-                  alt="Wedding"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    objectPosition: 'top'
-                  }}
-                />
-              </div>
-              <h5 style={{
-                textAlign: 'center',
-                color: colors.lightPurple,
-                margin: 0,
-                fontSize: '1rem'
-              }}>
-                Wedding
-              </h5>
-            </div>
-          </div>
-          
-          {/* Reception Template */}
-          <div className="col-6 col-md-3">
-            <div style={{
-              backgroundColor: colors.cardBg,
-              borderRadius: '8px',
-              overflow: 'hidden',
-              padding: '12px',
-              height: '100%',
-              border: `1px solid ${colors.darkPurple}20`
-            }}>
-              <div style={{
-                height: '180px',
-                overflow: 'hidden',
-                borderRadius: '4px',
-                marginBottom: '12px'
-              }}>
-                <img 
-                  src="/static/results/result_1747229942_wedding_3.jpg" 
-                  alt="Reception"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    objectPosition: 'top'
-                  }}
-                />
-              </div>
-              <h5 style={{
-                textAlign: 'center',
-                color: colors.lightPurple,
-                margin: 0,
-                fontSize: '1rem'
-              }}>
-                Reception
-              </h5>
-            </div>
-          </div>
-          
-          {/* Mehendi Template */}
-          <div className="col-6 col-md-3">
-            <div style={{
-              backgroundColor: colors.cardBg,
-              borderRadius: '8px',
-              overflow: 'hidden',
-              padding: '12px',
-              height: '100%',
-              border: `1px solid ${colors.darkPurple}20`
-            }}>
-              <div style={{
-                height: '180px',
-                overflow: 'hidden',
-                borderRadius: '4px',
-                marginBottom: '12px'
-              }}>
-                <img 
-                  src="/static/templates/bride/makeup/natural/4ea63131c2229217909c0eb9167437cb.jpg" 
-                  alt="Mehendi"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    objectPosition: 'top'
-                  }}
-                />
-              </div>
-              <h5 style={{
-                textAlign: 'center',
-                color: colors.lightPurple,
-                margin: 0,
-                fontSize: '1rem'
-              }}>
-                Mehendi
-              </h5>
-            </div>
+            ))}
           </div>
         </div>
         
-        {/* Spacer */}
-        <div style={{height: '40px'}}></div>
-        
-        {/* Categories Section */}
-        <h3 style={{
-          textAlign: 'center', 
-          marginBottom: '1.5rem',
-          color: colors.lightPurple,
-          fontWeight: '300'
+        {/* Image navigation dots */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginBottom: '30px'
         }}>
-          Categories
-        </h3>
-        
-        <div className="row g-4">
-          {/* Bride Category */}
-          <div className="col-6 col-md-3">
-            <div style={{
-              backgroundColor: colors.cardBg,
-              borderRadius: '8px',
-              overflow: 'hidden',
-              padding: '12px',
-              height: '100%',
-              border: `1px solid ${colors.darkPurple}20`
-            }}>
-              <div style={{
-                height: '150px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: colors.darkPurple,
-                borderRadius: '4px',
-                marginBottom: '12px'
-              }}>
-                <i className="fas fa-female fa-3x" style={{color: 'rgba(255,255,255,0.9)'}}></i>
-              </div>
-              <h5 style={{
-                textAlign: 'center',
-                color: colors.lightPurple,
-                margin: 0,
-                fontSize: '1rem'
-              }}>
-                Bride
-              </h5>
-            </div>
-          </div>
-          
-          {/* Groom Category */}
-          <div className="col-6 col-md-3">
-            <div style={{
-              backgroundColor: colors.cardBg,
-              borderRadius: '8px',
-              overflow: 'hidden',
-              padding: '12px',
-              height: '100%',
-              border: `1px solid ${colors.darkPurple}20`
-            }}>
-              <div style={{
-                height: '150px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: colors.darkPurple,
-                borderRadius: '4px',
-                marginBottom: '12px'
-              }}>
-                <i className="fas fa-male fa-3x" style={{color: 'rgba(255,255,255,0.9)'}}></i>
-              </div>
-              <h5 style={{
-                textAlign: 'center',
-                color: colors.lightPurple,
-                margin: 0,
-                fontSize: '1rem'
-              }}>
-                Groom
-              </h5>
-            </div>
-          </div>
-          
-          {/* Saloon Category */}
-          <div className="col-6 col-md-3">
-            <div style={{
-              backgroundColor: colors.cardBg,
-              borderRadius: '8px',
-              overflow: 'hidden',
-              padding: '12px',
-              height: '100%',
-              border: `1px solid ${colors.darkPurple}20`
-            }}>
-              <div style={{
-                height: '150px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: colors.darkPurple,
-                borderRadius: '4px',
-                marginBottom: '12px'
-              }}>
-                <i className="fas fa-cut fa-3x" style={{color: 'rgba(255,255,255,0.9)'}}></i>
-              </div>
-              <h5 style={{
-                textAlign: 'center',
-                color: colors.lightPurple,
-                margin: 0,
-                fontSize: '1rem'
-              }}>
-                Saloon
-              </h5>
-            </div>
-          </div>
-          
-          {/* Venues Category */}
-          <div className="col-6 col-md-3">
-            <div style={{
-              backgroundColor: colors.cardBg,
-              borderRadius: '8px',
-              overflow: 'hidden',
-              padding: '12px',
-              height: '100%',
-              border: `1px solid ${colors.darkPurple}20`
-            }}>
-              <div style={{
-                height: '150px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: colors.darkPurple,
-                borderRadius: '4px',
-                marginBottom: '12px'
-              }}>
-                <i className="fas fa-building fa-3x" style={{color: 'rgba(255,255,255,0.9)'}}></i>
-              </div>
-              <h5 style={{
-                textAlign: 'center',
-                color: colors.lightPurple,
-                margin: 0,
-                fontSize: '1rem'
-              }}>
-                Venues
-              </h5>
-            </div>
-          </div>
+          {templateImages.map((_, index) => (
+            <div 
+              key={index}
+              style={{
+                width: '10px',
+                height: '10px',
+                borderRadius: '50%',
+                backgroundColor: index === currentImageIndex ? colors.lightPurple : '#444',
+                margin: '0 5px',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s ease'
+              }}
+              onClick={() => setCurrentImageIndex(index)}
+            />
+          ))}
         </div>
         
         {/* Simple How It Works Section */}
@@ -352,7 +167,7 @@ const HomePage = () => {
           backgroundColor: colors.cardBg,
           borderRadius: '8px',
           padding: '1.5rem',
-          marginTop: '40px',
+          marginTop: '20px',
           marginBottom: '20px'
         }}>
           <h3 style={{
