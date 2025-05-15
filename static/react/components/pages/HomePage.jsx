@@ -7,40 +7,23 @@ import React, { useState, useEffect } from 'react';
 const HomePage = () => {
   // Define the dark purple theme colors
   const colors = {
-    darkPurple: '#6a0dad',
+    darkPurple: '#2b1744', // Updated to the exact dark purple shade requested
     mediumPurple: '#8a2be2',
     lightPurple: '#9d4edd',
     darkBg: '#1a1a1a',
     cardBg: '#212121'
   };
 
-  // Define template images grouped by ceremony using the pinterest directory
-  const ceremonyImages = {
-    haldi: [
-      '/templates/uploads/pinterest/haldi/haldi_2.jpg',
-      '/templates/uploads/pinterest/haldi/haldi_3.jpg',
-      '/templates/uploads/pinterest/haldi/haldi_10.jpg',
-      '/templates/uploads/pinterest/haldi/haldi_11.jpg'
-    ],
-    mehendi: [
-      '/templates/uploads/pinterest/mehendi/mehendi_1.jpg',
-      '/templates/uploads/pinterest/mehendi/mehendi_2.jpg',
-      '/templates/uploads/pinterest/mehendi/mehendi_3.jpg',
-      '/templates/uploads/pinterest/mehendi/mehendi_4.jpg'
-    ],
-    wedding: [
-      '/templates/uploads/pinterest/wedding/wedding_1.jpg',
-      '/templates/uploads/pinterest/wedding/wedding_3.jpg',
-      '/templates/uploads/pinterest/wedding/wedding_4.jpg',
-      '/templates/uploads/pinterest/wedding/wedding_5.jpg'
-    ],
-    reception: [
-      '/templates/uploads/pinterest/reception/reception_1.jpg',
-      '/templates/uploads/pinterest/reception/reception_2.jpg',
-      '/templates/uploads/pinterest/reception/reception_3.jpg',
-      '/templates/uploads/pinterest/reception/reception_4.jpg'
-    ]
-  };
+  // State to store template images for each ceremony
+  const [ceremonyImages, setCeremonyImages] = useState({
+    haldi: [],
+    mehendi: [],
+    wedding: [],
+    reception: []
+  });
+
+  // State to track if images are loading
+  const [loading, setLoading] = useState(true);
 
   // Ceremony titles
   const ceremonyTitles = {
@@ -53,6 +36,34 @@ const HomePage = () => {
   // Order of ceremonies
   const ceremonyOrder = ['haldi', 'mehendi', 'wedding', 'reception'];
 
+  // Default fallback images in case API fails
+  const defaultImages = {
+    haldi: [
+      '/templates/uploads/pinterest/haldi/haldi_2.jpg',
+      '/templates/uploads/pinterest/haldi/haldi_3.jpg',
+      '/templates/uploads/pinterest/haldi/haldi_4.jpg',
+      '/templates/uploads/pinterest/haldi/haldi_5.jpg'
+    ],
+    mehendi: [
+      '/templates/uploads/pinterest/mehendi/mehendi_1.jpg',
+      '/templates/uploads/pinterest/mehendi/mehendi_2.jpg',
+      '/templates/uploads/pinterest/mehendi/mehendi_3.jpg',
+      '/templates/uploads/pinterest/mehendi/mehendi_4.jpg'
+    ],
+    wedding: [
+      '/templates/uploads/pinterest/wedding/wedding_1.jpg',
+      '/templates/uploads/pinterest/wedding/wedding_2.jpg',
+      '/templates/uploads/pinterest/wedding/wedding_3.jpg',
+      '/templates/uploads/pinterest/wedding/wedding_4.jpg'
+    ],
+    reception: [
+      '/templates/uploads/pinterest/reception/reception_1.jpg',
+      '/templates/uploads/pinterest/reception/reception_2.jpg',
+      '/templates/uploads/pinterest/reception/reception_3.jpg',
+      '/templates/uploads/pinterest/reception/reception_4.jpg'
+    ]
+  };
+
   // State for the current image indices for each ceremony
   const [currentIndices, setCurrentIndices] = useState({
     haldi: 0,
@@ -61,25 +72,73 @@ const HomePage = () => {
     reception: 0
   });
 
+  // Fetch templates from API for each ceremony
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      setLoading(true);
+      try {
+        const templates = {};
+        
+        // Fetch templates for each ceremony type
+        for (const ceremony of ceremonyOrder) {
+          try {
+            const response = await fetch(`/api/templates?category_type=bride&subcategory=bridal&item_category=${ceremony}`);
+            if (response.ok) {
+              const data = await response.json();
+              if (data.templates && data.templates.length > 0) {
+                // Get up to 4 template images
+                templates[ceremony] = data.templates
+                  .slice(0, 4)
+                  .map(template => template.url);
+              } else {
+                // Use default images if no templates found
+                templates[ceremony] = defaultImages[ceremony];
+              }
+            } else {
+              templates[ceremony] = defaultImages[ceremony];
+            }
+          } catch (error) {
+            console.error(`Error fetching ${ceremony} templates:`, error);
+            templates[ceremony] = defaultImages[ceremony];
+          }
+        }
+        
+        setCeremonyImages(templates);
+      } catch (error) {
+        console.error('Error fetching templates:', error);
+        // Fall back to default images
+        setCeremonyImages(defaultImages);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchTemplates();
+  }, []);
+
   // Effect for auto-changing images
   useEffect(() => {
+    if (loading) return;
+    
     const intervals = {};
     
     // Set interval for each ceremony type
     Object.keys(ceremonyImages).forEach(ceremony => {
-      intervals[ceremony] = setInterval(() => {
-        setCurrentIndices(prev => ({
-          ...prev,
-          [ceremony]: (prev[ceremony] + 1) % ceremonyImages[ceremony].length
-        }));
-      }, 3000); // Change image every 3 seconds
+      if (ceremonyImages[ceremony] && ceremonyImages[ceremony].length > 0) {
+        intervals[ceremony] = setInterval(() => {
+          setCurrentIndices(prev => ({
+            ...prev,
+            [ceremony]: (prev[ceremony] + 1) % ceremonyImages[ceremony].length
+          }));
+        }, 3000); // Change image every 3 seconds
+      }
     });
 
     return () => {
       // Clear all intervals on component unmount
       Object.values(intervals).forEach(interval => clearInterval(interval));
     };
-  }, []);
+  }, [loading, ceremonyImages]);
 
   return (
     <div className="home-page" style={{backgroundColor: '#121212', padding: '20px 10px'}}>
@@ -95,7 +154,7 @@ const HomePage = () => {
           letterSpacing: '2px'
         }}>
           <span style={{
-            color: colors.mediumPurple,
+            color: colors.darkPurple,
             fontWeight: '800',
             fontSize: '2.2rem'
           }}>
@@ -116,66 +175,123 @@ const HomePage = () => {
       {/* Row of ceremony images */}
       <div className="container px-2">
         <div className="row g-0">
-          {ceremonyOrder.map(ceremony => (
-            <div className="col-md-3" key={ceremony}>
-              <div style={{
-                backgroundColor: colors.cardBg,
-                overflow: 'hidden',
-                boxShadow: `0 4px 20px rgba(0,0,0,0.3)`,
-                height: '100%'
-              }}>
-                <div style={{
-                  height: '280px',
-                  overflow: 'hidden',
-                  position: 'relative'
-                }}>
-                  {ceremonyImages[ceremony].map((src, index) => (
-                    <div 
-                      key={index}
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        opacity: index === currentIndices[ceremony] ? 1 : 0,
-                        transition: 'opacity 1s ease-in-out',
-                        zIndex: index === currentIndices[ceremony] ? 1 : 0
-                      }}
-                    >
-                      <img 
-                        src={src} 
-                        alt={`${ceremonyTitles[ceremony]} Image ${index + 1}`}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          objectPosition: 'center'
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-                <div style={{
-                  background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-                  padding: '15px',
-                  textAlign: 'center',
-                  position: 'relative',
-                  marginTop: '-50px'
-                }}>
-                  <h4 style={{
-                    color: 'white',
-                    margin: 0,
-                    fontWeight: '400',
-                    textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+          {loading ? (
+            // Loading state
+            <>
+              {[1, 2, 3, 4].map(num => (
+                <div className="col-md-3" key={`loading-${num}`}>
+                  <div style={{
+                    backgroundColor: colors.cardBg,
+                    overflow: 'hidden',
+                    boxShadow: `0 4px 20px rgba(0,0,0,0.3)`,
+                    height: '100%'
                   }}>
-                    {ceremonyTitles[ceremony]}
-                  </h4>
+                    <div style={{
+                      height: '280px',
+                      overflow: 'hidden',
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: '#1a1a1a'
+                    }}>
+                      <div className="spinner-border text-light" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                    </div>
+                    <div style={{
+                      background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                      padding: '15px',
+                      textAlign: 'center',
+                      position: 'relative',
+                      marginTop: '-50px'
+                    }}>
+                      <div className="placeholder-glow">
+                        <span className="placeholder col-8"></span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                {/* Navigation dots hidden as requested */}
+              ))}
+            </>
+          ) : (
+            // Images loaded
+            ceremonyOrder.map(ceremony => (
+              <div className="col-md-3" key={ceremony}>
+                <div style={{
+                  backgroundColor: colors.cardBg,
+                  overflow: 'hidden',
+                  boxShadow: `0 4px 20px rgba(0,0,0,0.3)`,
+                  height: '100%'
+                }}>
+                  <div style={{
+                    height: '280px',
+                    overflow: 'hidden',
+                    position: 'relative'
+                  }}>
+                    {ceremonyImages[ceremony] && ceremonyImages[ceremony].length > 0 ? (
+                      ceremonyImages[ceremony].map((src, index) => (
+                        <div 
+                          key={index}
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            opacity: index === currentIndices[ceremony] ? 1 : 0,
+                            transition: 'opacity 1s ease-in-out',
+                            zIndex: index === currentIndices[ceremony] ? 1 : 0
+                          }}
+                        >
+                          <img 
+                            src={src} 
+                            alt={`${ceremonyTitles[ceremony]} Image ${index + 1}`}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              objectPosition: 'center'
+                            }}
+                            onError={(e) => {
+                              console.error(`Failed to load image: ${src}`);
+                              e.target.src = '/static/placeholder.jpg';
+                            }}
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '100%',
+                        backgroundColor: '#1a1a1a'
+                      }}>
+                        <p style={{color: '#666', textAlign: 'center'}}>No images available</p>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{
+                    background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                    padding: '15px',
+                    textAlign: 'center',
+                    position: 'relative',
+                    marginTop: '-50px'
+                  }}>
+                    <h4 style={{
+                      color: 'white',
+                      margin: 0,
+                      fontWeight: '400',
+                      textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                    }}>
+                      {ceremonyTitles[ceremony]}
+                    </h4>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
         
         {/* Simple How It Works Section */}
