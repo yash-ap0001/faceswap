@@ -147,14 +147,21 @@ const UniversalPageNew = () => {
     // Construct API URL
     const url = `/api/templates?category_type=${category.key}&subcategory=${subcategory.key}&item_category=${item.key}`;
     
+    console.log("Fetching templates with URL:", url);
+    
     fetch(url)
-      .then(response => response.json())
+      .then(response => {
+        console.log("Got response with status:", response.status);
+        return response.json();
+      })
       .then(data => {
+        console.log("Received data:", data);
         setLoading(false);
         if (data.success && data.templates && data.templates.length > 0) {
+          console.log("Setting templates with count:", data.templates.length);
           setTemplates(data.templates);
         } else {
-          setError('No templates found for the selected category');
+          setError(data.error || 'No templates found for the selected category');
         }
       })
       .catch(error => {
