@@ -82,7 +82,6 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Settings',
             icon: 'fa-cog',
             subItems: [
-              { id: 'all-categories', label: 'All Categories', link: '/react#all-categories' },
               { id: 'bulk-upload', label: 'Bulk Upload Templates', link: '/react#bulk-upload' }
             ]
           }

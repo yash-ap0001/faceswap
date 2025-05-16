@@ -8,6 +8,7 @@ import UniversalSwapPage from './pages/UniversalSwapPage';
 import UniversalPage from './pages/UniversalPage';
 import UniversalPageNew from './pages/UniversalPageNew';
 import BulkUpload from './pages/BulkUpload';
+import VowBadge from './VowBadge';
 
 /**
  * Main App component that manages the application layout and state
@@ -77,18 +78,12 @@ const App = () => {
         return <BridalGalleryPage />;
       case 'face-swap-page':
         return <UniversalPageNew />;
-      case 'groom-face-swap':
-        return <UniversalSwapPage category="groom" />;
-      case 'bride-saloons':
-        return <UniversalSwapPage category="bride-saloon" />;
-      case 'groom-saloons':
-        return <UniversalSwapPage category="groom-saloon" />;
-      case 'makeup-artists':
-        return <UniversalSwapPage category="bride-saloon" />;
-      case 'all-categories':
-        return <UniversalPage />;
       case 'bulk-upload':
-        return <BulkUpload />;
+        return (
+          <div className="container mt-4" style={{ position: 'relative' }}>
+            <BulkUpload />
+          </div>
+        );
       default:
         // For pages that don't have dedicated components yet
         return <MainContent currentPage={currentPage} />;
@@ -162,6 +157,7 @@ const App = () => {
         ></i>
       </button>
       <div className="main-container" style={mainContainerStyle}>
+        <VowBadge />
         <div className="content-container">
           {renderPageContent()}
         </div>

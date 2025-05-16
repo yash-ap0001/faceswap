@@ -364,12 +364,11 @@ const UniversalPageNew = () => {
   return (
     <>
       <div className="app-container">
-        {/* Header */}
-
-        
-        {/* Main Content */}
-        <div className="main-container">
+        {/* Add top margin to push content below the badge */}
+        <div className="main-container" style={{ marginTop: '64px' }}>
           <div className="content-container">
+            {/* Page Heading */}
+            <h4 className="mb-4" style={{ fontWeight: 700, letterSpacing: '0.02em' }}>Face Swap</h4>
             {/* Main upload and options section (removed card) */}
             <div className="mb-3 bg-black text-light py-3 px-3">
               <div className="row">

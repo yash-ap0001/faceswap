@@ -1,0 +1,10 @@
+{
+    "e2c70891-ed6e-451c-85bc-c1d9edd748a4": {
+        "id": "e2c70891-ed6e-451c-85bc-c1d9edd748a4",
+        "username": "test",
+        "email": "test@gmail.com",
+        "password_hash": "scrypt:32768:8:1$MqYtw51mo3tAQsLE$ce5e8883b0d8cbb7287dbe928bda3bfe6ee324c143041f0e393780bb031538afe0a1ee73a60cbe89347fe22e8086e623a2aebc0c8875008a7aae8ee186eeff1b",
+        "created_at": "2025-05-16T16:50:30.355522",
+        "last_login": "2025-05-16T16:50:30.505605"
+    }
+}

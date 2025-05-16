@@ -293,7 +293,8 @@ const BridalSwapPage = () => {
   };
 
   return (
-    <div className="bridal-swap-page">
+    <div className="bridal-swap-page" style={{ marginTop: '64px' }}>
+      <h4 className="mb-4" style={{ fontWeight: 700, letterSpacing: '0.02em' }}>Bridal Swap</h4>
       <div className="d-flex align-items-center justify-content-between mb-3">
         <h6 className="m-0">Create Your Bridal Look</h6>
         
