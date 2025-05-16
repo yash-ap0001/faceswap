@@ -39,28 +39,28 @@ const HomePage = () => {
   // Default fallback images in case API fails
   const defaultImages = {
     haldi: [
-      '/templates/uploads/pinterest/haldi/haldi_2.jpg',
-      '/templates/uploads/pinterest/haldi/haldi_3.jpg',
-      '/templates/uploads/pinterest/haldi/haldi_4.jpg',
-      '/templates/uploads/pinterest/haldi/haldi_5.jpg'
+      '/static/templates/bride/haldi/haldi_1.jpg',
+      '/static/templates/bride/haldi/haldi_2.jpg',
+      '/static/templates/bride/haldi/haldi_3.jpg',
+      '/static/templates/bride/haldi/haldi_4.jpg'
     ],
     mehendi: [
-      '/templates/uploads/pinterest/mehendi/mehendi_1.jpg',
-      '/templates/uploads/pinterest/mehendi/mehendi_2.jpg',
-      '/templates/uploads/pinterest/mehendi/mehendi_3.jpg',
-      '/templates/uploads/pinterest/mehendi/mehendi_4.jpg'
+      '/static/templates/bride/mehendi/mehendi_1.jpg',
+      '/static/templates/bride/mehendi/mehendi_2.jpg',
+      '/static/templates/bride/mehendi/mehendi_3.jpg',
+      '/static/templates/bride/mehendi/mehendi_4.jpg'
     ],
     wedding: [
-      '/templates/uploads/pinterest/wedding/wedding_1.jpg',
-      '/templates/uploads/pinterest/wedding/wedding_2.jpg',
-      '/templates/uploads/pinterest/wedding/wedding_3.jpg',
-      '/templates/uploads/pinterest/wedding/wedding_4.jpg'
+      '/static/templates/bride/wedding/wedding_1.jpg',
+      '/static/templates/bride/wedding/wedding_2.jpg',
+      '/static/templates/bride/wedding/wedding_3.jpg',
+      '/static/templates/bride/wedding/wedding_4.jpg'
     ],
     reception: [
-      '/templates/uploads/pinterest/reception/reception_1.jpg',
-      '/templates/uploads/pinterest/reception/reception_2.jpg',
-      '/templates/uploads/pinterest/reception/reception_3.jpg',
-      '/templates/uploads/pinterest/reception/reception_4.jpg'
+      '/static/templates/bride/reception/reception_1.jpg',
+      '/static/templates/bride/reception/reception_2.jpg',
+      '/static/templates/bride/reception/reception_3.jpg',
+      '/static/templates/bride/reception/reception_4.jpg'
     ]
   };
 

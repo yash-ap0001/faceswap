@@ -340,60 +340,7 @@
       "description": "Celebrity face swap options",
       "icon": "star",
       "subcategories": [
-        {
-          "id": "men",
-          "name": "Men",
-          "description": "Male celebrity options",
-          "items": [
-            {
-              "id": "actors",
-              "name": "Actors",
-              "description": "Popular male actors"
-            },
-            {
-              "id": "singers",
-              "name": "Singers",
-              "description": "Famous male singers"
-            },
-            {
-              "id": "sports",
-              "name": "Sports Stars",
-              "description": "Male sports celebrities"
-            },
-            {
-              "id": "models",
-              "name": "Models",
-              "description": "Male fashion models"
-            }
-          ]
-        },
-        {
-          "id": "women",
-          "name": "Women",
-          "description": "Female celebrity options",
-          "items": [
-            {
-              "id": "actresses",
-              "name": "Actresses",
-              "description": "Popular female actresses"
-            },
-            {
-              "id": "singers",
-              "name": "Singers",
-              "description": "Famous female singers"
-            },
-            {
-              "id": "models",
-              "name": "Models",
-              "description": "Female fashion models"
-            },
-            {
-              "id": "sports",
-              "name": "Sports Stars",
-              "description": "Female sports celebrities"
-            }
-          ]
-        },
+        
         {
           "id": "tollywood",
           "name": "Tollywood",
@@ -408,16 +355,6 @@
               "id": "actresses",
               "name": "Actresses",
               "description": "Female Tollywood actresses"
-            },
-            {
-              "id": "classic",
-              "name": "Classic",
-              "description": "Legendary Tollywood stars"
-            },
-            {
-              "id": "new-gen",
-              "name": "New Generation",
-              "description": "Rising Tollywood stars"
             }
           ]
         },
@@ -435,132 +372,6 @@
               "id": "actresses",
               "name": "Actresses",
               "description": "Female Bollywood actresses"
-            },
-            {
-              "id": "classic",
-              "name": "Classic",
-              "description": "Legendary Bollywood stars"
-            },
-            {
-              "id": "new-gen",
-              "name": "New Generation",
-              "description": "Rising Bollywood stars"
-            }
-          ]
-        },
-        {
-          "id": "item",
-          "name": "Item",
-          "description": "Miscellaneous celebrity options",
-          "items": [
-            {
-              "id": "international",
-              "name": "International",
-              "description": "Famous international celebrities"
-            },
-            {
-              "id": "influencers",
-              "name": "Influencers",
-              "description": "Social media influencers"
-            },
-            {
-              "id": "trending",
-              "name": "Trending",
-              "description": "Currently trending personalities"
-            },
-            {
-              "id": "historical",
-              "name": "Historical",
-              "description": "Historical famous personalities"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "services",
-      "name": "Other Services",
-      "description": "Additional wedding services",
-      "icon": "bell",
-      "subcategories": [
-        {
-          "id": "catering",
-          "name": "Catering",
-          "description": "Food and beverage services",
-          "items": [
-            {
-              "id": "traditional",
-              "name": "Traditional",
-              "description": "Traditional cuisine for ceremonies"
-            },
-            {
-              "id": "multi-cuisine",
-              "name": "Multi-Cuisine",
-              "description": "Variety of cuisine options"
-            },
-            {
-              "id": "vegetarian",
-              "name": "Vegetarian",
-              "description": "Vegetarian catering options"
-            },
-            {
-              "id": "premium",
-              "name": "Premium",
-              "description": "High-end catering services"
-            }
-          ]
-        },
-        {
-          "id": "photography",
-          "name": "Photography",
-          "description": "Photography and videography services",
-          "items": [
-            {
-              "id": "traditional",
-              "name": "Traditional",
-              "description": "Classic wedding photography"
-            },
-            {
-              "id": "candid",
-              "name": "Candid",
-              "description": "Candid and natural photography"
-            },
-            {
-              "id": "cinematic",
-              "name": "Cinematic",
-              "description": "Cinematic photography and videography"
-            },
-            {
-              "id": "drone",
-              "name": "Drone & Special Effects",
-              "description": "Advanced photography with drone and special effects"
-            }
-          ]
-        },
-        {
-          "id": "decoration",
-          "name": "Decoration",
-          "description": "Venue decoration services",
-          "items": [
-            {
-              "id": "traditional",
-              "name": "Traditional",
-              "description": "Classical and traditional decoration"
-            },
-            {
-              "id": "contemporary",
-              "name": "Contemporary",
-              "description": "Modern and trendy decoration"
-            },
-            {
-              "id": "themed",
-              "name": "Themed",
-              "description": "Custom-themed decoration"
-            },
-            {
-              "id": "premium",
-              "name": "Premium",
-              "description": "Luxury and premium decoration services"
             }
           ]
         }

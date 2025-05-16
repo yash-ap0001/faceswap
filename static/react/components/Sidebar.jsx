@@ -28,7 +28,7 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Face Swap',
             icon: 'fa-magic',
             subItems: [
-              { id: 'face-swap-page', label: 'Universal Face Swap', link: '/react#face-swap-page' }
+              { id: 'face-swap-page', label: 'Face Swap', link: '/react#face-swap-page' }
             ]
           },
           {
@@ -38,51 +38,52 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             subItems: [
               { id: 'bridal-gallery', label: 'Bridal Gallery', link: '/react#bridal-gallery' },
               { id: 'bridal-swap', label: 'Create Bride Look', link: '/react#bridal-swap' },
-              { id: 'outfits-for-girls', label: 'Outfits for Girls', link: '/react#outfits-for-girls' },
-              { id: 'jewelry-collections', label: 'Jewelry Collections', link: '/react#jewelry-collections' },
-              { id: 'makeup-styles', label: 'Makeup Styles', link: '/react#makeup-styles' }
+            //   { id: 'outfits-for-girls', label: 'Outfits for Girls', link: '/react#outfits-for-girls' },
+            //   { id: 'jewelry-collections', label: 'Jewelry Collections', link: '/react#jewelry-collections' },
+            //   { id: 'makeup-styles', label: 'Makeup Styles', link: '/react#makeup-styles' }
+            // 
             ]
           },
-          {
-            id: 'groom',
-            title: 'Groom',
-            icon: 'fa-male',
-            subItems: [
-              { id: 'groom-face-swap', label: 'Create Groom Look', link: '/react#groom-face-swap' },
-              { id: 'traditional-wear', label: 'Traditional Wear', link: '/react#traditional-wear' },
-              { id: 'modern-suits', label: 'Modern Suits', link: '/react#modern-suits' },
-              { id: 'groom-accessories', label: 'Accessories', link: '/react#groom-accessories' }
-            ]
-          },
-          {
-            id: 'saloons',
-            title: 'Saloons',
-            icon: 'fa-cut',
-            subItems: [
-              { id: 'bride-saloons', label: 'Bride Saloons', link: '/react#bride-saloons' },
-              { id: 'groom-saloons', label: 'Groom Saloons', link: '/react#groom-saloons' },
-              { id: 'makeup-artists', label: 'Makeup Artists', link: '/react#makeup-artists' },
-              { id: 'saloon-packages', label: 'Saloon Packages', link: '/react#saloon-packages' }
-            ]
-          },
-          {
-            id: 'services',
-            title: 'Services',
-            icon: 'fa-concierge-bell',
-            subItems: [
-              { id: 'venue-search', label: 'Venue Search', link: '/react#venue-search' },
-              { id: 'catering-list', label: 'Catering List', link: '/react#catering-list' },
-              { id: 'event-managers', label: 'Event Managers', link: '/react#event-managers' },
-              { id: 'photographers', label: 'Photographers', link: '/react#photographers' }
-            ]
-          },
+          // {
+          //   id: 'groom',
+          //   title: 'Groom',
+          //   icon: 'fa-male',
+          //   subItems: [
+          //     { id: 'groom-face-swap', label: 'Create Groom Look', link: '/react#groom-face-swap' },
+          //     { id: 'traditional-wear', label: 'Traditional Wear', link: '/react#traditional-wear' },
+          //     { id: 'modern-suits', label: 'Modern Suits', link: '/react#modern-suits' },
+          //     { id: 'groom-accessories', label: 'Accessories', link: '/react#groom-accessories' }
+          //   ]
+          // },
+          // {
+          //   id: 'saloons',
+          //   title: 'Saloons',
+          //   icon: 'fa-cut',
+          //   subItems: [
+          //     { id: 'bride-saloons', label: 'Bride Saloons', link: '/react#bride-saloons' },
+          //     { id: 'groom-saloons', label: 'Groom Saloons', link: '/react#groom-saloons' },
+          //     { id: 'makeup-artists', label: 'Makeup Artists', link: '/react#makeup-artists' },
+          //     { id: 'saloon-packages', label: 'Saloon Packages', link: '/react#saloon-packages' }
+          //   ]
+          // },
+          // {
+          //   id: 'services',
+          //   title: 'Services',
+          //   icon: 'fa-concierge-bell',
+          //   subItems: [
+          //     { id: 'venue-search', label: 'Venue Search', link: '/react#venue-search' },
+          //     { id: 'catering-list', label: 'Catering List', link: '/react#catering-list' },
+          //     { id: 'event-managers', label: 'Event Managers', link: '/react#event-managers' },
+          //     { id: 'photographers', label: 'Photographers', link: '/react#photographers' }
+          //   ]
+          // },
           {
             id: 'settings',
             title: 'Settings',
             icon: 'fa-cog',
             subItems: [
               { id: 'all-categories', label: 'All Categories', link: '/react#all-categories' },
-              { id: 'bulk-upload', label: 'Bulk Upload Templates', link: '/bulk-upload' }
+              { id: 'bulk-upload', label: 'Bulk Upload Templates', link: '/react#bulk-upload' }
             ]
           }
         ];

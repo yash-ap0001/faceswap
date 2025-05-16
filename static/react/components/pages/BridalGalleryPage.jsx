@@ -216,7 +216,7 @@ const BridalGalleryPage = () => {
                   style={{ 
                     transform: `scale(${zoomLevel})`,
                     transition: 'transform 0.3s ease',
-                    maxHeight: '95vh',
+                    maxHeight: '100vh',
                     maxWidth: '100%',
                     objectFit: 'contain'
                   }} 
@@ -370,7 +370,7 @@ const BridalGalleryPage = () => {
           border-radius: 8px;
           width: 90%;
           max-width: 900px;
-          max-height: 95vh;
+          max-height: 100vh;
           display: flex;
           flex-direction: column;
         }

@@ -14,6 +14,7 @@ import io
 import traceback
 import logging
 from flask_login import LoginManager
+import base64
 
 # Import face enhancer
 from face_enhancer import FaceEnhancer
@@ -31,7 +32,7 @@ app.secret_key = os.environ.get("SESSION_SECRET", "development_secret_key")
 
 # Initialize the database
 from db import db
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://postgres:postgres@localhost/faceswap'
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
@@ -466,27 +467,35 @@ def get_templates_route():
     if not item_category:
         return jsonify({'success': False, 'message': 'Missing required category parameter'}), 400
     
-    # Create path to Pinterest template directory as specified by user
-    template_dir = os.path.join('templates', 'uploads', 'pinterest', item_category)
+    # Create path to template directory
+    if category_type == 'bride' and subcategory == 'bridal':
+        template_dir = os.path.join('static', 'templates', 'bride', item_category)
+    else:
+        template_dir = os.path.join('static', 'templates', category_type, subcategory, item_category)
     
     # Check if directory exists
     if not os.path.exists(template_dir):
-        # Fallback to static directory if Pinterest templates don't exist
-        template_dir = os.path.join('static', 'templates', item_category)
-        
-        if not os.path.exists(template_dir):
+        # Try fallback directory
+        fallback_dir = os.path.join('templates', 'uploads', 'pinterest', item_category)
+        if os.path.exists(fallback_dir):
+            template_dir = fallback_dir
+        else:
             return jsonify({
                 'success': False, 
                 'message': f'No templates found for {item_category}',
                 'templates': []
             }), 404
     
-    # Get all jpg files in the directory
+    # Get all image files in the directory
     template_files = [f for f in os.listdir(template_dir) 
-                     if f.lower().endswith('.jpg') and os.path.isfile(os.path.join(template_dir, f))]
+                     if f.lower().endswith(('.jpg', '.jpeg', '.png')) and 
+                     os.path.isfile(os.path.join(template_dir, f))]
     
-    # Limit to 6 files for consistency
-    template_files = template_files[:6]
+    # Sort files to ensure consistent order
+    template_files.sort()
+    
+    # Limit to 30 files for consistency
+    template_files = template_files[:30]
     
     # Create template objects
     templates = []
@@ -575,89 +584,49 @@ def api_categories():
                     "name": "Traditional Wear",
                     "items": [
                         {"id": "sherwani", "key": "sherwani", "name": "Sherwani"},
-                        {"id": "kurta_pajama", "key": "kurta_pajama", "name": "Kurta Pajama"},
-                        {"id": "dhoti", "key": "dhoti", "name": "Dhoti Style"},
-                        {"id": "indo_western", "key": "indo_western", "name": "Indo-Western"}
+                        {"id": "kurta", "key": "kurta", "name": "Kurta Pajama"},
+                        {"id": "jodhpuri", "key": "jodhpuri", "name": "Jodhpuri Suit"},
+                        {"id": "bandhgala", "key": "bandhgala", "name": "Bandhgala"}
                     ]
                 },
                 {
-                    "id": "suits",
-                    "key": "suits",
-                    "name": "Modern Suits",
+                    "id": "modern",
+                    "key": "modern",
+                    "name": "Modern Wear",
                     "items": [
                         {"id": "tuxedo", "key": "tuxedo", "name": "Tuxedo"},
-                        {"id": "three_piece", "key": "three_piece", "name": "Three Piece Suit"},
-                        {"id": "two_piece", "key": "two_piece", "name": "Two Piece Suit"},
-                        {"id": "blazer", "key": "blazer", "name": "Blazer"}
-                    ]
-                },
-                {
-                    "id": "accessories",
-                    "key": "accessories",
-                    "name": "Accessories",
-                    "items": [
-                        {"id": "turban", "key": "turban", "name": "Turban/Pagdi"},
-                        {"id": "brooch", "key": "brooch", "name": "Brooch & Pins"},
-                        {"id": "cufflinks", "key": "cufflinks", "name": "Cufflinks"},
-                        {"id": "footwear", "key": "footwear", "name": "Traditional Footwear"}
+                        {"id": "suit", "key": "suit", "name": "Formal Suit"},
+                        {"id": "blazer", "key": "blazer", "name": "Blazer"},
+                        {"id": "casual", "key": "casual", "name": "Casual Wear"}
                     ]
                 }
             ]
         },
         {
-            "id": "bride-saloon",
-            "key": "bride-saloon",
-            "name": "Bride Saloons",
+            "id": "salon",
+            "key": "salon",
+            "name": "Salon",
             "subcategories": [
                 {
-                    "id": "makeup",
-                    "key": "makeup",
-                    "name": "Makeup Styles",
+                    "id": "men",
+                    "key": "men",
+                    "name": "Men",
                     "items": [
-                        {"id": "natural", "key": "natural", "name": "Natural Look"},
-                        {"id": "glamorous", "key": "glamorous", "name": "Glamorous"},
-                        {"id": "traditional", "key": "traditional", "name": "Traditional"},
-                        {"id": "contemporary", "key": "contemporary", "name": "Contemporary"}
+                        {"id": "haircut", "key": "haircut", "name": "Haircut Styles"},
+                        {"id": "beard", "key": "beard", "name": "Beard Styles"},
+                        {"id": "facial", "key": "facial", "name": "Facial Styles"},
+                        {"id": "grooming", "key": "grooming", "name": "Grooming Styles"}
                     ]
                 },
                 {
-                    "id": "hairstyle",
-                    "key": "hairstyle",
-                    "name": "Hairstyles",
+                    "id": "women",
+                    "key": "women",
+                    "name": "Women",
                     "items": [
-                        {"id": "updo", "key": "updo", "name": "Updo Styles"},
-                        {"id": "open_hair", "key": "open_hair", "name": "Open Hair"},
-                        {"id": "braided", "key": "braided", "name": "Braided Styles"},
-                        {"id": "bun", "key": "bun", "name": "Bun Variations"}
-                    ]
-                }
-            ]
-        },
-        {
-            "id": "groom-saloon",
-            "key": "groom-saloon",
-            "name": "Groom Saloons",
-            "subcategories": [
-                {
-                    "id": "grooming",
-                    "key": "grooming",
-                    "name": "Grooming",
-                    "items": [
-                        {"id": "clean_shave", "key": "clean_shave", "name": "Clean Shave"},
-                        {"id": "beard_styles", "key": "beard_styles", "name": "Beard Styles"},
-                        {"id": "mustache", "key": "mustache", "name": "Mustache Styles"},
-                        {"id": "facial", "key": "facial", "name": "Facial & Spa"}
-                    ]
-                },
-                {
-                    "id": "haircut",
-                    "key": "haircut",
-                    "name": "Haircuts",
-                    "items": [
-                        {"id": "classic", "key": "classic", "name": "Classic Cut"},
-                        {"id": "fade", "key": "fade", "name": "Fade Styles"},
-                        {"id": "textured", "key": "textured", "name": "Textured Cut"},
-                        {"id": "pompadour", "key": "pompadour", "name": "Pompadour"}
+                        {"id": "haircut", "key": "haircut", "name": "Haircut Styles"},
+                        {"id": "coloring", "key": "coloring", "name": "Hair Coloring"},
+                        {"id": "styling", "key": "styling", "name": "Hair Styling"},
+                        {"id": "facial", "key": "facial", "name": "Facial Styles"}
                     ]
                 }
             ]
@@ -709,17 +678,6 @@ def api_categories():
                         {"id": "actresses", "key": "actresses", "name": "Actresses"},
                         {"id": "classic", "key": "classic", "name": "Classic Stars"},
                         {"id": "new-gen", "key": "new-gen", "name": "New Generation"}
-                    ]
-                },
-                {
-                    "id": "item",
-                    "key": "item",
-                    "name": "Item",
-                    "items": [
-                        {"id": "international", "key": "international", "name": "International"},
-                        {"id": "influencers", "key": "influencers", "name": "Influencers"},
-                        {"id": "trending", "key": "trending", "name": "Trending"},
-                        {"id": "historical", "key": "historical", "name": "Historical"}
                     ]
                 }
             ]
@@ -1489,115 +1447,67 @@ def bulk_upload_page():
 
 @app.route('/upload-bulk-templates', methods=['POST'])
 def upload_bulk_templates():
-    """
-    Handle bulk template upload for any category.
-    Process multiple images for different categories and subcategories.
-    """
     if 'files' not in request.files:
         return jsonify({'error': 'No files part'}), 400
-    
-    # Get category information
+
     category_type = request.form.get('category_type')
     subcategory = request.form.get('subcategory')
     item_category = request.form.get('item_category')
-    
-    if not category_type or not subcategory or not item_category:
-        return jsonify({'error': 'Category type, subcategory and item category are required'}), 400
-    
-    # Define valid categories and validate user input
-    valid_categories = {
+
+    # Define the categories structure (same as /api/categories)
+    categories = {
         'bride': {
             'bridal': ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'],
-            'outfits': ['casual', 'formal', 'party', 'ethnic', 'western'],
-            'jewelry': ['necklaces', 'earrings', 'maang_tikka', 'bangles', 'rings'],
-            'makeup': ['traditional', 'modern', 'natural', 'bold', 'reception']
+            'outfits': ['traditional', 'modern', 'fusion', 'casual'],
+            'jewelry': ['necklace', 'earrings', 'bangles', 'mang_tikka']
         },
         'groom': {
-            'traditional': ['sherwani', 'kurta', 'indo_western', 'dhoti', 'jodhpuri'],
-            'suits': ['tuxedos', 'three_piece', 'two_piece', 'blazers', 'casual'],
-            'accessories': ['watches', 'cufflinks', 'ties', 'pocket_squares', 'shoes']
+            'traditional': ['sherwani', 'kurta', 'jodhpuri', 'bandhgala'],
+            'modern': ['tuxedo', 'suit', 'blazer', 'casual']
+        },
+        'salon': {
+            'men': ['haircut', 'beard', 'facial', 'grooming'],
+            'women': ['haircut', 'coloring', 'styling', 'facial']
         },
         'celebrity': {
             'men': ['actors', 'singers', 'sports', 'models'],
             'women': ['actresses', 'singers', 'models', 'sports'],
             'tollywood': ['actors', 'actresses', 'classic', 'new-gen'],
-            'bollywood': ['actors', 'actresses', 'classic', 'new-gen'],
-            'item': ['international', 'influencers', 'trending', 'historical']
+            'bollywood': ['actors', 'actresses', 'classic', 'new-gen']
         }
     }
-    
-    if (category_type not in valid_categories or 
-        subcategory not in valid_categories[category_type] or 
-        item_category not in valid_categories[category_type][subcategory]):
+
+    # Validate category parameters
+    if (category_type not in categories or 
+        subcategory not in categories[category_type] or 
+        item_category not in categories[category_type][subcategory]):
         return jsonify({'error': 'Invalid category combination'}), 400
-    
+
     files = request.files.getlist('files')
     if not files or len(files) == 0:
         return jsonify({'error': 'No files selected'}), 400
-    
-    # Determine the target directory based on category type and subcategory
-    if category_type == 'bride':
-        if subcategory == 'bridal':
-            # Use Pinterest directory for bridal ceremony templates
-            target_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates', 'pinterest', item_category)
-        else:
-            # Use static templates directory for other bride categories
-            target_dir = os.path.join(app.static_folder, 'templates', subcategory, item_category)
-    elif category_type == 'groom':  # groom categories
-        target_dir = os.path.join(app.static_folder, 'templates', 'groom', subcategory, item_category)
-    elif category_type == 'celebrity':  # celebrity categories
-        target_dir = os.path.join(app.static_folder, 'templates', 'celebrity', subcategory, item_category)
-    
-    # Ensure the target directory exists
+
+    # Build the target directory path
+    target_dir = os.path.join('static', 'templates', category_type, subcategory, item_category)
     os.makedirs(target_dir, exist_ok=True)
-    
-    # Track uploads
+
     uploaded_files = []
-    
-    # Process each file
-    for file in files:
+    timestamp = int(time.time())
+    for idx, file in enumerate(files):
         if file and allowed_file(file.filename):
-            # Create a secure filename with the category and a unique index
-            existing_files = [f for f in os.listdir(target_dir) if os.path.isfile(os.path.join(target_dir, f))]
-            next_index = len(existing_files) + 1
-            
-            # Get original file extension
-            orig_filename = secure_filename(file.filename)
-            _, ext = os.path.splitext(orig_filename)
-            if not ext:
-                ext = '.jpg'  # Default to jpg if no extension found
-            
-            # Create the new filename
-            filename = f"{item_category}_{next_index}{ext}"
+            ext = os.path.splitext(secure_filename(file.filename))[1] or '.jpg'
+            filename = f"{category_type}_{subcategory}_{item_category}_{timestamp}_{idx+1}{ext}"
             filepath = os.path.join(target_dir, filename)
-            
-            # Save the file
             file.save(filepath)
             uploaded_files.append(filepath)
-            
-            # If it's a bridal ceremony category, also update the main template
-            if category_type == 'bride' and subcategory == 'bridal' and len(uploaded_files) == 1:
-                # Update main ceremony template
-                templates_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates')
-                os.makedirs(templates_dir, exist_ok=True)
-                
-                # The main Pinterest template for this ceremony type
-                main_template_path = os.path.join(templates_dir, f"{item_category}_pinterest.jpg")
-                shutil.copy(filepath, main_template_path)
-    
-    # Return success response
-    if len(uploaded_files) == 0:
+
+    if not uploaded_files:
         return jsonify({'error': 'No valid files were uploaded'}), 400
-    
+
     return jsonify({
         'success': True,
-        'message': f'Successfully uploaded {len(uploaded_files)} images to {category_type}/{subcategory}/{item_category}',
         'uploaded_count': len(uploaded_files),
-        'category_info': {
-            'type': category_type,
-            'subcategory': subcategory,
-            'item_category': item_category
-        }
+        'uploaded_files': uploaded_files
     })
 
 @app.route('/bridal-multi-swap', methods=['GET'])
@@ -1754,98 +1664,55 @@ def bridal_results():
 
 @app.route('/process_template', methods=['POST'])
 def process_template():
-    """
-    Process a single template with the source face (for AJAX requests)
-    Accepts data in two forms:
-    1. JSON: 
-       - source_path: path to the source image
-       - template_path: path to the template image
-       
-    2. Form data:
-       - source: uploaded source image file
-       - template_path: path to the template image
-       
-    Common parameters:   
-       - enhance: whether to enhance the face after swapping (optional)
-       - enhance_method: enhancement method to use (optional: "gfpgan", "codeformer", or "auto")
-       
-    Returns:
-       - JSON with result path or error
-    """
-    if faceapp is None or swapper is None:
-        return jsonify({'success': False, 'error': 'Models not loaded'})
-    
-    # Handle both JSON and form data
-    source_path = None
-    template_path = None
-    enhance = False
-    enhance_method = 'auto'
-    source_img = None
-    
-    # Process form data or JSON data
-    if request.is_json:
-        data = request.get_json()
-        source_path = data.get('source_path')
-        template_path = data.get('template_path')
-        enhance = data.get('enhance', False)
-        enhance_method = data.get('enhance_method', 'auto')
-        
-        if not source_path or not template_path:
-            return jsonify({'success': False, 'error': 'Missing source or template path'})
-            
-        # Read source image
-        source_img = cv2.imread(source_path)
-    else:
-        # Handle form data
-        if 'source' not in request.files:
-            return jsonify({'success': False, 'error': 'No source file provided'})
-            
-        source_file = request.files['source']
+    try:
+        # Get the template path from the request
         template_path = request.form.get('template_path')
+        if not template_path:
+            return jsonify({'success': False, 'error': 'No template path provided'}), 400
+
+        # Get enhancement options
         enhance = request.form.get('enhance') == 'true'
-        enhance_method = request.form.get('enhance_method', 'auto')
-        
-        if not source_file or not template_path:
-            return jsonify({'success': False, 'error': 'Missing source file or template path'})
-        
-        # Save the uploaded source file
-        timestamp = int(time.time())
-        source_filename = f"source_{timestamp}_{secure_filename(source_file.filename)}"
-        source_path = os.path.join(app.config['UPLOAD_FOLDER'], 'sources', source_filename)
-        
-        # Create directory if it doesn't exist
-        os.makedirs(os.path.dirname(source_path), exist_ok=True)
-        
-        # Save the file
+        enhance_method = request.form.get('enhance_method', 'gfpgan')
+
+        # Read the template image
+        template_img = cv2.imread(template_path)
+        if template_img is None:
+            return jsonify({'success': False, 'error': 'Failed to read template image'}), 400
+
+        # Detect face in template
+        target_faces = faceapp.get(template_img)
+        if not target_faces:
+            return jsonify({'success': False, 'error': 'No face detected in template'}), 400
+
+        # Get the source image from the request
+        if 'source' not in request.files:
+            return jsonify({'success': False, 'error': 'No source file provided'}), 400
+
+        source_file = request.files['source']
+        if source_file.filename == '':
+            return jsonify({'success': False, 'error': 'No selected file'}), 400
+
+        # Save the source file temporarily
+        source_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(source_file.filename))
         source_file.save(source_path)
-        
+
         # Read the source image
         source_img = cv2.imread(source_path)
-    
-    # Continue with processing
-    try:
-        # Read template image
-        template_img = cv2.imread(template_path)
-        
         if source_img is None:
-            return jsonify({'success': False, 'error': f'Failed to read source image: {source_path}'})
-            
-        if template_img is None:
-            return jsonify({'success': False, 'error': f'Failed to read template image: {template_path}'})
-            
-        # Detect faces
+            return jsonify({'success': False, 'error': 'Failed to read source image'}), 400
+
+        # Detect face in source image
         source_faces = faceapp.get(source_img)
-        target_faces = faceapp.get(template_img)
-        
         if not source_faces:
-            return jsonify({'success': False, 'error': 'No face detected in source image'})
-            
-        if not target_faces:
-            return jsonify({'success': False, 'error': 'No face detected in template image'})
-            
-        # Perform face swap
-        result_img = swapper.get(template_img, target_faces[0], source_faces[0], paste_back=True)
-        
+            return jsonify({'success': False, 'error': 'No face detected in source image'}), 400
+
+        # Get face detection results
+        source_face = source_faces[0]
+        target_face = target_faces[0]
+
+        # Perform the swap
+        result_img = swapper.get(template_img, target_face, source_face, paste_back=True)
+
         # Apply face enhancement if requested
         enhanced = False
         if enhance:
@@ -1910,40 +1777,44 @@ def process_template():
 @app.route('/bridal-swap', methods=['GET', 'POST'])
 def bridal_swap():
     if request.method == 'GET':
-        # Check for template parameters
-        style = request.args.get('style', None)
-        if style:
-            # Redirect to the multi-template page when a specific style is provided
-            return redirect(url_for('bridal_multi_swap', ceremony=style))
         return render_template('bridal_swap.html')
-    
-    if faceapp is None or swapper is None:
-        return jsonify({'error': 'Models not loaded. Please check server logs.'}), 500
 
     if 'source' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
+        return jsonify({'error': 'No source file provided'}), 400
     
     source_file = request.files['source']
-    selected_style = request.form.get('style', 'haldi')
-    template_url = request.form.get('template_url')  # Get the user-selected template URL
-    
-    # Check if this is a multi-template request by looking for "multi" parameter or additional templates
-    is_multi_request = request.form.get('multi') == 'true' or request.form.getlist('templates[]')
-    
-    # For multi-template support
-    template_paths = request.form.getlist('templates[]')
-    
-    logger.info(f"Received face swap request with style: {selected_style}, template URL: {template_url}, multi_request: {is_multi_request}")
-    
     if source_file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
     
-    if not allowed_file(source_file.filename):
-        return jsonify({'error': 'Invalid file type. Only PNG, JPG, and JPEG files are allowed.'}), 400
+    # Get template paths from form data
+    template_paths = []
+    ceremonies = []
+    
+    # Check if this is a multi-template request
+    is_multi_request = request.form.get('multi') == 'true'
+    
+    if is_multi_request:
+        # Get templates from the array and remove any duplicates
+        templates = list(set(request.form.getlist('templates[]')))
+        if not templates:
+            return jsonify({'error': 'No templates provided'}), 400
+        template_paths = templates
+    else:
+        # Single template request
+        template_path = request.form.get('template_path')
+        if not template_path:
+            return jsonify({'error': 'No template path provided'}), 400
+        template_paths = [template_path]
     
     try:
-        # Save the source file
-        source_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(source_file.filename))
+        # Create uploads directory if it doesn't exist
+        upload_dir = os.path.join('templates', 'uploads', 'sources')
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        # Save the source file temporarily with a unique name
+        timestamp = int(time.time())
+        source_filename = f"source_{timestamp}_{secure_filename(source_file.filename)}"
+        source_path = os.path.join(upload_dir, source_filename)
         source_file.save(source_path)
         
         # Read the source image for face detection
@@ -1958,300 +1829,61 @@ def bridal_swap():
         if not source_faces:
             return jsonify({'error': 'No face detected in your photo. Please upload a clear photo with your face visible.'}), 400
         
-        # For multi-template processing
-        if is_multi_request and template_paths:
-            logger.info(f"Processing {len(template_paths)} templates for multi-template request")
-            results = []
-            ceremonies = []
-            
-            for i, template_path in enumerate(template_paths):
-                ceremony = request.form.get(f'ceremony_{i}', selected_style)
-                ceremonies.append(ceremony)
-                logger.info(f"Processing template {i+1}/{len(template_paths)}: {ceremony}, path: {template_path}")
-                
-                if not os.path.exists(template_path):
-                    logger.warning(f"Template path does not exist: {template_path}, skipping")
-                    continue
-                
-                try:
-                    # Process the template
-                    template_img = cv2.imread(template_path)
-                    if template_img is None:
-                        logger.warning(f"Failed to read template image: {template_path}, skipping")
-                        continue
-                    
-                    # Detect faces in the template
-                    target_faces = faceapp.get(template_img)
-                    if not target_faces:
-                        logger.warning(f"No face detected in template: {template_path}, skipping")
-                        continue
-                    
-                    # Perform face swap with direct approach
-                    logger.info(f"Performing face swap for template {i+1}")
-                    source_face = source_faces[0]
-                    target_face = target_faces[0]
-                    
-                    # Direct face swap
-                    source_face_box = source_face['bbox'].astype(int)
-                    source_face_landmarks = source_face['kps']
-                    target_face_box = target_face['bbox'].astype(int)
-                    target_face_landmarks = target_face['kps']
-                    
-                    # Log detection results
-                    logger.info(f"Source face: box={source_face_box.tolist()}, landmarks shape={source_face_landmarks.shape}")
-                    logger.info(f"Target face: box={target_face_box.tolist()}, landmarks shape={target_face_landmarks.shape}")
-                    
-                    # Perform the swap - be explicit with paste_back=True
-                    # The error shows that there's an issue with paste_back parameter when automatic conversion happens
-                    result_img = swapper.get(template_img, target_face, source_face, paste_back=True)
-                    
-                    # Save result
-                    timestamp = int(time.time())
-                    output_filename = f'bridal_{ceremony}_{timestamp}_{i}_{secure_filename(source_file.filename)}'
-                    output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
-                    cv2.imwrite(output_path, result_img)
-                    
-                    # Add to results
-                    results.append({
-                        'result_image': output_filename,
-                        'ceremony': ceremony,
-                        'index': i
-                    })
-                    
-                except Exception as swap_error:
-                    logger.error(f"Error processing template {i+1}: {str(swap_error)}")
-                    logger.error(traceback.format_exc())
-            
-            # Clean up source file
-            os.remove(source_path)
-            
-            return jsonify({
-                'success': True,
-                'multi': True,
-                'results': results,
-                'ceremonies': ceremonies
-            })
-        
-        # Single template processing (original behavior)
-        else:
-            # Use the user-selected template if provided, otherwise fall back to a random one
-            if template_url and os.path.exists(template_url):
-                logger.info(f"Using user-selected template: {template_url}")
-                target_img = cv2.imread(template_url)
-                target_path = template_url
-            else:
-                logger.info(f"User-selected template not found or not provided, using random template for ceremony: {selected_style}")
-                # Get the template image directly from Pinterest based on ceremony type
-                target_img, target_path = get_pinterest_template_for_ceremony(selected_style)
-            
-            if target_img is None:
-                return jsonify({'error': 'Failed to load bridal template image'}), 500
-            
-            # Detect face in the template image
-            target_faces = faceapp.get(target_img)
-            
-            if not target_faces:
-                return jsonify({'error': 'No face detected in template image. Please try a different style.'}), 400
-            
-            # Perform face swap
-            logger.info(f"Performing face swap with style: {selected_style}, using Pinterest template")
-            result_img = swapper.get(target_img, target_faces[0], source_faces[0], paste_back=True)
-            
-            # Save result
-            timestamp = int(time.time())
-            output_filename = f'bridal_{selected_style}_{timestamp}_{secure_filename(source_file.filename)}'
-            output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
-            cv2.imwrite(output_path, result_img)
-            
-            # Clean up the source file
-            os.remove(source_path)
-            
-            # For consistency with the multi-template format, also return a results array
-            # This helps the frontend handle both single and multi-template responses in the same way
-            return jsonify({
-                'success': True,
-                'multi': False,
-                'result_image': output_filename,  # Keep for backward compatibility
-                'style': selected_style,          # Keep for backward compatibility
-                'results': [{
-                    'result_image': output_filename,
-                    'ceremony': selected_style,
-                    'index': 0
-                }]
-            })
-        
-    except Exception as e:
-        logger.error(f"Error in bridal_swap: {str(e)}")
-        logger.error(traceback.format_exc())
-        # Clean up files in case of error
-        if 'source_path' in locals() and os.path.exists(source_path):
-            os.remove(source_path)
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/bridal-swap-multi', methods=['POST'])
-def bridal_swap_multi():
-    """
-    Process multiple templates with the same source face.
-    Expects:
-    - source: uploaded image file
-    - template_0, template_1, etc.: paths to template images
-    - ceremony_0, ceremony_1, etc.: corresponding ceremony types
-    - template_count: number of templates
-    - enhance: whether to enhance the face after swapping (optional)
-    - enhance_method: enhancement method to use (optional: "gfpgan", "codeformer", or "auto")
-    Returns:
-    - JSON with results array or error message
-    """
-    if faceapp is None or swapper is None:
-        return jsonify({'success': False, 'error': 'Models not loaded. Please check server logs.'}), 500
-
-    if 'source' not in request.files:
-        return jsonify({'success': False, 'error': 'No source image provided'}), 400
-    
-    source_file = request.files['source']
-    if source_file.filename == '':
-        return jsonify({'success': False, 'error': 'No source image selected'}), 400
-    
-    if not allowed_file(source_file.filename):
-        return jsonify({'success': False, 'error': 'Invalid file format for source image'}), 400
-    
-    # Log all form data for debugging
-    logger.info("Received form data for multi-swap:")
-    for key, value in request.form.items():
-        logger.info(f"  {key}: {value}")
-    
-    # Get template count
-    template_count = int(request.form.get('template_count', '0'))
-    logger.info(f"Template count from form: {template_count}")
-    
-    # Face enhancement options
-    enhance = request.form.get('enhance', 'false').lower() == 'true'
-    enhance_method = request.form.get('enhance_method', 'auto')
-    logger.info(f"Enhancement options: enhance={enhance}, method={enhance_method}")
-    
-    if template_count <= 0 or template_count > 5:
-        return jsonify({'success': False, 'error': 'Invalid number of templates. Please select 1-5 templates.'}), 400
-    
-    # Get template paths
-    template_paths = []
-    ceremony_types = []
-    for i in range(template_count):
-        template_path = request.form.get(f'template_{i}')
-        ceremony_type = request.form.get(f'ceremony_{i}', 'unknown')
-        
-        logger.info(f"Template {i+1}: Path={template_path}, Ceremony={ceremony_type}")
-        
-        if not template_path:
-            return jsonify({'success': False, 'error': f'Template {i+1} path not provided'}), 400
-            
-        if not os.path.exists(template_path):
-            logger.error(f"Template file not found: {template_path}")
-            return jsonify({'success': False, 'error': f'Template {i+1} file not found'}), 400
-        
-        template_paths.append(template_path)
-        ceremony_types.append(ceremony_type)
-    
-    try:
-        # Save the source image
-        source_filename = secure_filename(source_file.filename)
-        source_path = os.path.join(app.config['UPLOAD_FOLDER'], source_filename)
-        source_file.save(source_path)
-        
-        # Read the source image
-        source_img = cv2.imread(source_path)
-        if source_img is None:
-            return jsonify({'success': False, 'error': 'Failed to read source image'}), 400
-        
-        # Detect face in source image
-        source_faces = faceapp.get(source_img)
-        if not source_faces:
-            return jsonify({'success': False, 'error': 'No face detected in your photo. Please upload a clear photo with your face visible.'}), 400
-        
-        # Create results directory if it doesn't exist
-        results_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'results')
-        os.makedirs(results_dir, exist_ok=True)
-        
-        # Process each template
+        # Process templates
         results = []
-        for i, (template_path, ceremony_type) in enumerate(zip(template_paths, ceremony_types)):
+        processed_paths = set()  # Keep track of processed paths to avoid duplicates
+        
+        for i, template_path in enumerate(template_paths):
+            # Skip if we've already processed this template
+            if template_path in processed_paths:
+                continue
+                
             try:
+                # Extract ceremony type from template path
+                ceremony = os.path.basename(template_path).split('_')[0]
+                ceremonies.append(ceremony)
+                
                 # Read template image
                 template_img = cv2.imread(template_path)
                 if template_img is None:
-                    logger.warning(f"Failed to read template image at {template_path}")
+                    logger.error(f"Failed to read template image: {template_path}")
                     continue
                 
                 # Detect face in template
                 target_faces = faceapp.get(template_img)
                 if not target_faces:
-                    logger.warning(f"No face detected in template image at {template_path}")
+                    logger.error(f"No face detected in template: {template_path}")
                     continue
                 
-                # Perform face swap
-                logger.info(f"Processing template {i+1}/{template_count}: {ceremony_type}")
-                
-                # Extract the face boxes to avoid comparison issues
-                target_face = target_faces[0]
+                # Get face detection results
                 source_face = source_faces[0]
+                target_face = target_faces[0]
                 
-                # Perform the swap with proper error handling
-                try:
-                    # Direct face swap approach - similar to how it works in the Create Bride Look function
-                    try:
-                        # This is how it works in the traditional bridal_swap function
-                        # First, we get faces with face detection
-                        source_face_box = source_face['bbox'].astype(int)
-                        source_face_landmarks = source_face['kps']
-                        target_face_box = target_face['bbox'].astype(int)
-                        target_face_landmarks = target_face['kps']
-                        
-                        # Log detection results
-                        logger.info(f"Source face: box={source_face_box.tolist()}, landmarks shape={source_face_landmarks.shape}")
-                        logger.info(f"Target face: box={target_face_box.tolist()}, landmarks shape={target_face_landmarks.shape}")
-                        
-                        # Direct approach with swapper
-                        # This is the same approach used in bridal_swap that works
-                        # Fixed to use explicit paste_back=True parameter
-                        result_img = swapper.get(template_img, target_face, source_face, paste_back=True)
-                        logger.info(f"Face swap successful")
-                    except Exception as inner_error:
-                        logger.error(f"Face swap operation failed: {inner_error}")
-                        logger.error(f"Detailed error: {traceback.format_exc()}")
-                        # Create a demo result with face boxes for debugging
-                        result_img = create_demo_result(source_img, template_img, source_face, target_face)
-                        logger.info(f"Created fallback result with face boxes due to error")
-                    
-                except Exception as swap_error:
-                    logger.error(f"Face swap operation failed: {swap_error}")
-                    # Create a demo result with face boxes for debugging
-                    result_img = create_demo_result(source_img, template_img, source_face, target_face)
-                    logger.info("Created fallback result with face boxes")
+                # Perform the swap
+                result_img = swapper.get(template_img, target_face, source_face, paste_back=True)
                 
                 # Apply face enhancement if requested
-                enhanced = False
-                enhanced_method = None
-                if enhance:
+                if request.form.get('enhance') == 'true':
                     try:
                         # Initialize the face enhancer if not already initialized
                         global face_enhancer
                         if face_enhancer is None:
                             from face_enhancer import FaceEnhancer
                             face_enhancer = FaceEnhancer()
-                        logger.info(f"Applying face enhancement with method: {enhance_method}")
                         
                         # Apply face enhancement
+                        enhance_method = request.form.get('enhance_method', 'gfpgan')
                         result_img = face_enhancer.enhance(result_img, method=enhance_method, strength=0.8)
-                        logger.info("Face enhancement applied successfully")
-                        enhanced = True
-                        enhanced_method = enhance_method
                     except Exception as e:
                         logger.error(f"Face enhancement failed: {str(e)}")
-                        logger.error(traceback.format_exc())
                         # Continue with the unenhanced result
                 
-                # Save result
-                timestamp = int(time.time())
-                result_filename = f"multi_{i}_{ceremony_type}_{timestamp}_{secure_filename(source_file.filename)}"
+                # Create results directory if it doesn't exist
+                results_dir = os.path.join('static', 'results')
+                os.makedirs(results_dir, exist_ok=True)
+                
+                # Save result with unique filename per template
+                result_filename = f"{ceremony}_{timestamp}_{i}_{os.path.basename(template_path)}"
                 result_path = os.path.join(results_dir, result_filename)
                 
                 # Save the result
@@ -2259,18 +1891,24 @@ def bridal_swap_multi():
                 
                 # Add to results
                 results.append({
-                    'ceremony': ceremony_type,
-                    'result_path': f"/uploads/results/{result_filename}",
-                    'enhanced': enhanced,
-                    'enhance_method': enhanced_method
+                    'result_image': f'/static/results/{result_filename}',
+                    'template_path': template_path,
+                    'ceremony': ceremony,
+                    'index': i
                 })
                 
+                # Mark this template as processed
+                processed_paths.add(template_path)
+                
             except Exception as e:
-                logger.error(f"Error processing template {i+1}/{template_count}: {str(e)}")
+                logger.error(f"Error processing template {i+1}/{len(template_paths)}: {str(e)}")
                 # Continue with next template
         
         # Clean up source file
-        os.remove(source_path)
+        try:
+            os.remove(source_path)
+        except Exception as e:
+            logger.error(f"Error cleaning up source file: {str(e)}")
         
         if not results:
             return jsonify({'success': False, 'error': 'Failed to process any templates. Please try again.'}), 500
@@ -2283,11 +1921,14 @@ def bridal_swap_multi():
         })
         
     except Exception as e:
-        logger.error(f"Error in bridal_swap_multi: {str(e)}")
+        logger.error(f"Error in bridal_swap: {str(e)}")
         logger.error(traceback.format_exc())
         # Clean up files in case of error
         if 'source_path' in locals() and os.path.exists(source_path):
-            os.remove(source_path)
+            try:
+                os.remove(source_path)
+            except Exception as cleanup_error:
+                logger.error(f"Error cleaning up source file: {str(cleanup_error)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/templates', methods=['GET'])
@@ -2295,56 +1936,40 @@ def get_templates():
     """
     API endpoint to get available templates for a specific category.
     Returns templates for the requested category with URLs for display.
-    Always performs a fresh scan of the filesystem to avoid caching issues.
     
     Query parameters:
-    - ceremony_type: For backward compatibility with bridal ceremonies
-    - category_type: 'bride' or 'groom'
-    - subcategory: e.g., 'bridal', 'outfits', 'jewelry' for bride or 'traditional', 'suits', 'accessories' for groom
-    - item_category: Specific item category, e.g., 'haldi', 'casual', etc.
+    - category_type: Main category (bride, groom, salon, celebrity)
+    - subcategory: Subcategory within the main category
+    - item_category: Specific item within the subcategory
     """
-    # Add cache-busting parameter in logs (not used but helps in debugging)
-    cache_buster = request.args.get('_t', 'none')
-    
-    # Check for category-based parameters
+    # Get category parameters
     category_type = request.args.get('category_type')
     subcategory = request.args.get('subcategory')
     item_category = request.args.get('item_category')
     
-    # For backward compatibility - check for ceremony_type parameter
-    ceremony_type = request.args.get('ceremony_type', request.args.get('ceremony'))
-    
-    # If ceremony_type is provided, use bridal category structure
-    if ceremony_type and not (category_type and subcategory and item_category):
-        category_type = 'bride'
-        subcategory = 'bridal'
-        item_category = ceremony_type
-        app.logger.info(f"Using ceremony_type parameter: {ceremony_type}")
-    elif category_type and subcategory and item_category:
-        app.logger.info(f"Using category parameters: {category_type}/{subcategory}/{item_category}")
-    else:
-        app.logger.warning("Missing required category parameters")
+    if not all([category_type, subcategory, item_category]):
         return jsonify({'error': 'Missing required category parameters'}), 400
     
-    # Define valid categories
+    # Define valid categories based on the new structure
     valid_categories = {
         'bride': {
             'bridal': ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'],
-            'outfits': ['casual', 'formal', 'party', 'ethnic', 'western'],
-            'jewelry': ['necklaces', 'earrings', 'maang_tikka', 'bangles', 'rings'],
-            'makeup': ['traditional', 'modern', 'natural', 'bold', 'reception']
+            'outfits': ['traditional', 'modern', 'fusion', 'casual'],
+            'jewelry': ['necklace', 'earrings', 'bangles', 'mang_tikka']
         },
         'groom': {
-            'traditional': ['sherwani', 'kurta', 'indo_western', 'dhoti', 'jodhpuri'],
-            'suits': ['tuxedos', 'three_piece', 'two_piece', 'blazers', 'casual'],
-            'accessories': ['watches', 'cufflinks', 'ties', 'pocket_squares', 'shoes']
+            'traditional': ['sherwani', 'kurta', 'jodhpuri', 'bandhgala'],
+            'modern': ['tuxedo', 'suit', 'blazer', 'casual']
+        },
+        'salon': {
+            'men': ['haircut', 'beard', 'facial', 'grooming'],
+            'women': ['haircut', 'coloring', 'styling', 'facial']
         },
         'celebrity': {
             'men': ['actors', 'singers', 'sports', 'models'],
             'women': ['actresses', 'singers', 'models', 'sports'],
             'tollywood': ['actors', 'actresses', 'classic', 'new-gen'],
-            'bollywood': ['actors', 'actresses', 'classic', 'new-gen'],
-            'item': ['international', 'influencers', 'trending', 'historical']
+            'bollywood': ['actors', 'actresses', 'classic', 'new-gen']
         }
     }
     
@@ -2352,121 +1977,48 @@ def get_templates():
     if (category_type not in valid_categories or 
         subcategory not in valid_categories[category_type] or 
         item_category not in valid_categories[category_type][subcategory]):
-        app.logger.warning(f"Invalid category combination: {category_type}/{subcategory}/{item_category}")
-        return jsonify({'error': f'Invalid category combination: {category_type}/{subcategory}/{item_category}'}), 400
+        return jsonify({'error': 'Invalid category combination'}), 400
     
-    app.logger.info(f"Fetching templates for {category_type}/{subcategory}/{item_category}, cache-buster: {cache_buster}")
+    # Determine the target directory based on category type
+    if category_type == 'bride':
+        if subcategory == 'bridal':
+            target_dir = os.path.join(app.static_folder, 'templates', category_type, item_category)
+        else:
+            target_dir = os.path.join(app.static_folder, 'templates', category_type, subcategory, item_category)
+    elif category_type == 'groom':
+        target_dir = os.path.join(app.static_folder, 'templates', category_type, subcategory, item_category)
+    elif category_type == 'salon':
+        target_dir = os.path.join(app.static_folder, 'templates', category_type, subcategory, item_category)
+    elif category_type == 'celebrity':
+        target_dir = os.path.join(app.static_folder, 'templates', category_type, subcategory, item_category)
     
-    # Ensure fresh list by explicitly creating a new array
+    # Create directory if it doesn't exist
+    os.makedirs(target_dir, exist_ok=True)
+    
+    # Get all template files
     templates = []
     template_id = 1
     
-    # Set defaults for template variables to avoid "possibly unbound" errors
-    template_dir = None
-    template_type = 'pinterest'  # Default to Pinterest templates
+    if os.path.exists(target_dir):
+        for file in sorted(os.listdir(target_dir)):
+            if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                file_path = os.path.join(target_dir, file)
+                if os.path.isfile(file_path):
+                    template_id_str = f"{category_type}_{subcategory}_{item_category}_{template_id}"
+                    
+                    # Calculate URL based on category type
+                    url_path = file_path.replace(app.static_folder, '/static')
+                    
+                    templates.append({
+                        'id': template_id_str,
+                        'category_type': category_type,
+                        'subcategory': subcategory,
+                        'item_category': item_category,
+                        'path': file_path,
+                        'url': f"{url_path}?t={int(time.time())}"
+                    })
+                    template_id += 1
     
-    # Handle bridal ceremony templates (from uploads/templates/pinterest)
-    if category_type == 'bride' and subcategory == 'bridal':
-        # Get templates directory for bridal ceremonies
-        template_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates', 'pinterest')
-        
-        # Check if template directory exists
-        if not os.path.exists(template_dir):
-            app.logger.warning(f"Template directory does not exist: {template_dir}")
-            os.makedirs(template_dir, exist_ok=True)
-            app.logger.info(f"Created template directory: {template_dir}")
-        
-        app.logger.info(f"Scanning bridal template directory: {template_dir}")
-        
-        # Log all subdirectories in templates for debugging
-        try:
-            subdirs = [d for d in os.listdir(template_dir) if os.path.isdir(os.path.join(template_dir, d))]
-            app.logger.info(f"Template subdirectories: {subdirs}")
-            
-            # Also log files in the template root
-            files = [f for f in os.listdir(template_dir) if os.path.isfile(os.path.join(template_dir, f))]
-            app.logger.info(f"Files in template root: {files}")
-        except Exception as e:
-            app.logger.error(f"Error scanning template directory: {e}")
-            
-        # We're using Pinterest templates for bridal ceremonies
-        template_type = 'pinterest'
-    
-    # Handle bridal ceremony templates
-    if category_type == 'bride' and subcategory == 'bridal':
-        # We'll only check for images directly in the item_category subdirectory
-        # since we're already in the .../templates/pinterest directory
-        
-        # Check for item category directory
-        type_dir = os.path.join(template_dir, item_category)
-        if os.path.exists(type_dir) and os.path.isdir(type_dir):
-            app.logger.info(f"Scanning additional templates in: {type_dir}")
-            for file in sorted(os.listdir(type_dir)):
-                if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
-                    file_path = os.path.join(type_dir, file)
-                    if os.path.isfile(file_path):
-                        template_id_str = f"{item_category}_{template_type}_{template_id}"
-                        app.logger.info(f"Found additional {template_type} template: {file_path}")
-                        
-                        # Calculate the URL for the template
-                        url_path = f"/templates/uploads/pinterest/{item_category}/{file}"
-                        templates.append({
-                            'id': template_id_str,
-                            'template_type': template_type,
-                            'category_type': category_type,
-                            'subcategory': subcategory,
-                            'item_category': item_category,
-                            'path': file_path,
-                            'url': f"{url_path}?t={int(time.time())}"
-                        })
-                        template_id += 1
-    # Handle other category types (bride non-bridal and groom)
-    else:
-        # Determine the appropriate directory based on category type
-        if category_type == 'bride':
-            target_dir = os.path.join(app.static_folder, 'templates', subcategory, item_category)
-        elif category_type == 'groom':
-            target_dir = os.path.join(app.static_folder, 'templates', 'groom', subcategory, item_category)
-        elif category_type == 'celebrity':
-            target_dir = os.path.join(app.static_folder, 'templates', 'celebrity', subcategory, item_category)
-        
-        app.logger.info(f"Scanning category directory: {target_dir}")
-        
-        # Create directory if it doesn't exist
-        if not os.path.exists(target_dir):
-            app.logger.warning(f"Category directory does not exist: {target_dir}")
-            os.makedirs(target_dir, exist_ok=True)
-            app.logger.info(f"Created category directory: {target_dir}")
-            
-        # Scan for template images in the category directory
-        if os.path.exists(target_dir) and os.path.isdir(target_dir):
-            for file in sorted(os.listdir(target_dir)):
-                if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
-                    file_path = os.path.join(target_dir, file)
-                    if os.path.isfile(file_path):
-                        template_id_str = f"{category_type}_{subcategory}_{item_category}_{template_id}"
-                        app.logger.info(f"Found category template: {file_path}")
-                        
-                        # Calculate the URL relative to the static directory
-                        url_path = file_path.replace(app.static_folder, '/static')
-                        templates.append({
-                            'id': template_id_str,
-                            'category_type': category_type,
-                            'subcategory': subcategory,
-                            'item_category': item_category,
-                            'path': file_path,
-                            'url': f"{url_path}?t={int(time.time())}"
-                        })
-                        template_id += 1
-    
-    # This section is intentionally removed as it's redundant
-    # The pinterest templates are already handled in the loop above
-    # via the type_dir approach with template_type = 'pinterest'
-    
-    # Return the collected template information
-    app.logger.info(f"Found {len(templates)} templates for {category_type}/{subcategory}/{item_category}")
-    
-    # Include category information in the response
     return jsonify({
         'templates': templates,
         'count': len(templates),
@@ -2478,561 +2030,37 @@ def get_templates():
         'timestamp': int(time.time())
     })
 
-def get_bridal_template(style, template_type='natural'):
-    """
-    Get the template image for the selected bridal style and template type.
-    
-    Args:
-        style (str): The bridal style ('haldi', 'mehendi', 'sangeeth', 'wedding', or 'reception')
-        template_type (str): The template type ('real', 'natural' or 'ai')
-        
-    Returns:
-        tuple: (template_img, template_path)
-    """
-    # Validate style name
-    valid_styles = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
-    if style not in valid_styles:
-        logger.warning(f"Invalid style: {style}. Using 'wedding' as fallback.")
-        style = 'wedding'
-    
-    # Validate template type
-    valid_types = ['real', 'natural', 'ai', 'pinterest']
-    if template_type not in valid_types:
-        logger.warning(f"Invalid template type: {template_type}. Using 'pinterest' as fallback.")
-        template_type = 'pinterest'
-    
-    # Create template directories if they don't exist
-    template_dir = os.path.join('templates', 'uploads')
-    type_dir = os.path.join(template_dir, template_type)
-    os.makedirs(template_dir, exist_ok=True)
-    os.makedirs(type_dir, exist_ok=True)
-    
-    # First try the direct combination of style and type
-    template_filename = f"{style}_{template_type}.jpg"
-    template_path = os.path.join(template_dir, template_filename)
-    
-    # Check if the file exists
-    if os.path.exists(template_path):
-        template_img = cv2.imread(template_path)
-        if template_img is not None:
-            logger.info(f"Using template: {template_path}")
-            return template_img, template_path
-    
-    # If direct file doesn't exist, check in type subdirectory
-    subdir_template_path = os.path.join(type_dir, f"{style}.jpg")
-    if os.path.exists(subdir_template_path):
-        template_img = cv2.imread(subdir_template_path)
-        if template_img is not None:
-            logger.info(f"Using template from subdirectory: {subdir_template_path}")
-            return template_img, subdir_template_path
-    
-    # If still not found, try legacy template format
-    legacy_template = f"{style}_template.jpg"
-    legacy_path = os.path.join(template_dir, legacy_template)
-    if os.path.exists(legacy_path):
-        template_img = cv2.imread(legacy_path)
-        if template_img is not None:
-            logger.info(f"Using legacy template: {legacy_path}")
-            return template_img, legacy_path
-    
-    # If all else fails, look for another style of the same type
-    logger.warning(f"No template found for {style}_{template_type}. Trying fallback.")
-    for fallback_style in valid_styles:
-        if fallback_style != style:
-            fallback_path = os.path.join(template_dir, f"{fallback_style}_{template_type}.jpg")
-            if os.path.exists(fallback_path):
-                template_img = cv2.imread(fallback_path)
-                if template_img is not None:
-                    logger.info(f"Using fallback template: {fallback_path}")
-                    return template_img, fallback_path
-    
-    # Last resort: create a blank colored template
-    logger.warning(f"No fallback template found. Creating blank template for {style}.")
-    img_height, img_width = 1024, 768
-    template_img = np.zeros((img_height, img_width, 3), dtype=np.uint8)
-    
-    # Set background color based on style
-    if style == 'haldi':
-        # Yellow for Haldi
-        template_img[:] = (0, 215, 255)  # BGR for yellow
-    elif style == 'mehendi':
-        # Green for Mehendi
-        template_img[:] = (0, 128, 0)  # BGR for green
-    elif style == 'sangeeth':
-        # Blue for Sangeeth
-        template_img[:] = (255, 100, 0)  # BGR for blue-orange
-    elif style == 'wedding':
-        # Red for Wedding
-        template_img[:] = (0, 0, 255)  # BGR for red
-    elif style == 'reception':
-        # Purple for Reception
-        template_img[:] = (128, 0, 128)  # BGR for purple
-    
-    # Add a label indicating which template type this is
-    template_type_label = "Natural" if template_type == "natural" else ("Real" if template_type == "real" else "AI-Generated")
-    
-    # Add text
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    text = f"{style.capitalize()} {template_type_label} Template"
-    text_size = cv2.getTextSize(text, font, 1, 2)[0]
-    text_x = (img_width - text_size[0]) // 2
-    text_y = (img_height + text_size[1]) // 2
-    cv2.putText(template_img, text, (text_x, text_y), font, 1, (255, 255, 255), 2)
-    
-    # Save the template
-    backup_path = os.path.join(template_dir, f"{style}_{template_type}.jpg")
-    cv2.imwrite(backup_path, template_img)
-    logger.info(f"Created and saved blank template: {backup_path}")
-    
-    return template_img, backup_path
+@app.route('/move-template', methods=['POST'])
+def move_template():
+    data = request.get_json()
+    template_paths = data.get('template_paths', [])
+    new_category = data.get('category_type')
+    new_subcategory = data.get('subcategory')
+    new_item = data.get('item_category')
 
+    if not template_paths or not new_category or not new_subcategory or not new_item:
+        return jsonify({'success': False, 'message': 'Missing parameters'}), 400
 
-def get_pinterest_template_for_ceremony(ceremony):
-    """
-    Get a random template image from the Pinterest directory for the specified ceremony.
-    
-    Args:
-        ceremony (str): The ceremony type ('haldi', 'mehendi', 'sangeeth', 'wedding', or 'reception')
-        
-    Returns:
-        tuple: (template_img, template_path)
-    """
-    # Validate ceremony name
-    valid_ceremonies = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception']
-    if ceremony not in valid_ceremonies:
-        logger.warning(f"Invalid ceremony: {ceremony}. Using 'wedding' as fallback.")
-        ceremony = 'wedding'
-    
-    # Path to Pinterest directory for this ceremony
-    template_dir = os.path.join('templates', 'uploads')
-    pinterest_dir = os.path.join(template_dir, 'pinterest', ceremony)
-    
-    # Ensure directory exists
-    if not os.path.exists(pinterest_dir):
-        logger.warning(f"Pinterest directory for {ceremony} not found: {pinterest_dir}")
-        os.makedirs(pinterest_dir, exist_ok=True)
-        
-        # If no directory exists, try to use a main pinterest file
-        main_pinterest_path = os.path.join(template_dir, f"{ceremony}_pinterest.jpg")
-        if os.path.exists(main_pinterest_path):
-            logger.info(f"Using main Pinterest template: {main_pinterest_path}")
-            template_img = cv2.imread(main_pinterest_path)
-            if template_img is not None:
-                return template_img, main_pinterest_path
-                
-        # If still not found, return None
-        logger.error(f"No Pinterest templates found for {ceremony}")
-        return None, None
-    
-    # Get all image files from the Pinterest directory
-    image_files = []
-    for file in os.listdir(pinterest_dir):
-        if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
-            file_path = os.path.join(pinterest_dir, file)
-            if os.path.isfile(file_path):
-                image_files.append(file_path)
-    
-    # If no images found, return None
-    if not image_files:
-        logger.error(f"No images found in Pinterest directory for {ceremony}: {pinterest_dir}")
-        return None, None
-    
-    # Select a random image from the available ones
-    import random
-    selected_path = random.choice(image_files)
-    logger.info(f"Selected Pinterest template: {selected_path}")
-    
-    # Load the selected image
-    template_img = cv2.imread(selected_path)
-    if template_img is None:
-        logger.error(f"Failed to load selected Pinterest template: {selected_path}")
-        return None, None
-        
-    return template_img, selected_path
+    target_dir = os.path.join('static', 'templates', new_category, new_subcategory, new_item)
+    os.makedirs(target_dir, exist_ok=True)
+    moved = []
+    errors = []
 
-
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if faceapp is None:
-        return jsonify({'error': 'Face detection model not loaded. Please check server logs.'}), 500
-
-    if 'source' not in request.files or 'target' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
-    
-    source_file = request.files['source']
-    target_file = request.files['target']
-    
-    if source_file.filename == '' or target_file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-    
-    if not (allowed_file(source_file.filename) and allowed_file(target_file.filename)):
-        return jsonify({'error': 'Invalid file type. Only PNG, JPG, and JPEG files are allowed.'}), 400
-    
-    try:
-        # Save uploaded files
-        source_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(source_file.filename))
-        target_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(target_file.filename))
-        
-        source_file.save(source_path)
-        target_file.save(target_path)
-        
-        # Read images
-        source_img = cv2.imread(source_path)
-        target_img = cv2.imread(target_path)
-        
-        if source_img is None or target_img is None:
-            return jsonify({'error': 'Failed to read one or both images'}), 400
-        
-        # Detect faces
-        source_faces = faceapp.get(source_img)
-        target_faces = faceapp.get(target_img)
-        
-        if not source_faces:
-            return jsonify({'error': 'No face detected in source image'}), 400
-        
-        if not target_faces:
-            return jsonify({'error': 'No face detected in target image'}), 400
-        
-        # Check if we're running in demo mode or with actual face swap
-        if demo_mode or swapper is None:
-            logger.info("Using demo mode for face visualization")
-            result_img = create_demo_result(source_img, target_img, source_faces[0], target_faces[0])
-        else:
-            # Perform actual face swap with the model
-            logger.info("Performing face swap with the model")
-            # Fixed to use explicit paste_back=True parameter
-            result_img = swapper.get(target_img, target_faces[0], source_faces[0], paste_back=True)
-        
-        # Save result
-        output_filename = 'result_' + secure_filename(target_file.filename)
-        output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
-        cv2.imwrite(output_path, result_img)
-        
-        # Clean up uploaded files
-        os.remove(source_path)
-        os.remove(target_path)
-        
-        response_data = {
-            'success': True,
-            'result_image': output_filename,
-            'demo_mode': demo_mode
-        }
-        
-        # Add more information when in demo mode
-        if demo_mode:
-            response_data['message'] = 'Running in demonstration mode. The image shows detected faces with boxes instead of actual face swapping.'
-            
-        return jsonify(response_data)
-        
-    except Exception as e:
-        logger.error(f"Error in upload_file: {str(e)}")
-        logger.error(traceback.format_exc())
-        # Clean up uploaded files in case of error
-        if 'source_path' in locals() and os.path.exists(source_path):
-            os.remove(source_path)
-        if 'target_path' in locals() and os.path.exists(target_path):
-            os.remove(target_path)
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/uploads/<path:filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'].replace('templates/', ''), filename)
-    
-@app.route('/templates/uploads/<path:filename>')
-def template_file(filename):
-    """Serve template files from the templates/uploads directory."""
-    # If the file contains slashes, we need to handle the path components properly
-    if '/' in filename:
-        # Get the relative directory and filename
-        directory, name = os.path.split(filename)
-        return send_from_directory(os.path.join('templates/uploads', directory), name)
-    else:
-        # For simple filenames
-        return send_from_directory('templates/uploads', filename)
-
-@app.route('/check-models')
-def check_models():
-    status = {
-        'face_detection': faceapp is not None,
-        'face_swap': swapper is not None,
-        'demo_mode': demo_mode
-    }
-    return jsonify(status)
-
-@app.route('/upload-model', methods=['GET', 'POST'])
-def upload_model():
-    global swapper, demo_mode
-    
-    if request.method == 'POST':
-        if 'model_file' not in request.files:
-            return render_template('upload_model.html', error='No file part')
-        
-        model_file = request.files['model_file']
-        
-        if model_file.filename == '':
-            return render_template('upload_model.html', error='No selected file')
-        
-        # Check that it's an ONNX file
-        if not model_file.filename.endswith('.onnx'):
-            return render_template('upload_model.html', error='File must be an ONNX model (.onnx)')
-        
-        # Save the model file
-        model_path = os.path.join('models', 'inswapper_128.onnx')
-        os.makedirs('models', exist_ok=True)
-        
+    for path in template_paths:
         try:
-            model_file.save(model_path)
-            logger.info(f"Model file saved to {model_path}")
-            
-            # Validate the model file
-            import onnx
-            try:
-                onnx.load(model_path)
-                logger.info("Model file validated successfully")
-                
-                # Load the model
-                providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
-                swapper = get_model(model_path, providers=providers)
-                logger.info("Face swap model loaded successfully")
-                
-                # Update demo mode
-                demo_mode = False
-                
-                return render_template('upload_model.html', success=True, message="Model uploaded and loaded successfully!")
-            except Exception as e:
-                logger.error(f"Failed to validate model: {str(e)}")
-                return render_template('upload_model.html', error=f"Invalid model file: {str(e)}")
-                
+            filename = os.path.basename(path)
+            # If path is relative, make it absolute
+            if not os.path.isabs(path):
+                abs_path = os.path.join(os.getcwd(), path)
+            else:
+                abs_path = path
+            new_path = os.path.join(target_dir, filename)
+            os.rename(abs_path, new_path)
+            moved.append(new_path)
         except Exception as e:
-            logger.error(f"Error saving model file: {str(e)}")
-            return render_template('upload_model.html', error=f"Error saving model: {str(e)}")
-    
-    return render_template('upload_model.html')
+            errors.append(f"{path}: {str(e)}")
 
-# Helper function to resize large images for face detection
-def resize_image_if_needed(image, max_size=1280):
-    """
-    Resize an image if it's larger than max_size while maintaining aspect ratio.
-    
-    Args:
-        image: OpenCV image
-        max_size: Maximum dimension (width or height)
-        
-    Returns:
-        Resized image
-    """
-    h, w = image.shape[:2]
-    
-    # If image is already smaller than max_size, return as is
-    if h <= max_size and w <= max_size:
-        return image
-    
-    # Calculate new dimensions
-    if h > w:
-        new_h = max_size
-        new_w = int(w * (max_size / h))
-    else:
-        new_w = max_size
-        new_h = int(h * (max_size / w))
-    
-    # Resize image
-    return cv2.resize(image, (new_w, new_h))
+    return jsonify({'success': True, 'moved': moved, 'errors': errors})
 
-# Universal face swap endpoint to work across groom and saloon categories
-@app.route('/universal-face-swap', methods=['POST'])
-@app.route('/universal_face_swap', methods=['POST'])
-def universal_face_swap():
-    """
-    Process a face swap across multiple template categories (Groom, Saloon) with a single API call.
-    Designed for minimal UI requiring only two clicks: upload and swap.
-    
-    Accepts:
-    - source: Uploaded source image file
-    - category: Optional category to specify target templates (groom, bride-saloon, groom-saloon, auto)
-    - process_all: Boolean flag to process all available templates across categories
-    
-    Returns:
-    - JSON with result paths or error
-    """
-    if not faceapp or not swapper:
-        return jsonify({'success': False, 'message': 'Face models not loaded properly'}), 500
-    
-    if 'source' not in request.files:
-        return jsonify({'success': False, 'message': 'No source file found'}), 400
-    
-    source_file = request.files['source']
-    if source_file.filename == '':
-        return jsonify({'success': False, 'message': 'Empty source filename'}), 400
-    
-    if not allowed_file(source_file.filename):
-        return jsonify({'success': False, 'message': 'Invalid file type'}), 400
-    
-    # Get category parameter 
-    category = request.form.get('category', 'auto')
-    process_all = request.form.get('process_all', 'false').lower() == 'true'
-    
-    # Determine which template categories to use
-    template_categories = []
-    
-    if category == 'groom' or category == 'auto' or process_all:
-        template_categories.append({
-            'category_type': 'groom',
-            'subcategories': [
-                {'subcategory': 'traditional', 'items': ['wedding', 'formal']},
-                {'subcategory': 'modern', 'items': ['casual', 'formal']},
-                {'subcategory': 'accessories', 'items': ['turban', 'jewelry']}
-            ]
-        })
-    
-    if category == 'bride-saloon' or category == 'auto' or process_all:
-        template_categories.append({
-            'category_type': 'bride',
-            'subcategories': [
-                {'subcategory': 'makeup', 'items': ['natural', 'glamour']},
-                {'subcategory': 'hair', 'items': ['updo', 'open']}
-            ]
-        })
-    
-    if category == 'groom-saloon' or category == 'auto' or process_all:
-        template_categories.append({
-            'category_type': 'groom',
-            'subcategories': [
-                {'subcategory': 'saloon', 'items': ['hair', 'beard', 'formal']}
-            ]
-        })
-        
-    if category == 'celebrity' or category == 'auto' or process_all:
-        template_categories.append({
-            'category_type': 'celebrity',
-            'subcategories': [
-                {'subcategory': 'men', 'items': ['actors', 'singers', 'sports', 'models']},
-                {'subcategory': 'women', 'items': ['actresses', 'singers', 'models', 'sports']},
-                {'subcategory': 'tollywood', 'items': ['actors', 'actresses', 'classic', 'new-gen']},
-                {'subcategory': 'bollywood', 'items': ['actors', 'actresses', 'classic', 'new-gen']},
-                {'subcategory': 'item', 'items': ['international', 'influencers', 'trending', 'historical']}
-            ]
-        })
-    
-    # Save source file temporarily
-    source_filename = secure_filename(source_file.filename)
-    source_path = os.path.join(app.config['UPLOAD_FOLDER'], 'source_' + source_filename)
-    source_file.save(source_path)
-    
-    try:
-        # Read source image and detect face
-        source_img = cv2.imread(source_path)
-        source_img = resize_image_if_needed(source_img)
-        source_faces = faceapp.get(source_img)
-        
-        if len(source_faces) == 0:
-            os.remove(source_path)
-            return jsonify({'success': False, 'message': 'No face detected in source image'}), 400
-        
-        results = []
-        
-        # Process templates from each category
-        for cat in template_categories:
-            for subcat in cat['subcategories']:
-                for item in subcat['items']:
-                    # Get templates for this category
-                    templates = []
-                    target_dir = None
-                    
-                    if cat['category_type'] == 'bride':
-                        if subcat['subcategory'] == 'makeup' or subcat['subcategory'] == 'hair':
-                            # Use bridal templates for now
-                            target_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'templates', 'pinterest', item)
-                    elif cat['category_type'] == 'groom':
-                        target_dir = os.path.join(app.static_folder, 'templates', 'groom', subcat['subcategory'], item)
-                    elif cat['category_type'] == 'celebrity':
-                        target_dir = os.path.join(app.static_folder, 'templates', 'celebrity', subcat['subcategory'], item)
-                    
-                    if not target_dir or not os.path.exists(target_dir):
-                        # Skip this category if directory doesn't exist
-                        continue
-                    
-                    # Find template images in directory
-                    template_paths = []
-                    for file in os.listdir(target_dir):
-                        if file.lower().endswith(('.jpg', '.jpeg', '.png')):
-                            template_paths.append(os.path.join(target_dir, file))
-                    
-                    # Sort and limit to max 2 templates per category to avoid too many results
-                    template_paths = sorted(template_paths)[:2]
-                    
-                    # Process each template
-                    for template_path in template_paths:
-                        try:
-                            # Read template image
-                            target_img = cv2.imread(template_path)
-                            target_img = resize_image_if_needed(target_img)
-                            target_faces = faceapp.get(target_img)
-                            
-                            if len(target_faces) == 0:
-                                continue  # Skip if no face in template
-                            
-                            # Perform face swap
-                            result_img = swapper.get(target_img, target_faces[0], source_faces[0], paste_back=True)
-                            
-                            # Apply face enhancement if face enhancer is available
-                            if face_enhancer and request.form.get('enhance', 'false').lower() == 'true':
-                                enhance_method = request.form.get('enhance_method', 'auto')
-                                result_img = face_enhancer.enhance_face(result_img, target_faces[0], method=enhance_method)
-                            
-                            # Save result
-                            result_filename = f"result_{cat['category_type']}_{subcat['subcategory']}_{item}_{os.path.basename(template_path)}"
-                            result_path = os.path.join(app.config['UPLOAD_FOLDER'], result_filename)
-                            cv2.imwrite(result_path, result_img)
-                            
-                            # Add to results
-                            results.append({
-                                'category_type': cat['category_type'],
-                                'subcategory': subcat['subcategory'],
-                                'item_category': item,
-                                'template_path': template_path,
-                                'result_path': result_path,
-                                'result_url': f"/uploads/{result_filename}",
-                                'category': f"{subcat['subcategory'].capitalize()} {item.capitalize()}"
-                            })
-                        except Exception as e:
-                            app.logger.error(f"Error processing template {template_path}: {str(e)}")
-                            # Continue with next template
-        
-        # Clean up source file
-        os.remove(source_path)
-        
-        return jsonify({
-            'success': True,
-            'results': results,
-            'count': len(results),
-            'detected_category': category if category != 'auto' else template_categories[0]['category_type']
-        })
-    
-    except Exception as e:
-        app.logger.error(f"Error in universal_face_swap: {str(e)}")
-        app.logger.error(traceback.format_exc())
-        
-        # Clean up files
-        if os.path.exists(source_path):
-            os.remove(source_path)
-        
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-
-# Import React routes from separate file
-# Universal page route (a direct HTML version that doesn't require React build)
-@app.route('/universal')
-def universal_page():
-    """Render the universal categories page using React."""
-    return redirect('/react#face-swap-page')
-
-@app.route('/universal-swap')
-def universal_swap_page():
-    """Render the universal face swap page with a direct HTML template."""
-    return render_template('universal_swap.html')
-
-from react_routes import react_bp, api_bp
-
-# Register React blueprints
-app.register_blueprint(react_bp)
-app.register_blueprint(api_bp)
+if __name__ == '__main__':
+    app.run(debug=True)

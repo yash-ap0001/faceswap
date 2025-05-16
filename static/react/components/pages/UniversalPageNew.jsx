@@ -134,10 +134,9 @@ const UniversalPageNew = () => {
   
   // Handle view templates button
   const handleViewTemplates = () => {
-    if (!sourceFile || !selectedItem) {
+    if (!selectedItem) {
       return;
     }
-    
     setLoading(true);
     setTemplates([]);
     setError(null);
@@ -197,10 +196,14 @@ const UniversalPageNew = () => {
   
   // Handle process templates button
   const handleProcessTemplates = () => {
-    if (selectedTemplates.length === 0 || !sourceFile) {
+    if (!sourceFile) {
+      setError('Please upload an image before processing templates.');
       return;
     }
-    
+    if (selectedTemplates.length === 0) {
+      setError('Please select at least one template to process.');
+      return;
+    }
     setProcessingResults(true);
     setResults([]);
     setError(null);
@@ -209,13 +212,13 @@ const UniversalPageNew = () => {
     const formData = new FormData();
     formData.append('source', sourceFile);
     
-    // Add selected templates
-    selectedTemplates.forEach((template, index) => {
-      formData.append(`template_${index}`, template.path);
+    // Add selected templates - only append each template path once
+    selectedTemplates.forEach((template) => {
+      formData.append('templates[]', template.path);
     });
     
-    // Add template count
-    formData.append('template_count', selectedTemplates.length);
+    // Add multi parameter
+    formData.append('multi', 'true');
     
     // Add enhancement options
     if (enhance) {
@@ -224,13 +227,15 @@ const UniversalPageNew = () => {
     }
     
     // Send the request
-    fetch('/bridal_swap_multi', {
+    fetch('/bridal-swap', {
       method: 'POST',
       body: formData
     })
       .then(response => {
         if (!response.ok) {
-          throw new Error('Failed to process templates');
+          return response.json().then(err => {
+            throw new Error(err.error || `Server error: ${response.status} ${response.statusText}`);
+          });
         }
         return response.json();
       })
@@ -238,9 +243,10 @@ const UniversalPageNew = () => {
         console.log('Process response:', data);
         setProcessingResults(false);
         if (data.success) {
+          // Map the results to include both the result image URL and template path
           setResults(data.results.map(result => ({
-            url: result.result_url,
-            template: result.template_path
+            url: result.result_image,
+            template: result.template_path || result.ceremony
           })));
           setShowTemplates(false);
           setShowResults(true);
@@ -359,11 +365,7 @@ const UniversalPageNew = () => {
     <>
       <div className="app-container">
         {/* Header */}
-        <header className="app-header">
-          <div className="logo-container">
-            {/* Logo/branding removed as requested */}
-          </div>
-        </header>
+
         
         {/* Main Content */}
         <div className="main-container">
@@ -377,7 +379,7 @@ const UniversalPageNew = () => {
                     <div 
                       className="upload-area mb-2" 
                       id="uploadArea" 
-                      style={{ minHeight: '100px', padding: '10px', position: 'relative' }}
+                      style={{ minHeight: '100px', padding: '10px', position: 'relative', border: '2px dashed #888', borderRadius: '8px', background: 'rgba(0,0,0,0.1)' }}
                       onClick={() => fileInputRef.current.click()}
                     >
                       <i className="fas fa-cloud-upload-alt fa-lg text-light-purple"></i>
@@ -481,7 +483,7 @@ const UniversalPageNew = () => {
                         id="viewTemplatesBtn"
                         className="btn btn-sm btn-primary"
                         onClick={handleViewTemplates}
-                        disabled={!selectedItem || !sourceFile}
+                        disabled={!selectedItem}
                       >
                         <i className="fas fa-images me-1"></i> View Templates
                       </button>
@@ -717,7 +719,7 @@ const UniversalPageNew = () => {
               {viewerImages.length > 0 && (
                 <div 
                   className="modal-body p-0 position-relative d-flex align-items-center justify-content-center"
-                  style={{ minHeight: '95vh' }}
+                  style={{ minHeight: '100vh' }}
                 >
                   {/* Left Navigation Button */}
                   {viewerImages.length > 1 && (
@@ -735,7 +737,7 @@ const UniversalPageNew = () => {
                   <div 
                     className="image-container d-flex justify-content-center align-items-center"
                     style={{ 
-                      height: '90vh', 
+                      height: '100vh', 
                       width: '100%',
                       cursor: 'move',
                       overflow: 'hidden'
@@ -746,7 +748,7 @@ const UniversalPageNew = () => {
                       src={viewerImages[currentImageIndex]} 
                       alt={`Viewer image ${currentImageIndex + 1}`}
                       style={{ 
-                        maxHeight: '90vh', 
+                        maxHeight: '100vh', 
                         maxWidth: '100%', 
                         objectFit: 'contain',
                         transform: `scale(${zoomLevel})`,

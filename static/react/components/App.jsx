@@ -7,6 +7,7 @@ import BridalGalleryPage from './pages/BridalGalleryPage';
 import UniversalSwapPage from './pages/UniversalSwapPage';
 import UniversalPage from './pages/UniversalPage';
 import UniversalPageNew from './pages/UniversalPageNew';
+import BulkUpload from './pages/BulkUpload';
 
 /**
  * Main App component that manages the application layout and state
@@ -86,6 +87,8 @@ const App = () => {
         return <UniversalSwapPage category="bride-saloon" />;
       case 'all-categories':
         return <UniversalPage />;
+      case 'bulk-upload':
+        return <BulkUpload />;
       default:
         // For pages that don't have dedicated components yet
         return <MainContent currentPage={currentPage} />;
