@@ -12,8 +12,6 @@ const UniversalSwapPage = ({ category = 'auto' }) => {
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [enhance, setEnhance] = useState(false);
-  const [enhanceMethod, setEnhanceMethod] = useState('auto');
   const [detectedCategory, setDetectedCategory] = useState(category);
   const [successMessage, setSuccessMessage] = useState('');
   const fileInputRef = useRef(null);
@@ -44,38 +42,36 @@ const UniversalSwapPage = ({ category = 'auto' }) => {
   };
   
   // Process the face swap
-  const handleSubmit = (file) => {
+  const handleSubmit = async (file = sourceImage) => {
+    if (!file) return;
+    
     setIsLoading(true);
     setError(null);
-    setResults([]);
-    setSuccessMessage('');
     
     const formData = new FormData();
-    formData.append('source', file || sourceImage);
-    formData.append('category', category);
-    formData.append('enhance', enhance);
-    formData.append('enhance_method', enhanceMethod);
-    
-    fetch('/universal-face-swap', {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-      setIsLoading(false);
+    formData.append('source', file);
+    formData.append('category', detectedCategory);
+
+    try {
+      const response = await fetch('/process_universal', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      
       if (data.success) {
         setResults(data.results);
-        setDetectedCategory(data.detected_category);
-        setSuccessMessage(`Generated ${data.count} face swap images successfully!`);
+        setSuccessMessage('Face swap completed successfully!');
       } else {
         setError(data.message || 'Error processing face swap');
       }
-    })
-    .catch(err => {
+    } catch (error) {
+      console.error('Error:', error);
+      setError('Error processing face swap. Please try again.');
+    } finally {
       setIsLoading(false);
-      setError('Network error: ' + err.message);
-      console.error('Error:', err);
-    });
+    }
   };
   
   // Trigger file input click
@@ -128,33 +124,6 @@ const UniversalSwapPage = ({ category = 'auto' }) => {
               className="d-none" 
             />
           </div>
-          
-          <div className="form-check mb-2 text-start">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="enhanceCheck"
-              checked={enhance}
-              onChange={(e) => setEnhance(e.target.checked)}
-            />
-            <label className="form-check-label" htmlFor="enhanceCheck">
-              Enhance face quality
-            </label>
-          </div>
-          
-          {enhance && (
-            <div className="mb-3">
-              <select 
-                className="form-select"
-                value={enhanceMethod}
-                onChange={(e) => setEnhanceMethod(e.target.value)}
-              >
-                <option value="auto">Auto enhancement</option>
-                <option value="gfpgan">GFPGAN (better for details)</option>
-                <option value="codeformer">CodeFormer (smoother results)</option>
-              </select>
-            </div>
-          )}
           
           <button
             className="btn btn-primary"

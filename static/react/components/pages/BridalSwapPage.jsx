@@ -11,8 +11,6 @@ const BridalSwapPage = () => {
   const [ceremonyType, setCeremonyType] = useState('haldi');
   const [templates, setTemplates] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [enhanceEnabled, setEnhanceEnabled] = useState(true);
-  const [enhanceMethod, setEnhanceMethod] = useState('auto');
   const [results, setResults] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -210,8 +208,6 @@ const BridalSwapPage = () => {
     const formData = new FormData();
     formData.append('source', sourceImage);
     formData.append('template_path', template.path);
-    formData.append('enhance', enhanceEnabled ? 'true' : 'false');
-    formData.append('enhance_method', enhanceMethod);
 
     try {
       const response = await fetch('/process_template', {
@@ -227,9 +223,7 @@ const BridalSwapPage = () => {
       if (result.success) {
         const resultItem = {
           template_path: template.path,
-          result_path: result.result_path,
-          enhanced: result.enhanced,
-          enhance_method: result.enhance_method
+          result_path: result.result_path
         };
         console.log('Setting result item:', resultItem);
         setResults([resultItem]);
@@ -264,9 +258,6 @@ const BridalSwapPage = () => {
     selectedTemplates.forEach((template) => {
       formData.append(`templates[]`, template.path);
     });
-    
-    formData.append('enhance', enhanceEnabled ? 'true' : 'false');
-    formData.append('enhance_method', enhanceMethod);
 
     try {
       const response = await fetch('/multi_face_swap', {
@@ -279,7 +270,10 @@ const BridalSwapPage = () => {
       console.log("Multi-swap API response:", result);
       
       if (result.success && result.results && Array.isArray(result.results)) {
-        setResults(result.results);
+        setResults(result.results.map(r => ({
+          template_path: r.template_path,
+          result_path: r.result_path
+        })));
         setIsMultiSelectMode(false); // Switch back to single view mode after processing
       } else {
         alert(result.message || 'Error processing templates');
@@ -335,34 +329,6 @@ const BridalSwapPage = () => {
                 />
               </div>
             )}
-              
-            <div className="d-flex align-items-center mt-2">
-              <div className="form-check form-switch me-3">
-                <input 
-                  className="form-check-input" 
-                  type="checkbox"
-                  id="enhanceSwitch"
-                  checked={enhanceEnabled}
-                  onChange={() => setEnhanceEnabled(!enhanceEnabled)}
-                />
-                <label className="form-check-label small" htmlFor="enhanceSwitch">
-                  Enhance
-                </label>
-              </div>
-              
-              {enhanceEnabled && (
-                <select 
-                  className="form-select form-select-sm"
-                  value={enhanceMethod}
-                  onChange={(e) => setEnhanceMethod(e.target.value)}
-                  style={{width: 'auto'}}
-                >
-                  <option value="auto">Auto</option>
-                  <option value="gfpgan">GFPGAN</option>
-                  <option value="codeformer">CodeFormer</option>
-                </select>
-              )}
-            </div>
             
             {isMultiSelectMode && selectedTemplates.length > 0 && (
               <button 
@@ -488,11 +454,6 @@ const BridalSwapPage = () => {
                           <i className="fas fa-search-plus"></i>
                         </div>
                       </div>
-                      {result.enhanced && (
-                        <span className="position-absolute top-0 start-0 badge bg-info m-1" style={{fontSize: '0.65rem'}}>
-                          {result.enhance_method}
-                        </span>
-                      )}
                       <a 
                         href={`${result.result_path}?t=${Date.now()}`} 
                         className="btn btn-sm btn-primary position-absolute bottom-0 end-0 m-1 p-0"

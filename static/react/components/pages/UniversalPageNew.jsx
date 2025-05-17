@@ -34,10 +34,6 @@ const UniversalPageNew = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
   
-  // State for enhancement options
-  const [enhance, setEnhance] = useState(false);
-  const [enhanceMethod, setEnhanceMethod] = useState('auto');
-  
   // Fetch categories when component mounts
   useEffect(() => {
     fetch('/api/categories')
@@ -219,12 +215,6 @@ const UniversalPageNew = () => {
     
     // Add multi parameter
     formData.append('multi', 'true');
-    
-    // Add enhancement options
-    if (enhance) {
-      formData.append('enhance', 'true');
-      formData.append('enhance_method', enhanceMethod);
-    }
     
     // Send the request
     fetch('/bridal-swap', {
@@ -488,35 +478,6 @@ const UniversalPageNew = () => {
                       </button>
                     </div>
                   </div>
-                  
-                  {/* Enhancement options */}
-                  <div className="d-flex justify-content-end align-items-center mt-2">
-                    <div className="form-check form-switch">
-                      <input 
-                        className="form-check-input" 
-                        type="checkbox" 
-                        id="enhanceSwitch" 
-                        checked={enhance}
-                        onChange={(e) => setEnhance(e.target.checked)}
-                      />
-                      <label className="form-check-label small" htmlFor="enhanceSwitch">Auto Enhance</label>
-                    </div>
-                  </div>
-                  
-                  {/* Enhancement method (visible when enhance is checked) */}
-                  {enhance && (
-                    <div className="mt-2">
-                      <select 
-                        className="form-select form-select-sm" 
-                        value={enhanceMethod}
-                        onChange={(e) => setEnhanceMethod(e.target.value)}
-                      >
-                        <option value="auto">Auto detection</option>
-                        <option value="gfpgan">GFPGAN (better details)</option>
-                        <option value="codeformer">CodeFormer (smoother)</option>
-                      </select>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
