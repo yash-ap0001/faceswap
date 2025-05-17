@@ -18,6 +18,7 @@ const HomePage = () => {
   const [ceremonyImages, setCeremonyImages] = useState({
     haldi: [],
     mehendi: [],
+    sangeeth: [],
     wedding: [],
     reception: []
   });
@@ -29,12 +30,13 @@ const HomePage = () => {
   const ceremonyTitles = {
     haldi: 'Haldi',
     mehendi: 'Mehendi',
+    sangeeth: 'Sangeeth',
     wedding: 'Wedding',
     reception: 'Reception'
   };
 
   // Order of ceremonies
-  const ceremonyOrder = ['haldi', 'mehendi', 'wedding', 'reception'];
+  const ceremonyOrder = ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'];
 
   // Default fallback images in case API fails
   const defaultImages = {
@@ -49,6 +51,12 @@ const HomePage = () => {
       '/static/templates/bride/mehendi/mehendi_2.jpg',
       '/static/templates/bride/mehendi/mehendi_3.jpg',
       '/static/templates/bride/mehendi/mehendi_4.jpg'
+    ],
+    sangeeth: [
+      '/static/templates/bride/sangeeth/sangeeth_1.jpg',
+      '/static/templates/bride/sangeeth/sangeeth_2.jpg',
+      '/static/templates/bride/sangeeth/sangeeth_3.jpg',
+      '/static/templates/bride/sangeeth/sangeeth_4.jpg'
     ],
     wedding: [
       '/static/templates/bride/wedding/wedding_1.jpg',
@@ -68,15 +76,25 @@ const HomePage = () => {
   const [currentIndices, setCurrentIndices] = useState({
     haldi: 0,
     mehendi: 0,
+    sangeeth: 0,
     wedding: 0,
     reception: 0
   });
+
+  // Simple in-memory cache for ceremony images
+  let ceremonyImagesCache = null;
 
   // Fetch templates from API for each ceremony
   useEffect(() => {
     const fetchTemplates = async () => {
       setLoading(true);
       try {
+        // Use cache if available
+        if (ceremonyImagesCache) {
+          setCeremonyImages(ceremonyImagesCache);
+          setLoading(false);
+          return;
+        }
         const templates = {};
         
         // Fetch templates for each ceremony type
@@ -104,6 +122,8 @@ const HomePage = () => {
         }
         
         setCeremonyImages(templates);
+        // Store in cache
+        ceremonyImagesCache = templates;
       } catch (error) {
         console.error('Error fetching templates:', error);
         // Fall back to default images
@@ -141,7 +161,7 @@ const HomePage = () => {
   }, [loading, ceremonyImages]);
 
   return (
-    <div className="home-page" style={{ padding: '20px 10px'}}>
+    <div className="home-page" style={{ padding: '20px 10px', position: 'relative' }}>
       {/* Brand logo */}
       <div style={{
         textAlign: 'center',
@@ -158,7 +178,7 @@ const HomePage = () => {
             fontWeight: '800',
             fontSize: '2.2rem'
           }}>
-            VOW
+            BRIDE
           </span>
           <span style={{
             marginLeft: '10px',
@@ -167,7 +187,7 @@ const HomePage = () => {
             fontStyle: 'italic',
             fontSize: '2rem'
           }}>
-            BRIDE
+            FACE SWAP
           </span>
         </h1>
       </div>
@@ -217,7 +237,7 @@ const HomePage = () => {
           ) : (
             // Images loaded
             ceremonyOrder.map(ceremony => (
-              <div className="col-md-3" key={ceremony}>
+              <div className="col" key={ceremony}>
                 <div style={{
                   backgroundColor: colors.cardBg,
                   overflow: 'hidden',

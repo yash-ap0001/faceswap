@@ -260,9 +260,9 @@ def api_categories():
     Returns a JSON object with all categories, subcategories, and items.
     """
     try:
-        with open('static/data/categories.json', 'r') as f:
+        with open('categories.json', 'r') as f:
             categories_data = json.load(f)
-        return jsonify(categories_data)
+        return jsonify({"categories": categories_data["categories"], "success": True})
     except FileNotFoundError:
         return jsonify({"error": "Categories data not found", "success": False}), 404
     except Exception as e:

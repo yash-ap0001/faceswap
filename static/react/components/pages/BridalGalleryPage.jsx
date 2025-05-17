@@ -155,8 +155,7 @@ const BridalGalleryPage = () => {
   }, [isModalOpen, selectedImage]);
 
   return (
-    <div className="bridal-gallery-page" style={{ marginTop: '64px' }}>
-      <h4 className="mb-4" style={{ fontWeight: 700, letterSpacing: '0.02em' }}>Bridal Gallery</h4>
+    <div className="bridal-gallery-page" style={{ marginTop: '64px', position: 'relative' }}>
       <div className="d-flex align-items-center justify-content-between mb-3">
         <div className="btn-group btn-group-sm" role="group">
           {['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'].map(ceremony => (

@@ -1,0 +1,334 @@
+{
+  "categories": [
+    {
+      "id": "bride",
+      "key": "bride",
+      "name": "Bride",
+      "subcategories": [
+        {
+          "id": "bridal",
+          "key": "bridal",
+          "name": "Bridal Ceremonies",
+          "items": [
+            {
+              "id": "haldi",
+              "key": "haldi",
+              "name": "Haldi Ceremony"
+            },
+            {
+              "id": "mehendi",
+              "key": "mehendi",
+              "name": "Mehendi Ceremony"
+            },
+            {
+              "id": "sangeeth",
+              "key": "sangeeth",
+              "name": "Sangeeth Ceremony"
+            },
+            {
+              "id": "wedding",
+              "key": "wedding",
+              "name": "Wedding Ceremony"
+            },
+            {
+              "id": "reception",
+              "key": "reception",
+              "name": "Reception Ceremony"
+            }
+          ]
+        },
+        {
+          "id": "outfits",
+          "key": "outfits",
+          "name": "Outfit Styles",
+          "items": [
+            {
+              "id": "traditional",
+              "key": "traditional",
+              "name": "Traditional"
+            },
+            {
+              "id": "modern",
+              "key": "modern",
+              "name": "Modern"
+            },
+            {
+              "id": "fusion",
+              "key": "fusion",
+              "name": "Fusion"
+            },
+            {
+              "id": "casual",
+              "key": "casual",
+              "name": "Casual"
+            }
+          ]
+        },
+        {
+          "id": "jewelry",
+          "key": "jewelry",
+          "name": "Jewelry Types",
+          "items": [
+            {
+              "id": "necklace",
+              "key": "necklace",
+              "name": "Necklace Sets"
+            },
+            {
+              "id": "earrings",
+              "key": "earrings",
+              "name": "Earrings"
+            },
+            {
+              "id": "bangles",
+              "key": "bangles",
+              "name": "Bangles & Bracelets"
+            },
+            {
+              "id": "mang_tikka",
+              "key": "mang_tikka",
+              "name": "Mang Tikka"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "groom",
+      "key": "groom",
+      "name": "Groom",
+      "subcategories": [
+        {
+          "id": "traditional",
+          "key": "traditional",
+          "name": "Traditional Wear",
+          "items": [
+            {
+              "id": "sherwani",
+              "key": "sherwani",
+              "name": "Sherwani"
+            },
+            {
+              "id": "kurta",
+              "key": "kurta",
+              "name": "Kurta Pajama"
+            },
+            {
+              "id": "jodhpuri",
+              "key": "jodhpuri",
+              "name": "Jodhpuri Suit"
+            },
+            {
+              "id": "bandhgala",
+              "key": "bandhgala",
+              "name": "Bandhgala"
+            }
+          ]
+        },
+        {
+          "id": "modern",
+          "key": "modern",
+          "name": "Modern Wear",
+          "items": [
+            {
+              "id": "tuxedo",
+              "key": "tuxedo",
+              "name": "Tuxedo"
+            },
+            {
+              "id": "suit",
+              "key": "suit",
+              "name": "Formal Suit"
+            },
+            {
+              "id": "blazer",
+              "key": "blazer",
+              "name": "Blazer"
+            },
+            {
+              "id": "casual",
+              "key": "casual",
+              "name": "Casual Wear"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "salon",
+      "key": "salon",
+      "name": "Saloon",
+      "subcategories": [
+        {
+          "id": "men",
+          "key": "men",
+          "name": "Men",
+          "items": [
+            {
+              "id": "haircut",
+              "key": "haircut",
+              "name": "Haircut Styles"
+            },
+            {
+              "id": "beard",
+              "key": "beard",
+              "name": "Beard Styles"
+            },
+            {
+              "id": "facial",
+              "key": "facial",
+              "name": "Facial Styles"
+            },
+            {
+              "id": "grooming",
+              "key": "grooming",
+              "name": "Grooming Styles"
+            }
+          ]
+        },
+        {
+          "id": "women",
+          "key": "women",
+          "name": "Women",
+          "items": [
+            {
+              "id": "haircut",
+              "key": "haircut",
+              "name": "Haircut Styles"
+            },
+            {
+              "id": "coloring",
+              "key": "coloring",
+              "name": "Hair Coloring"
+            },
+            {
+              "id": "styling",
+              "key": "styling",
+              "name": "Hair Styling"
+            },
+            {
+              "id": "facial",
+              "key": "facial",
+              "name": "Facial Styles"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "celebrity",
+      "key": "celebrity",
+      "name": "Celebrity",
+      "subcategories": [
+        {
+          "id": "men",
+          "key": "men",
+          "name": "Men",
+          "items": [
+            {
+              "id": "actors",
+              "key": "actors",
+              "name": "Actors"
+            },
+            {
+              "id": "singers",
+              "key": "singers",
+              "name": "Singers"
+            },
+            {
+              "id": "sports",
+              "key": "sports",
+              "name": "Sports Stars"
+            },
+            {
+              "id": "models",
+              "key": "models",
+              "name": "Models"
+            }
+          ]
+        },
+        {
+          "id": "women",
+          "key": "women",
+          "name": "Women",
+          "items": [
+            {
+              "id": "actresses",
+              "key": "actresses",
+              "name": "Actresses"
+            },
+            {
+              "id": "singers",
+              "key": "singers",
+              "name": "Singers"
+            },
+            {
+              "id": "models",
+              "key": "models",
+              "name": "Models"
+            },
+            {
+              "id": "sports",
+              "key": "sports",
+              "name": "Sports Stars"
+            }
+          ]
+        },
+        {
+          "id": "tollywood",
+          "key": "tollywood",
+          "name": "Tollywood",
+          "items": [
+            {
+              "id": "actors",
+              "key": "actors",
+              "name": "Actors"
+            },
+            {
+              "id": "actresses",
+              "key": "actresses",
+              "name": "Actresses"
+            },
+            {
+              "id": "classic",
+              "key": "classic",
+              "name": "Classic Stars"
+            },
+            {
+              "id": "new-gen",
+              "key": "new-gen",
+              "name": "New Generation"
+            }
+          ]
+        },
+        {
+          "id": "bollywood",
+          "key": "bollywood",
+          "name": "Bollywood",
+          "items": [
+            {
+              "id": "actors",
+              "key": "actors",
+              "name": "Actors"
+            },
+            {
+              "id": "actresses",
+              "key": "actresses",
+              "name": "Actresses"
+            },
+            {
+              "id": "classic",
+              "key": "classic",
+              "name": "Classic Stars"
+            },
+            {
+              "id": "new-gen",
+              "key": "new-gen",
+              "name": "New Generation"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

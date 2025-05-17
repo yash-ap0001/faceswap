@@ -27,6 +27,10 @@ const BulkUpload = () => {
   const [moveItems, setMoveItems] = useState([]);
   const [moveStatus, setMoveStatus] = useState('');
 
+  // Add state for cleanup age
+  const [cleanupAge, setCleanupAge] = useState(30);
+  const [cleanupStatus, setCleanupStatus] = useState('');
+
   // Fetch categories from backend on mount
   useEffect(() => {
     fetch('/api/categories')
@@ -90,6 +94,17 @@ const BulkUpload = () => {
     setMoveItems(sub ? sub.items : []);
     setMoveItem('');
   }, [moveSubcategory, moveCategory, categories]);
+
+  // Fetch current cleanup age from backend on mount
+  useEffect(() => {
+    fetch('/api/cleanup-age')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && typeof data.age_minutes === 'number') {
+          setCleanupAge(data.age_minutes);
+        }
+      });
+  }, []);
 
   // Handle file selection
   const handleFileChange = (event) => {
@@ -257,6 +272,29 @@ const BulkUpload = () => {
       }
     } catch (error) {
       setMoveStatus('Move failed: ' + error.message);
+    }
+  };
+
+  const handleCleanupAgeChange = (e) => {
+    setCleanupAge(e.target.value);
+  };
+
+  const handleSaveCleanupAge = async () => {
+    setCleanupStatus('Saving...');
+    try {
+      const response = await fetch('/api/cleanup-age', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ age_minutes: Number(cleanupAge) })
+      });
+      const data = await response.json();
+      if (data.success) {
+        setCleanupStatus('Saved!');
+      } else {
+        setCleanupStatus('Failed to save');
+      }
+    } catch (err) {
+      setCleanupStatus('Error saving');
     }
   };
 
@@ -520,6 +558,31 @@ const BulkUpload = () => {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* Settings Section */}
+      <div className="row mb-4">
+        <div className="col-12">
+          <div className="bg-dark p-3 rounded shadow-sm border-0 mb-3">
+            <h6 className="mb-2">Settings</h6>
+            <div className="d-flex align-items-center gap-2">
+              <label htmlFor="cleanupAge" className="form-label mb-0 small">Delete uploads/results older than</label>
+              <input
+                type="number"
+                min="1"
+                max="1440"
+                value={cleanupAge}
+                onChange={handleCleanupAgeChange}
+                id="cleanupAge"
+                className="form-control form-control-sm bg-dark text-light border-secondary"
+                style={{ width: '80px' }}
+              />
+              <span className="small">minutes</span>
+              <button className="btn btn-sm btn-primary ms-2" onClick={handleSaveCleanupAge}>Save</button>
+              {cleanupStatus && <span className="ms-2 small text-info">{cleanupStatus}</span>}
+            </div>
           </div>
         </div>
       </div>

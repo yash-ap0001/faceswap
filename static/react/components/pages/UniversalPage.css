@@ -43,7 +43,7 @@
   display: flex;
   flex: 1;
   padding: 1.5rem;
-  overflow: hidden; /* Prevent double scrollbars */
+  /* overflow: hidden; */ /* Removed to prevent double scrollbars */
 }
 
 .content-container {
@@ -53,7 +53,8 @@
   max-width: 1600px;
   margin: 0 auto;
   width: 100%;
-  overflow-y: auto; /* Allow scrolling only in the content container */
+  /* overflow-y: auto; */ /* Removed to prevent double scrollbars */
+  /* height: 100vh; */ /* Removed to prevent double scrollbars */
 }
 
 /* Form styles */

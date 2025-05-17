@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
+// Place this at the very top of the file, before HomePage is defined
+let ceremonyImagesCache = null;
+
 /**
  * Sidebar component with navigation links
  * 
@@ -24,26 +27,27 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
         // Use hardcoded menu structure without Home item
         const defaultMenu = [
           {
-            id: 'face-swap',
-            title: 'Face Swap',
-            icon: 'fa-magic',
-            subItems: [
-              { id: 'face-swap-page', label: 'Face Swap', link: '/react#face-swap-page' }
-            ]
-          },
-          {
             id: 'bride',
             title: 'Bride',
             icon: 'fa-female',
             subItems: [
-              { id: 'bridal-gallery', label: 'Bridal Gallery', link: '/react#bridal-gallery' },
-              { id: 'bridal-swap', label: 'Create Bride Look', link: '/react#bridal-swap' },
+              { id: 'bridal-gallery', label: 'Gallery', link: '/react#bridal-gallery' },
+              { id: 'bridal-swap', label: 'Swap', link: '/react#bridal-swap' },
             //   { id: 'outfits-for-girls', label: 'Outfits for Girls', link: '/react#outfits-for-girls' },
             //   { id: 'jewelry-collections', label: 'Jewelry Collections', link: '/react#jewelry-collections' },
             //   { id: 'makeup-styles', label: 'Makeup Styles', link: '/react#makeup-styles' }
             // 
             ]
           },
+          {
+            id: 'face-swap',
+            title: 'All Face Swap',
+            icon: 'fa-exchange-alt',
+            subItems: [
+              { id: 'face-swap-page', label: 'Swap', link: '/react#face-swap-page' }
+            ]
+          },
+        
           // {
           //   id: 'groom',
           //   title: 'Groom',
@@ -82,7 +86,8 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
             title: 'Settings',
             icon: 'fa-cog',
             subItems: [
-              { id: 'bulk-upload', label: 'Bulk Upload Templates', link: '/react#bulk-upload' }
+              { id: 'bulk-upload', label: 'Bulk Upload', link: '/react#bulk-upload' },
+              { id: 'category-config', label: 'Category Configuration', link: '/react#category-config' }
             ]
           }
         ];
@@ -185,8 +190,9 @@ const Sidebar = ({ isOpen, activeItem, onNavigation }) => {
                   {section.subItems.map((item) => (
                     <li 
                       key={item.id} 
-                      className={activeItem === item.id ? 'active' : ''}
+                      className={`sidebar-subitem${activeItem === item.id ? ' active' : ''}`}
                       onClick={() => handleItemClick(item.id, item.link)}
+                      style={{ paddingLeft: '24px', fontSize: '0.97em', color: '#bbaadd', fontWeight: 400 }}
                     >
                       <span>{item.label}</span>
                     </li>

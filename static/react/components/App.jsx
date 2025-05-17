@@ -4,11 +4,10 @@ import MainContent from './MainContent';
 import HomePage from './pages/HomePage';
 import BridalSwapPage from './pages/BridalSwapPage';
 import BridalGalleryPage from './pages/BridalGalleryPage';
-import UniversalSwapPage from './pages/UniversalSwapPage';
-import UniversalPage from './pages/UniversalPage';
 import UniversalPageNew from './pages/UniversalPageNew';
 import BulkUpload from './pages/BulkUpload';
-import VowBadge from './VowBadge';
+import CategoryConfigPage from './pages/CategoryConfigPage';
+import { VowBadge, RightCornerBadge } from './VowBadge';
 
 /**
  * Main App component that manages the application layout and state
@@ -67,6 +66,22 @@ const App = () => {
     }
   }, []);
 
+  // Listen for hash changes and update currentPage
+  useEffect(() => {
+    const onHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash) {
+        setActiveItem(hash);
+        setCurrentPage(hash);
+      } else {
+        setActiveItem('home');
+        setCurrentPage('home');
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
   // Render the appropriate page component based on currentPage
   const renderPageContent = () => {
     switch (currentPage) {
@@ -84,6 +99,8 @@ const App = () => {
             <BulkUpload />
           </div>
         );
+      case 'category-config':
+        return <CategoryConfigPage />;
       default:
         // For pages that don't have dedicated components yet
         return <MainContent currentPage={currentPage} />;
@@ -158,6 +175,7 @@ const App = () => {
       </button>
       <div className="main-container" style={mainContainerStyle}>
         <VowBadge />
+        <RightCornerBadge />
         <div className="content-container">
           {renderPageContent()}
         </div>
@@ -277,6 +295,24 @@ const App = () => {
           .menu-items li.active {
             background-color: #5c2a91;
             color: white;
+          }
+          
+          .sidebar-subitem {
+            padding-left: 60px !important;
+            font-size: 0.92em !important;
+            color: #bbaadd !important;
+            font-weight: 400 !important;
+            background: none !important;
+            border: none !important;
+          }
+          .sidebar-subitem.active {
+            color: #fff !important;
+            font-weight: 600 !important;
+            background: linear-gradient(90deg, #5c2a91 0%, #b983ff 100%) !important;
+            border-radius: 16px !important;
+            padding-left: 60px !important;
+            padding-right: 12px !important;
+            transition: background 0.2s;
           }
         `}
       </style>

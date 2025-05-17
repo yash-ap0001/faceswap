@@ -15,9 +15,8 @@ import traceback
 import logging
 from flask_login import LoginManager
 import base64
-
-# Import face enhancer
-from face_enhancer import FaceEnhancer
+import threading
+import json
 
 # Initialize global face enhancer variable
 face_enhancer = None
@@ -407,23 +406,17 @@ try:
         swapper = get_model(swap_model_path, providers=providers)
         logger.info("Face swap model initialized successfully")
         
-        # Initialize face enhancer
-        face_enhancer = FaceEnhancer()
-        logger.info("Face enhancer initialized")
-        
         print("All models loaded successfully!")
     except Exception as e:
         logger.warning(f"Failed to initialize face swap model: {str(e)}")
         logger.warning("Running in demonstration mode with visual indicators instead of actual face swapping")
         swapper = None
-        face_enhancer = None
         demo_mode = True
 except Exception as e:
     logger.error(f"Error loading models: {str(e)}")
     logger.error(traceback.format_exc())
     faceapp = None
     swapper = None
-    face_enhancer = None
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
@@ -524,167 +517,160 @@ def get_templates_route():
         'item_category': item_category
     })
 
-@app.route('/api/categories')
-def api_categories():
-    """
-    API endpoint to get the categories structure for the Universal Face Swap page.
-    Returns a JSON with hierarchical category data.
-    """
-    # Define the categories structure
-    categories = [
-        {
-            "id": "bride",
-            "key": "bride",
-            "name": "Bride",
-            "subcategories": [
-                {
-                    "id": "bridal",
-                    "key": "bridal",
-                    "name": "Bridal Ceremonies",
-                    "items": [
-                        {"id": "haldi", "key": "haldi", "name": "Haldi Ceremony"},
-                        {"id": "mehendi", "key": "mehendi", "name": "Mehendi Ceremony"},
-                        {"id": "sangeeth", "key": "sangeeth", "name": "Sangeeth Ceremony"},
-                        {"id": "wedding", "key": "wedding", "name": "Wedding Ceremony"},
-                        {"id": "reception", "key": "reception", "name": "Reception Ceremony"}
-                    ]
-                },
-                {
-                    "id": "outfits",
-                    "key": "outfits",
-                    "name": "Outfit Styles",
-                    "items": [
-                        {"id": "traditional", "key": "traditional", "name": "Traditional"},
-                        {"id": "modern", "key": "modern", "name": "Modern"},
-                        {"id": "fusion", "key": "fusion", "name": "Fusion"},
-                        {"id": "casual", "key": "casual", "name": "Casual"}
-                    ]
-                },
-                {
-                    "id": "jewelry",
-                    "key": "jewelry",
-                    "name": "Jewelry Types",
-                    "items": [
-                        {"id": "necklace", "key": "necklace", "name": "Necklace Sets"},
-                        {"id": "earrings", "key": "earrings", "name": "Earrings"},
-                        {"id": "bangles", "key": "bangles", "name": "Bangles & Bracelets"},
-                        {"id": "mang_tikka", "key": "mang_tikka", "name": "Mang Tikka"}
-                    ]
-                }
-            ]
-        },
-        {
-            "id": "groom",
-            "key": "groom",
-            "name": "Groom",
-            "subcategories": [
-                {
-                    "id": "traditional",
-                    "key": "traditional",
-                    "name": "Traditional Wear",
-                    "items": [
-                        {"id": "sherwani", "key": "sherwani", "name": "Sherwani"},
-                        {"id": "kurta", "key": "kurta", "name": "Kurta Pajama"},
-                        {"id": "jodhpuri", "key": "jodhpuri", "name": "Jodhpuri Suit"},
-                        {"id": "bandhgala", "key": "bandhgala", "name": "Bandhgala"}
-                    ]
-                },
-                {
-                    "id": "modern",
-                    "key": "modern",
-                    "name": "Modern Wear",
-                    "items": [
-                        {"id": "tuxedo", "key": "tuxedo", "name": "Tuxedo"},
-                        {"id": "suit", "key": "suit", "name": "Formal Suit"},
-                        {"id": "blazer", "key": "blazer", "name": "Blazer"},
-                        {"id": "casual", "key": "casual", "name": "Casual Wear"}
-                    ]
-                }
-            ]
-        },
-        {
-            "id": "salon",
-            "key": "salon",
-            "name": "Salon",
-            "subcategories": [
-                {
-                    "id": "men",
-                    "key": "men",
-                    "name": "Men",
-                    "items": [
-                        {"id": "haircut", "key": "haircut", "name": "Haircut Styles"},
-                        {"id": "beard", "key": "beard", "name": "Beard Styles"},
-                        {"id": "facial", "key": "facial", "name": "Facial Styles"},
-                        {"id": "grooming", "key": "grooming", "name": "Grooming Styles"}
-                    ]
-                },
-                {
-                    "id": "women",
-                    "key": "women",
-                    "name": "Women",
-                    "items": [
-                        {"id": "haircut", "key": "haircut", "name": "Haircut Styles"},
-                        {"id": "coloring", "key": "coloring", "name": "Hair Coloring"},
-                        {"id": "styling", "key": "styling", "name": "Hair Styling"},
-                        {"id": "facial", "key": "facial", "name": "Facial Styles"}
-                    ]
-                }
-            ]
-        },
-        {
-            "id": "celebrity",
-            "key": "celebrity",
-            "name": "Celebrity",
-            "subcategories": [
-                {
-                    "id": "men",
-                    "key": "men",
-                    "name": "Men",
-                    "items": [
-                        {"id": "actors", "key": "actors", "name": "Actors"},
-                        {"id": "singers", "key": "singers", "name": "Singers"},
-                        {"id": "sports", "key": "sports", "name": "Sports Stars"},
-                        {"id": "models", "key": "models", "name": "Models"}
-                    ]
-                },
-                {
-                    "id": "women",
-                    "key": "women",
-                    "name": "Women",
-                    "items": [
-                        {"id": "actresses", "key": "actresses", "name": "Actresses"},
-                        {"id": "singers", "key": "singers", "name": "Singers"},
-                        {"id": "models", "key": "models", "name": "Models"},
-                        {"id": "sports", "key": "sports", "name": "Sports Stars"}
-                    ]
-                },
-                {
-                    "id": "tollywood",
-                    "key": "tollywood",
-                    "name": "Tollywood",
-                    "items": [
-                        {"id": "actors", "key": "actors", "name": "Actors"},
-                        {"id": "actresses", "key": "actresses", "name": "Actresses"},
-                        {"id": "classic", "key": "classic", "name": "Classic Stars"},
-                        {"id": "new-gen", "key": "new-gen", "name": "New Generation"}
-                    ]
-                },
-                {
-                    "id": "bollywood",
-                    "key": "bollywood",
-                    "name": "Bollywood",
-                    "items": [
-                        {"id": "actors", "key": "actors", "name": "Actors"},
-                        {"id": "actresses", "key": "actresses", "name": "Actresses"},
-                        {"id": "classic", "key": "classic", "name": "Classic Stars"},
-                        {"id": "new-gen", "key": "new-gen", "name": "New Generation"}
-                    ]
-                }
-            ]
+CATEGORIES_FILE = 'categories.json'
+
+def load_categories():
+    if not os.path.exists(CATEGORIES_FILE):
+        return []
+    with open(CATEGORIES_FILE, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+def save_categories(categories):
+    with open(CATEGORIES_FILE, 'w', encoding='utf-8') as f:
+        json.dump(categories, f, indent=2)
+
+@app.route('/api/categories', methods=['GET'])
+def get_categories():
+    categories = load_categories()
+    return jsonify({
+        "categories": categories["categories"],
+        "success": True
+    })
+
+@app.route('/api/categories', methods=['POST'])
+def add_category():
+    try:
+        categories = load_categories()
+        data = request.get_json()
+        name = data.get('name', '').strip()
+        if not name:
+            return jsonify({'success': False, 'message': 'Category name required'}), 400
+        
+        new_cat = {
+            'id': name.lower().replace(' ', '_'),
+            'key': name.lower().replace(' ', '_'),
+            'name': name,
+            'subcategories': []
         }
-    ]
-    
-    return jsonify({"success": True, "categories": categories})
+        
+        if not isinstance(categories, dict):
+            categories = {"categories": []}
+        elif "categories" not in categories:
+            categories["categories"] = []
+            
+        categories["categories"].append(new_cat)
+        save_categories(categories)
+        return jsonify({'success': True, 'category': new_cat}), 201
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/categories/<cat_id>/subcategories', methods=['POST'])
+def add_subcategory(cat_id):
+    categories = load_categories()
+    data = request.get_json()
+    name = data.get('name', '').strip()
+    if not name:
+        return jsonify({'success': False, 'message': 'Subcategory name required'}), 400
+    for cat in categories["categories"]:
+        if cat['id'] == cat_id:
+            new_sub = {
+                'id': name.lower().replace(' ', '_'),
+                'key': name.lower().replace(' ', '_'),
+                'name': name,
+                'items': []
+            }
+            cat['subcategories'].append(new_sub)
+            save_categories(categories)
+            return jsonify({'success': True, 'subcategory': new_sub}), 201
+    return jsonify({'success': False, 'message': 'Category not found'}), 404
+
+@app.route('/api/categories/<cat_id>/subcategories/<sub_id>/items', methods=['POST'])
+def add_item(cat_id, sub_id):
+    categories = load_categories()
+    data = request.get_json()
+    name = data.get('name', '').strip()
+    if not name:
+        return jsonify({'success': False, 'message': 'Item name required'}), 400
+    for cat in categories["categories"]:
+        if cat['id'] == cat_id:
+            for sub in cat['subcategories']:
+                if sub['id'] == sub_id:
+                    new_item = {
+                        'id': name.lower().replace(' ', '_'),
+                        'key': name.lower().replace(' ', '_'),
+                        'name': name
+                    }
+                    sub['items'].append(new_item)
+                    save_categories(categories)
+                    return jsonify({'success': True, 'item': new_item}), 201
+    return jsonify({'success': False, 'message': 'Category or subcategory not found'}), 404
+
+@app.route('/api/categories/<cat_id>', methods=['PUT', 'DELETE'])
+def update_or_delete_category(cat_id):
+    categories = load_categories()
+    if request.method == 'PUT':
+        data = request.get_json()
+        name = data.get('name', '').strip()
+        for cat in categories["categories"]:
+            if cat['id'] == cat_id:
+                cat['name'] = name
+                save_categories(categories)
+                return jsonify({'success': True, 'category': cat})
+        return jsonify({'success': False, 'message': 'Category not found'}), 404
+    elif request.method == 'DELETE':
+        categories["categories"] = [cat for cat in categories["categories"] if cat['id'] != cat_id]
+        save_categories(categories)
+        return jsonify({'success': True})
+
+@app.route('/api/categories/<cat_id>/subcategories/<sub_id>', methods=['PUT', 'DELETE'])
+def update_or_delete_subcategory(cat_id, sub_id):
+    categories = load_categories()
+    for cat in categories["categories"]:
+        if cat['id'] == cat_id:
+            if request.method == 'PUT':
+                data = request.get_json()
+                name = data.get('name', '').strip()
+                for sub in cat['subcategories']:
+                    if sub['id'] == sub_id:
+                        sub['name'] = name
+                        save_categories(categories)
+                        return jsonify({'success': True, 'subcategory': sub})
+                return jsonify({'success': False, 'message': 'Subcategory not found'}), 404
+            elif request.method == 'DELETE':
+                original_count = len(cat['subcategories'])
+                cat['subcategories'] = [sub for sub in cat['subcategories'] if sub['id'] != sub_id]
+                if len(cat['subcategories']) < original_count:
+                    save_categories(categories)
+                    return jsonify({'success': True})
+                else:
+                    return jsonify({'success': False, 'message': 'Subcategory not found'}), 404
+    return jsonify({'success': False, 'message': 'Category not found'}), 404
+
+@app.route('/api/categories/<cat_id>/subcategories/<sub_id>/items/<item_id>', methods=['PUT', 'DELETE'])
+def update_or_delete_item(cat_id, sub_id, item_id):
+    categories = load_categories()
+    for cat in categories["categories"]:
+        if cat['id'] == cat_id:
+            for sub in cat['subcategories']:
+                if sub['id'] == sub_id:
+                    if request.method == 'PUT':
+                        data = request.get_json()
+                        name = data.get('name', '').strip()
+                        for item in sub['items']:
+                            if item['id'] == item_id:
+                                item['name'] = name
+                                save_categories(categories)
+                                return jsonify({'success': True, 'item': item})
+                        return jsonify({'success': False, 'message': 'Item not found'}), 404
+                    elif request.method == 'DELETE':
+                        original_count = len(sub['items'])
+                        sub['items'] = [item for item in sub['items'] if item['id'] != item_id]
+                        if len(sub['items']) < original_count:
+                            save_categories(categories)
+                            return jsonify({'success': True})
+                        else:
+                            return jsonify({'success': False, 'message': 'Item not found'}), 404
+    return jsonify({'success': False, 'message': 'Category or subcategory not found'}), 404
 
 @app.route('/api/menu')
 def api_menu():
@@ -2061,6 +2047,47 @@ def move_template():
             errors.append(f"{path}: {str(e)}")
 
     return jsonify({'success': True, 'moved': moved, 'errors': errors})
+
+# Configurable file age for cleanup (in seconds)
+CLEANUP_FILE_AGE_SECONDS = 30 * 60  # 30 minutes by default
+
+RESULTS_DIR = 'static/results'
+SOURCES_DIR = os.path.join('templates', 'uploads', 'sources')
+
+def cleanup_old_files():
+    now = time.time()
+    for folder in [RESULTS_DIR, SOURCES_DIR]:
+        if not os.path.exists(folder):
+            continue
+        for filename in os.listdir(folder):
+            file_path = os.path.join(folder, filename)
+            if os.path.isfile(file_path):
+                if now - os.path.getmtime(file_path) > CLEANUP_FILE_AGE_SECONDS:
+                    try:
+                        os.remove(file_path)
+                    except Exception as e:
+                        print(f"Failed to delete {file_path}: {e}")
+
+# Call cleanup in a background thread after each result is generated
+def trigger_cleanup():
+    threading.Thread(target=cleanup_old_files, daemon=True).start()
+
+@app.route('/api/cleanup-age', methods=['GET'])
+def get_cleanup_age():
+    return jsonify({'success': True, 'age_minutes': CLEANUP_FILE_AGE_SECONDS // 60})
+
+@app.route('/api/cleanup-age', methods=['POST'])
+def set_cleanup_age():
+    global CLEANUP_FILE_AGE_SECONDS
+    data = request.get_json()
+    try:
+        age_minutes = int(data.get('age_minutes', 30))
+        if age_minutes < 1 or age_minutes > 1440:
+            return jsonify({'success': False, 'message': 'Value out of range'}), 400
+        CLEANUP_FILE_AGE_SECONDS = age_minutes * 60
+        return jsonify({'success': True, 'age_minutes': age_minutes})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)

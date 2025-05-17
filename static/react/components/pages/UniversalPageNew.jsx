@@ -352,10 +352,10 @@ const UniversalPageNew = () => {
   }, [zoomLevel]);
   
   return (
-    <>
+    <div className="universal-page-new" style={{ marginTop: '64px', position: 'relative' }}>
       <div className="app-container">
         {/* Add top margin to push content below the badge */}
-        <div className="main-container" style={{ marginTop: '64px' }}>
+        <div className="main-container">
           <div className="content-container">
             {/* Page Heading */}
             <h4 className="mb-4" style={{ fontWeight: 700, letterSpacing: '0.02em' }}>Face Swap</h4>
@@ -774,7 +774,7 @@ const UniversalPageNew = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
