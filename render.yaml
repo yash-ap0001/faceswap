@@ -14,7 +14,7 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: PYTHON_VERSION
-        value: 3.10.0
+        value: 3.13.1
       - key: PIP_NO_CACHE_DIR
         value: "1"
       - key: PIP_DISABLE_PIP_VERSION_CHECK
