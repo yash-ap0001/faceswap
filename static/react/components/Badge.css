@@ -1,0 +1,42 @@
+.badge-corner {
+  position: absolute;
+  top: 24px;
+  z-index: 100;
+  padding: 8px 24px;
+  border-radius: 16px;
+  background: rgba(34, 18, 60, 0.85);
+  box-shadow: 0 2px 8px rgba(58,28,113,0.10);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  user-select: none;
+}
+
+.badge-left {
+  left: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.badge-right {
+  right: 24px;
+  font-size: 0.9rem;
+  color: #e0e0e0;
+}
+
+@media (max-width: 600px) {
+  .badge-corner {
+    top: 8px;
+    padding: 6px 12px;
+    font-size: 0.95rem;
+  }
+  .badge-left {
+    left: 8px;
+  }
+  .badge-right {
+    right: 8px;
+    font-size: 0.8rem;
+  }
+} 

@@ -68,4 +68,6 @@ models/inswapper_128.onnx
 # Keep only small model files
 !models/buffalo_l/2d106det.onnx
 !models/buffalo_l/det_10g.onnx
-!models/buffalo_l/genderage.onnx 
+!models/buffalo_l/genderage.onnx
+
+node_modules/
