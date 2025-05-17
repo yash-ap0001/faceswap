@@ -44,6 +44,7 @@ ENV/
 # Uploads and generated files
 uploads/
 static/uploads/
+static/results/
 *.onnx
 *.pth
 *.pt
