@@ -1,52 +1,104 @@
-# FaceSwapAI
+# FaceSwapAI - Full Stack Application
 
-## Technical Knowledge Transfer (KT)
+This is a full-stack application with a React frontend and Flask backend.
 
-FaceSwapAI is a web application that allows users to perform face swaps using a React frontend and a Flask backend. The backend handles image processing and face swapping, while the frontend provides a user-friendly interface.
+## Project Structure
+```
+faceswapai/
+├── backend/           # Flask backend
+│   ├── app.py
+│   ├── requirements.txt
+│   ├── wsgi.py
+│   └── ...
+├── frontend/          # React frontend
+│   ├── package.json
+│   ├── src/
+│   └── ...
+└── README.md
+```
 
-### Project Structure
-- `app/` - Flask backend code
-- `static/react/` - React frontend source code
-- `static/dist/` - Compiled frontend assets (e.g., `bundle.js`)
-- `models/` - Model files (not included in the repo; see below)
+## Backend Setup (Flask)
 
-## How to Run
+1. Create a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-### 1. Backend (Flask)
-1. **Install Python dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. **Run the Flask app:**
-   ```bash
-   python app.py
-   ```
-   The backend will start on `http://localhost:5000` by default.
+2. Install dependencies:
+```bash
+cd backend
+pip install -r requirements.txt
+```
 
-### 2. Frontend (React)
-1. **Install Node.js dependencies:**
-   ```bash
-   cd static/react
-   npm install
-   ```
-2. **Build the frontend:**
-   ```bash
-   npm run build
-   ```
-   This will generate `bundle.js` in `static/dist/`.
+3. Set up environment variables:
+```bash
+export SESSION_SECRET=your_secret_key
+export HUGGINGFACE_TOKEN=your_token_if_needed
+```
 
-### 3. Model Files
-- **Model files are NOT included in the repository.**
-- Download the required `.onnx` models and place them in the `models/` directory as specified in the backend code.
-- Example model structure:
-  - `models/buffalo_l/2d106det.onnx`
-  - `models/buffalo_l/det_10g.onnx`
-  - `models/buffalo_l/genderage.onnx`
+4. Run the development server:
+```bash
+python wsgi.py
+```
 
-## Notes
-- Do NOT commit `node_modules/` or large model files to the repository.
-- Use `.gitignore` to exclude these directories/files.
-- For any issues, check the backend logs or browser console for errors.
+## Frontend Setup (React)
+
+1. Install dependencies:
+```bash
+cd frontend
+npm install
+```
+
+2. Run the development server:
+```bash
+npm start
+```
+
+## Deployment
+
+### Backend Deployment (PythonAnywhere)
+
+1. Sign up for PythonAnywhere
+2. Upload backend code to PythonAnywhere
+3. Set up virtual environment and install requirements
+4. Configure WSGI file
+5. Set up environment variables
+6. Configure static files
+
+### Frontend Deployment (Vercel/Netlify)
+
+1. Build the React app:
+```bash
+cd frontend
+npm run build
+```
+
+2. Deploy to Vercel or Netlify:
+- Connect your GitHub repository
+- Set build command: `npm run build`
+- Set output directory: `build`
+
+## Environment Variables
+
+### Backend (.env)
+```
+SESSION_SECRET=your_secret_key
+HUGGINGFACE_TOKEN=your_token_if_needed
+```
+
+### Frontend (.env)
+```
+REACT_APP_API_URL=your_backend_url
+```
+
+## Production Considerations
+
+1. Enable CORS on backend
+2. Set up proper error handling
+3. Configure proper security headers
+4. Set up proper logging
+5. Configure proper file upload limits
 
 ---
 
