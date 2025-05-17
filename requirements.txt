@@ -1,7 +1,7 @@
 flask==2.0.1
 numpy==1.24.3
 opencv-python==4.8.0.76
-git+https://github.com/deepinsight/insightface.git
+git+https://github.com/deepinsight/insightface.git#subdirectory=python-package
 requests==2.26.0
 werkzeug==2.0.1
 gunicorn==20.1.0
