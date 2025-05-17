@@ -1,8 +1,10 @@
 services:
   - type: web
     name: faceswap-app
-    env: python
+    runtime: python
     buildCommand: |
+      apt-get update && apt-get install -y build-essential python3-dev
+      python -m pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
       cd frontend && npm install && npm run build
     startCommand: gunicorn wsgi:app
@@ -13,6 +15,10 @@ services:
         generateValue: true
       - key: PYTHON_VERSION
         value: 3.10.0
+      - key: PIP_NO_CACHE_DIR
+        value: "1"
+      - key: PIP_DISABLE_PIP_VERSION_CHECK
+        value: "1"
     disk:
       name: uploads
       mountPath: /uploads
