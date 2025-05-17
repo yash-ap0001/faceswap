@@ -57,4 +57,15 @@ static/results/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db 
+Thumbs.db
+
+# Model files
+models/**/*.onnx
+models/enhancement/
+models/buffalo_l/
+models/inswapper_128.onnx
+
+# Keep only small model files
+!models/buffalo_l/2d106det.onnx
+!models/buffalo_l/det_10g.onnx
+!models/buffalo_l/genderage.onnx 
