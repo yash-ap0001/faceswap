@@ -324,3 +324,7 @@ def api_categories():
         return jsonify({"error": "Categories data not found", "success": False}), 404
     except Exception as e:
         return jsonify({"error": str(e), "success": False}), 500
+
+@api_bp.route('/get_templates')
+def get_templates():
+    return fallback_templates()
