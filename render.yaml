@@ -22,7 +22,7 @@ services:
       - key: PIP_DISABLE_PIP_VERSION_CHECK
         value: "1"
       - key: DATABASE_URL
-        value: sqlite:///local.db
+        value: postgres://postgres:postgres@localhost:5432/postgres
     disk:
       name: uploads
       mountPath: /uploads
