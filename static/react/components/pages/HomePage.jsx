@@ -107,12 +107,16 @@ const HomePage = () => {
                 // Get up to 4 template images
                 templates[ceremony] = data.templates
                   .slice(0, 4)
-                  .map(template => template.url);
+                  .map(template => {
+                    // Use the full URL from the backend
+                    return template.url;
+                  });
               } else {
                 // Use default images if no templates found
                 templates[ceremony] = defaultImages[ceremony];
               }
             } else {
+              console.error(`Error fetching ${ceremony} templates:`, await response.text());
               templates[ceremony] = defaultImages[ceremony];
             }
           } catch (error) {

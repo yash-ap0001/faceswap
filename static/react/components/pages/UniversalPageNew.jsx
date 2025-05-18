@@ -152,7 +152,7 @@ const UniversalPageNew = () => {
     const queryString = new URLSearchParams(params).toString();
     
     // Fetch templates
-    fetch(`/get_templates?${queryString}`)
+    fetch(`/api/templates?${queryString}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to fetch templates');
@@ -166,13 +166,33 @@ const UniversalPageNew = () => {
           setTemplates(data.templates);
           setShowTemplates(true);
         } else {
-          setError('No templates found for the selected options.');
+          // Use default templates if none found
+          const defaultTemplates = Array.from({ length: 6 }, (_, i) => ({
+            id: `${item.id}_${i + 1}`,
+            path: `/static/templates/${category.id}/${subcategory.id}/${item.id}/${item.id}_${i + 1}.jpg`,
+            url: `/static/templates/${category.id}/${subcategory.id}/${item.id}/${item.id}_${i + 1}.jpg`,
+            category_type: category.id,
+            subcategory: subcategory.id,
+            item_category: item.id
+          }));
+          setTemplates(defaultTemplates);
+          setShowTemplates(true);
         }
       })
       .catch(error => {
         console.error('Error fetching templates:', error);
         setLoading(false);
-        setError(`Failed to fetch templates: ${error.message}`);
+        // Use default templates on error
+        const defaultTemplates = Array.from({ length: 6 }, (_, i) => ({
+          id: `${item.id}_${i + 1}`,
+          path: `/static/templates/${category.id}/${subcategory.id}/${item.id}/${item.id}_${i + 1}.jpg`,
+          url: `/static/templates/${category.id}/${subcategory.id}/${item.id}/${item.id}_${i + 1}.jpg`,
+          category_type: category.id,
+          subcategory: subcategory.id,
+          item_category: item.id
+        }));
+        setTemplates(defaultTemplates);
+        setShowTemplates(true);
       });
   };
   

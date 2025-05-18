@@ -38,7 +38,12 @@ const BulkUpload = () => {
       .then(data => {
         if (data.success && data.categories) {
           setCategories(data.categories);
+        } else {
+          console.error('Failed to fetch categories:', data.message);
         }
+      })
+      .catch(error => {
+        console.error('Error fetching categories:', error);
       });
   }, []);
 
@@ -153,6 +158,7 @@ const BulkUpload = () => {
   // Handle file upload
   const handleUpload = async () => {
     if (!selectedFiles.length || !categoryType || !subcategory || !itemCategory) {
+      setUploadStatus('Please select files and all category options');
       return;
     }
 
@@ -169,10 +175,14 @@ const BulkUpload = () => {
     formData.append('item_category', itemCategory);
 
     try {
-      const response = await fetch('/upload-bulk-templates', {
+      const response = await fetch('/api/upload-bulk-templates', {
         method: 'POST',
         body: formData
       });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
 
       const data = await response.json();
 
@@ -183,9 +193,10 @@ const BulkUpload = () => {
         setSelectedFiles([]);
         refreshTemplates();
       } else {
-        setUploadStatus('Upload failed: ' + data.message);
+        setUploadStatus('Upload failed: ' + (data.message || 'Unknown error'));
       }
     } catch (error) {
+      console.error('Upload error:', error);
       setUploadStatus('Upload failed: ' + error.message);
     } finally {
       setLoading(false);
@@ -226,13 +237,29 @@ const BulkUpload = () => {
   // Refresh templates
   const refreshTemplates = async () => {
     if (!categoryType || !subcategory || !itemCategory) return;
-
+    
+    setLoading(true);
     try {
-      const response = await fetch(`/get_templates?category_type=${categoryType}&subcategory=${subcategory}&item_category=${itemCategory}`);
+      const response = await fetch(
+        `/api/templates?category_type=${categoryType}&subcategory=${subcategory}&item_category=${itemCategory}`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch templates');
+      }
+      
       const data = await response.json();
-      setTemplates(data.templates || []);
+      if (data.templates && data.templates.length > 0) {
+        setTemplates(data.templates);
+      } else {
+        setTemplates([]);
+        console.log('No templates found');
+      }
     } catch (error) {
       console.error('Error fetching templates:', error);
+      setTemplates([]);
+    } finally {
+      setLoading(false);
     }
   };
 

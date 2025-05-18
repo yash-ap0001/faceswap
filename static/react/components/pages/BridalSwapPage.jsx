@@ -25,60 +25,45 @@ const BridalSwapPage = () => {
   const fetchTemplates = async (ceremony) => {
     setIsLoading(true);
     try {
-      try {
-        // First try the primary API endpoint
-        const response = await fetch(
-          `/get_templates?ceremony_type=${ceremony}&category_type=bride&subcategory=bridal&item_category=${ceremony}`
-        );
+      // Try the main API endpoint
+      const response = await fetch(
+        `/api/templates?category_type=bride&subcategory=bridal&item_category=${ceremony}`
+      );
+      
+      if (response.ok) {
         const data = await response.json();
-        
-        if (data.success && data.templates && data.templates.length > 0) {
+        if (data.templates && data.templates.length > 0) {
           console.log(`Received template data for ${ceremony}:`, data);
           setTemplates(data.templates);
           setIsLoading(false);
           return;
-        } else {
-          console.error('Error in template data structure:', data.message || 'Unknown error');
         }
-      } catch (error) {
-        console.error('Error fetching templates from primary endpoint:', error);
       }
       
-      // If primary endpoint fails, try the fallback API endpoint
-      try {
-        const fallbackResponse = await fetch(
-          `/api/fallback/templates?ceremony_type=${ceremony}&category_type=bride&subcategory=bridal&item_category=${ceremony}`
-        );
-        const fallbackData = await fallbackResponse.json();
-        
-        if (fallbackData.success && fallbackData.templates && fallbackData.templates.length > 0) {
-          console.log(`Received fallback template data for ${ceremony}:`, fallbackData);
-          setTemplates(fallbackData.templates);
-          setIsLoading(false);
-          return;
-        } else {
-          console.error('Error in fallback template data structure:', fallbackData.message || 'Unknown error');
-        }
-      } catch (error) {
-        console.error('Error fetching templates from fallback endpoint:', error);
-      }
-      
-      // If both endpoints fail, create static fallback templates
-      const staticFallbackTemplates = Array.from({ length: 6 }, (_, i) => ({
+      // If main endpoint fails, use default images
+      console.log(`Using default templates for ${ceremony}`);
+      const defaultTemplates = Array.from({ length: 6 }, (_, i) => ({
         id: `${ceremony}_${i + 1}`,
-        path: `static/templates/bride/bridal/${ceremony}/${ceremony}_${i + 1}.jpg`,
+        path: `/static/templates/bride/bridal/${ceremony}/${ceremony}_${i + 1}.jpg`,
         url: `/static/templates/bride/bridal/${ceremony}/${ceremony}_${i + 1}.jpg`,
         category_type: 'bride',
         subcategory: 'bridal',
-        item_category: ceremony,
-        template_type: 'fallback'
+        item_category: ceremony
       }));
       
-      console.log(`Using static fallback templates for ${ceremony}`);
-      setTemplates(staticFallbackTemplates);
+      setTemplates(defaultTemplates);
     } catch (error) {
-      console.error('Error in template handling:', error);
-      setTemplates([]);
+      console.error('Error fetching templates:', error);
+      // Use default templates on error
+      const defaultTemplates = Array.from({ length: 6 }, (_, i) => ({
+        id: `${ceremony}_${i + 1}`,
+        path: `/static/templates/bride/bridal/${ceremony}/${ceremony}_${i + 1}.jpg`,
+        url: `/static/templates/bride/bridal/${ceremony}/${ceremony}_${i + 1}.jpg`,
+        category_type: 'bride',
+        subcategory: 'bridal',
+        item_category: ceremony
+      }));
+      setTemplates(defaultTemplates);
     } finally {
       setIsLoading(false);
     }

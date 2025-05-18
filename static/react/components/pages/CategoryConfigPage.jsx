@@ -74,10 +74,22 @@ const CategoryConfigPage = () => {
   // Fetch categories from backend
   const fetchCategories = async () => {
     setLoading(true);
-    const res = await fetch('/api/categories');
-    const data = await res.json();
-    if (data.success && data.categories) setCategories(data.categories);
-    setLoading(false);
+    try {
+      const res = await fetch('/api/categories');
+      if (!res.ok) {
+        throw new Error('Failed to fetch categories');
+      }
+      const data = await res.json();
+      if (data.success && data.categories) {
+        setCategories(data.categories);
+      } else {
+        console.error('Failed to fetch categories:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -86,33 +98,98 @@ const CategoryConfigPage = () => {
 
   // Edit and delete handlers using backend
   const handleEditCategory = async (catId, name) => {
-    await fetch(`/api/categories/${catId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
-    fetchCategories();
+    try {
+      const response = await fetch(`/api/categories/${catId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update category');
+      }
+      
+      await fetchCategories();
+    } catch (error) {
+      console.error('Error updating category:', error);
+    }
   };
+
   const handleDeleteCategory = async (catId) => {
     if (window.confirm('Delete this category and all its subcategories/items?')) {
-      await fetch(`/api/categories/${catId}`, { method: 'DELETE' });
-      fetchCategories();
+      try {
+        const response = await fetch(`/api/categories/${catId}`, { method: 'DELETE' });
+        if (!response.ok) {
+          throw new Error('Failed to delete category');
+        }
+        await fetchCategories();
+      } catch (error) {
+        console.error('Error deleting category:', error);
+      }
     }
   };
+
   const handleEditSub = async (catId, subId, name) => {
-    await fetch(`/api/categories/${catId}/subcategories/${subId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
-    fetchCategories();
+    try {
+      const response = await fetch(`/api/categories/${catId}/subcategories/${subId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update subcategory');
+      }
+      
+      await fetchCategories();
+    } catch (error) {
+      console.error('Error updating subcategory:', error);
+    }
   };
+
   const handleDeleteSub = async (catId, subId) => {
     if (window.confirm('Delete this subcategory and all its items?')) {
-      await fetch(`/api/categories/${catId}/subcategories/${subId}`, { method: 'DELETE' });
-      fetchCategories();
+      try {
+        const response = await fetch(`/api/categories/${catId}/subcategories/${subId}`, { method: 'DELETE' });
+        if (!response.ok) {
+          throw new Error('Failed to delete subcategory');
+        }
+        await fetchCategories();
+      } catch (error) {
+        console.error('Error deleting subcategory:', error);
+      }
     }
   };
+
   const handleEditItem = async (catId, subId, itemId, name) => {
-    await fetch(`/api/categories/${catId}/subcategories/${subId}/items/${itemId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
-    fetchCategories();
+    try {
+      const response = await fetch(`/api/categories/${catId}/subcategories/${subId}/items/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update item');
+      }
+      
+      await fetchCategories();
+    } catch (error) {
+      console.error('Error updating item:', error);
+    }
   };
+
   const handleDeleteItem = async (catId, subId, itemId) => {
     if (window.confirm('Delete this item?')) {
-      await fetch(`/api/categories/${catId}/subcategories/${subId}/items/${itemId}`, { method: 'DELETE' });
-      fetchCategories();
+      try {
+        const response = await fetch(`/api/categories/${catId}/subcategories/${subId}/items/${itemId}`, { method: 'DELETE' });
+        if (!response.ok) {
+          throw new Error('Failed to delete item');
+        }
+        await fetchCategories();
+      } catch (error) {
+        console.error('Error deleting item:', error);
+      }
     }
   };
 
