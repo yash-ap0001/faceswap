@@ -480,7 +480,7 @@ def get_templates_route():
         else:
             return jsonify({
                 'success': False, 
-                'message': f'No templates found for {item_category}',
+                'message': f'No templates found for {category_type}/{subcategory}/{item_category}',
                 'templates': []
             }), 404
     
