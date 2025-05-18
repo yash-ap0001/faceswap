@@ -200,9 +200,8 @@ def fallback_templates():
     # Generate 6 placeholder templates
     for i in range(1, 7):
         template_id = f"{item_category}_{i}"
-        template_path = f"templates/uploads/pinterest/{item_category}/{item_category}_{i}.jpg"
-        template_url = f"/templates/uploads/pinterest/{item_category}/{item_category}_{i}.jpg"
-        
+        template_path = f"static/templates/bride/{item_category}/{item_category}_{i}.jpg"
+        template_url = f"/static/templates/bride/{item_category}/{item_category}_{i}.jpg"
         fallback_templates.append({
             "id": template_id,
             "path": template_path,

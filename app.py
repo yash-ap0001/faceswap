@@ -776,7 +776,7 @@ def bridal_gallery():
             for file in os.listdir(pinterest_dir):
                 if file.lower().endswith(('.jpg', '.jpeg', '.png')):
                     all_templates[ceremony].append({
-                        'url': f"/templates/uploads/pinterest/{ceremony}/{file}",
+                        'url': f"/static/templates/bride/{ceremony}/{file}",
                         'title': f"{ceremony.title()} Style",
                         'description': "Traditional ceremony template"
                     })
