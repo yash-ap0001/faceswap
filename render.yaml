@@ -16,11 +16,13 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: PYTHON_VERSION
-        value: 3.13.1
+        value: 3.10.0
       - key: PIP_NO_CACHE_DIR
         value: "1"
       - key: PIP_DISABLE_PIP_VERSION_CHECK
         value: "1"
+      - key: DATABASE_URL
+        value: sqlite:///local.db
     disk:
       name: uploads
       mountPath: /uploads
