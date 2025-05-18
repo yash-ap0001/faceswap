@@ -542,14 +542,18 @@ def get_templates():
 
 @app.route('/bridal-swap', methods=['GET', 'POST'])
 def bridal_swap():
+    app.logger.info("Received request to /bridal-swap")
     if request.method == 'GET':
+        app.logger.info("GET request received, rendering bridal_swap.html")
         return render_template('bridal_swap.html')
 
     if 'source' not in request.files:
+        app.logger.error("No source file provided")
         return jsonify({'error': 'No source file provided'}), 400
     
     source_file = request.files['source']
     if source_file.filename == '':
+        app.logger.error("No selected file")
         return jsonify({'error': 'No selected file'}), 400
     
     # Get template paths from form data
@@ -558,17 +562,22 @@ def bridal_swap():
     
     # Check if this is a multi-template request
     is_multi_request = request.form.get('multi') == 'true'
+    app.logger.info(f"Is multi-template request: {is_multi_request}")
     
     if is_multi_request:
         # Get templates from the array and remove any duplicates
         templates = list(set(request.form.getlist('templates[]')))
+        app.logger.info(f"Templates: {templates}")
         if not templates:
+            app.logger.error("No templates provided")
             return jsonify({'error': 'No templates provided'}), 400
         template_paths = templates
     else:
         # Single template request
         template_path = request.form.get('template_path')
+        app.logger.info(f"Template path: {template_path}")
         if not template_path:
+            app.logger.error("No template path provided")
             return jsonify({'error': 'No template path provided'}), 400
         template_paths = [template_path]
     
@@ -582,17 +591,20 @@ def bridal_swap():
         source_filename = f"source_{timestamp}_{secure_filename(source_file.filename)}"
         source_path = os.path.join(upload_dir, source_filename)
         source_file.save(source_path)
+        app.logger.info(f"Source file saved to: {source_path}")
         
         # Read the source image for face detection
         source_img = cv2.imread(source_path)
         
         if source_img is None:
+            app.logger.error("Failed to read source image")
             return jsonify({'error': 'Failed to read source image'}), 400
         
         # Detect face in source image
         source_faces = faceapp.get(source_img)
         
         if not source_faces:
+            app.logger.error("No face detected in your photo. Please upload a clear photo with your face visible.")
             return jsonify({'error': 'No face detected in your photo. Please upload a clear photo with your face visible.'}), 400
         
         # Process templates
@@ -602,12 +614,14 @@ def bridal_swap():
         for i, template_path in enumerate(template_paths):
             # Skip if we've already processed this template
             if template_path in processed_paths:
+                app.logger.info(f"Skipping already processed template: {template_path}")
                 continue
                 
             try:
                 # Extract ceremony type from template path
                 ceremony = os.path.basename(template_path).split('_')[0]
                 ceremonies.append(ceremony)
+                app.logger.info(f"Processing ceremony: {ceremony}")
                 
                 # Read template image - handle both absolute and relative paths
                 if template_path.startswith('/'):
@@ -616,13 +630,13 @@ def bridal_swap():
                     template_path = template_path[7:]  # Remove 'static/' prefix
                 template_img = cv2.imread(template_path)
                 if template_img is None:
-                    logger.error(f"Failed to read template image: {template_path}")
+                    app.logger.error(f"Failed to read template image: {template_path}")
                     continue
                 
                 # Detect face in template
                 target_faces = faceapp.get(template_img)
                 if not target_faces:
-                    logger.error(f"No face detected in template: {template_path}")
+                    app.logger.error(f"No face detected in template: {template_path}")
                     continue
                 
                 # Get face detection results
@@ -631,6 +645,7 @@ def bridal_swap():
                 
                 # Perform the swap
                 result_img = swapper.get(template_img, target_face, source_face, paste_back=True)
+                app.logger.info("Face swap completed successfully")
                 
                 # Apply face enhancement if requested
                 if request.form.get('enhance') == 'true':
@@ -643,9 +658,11 @@ def bridal_swap():
                         
                         # Apply face enhancement
                         enhance_method = request.form.get('enhance_method', 'gfpgan')
+                        app.logger.info(f"Applying face enhancement with method: {enhance_method}")
                         result_img = face_enhancer.enhance(result_img, method=enhance_method, strength=0.8)
+                        app.logger.info("Face enhancement applied successfully")
                     except Exception as e:
-                        logger.error(f"Face enhancement failed: {str(e)}")
+                        app.logger.error(f"Face enhancement failed: {str(e)}")
                         # Continue with the unenhanced result
                 
                 # Create results directory if it doesn't exist
@@ -658,6 +675,7 @@ def bridal_swap():
                 
                 # Save the result
                 cv2.imwrite(result_path, result_img)
+                app.logger.info(f"Result saved to: {result_path}")
                 
                 # Add to results
                 results.append({
@@ -671,33 +689,37 @@ def bridal_swap():
                 processed_paths.add(template_path)
                 
             except Exception as e:
-                logger.error(f"Error processing template {i+1}/{len(template_paths)}: {str(e)}")
+                app.logger.error(f"Error processing template {i+1}/{len(template_paths)}: {str(e)}")
                 # Continue with next template
         
         # Clean up source file
         try:
             os.remove(source_path)
+            app.logger.info(f"Source file cleaned up: {source_path}")
         except Exception as e:
-            logger.error(f"Error cleaning up source file: {str(e)}")
+            app.logger.error(f"Error cleaning up source file: {str(e)}")
         
         if not results:
+            app.logger.error("Failed to process any templates. Please try again.")
             return jsonify({'success': False, 'error': 'Failed to process any templates. Please try again.'}), 500
         
         # Return all results
+        app.logger.info(f"Returning {len(results)} results")
         return jsonify({
             'success': True,
             'results': results,
             'count': len(results)
         })
     except Exception as e:
-        logger.error(f"Error in bridal_swap: {str(e)}")
-        logger.error(traceback.format_exc())
+        app.logger.error(f"Error in bridal_swap: {str(e)}")
+        app.logger.error(traceback.format_exc())
         # Clean up files in case of error
         if 'source_path' in locals() and os.path.exists(source_path):
             try:
                 os.remove(source_path)
+                app.logger.info(f"Source file cleaned up after error: {source_path}")
             except Exception as cleanup_error:
-                logger.error(f"Error cleaning up source file: {str(cleanup_error)}")
+                app.logger.error(f"Error cleaning up source file: {str(cleanup_error)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/bridal-gallery')
@@ -1600,46 +1622,57 @@ def bridal_results():
 
 @app.route('/process_template', methods=['POST'])
 def process_template():
+    app.logger.info("Received request to /process_template")
     try:
         # Get the template path from the request
         template_path = request.form.get('template_path')
+        app.logger.info(f"Template path: {template_path}")
         if not template_path:
+            app.logger.error("No template path provided")
             return jsonify({'success': False, 'error': 'No template path provided'}), 400
 
         # Get enhancement options
         enhance = request.form.get('enhance') == 'true'
         enhance_method = request.form.get('enhance_method', 'gfpgan')
+        app.logger.info(f"Enhance: {enhance}, Enhance method: {enhance_method}")
 
         # Read the template image
         template_img = cv2.imread(template_path)
         if template_img is None:
+            app.logger.error(f"Failed to read template image: {template_path}")
             return jsonify({'success': False, 'error': 'Failed to read template image'}), 400
 
         # Detect face in template
         target_faces = faceapp.get(template_img)
         if not target_faces:
+            app.logger.error(f"No face detected in template: {template_path}")
             return jsonify({'success': False, 'error': 'No face detected in template'}), 400
 
         # Get the source image from the request
         if 'source' not in request.files:
+            app.logger.error("No source file provided")
             return jsonify({'success': False, 'error': 'No source file provided'}), 400
 
         source_file = request.files['source']
         if source_file.filename == '':
+            app.logger.error("No selected file")
             return jsonify({'success': False, 'error': 'No selected file'}), 400
 
         # Save the source file temporarily
         source_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(source_file.filename))
         source_file.save(source_path)
+        app.logger.info(f"Source file saved to: {source_path}")
 
         # Read the source image
         source_img = cv2.imread(source_path)
         if source_img is None:
+            app.logger.error(f"Failed to read source image: {source_path}")
             return jsonify({'success': False, 'error': 'Failed to read source image'}), 400
 
         # Detect face in source image
         source_faces = faceapp.get(source_img)
         if not source_faces:
+            app.logger.error("No face detected in source image")
             return jsonify({'success': False, 'error': 'No face detected in source image'}), 400
 
         # Get face detection results
@@ -1648,6 +1681,7 @@ def process_template():
 
         # Perform the swap
         result_img = swapper.get(template_img, target_face, source_face, paste_back=True)
+        app.logger.info("Face swap completed successfully")
 
         # Apply face enhancement if requested
         enhanced = False
@@ -1752,7 +1786,7 @@ def cleanup_old_files():
     now = time.time()
     for folder in [RESULTS_DIR, SOURCES_DIR]:
         if not os.path.exists(folder):
-            continue
+                continue
         for filename in os.listdir(folder):
             file_path = os.path.join(folder, filename)
             if os.path.isfile(file_path):
