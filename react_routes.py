@@ -7,6 +7,7 @@ import json
 import time
 import logging
 import os
+import traceback
 from flask import Blueprint, render_template, jsonify, request, current_app
 
 # Configure logging
@@ -69,10 +70,13 @@ def react_app(path=None):
     except Exception as e:
         error_msg = f"Error rendering React app: {str(e)}"
         logger.error(error_msg)
-        current_app.logger.error(error_msg)
+        traceback_str = traceback.format_exc()
+        logger.error(traceback_str)
+        current_app.logger.error(traceback_str)
         return jsonify({
             "error": "Internal Server Error",
             "message": error_msg,
+            "traceback": traceback_str,
             "template_folder": current_app.template_folder,
             "template_path": template_path if 'template_path' in locals() else None
         }), 500
