@@ -3,12 +3,13 @@ services:
     name: faceswap-app
     runtime: python
     buildCommand: |
-      apt-get update && apt-get install -y build-essential python3-dev cmake git pkg-config libglib2.0-dev libsm6 libxext6 libxrender-dev
-      python -m pip install --upgrade pip setuptools wheel
-      pip install --no-cache-dir -r requirements.txt
+      python -m venv .venv
+      . .venv/bin/activate
+      pip install --upgrade pip setuptools wheel
+      pip install -r requirements.txt
       npm install
       npx webpack --mode production
-    startCommand: gunicorn wsgi:app
+    startCommand: . .venv/bin/activate && gunicorn wsgi:app
     envVars:
       - key: FLASK_ENV
         value: production
