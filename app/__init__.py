@@ -65,4 +65,7 @@ def create_app():
     with app.app_context():
         db.create_all()
     
-    return app 
+    return app
+
+# Create the app instance
+app = create_app() 
