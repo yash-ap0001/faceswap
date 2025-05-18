@@ -1,8 +1,12 @@
 import os
-from flask import Flask, send_from_directory, redirect, url_for
+from flask import Flask, send_from_directory, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -38,40 +42,61 @@ def create_app():
     logging.basicConfig(level=logging.DEBUG)
     
     # Create necessary directories
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    os.makedirs('static/results', exist_ok=True)
-    os.makedirs('static/images/event_managers', exist_ok=True)
-    os.makedirs('static/js', exist_ok=True)
-    os.makedirs('static/css', exist_ok=True)
-    os.makedirs('static/dist', exist_ok=True)
+    try:
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        os.makedirs('static/results', exist_ok=True)
+        os.makedirs('static/images/event_managers', exist_ok=True)
+        os.makedirs('static/js', exist_ok=True)
+        os.makedirs('static/css', exist_ok=True)
+        os.makedirs('static/dist', exist_ok=True)
+        logger.debug("Created necessary directories")
+    except Exception as e:
+        logger.error(f"Error creating directories: {str(e)}")
     
     # Register blueprints
     try:
         from react_routes import react_bp, api_bp
         app.register_blueprint(react_bp)  # Register React blueprint
         app.register_blueprint(api_bp)  # Register API blueprint
+        logger.debug("Registered React and API blueprints")
     except ImportError as e:
-        logging.warning(f"Could not import React routes: {e}")
+        logger.error(f"Could not import React routes: {str(e)}")
     
     # Root route - redirect to React app
     @app.route('/')
     def index():
-        return redirect('/react')
+        try:
+            return redirect('/react')
+        except Exception as e:
+            logger.error(f"Error in root route: {str(e)}")
+            return jsonify({"error": "Internal Server Error", "message": str(e)}), 500
     
     # Serve static files
     @app.route('/static/<path:path>')
     def serve_static(path):
-        return send_from_directory('static', path)
+        try:
+            return send_from_directory('static', path)
+        except Exception as e:
+            logger.error(f"Error serving static file {path}: {str(e)}")
+            return jsonify({"error": "File Not Found", "message": str(e)}), 404
     
     # Serve React bundle
     @app.route('/dist/<path:path>')
     def serve_dist(path):
-        return send_from_directory('static/dist', path)
+        try:
+            return send_from_directory('static/dist', path)
+        except Exception as e:
+            logger.error(f"Error serving dist file {path}: {str(e)}")
+            return jsonify({"error": "File Not Found", "message": str(e)}), 404
     
     # Create database tables only if DATABASE_URL is set
     if app.config['SQLALCHEMY_DATABASE_URI']:
-        with app.app_context():
-            db.create_all()
+        try:
+            with app.app_context():
+                db.create_all()
+                logger.debug("Created database tables")
+        except Exception as e:
+            logger.error(f"Error creating database tables: {str(e)}")
     
     return app
 

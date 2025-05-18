@@ -5,7 +5,12 @@ These routes serve the React application and provide API endpoints for it.
 
 import json
 import time
-from flask import Blueprint, render_template, jsonify, request
+import logging
+from flask import Blueprint, render_template, jsonify, request, current_app
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # Create a blueprint for React app routes
 react_bp = Blueprint('react', __name__, url_prefix='/react')
@@ -22,7 +27,13 @@ def react_app(path=None):
     This serves as the entry point for the SPA (Single Page Application).
     The catch-all route ensures all React routes are handled by the SPA.
     """
-    return render_template('layout.html')
+    try:
+        logger.debug("Rendering React app template")
+        return render_template('layout.html')
+    except Exception as e:
+        logger.error(f"Error rendering React app: {str(e)}")
+        current_app.logger.error(f"Error rendering React app: {str(e)}")
+        return jsonify({"error": "Internal Server Error", "message": str(e)}), 500
 
 @api_bp.route('/menu')
 def api_menu():
