@@ -14,21 +14,40 @@ import zipfile
 import io
 import traceback
 import logging
+from logging.handlers import RotatingFileHandler
 from flask_login import LoginManager
 import base64
 import threading
 import json
 
-# Initialize global face enhancer variable
-face_enhancer = None
-
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# Add file handler for server logs
+file_handler = RotatingFileHandler('app.log', maxBytes=10240, backupCount=10)
+file_handler.setFormatter(logging.Formatter(
+    '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+))
+file_handler.setLevel(logging.DEBUG)
+logger.addHandler(file_handler)
+
+# Also log to console
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+console_handler.setLevel(logging.DEBUG)
+logger.addHandler(console_handler)
+
+logger.setLevel(logging.DEBUG)
+
 # Create the Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "development_secret_key")
+
+# Configure Flask app logging
+app.logger.setLevel(logging.DEBUG)
+app.logger.addHandler(file_handler)
+app.logger.addHandler(console_handler)
 
 # Initialize the database
 # --- Database and User Auth/Manager code commented out ---
@@ -542,7 +561,11 @@ def get_templates():
 
 @app.route('/bridal-swap', methods=['GET', 'POST'])
 def bridal_swap():
-    app.logger.info("Received request to /bridal-swap")
+    app.logger.info("=== Starting bridal-swap request ===")
+    app.logger.info(f"Request method: {request.method}")
+    app.logger.info(f"Request form data: {request.form}")
+    app.logger.info(f"Request files: {request.files}")
+    
     if request.method == 'GET':
         app.logger.info("GET request received, rendering bridal_swap.html")
         return render_template('bridal_swap.html')
@@ -552,6 +575,8 @@ def bridal_swap():
         return jsonify({'error': 'No source file provided'}), 400
     
     source_file = request.files['source']
+    app.logger.info(f"Source file received: {source_file.filename}")
+    
     if source_file.filename == '':
         app.logger.error("No selected file")
         return jsonify({'error': 'No selected file'}), 400
@@ -567,7 +592,7 @@ def bridal_swap():
     if is_multi_request:
         # Get templates from the array and remove any duplicates
         templates = list(set(request.form.getlist('templates[]')))
-        app.logger.info(f"Templates: {templates}")
+        app.logger.info(f"Templates received: {templates}")
         if not templates:
             app.logger.error("No templates provided")
             return jsonify({'error': 'No templates provided'}), 400
@@ -585,6 +610,7 @@ def bridal_swap():
         # Create uploads directory if it doesn't exist
         upload_dir = os.path.join('templates', 'uploads', 'sources')
         os.makedirs(upload_dir, exist_ok=True)
+        app.logger.info(f"Upload directory: {upload_dir}")
         
         # Save the source file temporarily with a unique name
         timestamp = int(time.time())
@@ -612,6 +638,7 @@ def bridal_swap():
         processed_paths = set()  # Keep track of processed paths to avoid duplicates
         
         for i, template_path in enumerate(template_paths):
+            app.logger.info(f"Processing template {i+1}/{len(template_paths)}: {template_path}")
             # Skip if we've already processed this template
             if template_path in processed_paths:
                 app.logger.info(f"Skipping already processed template: {template_path}")
@@ -628,6 +655,7 @@ def bridal_swap():
                     template_path = template_path[1:]  # Remove leading slash
                 if template_path.startswith('static/'):
                     template_path = template_path[7:]  # Remove 'static/' prefix
+                app.logger.info(f"Reading template image from: {template_path}")
                 template_img = cv2.imread(template_path)
                 if template_img is None:
                     app.logger.error(f"Failed to read template image: {template_path}")
@@ -690,6 +718,7 @@ def bridal_swap():
                 
             except Exception as e:
                 app.logger.error(f"Error processing template {i+1}/{len(template_paths)}: {str(e)}")
+                app.logger.error(traceback.format_exc())
                 # Continue with next template
         
         # Clean up source file
