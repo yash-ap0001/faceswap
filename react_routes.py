@@ -29,24 +29,52 @@ def react_app(path=None):
     The catch-all route ensures all React routes are handled by the SPA.
     """
     try:
+        # Get absolute paths
+        template_folder = os.path.abspath(current_app.template_folder)
+        template_path = os.path.join(template_folder, 'layout.html')
+        
+        # Log template information
+        logger.debug(f"Template folder: {template_folder}")
+        logger.debug(f"Template path: {template_path}")
+        logger.debug(f"Template exists: {os.path.exists(template_path)}")
+        
         # Check if template exists
-        template_path = os.path.join(current_app.template_folder, 'layout.html')
         if not os.path.exists(template_path):
-            logger.error(f"Template not found at: {template_path}")
+            error_msg = f"Template not found at: {template_path}"
+            logger.error(error_msg)
             return jsonify({
                 "error": "Template Not Found",
-                "message": f"layout.html not found in {current_app.template_folder}"
+                "message": error_msg,
+                "template_folder": template_folder,
+                "template_path": template_path
             }), 500
 
-        logger.debug(f"Rendering React app template from: {template_path}")
+        # Try to read template content to verify it's accessible
+        try:
+            with open(template_path, 'r', encoding='utf-8') as f:
+                template_content = f.read()
+                logger.debug(f"Successfully read template file, size: {len(template_content)} bytes")
+        except Exception as e:
+            error_msg = f"Error reading template file: {str(e)}"
+            logger.error(error_msg)
+            return jsonify({
+                "error": "Template Read Error",
+                "message": error_msg,
+                "template_folder": template_folder,
+                "template_path": template_path
+            }), 500
+
+        logger.debug("Attempting to render template")
         return render_template('layout.html')
     except Exception as e:
-        logger.error(f"Error rendering React app: {str(e)}")
-        current_app.logger.error(f"Error rendering React app: {str(e)}")
+        error_msg = f"Error rendering React app: {str(e)}"
+        logger.error(error_msg)
+        current_app.logger.error(error_msg)
         return jsonify({
             "error": "Internal Server Error",
-            "message": str(e),
-            "template_folder": current_app.template_folder
+            "message": error_msg,
+            "template_folder": current_app.template_folder,
+            "template_path": template_path if 'template_path' in locals() else None
         }), 500
 
 @api_bp.route('/menu')
