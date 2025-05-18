@@ -514,10 +514,8 @@ def get_templates():
                 file_path = os.path.join(target_dir, file)
                 if os.path.isfile(file_path):
                     template_id_str = f"{category_type}_{subcategory}_{item_category}_{template_id}"
-                    
                     # Calculate URL based on category type
                     url_path = file_path.replace(app.static_folder, '/static')
-                    
                     templates.append({
                         'id': template_id_str,
                         'category_type': category_type,
@@ -691,7 +689,6 @@ def bridal_swap():
             'results': results,
             'count': len(results)
         })
-        
     except Exception as e:
         logger.error(f"Error in bridal_swap: {str(e)}")
         logger.error(traceback.format_exc())
@@ -1785,6 +1782,121 @@ def set_cleanup_age():
         return jsonify({'success': True, 'age_minutes': age_minutes})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 400
+
+@app.route('/api/templates', methods=['GET'])
+def api_templates():
+    """
+    API endpoint to get available templates for a specific category.
+    Returns templates for the requested category with URLs for display.
+    
+    Query parameters:
+    - category_type: Main category (bride, groom, salon, celebrity)
+    - subcategory: Subcategory within the main category
+    - item_category: Specific item within the subcategory
+    """
+    # Get category parameters
+    category_type = request.args.get('category_type')
+    subcategory = request.args.get('subcategory')
+    item_category = request.args.get('item_category')
+    
+    app.logger.info(f"Template request: category_type={category_type}, subcategory={subcategory}, item_category={item_category}")
+    
+    if not all([category_type, subcategory, item_category]):
+        return jsonify({'error': 'Missing required category parameters'}), 400
+    
+    # Define valid categories based on the new structure
+    valid_categories = {
+        'bride': {
+            'bridal': ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'],
+            'outfits': ['traditional', 'modern', 'fusion', 'casual'],
+            'jewelry': ['necklace', 'earrings', 'bangles', 'mang_tikka']
+        },
+        'groom': {
+            'traditional': ['sherwani', 'kurta', 'jodhpuri', 'bandhgala'],
+            'modern': ['tuxedo', 'suit', 'blazer', 'casual']
+        },
+        'salon': {
+            'men': ['haircut', 'beard', 'facial', 'grooming'],
+            'women': ['haircut', 'coloring', 'styling', 'facial']
+        },
+        'celebrity': {
+            'men': ['actors', 'singers', 'sports', 'models'],
+            'women': ['actresses', 'singers', 'models', 'sports'],
+            'tollywood': ['actors', 'actresses', 'classic', 'new-gen'],
+            'bollywood': ['actors', 'actresses', 'classic', 'new-gen']
+        }
+    }
+    
+    # Validate category parameters
+    if (category_type not in valid_categories or 
+        subcategory not in valid_categories[category_type] or 
+        item_category not in valid_categories[category_type][subcategory]):
+        return jsonify({'error': 'Invalid category combination'}), 400
+    
+    # Determine the target directory based on category type
+    if category_type == 'bride' and subcategory == 'bridal':
+        # For bridal templates, use the unified structure
+        target_dir = os.path.join(app.static_folder, 'templates', category_type, subcategory, item_category)
+        app.logger.info(f"Looking for bridal templates in: {target_dir}")
+    else:
+        # For all other categories, use the standard structure
+        target_dir = os.path.join(app.static_folder, 'templates', category_type, subcategory, item_category)
+        app.logger.info(f"Looking for templates in: {target_dir}")
+    
+    # Create directory if it doesn't exist
+    os.makedirs(target_dir, exist_ok=True)
+    
+    # Get all template files
+    templates = []
+    template_id = 1
+    
+    if os.path.exists(target_dir):
+        app.logger.info(f"Directory exists: {target_dir}")
+        for file in sorted(os.listdir(target_dir)):
+            if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                file_path = os.path.join(target_dir, file)
+                if os.path.isfile(file_path):
+                    template_id_str = f"{category_type}_{subcategory}_{item_category}_{template_id}"
+                    # Calculate URL based on category type
+                    url_path = file_path.replace(app.static_folder, '/static')
+                    templates.append({
+                        'id': template_id_str,
+                        'category_type': category_type,
+                        'subcategory': subcategory,
+                        'item_category': item_category,
+                        'path': file_path,
+                        'url': f"{url_path}?t={int(time.time())}"
+                    })
+                    template_id += 1
+        app.logger.info(f"Found {len(templates)} templates")
+    else:
+        app.logger.warning(f"Directory does not exist: {target_dir}")
+    
+    return jsonify({
+        'templates': templates,
+        'count': len(templates),
+        'category_type': category_type,
+        'subcategory': subcategory,
+        'item_category': item_category,
+        'success': True,
+        'has_templates': len(templates) > 0,
+        'timestamp': int(time.time())
+    })
+
+@app.route('/api/categories', methods=['GET'])
+def api_categories():
+    """
+    API endpoint to get available categories.
+    Returns a JSON object with the valid categories structure from categories.json.
+    """
+    import json
+    try:
+        with open('categories.json', 'r') as f:
+            categories_data = json.load(f)
+        return jsonify(categories_data)
+    except Exception as e:
+        app.logger.error(f"Error reading categories.json: {str(e)}")
+        return jsonify({"error": "Failed to load categories"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
