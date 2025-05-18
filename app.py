@@ -1938,6 +1938,8 @@ def get_templates():
     subcategory = request.args.get('subcategory')
     item_category = request.args.get('item_category')
     
+    app.logger.info(f"Template request: category_type={category_type}, subcategory={subcategory}, item_category={item_category}")
+    
     if not all([category_type, subcategory, item_category]):
         return jsonify({'error': 'Missing required category parameters'}), 400
     
@@ -1971,17 +1973,14 @@ def get_templates():
         return jsonify({'error': 'Invalid category combination'}), 400
     
     # Determine the target directory based on category type
-    if category_type == 'bride':
-        if subcategory == 'bridal':
-            target_dir = os.path.join(app.static_folder, 'templates', category_type, item_category)
-        else:
-            target_dir = os.path.join(app.static_folder, 'templates', category_type, subcategory, item_category)
-    elif category_type == 'groom':
+    if category_type == 'bride' and subcategory == 'bridal':
+        # For bridal templates, use the unified structure
         target_dir = os.path.join(app.static_folder, 'templates', category_type, subcategory, item_category)
-    elif category_type == 'salon':
+        app.logger.info(f"Looking for bridal templates in: {target_dir}")
+    else:
+        # For all other categories, use the standard structure
         target_dir = os.path.join(app.static_folder, 'templates', category_type, subcategory, item_category)
-    elif category_type == 'celebrity':
-        target_dir = os.path.join(app.static_folder, 'templates', category_type, subcategory, item_category)
+        app.logger.info(f"Looking for templates in: {target_dir}")
     
     # Create directory if it doesn't exist
     os.makedirs(target_dir, exist_ok=True)
@@ -1991,6 +1990,7 @@ def get_templates():
     template_id = 1
     
     if os.path.exists(target_dir):
+        app.logger.info(f"Directory exists: {target_dir}")
         for file in sorted(os.listdir(target_dir)):
             if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
                 file_path = os.path.join(target_dir, file)
@@ -2009,6 +2009,9 @@ def get_templates():
                         'url': f"{url_path}?t={int(time.time())}"
                     })
                     template_id += 1
+        app.logger.info(f"Found {len(templates)} templates")
+    else:
+        app.logger.warning(f"Directory does not exist: {target_dir}")
     
     return jsonify({
         'templates': templates,
