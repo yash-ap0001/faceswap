@@ -1,5 +1,5 @@
 import os
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import logging
@@ -43,6 +43,7 @@ def create_app():
     os.makedirs('static/images/event_managers', exist_ok=True)
     os.makedirs('static/js', exist_ok=True)
     os.makedirs('static/css', exist_ok=True)
+    os.makedirs('static/dist', exist_ok=True)
     
     # Register blueprints
     try:
@@ -52,10 +53,20 @@ def create_app():
     except ImportError as e:
         logging.warning(f"Could not import React routes: {e}")
     
+    # Root route - redirect to React app
+    @app.route('/')
+    def index():
+        return redirect('/react')
+    
     # Serve static files
     @app.route('/static/<path:path>')
     def serve_static(path):
         return send_from_directory('static', path)
+    
+    # Serve React bundle
+    @app.route('/dist/<path:path>')
+    def serve_dist(path):
+        return send_from_directory('static/dist', path)
     
     # Create database tables only if DATABASE_URL is set
     if app.config['SQLALCHEMY_DATABASE_URI']:
