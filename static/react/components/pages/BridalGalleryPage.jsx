@@ -61,8 +61,8 @@ const BridalGalleryPage = () => {
       // If both endpoints fail, create static fallback templates
       const staticFallbackTemplates = Array.from({ length: 6 }, (_, i) => ({
         id: `${ceremony}_${i + 1}`,
-        path: `static/images/templates/${ceremony}/${i + 1}.jpg`,
-        url: `/static/images/templates/${ceremony}/${i + 1}.jpg`,
+        path: `static/templates/bride/bridal/${ceremony}/${ceremony}_${i + 1}.jpg`,
+        url: `/static/templates/bride/bridal/${ceremony}/${ceremony}_${i + 1}.jpg`,
         category_type: 'bride',
         subcategory: 'bridal',
         item_category: ceremony,

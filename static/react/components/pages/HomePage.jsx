@@ -41,34 +41,34 @@ const HomePage = () => {
   // Default fallback images in case API fails
   const defaultImages = {
     haldi: [
-      '/static/templates/bride/haldi/haldi_1.jpg',
-      '/static/templates/bride/haldi/haldi_2.jpg',
-      '/static/templates/bride/haldi/haldi_3.jpg',
-      '/static/templates/bride/haldi/haldi_4.jpg'
+      '/static/templates/bride/bridal/haldi/haldi_1.jpg',
+      '/static/templates/bride/bridal/haldi/haldi_2.jpg',
+      '/static/templates/bride/bridal/haldi/haldi_3.jpg',
+      '/static/templates/bride/bridal/haldi/haldi_4.jpg'
     ],
     mehendi: [
-      '/static/templates/bride/mehendi/mehendi_1.jpg',
-      '/static/templates/bride/mehendi/mehendi_2.jpg',
-      '/static/templates/bride/mehendi/mehendi_3.jpg',
-      '/static/templates/bride/mehendi/mehendi_4.jpg'
+      '/static/templates/bride/bridal/mehendi/mehendi_1.jpg',
+      '/static/templates/bride/bridal/mehendi/mehendi_2.jpg',
+      '/static/templates/bride/bridal/mehendi/mehendi_3.jpg',
+      '/static/templates/bride/bridal/mehendi/mehendi_4.jpg'
     ],
     sangeeth: [
-      '/static/templates/bride/sangeeth/sangeeth_1.jpg',
-      '/static/templates/bride/sangeeth/sangeeth_2.jpg',
-      '/static/templates/bride/sangeeth/sangeeth_3.jpg',
-      '/static/templates/bride/sangeeth/sangeeth_4.jpg'
+      '/static/templates/bride/bridal/sangeeth/sangeeth_1.jpg',
+      '/static/templates/bride/bridal/sangeeth/sangeeth_2.jpg',
+      '/static/templates/bride/bridal/sangeeth/sangeeth_3.jpg',
+      '/static/templates/bride/bridal/sangeeth/sangeeth_4.jpg'
     ],
     wedding: [
-      '/static/templates/bride/wedding/wedding_1.jpg',
-      '/static/templates/bride/wedding/wedding_2.jpg',
-      '/static/templates/bride/wedding/wedding_3.jpg',
-      '/static/templates/bride/wedding/wedding_4.jpg'
+      '/static/templates/bride/bridal/wedding/wedding_1.jpg',
+      '/static/templates/bride/bridal/wedding/wedding_2.jpg',
+      '/static/templates/bride/bridal/wedding/wedding_3.jpg',
+      '/static/templates/bride/bridal/wedding/wedding_4.jpg'
     ],
     reception: [
-      '/static/templates/bride/reception/reception_1.jpg',
-      '/static/templates/bride/reception/reception_2.jpg',
-      '/static/templates/bride/reception/reception_3.jpg',
-      '/static/templates/bride/reception/reception_4.jpg'
+      '/static/templates/bride/bridal/reception/reception_1.jpg',
+      '/static/templates/bride/bridal/reception/reception_2.jpg',
+      '/static/templates/bride/bridal/reception/reception_3.jpg',
+      '/static/templates/bride/bridal/reception/reception_4.jpg'
     ]
   };
 
