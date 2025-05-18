@@ -6,7 +6,8 @@ services:
       apt-get update && apt-get install -y build-essential python3-dev cmake git pkg-config libglib2.0-dev libsm6 libxext6 libxrender-dev
       python -m pip install --upgrade pip setuptools wheel
       pip install --no-cache-dir -r requirements.txt
-      cd frontend && npm install && npm run build
+      npm install
+      npx webpack --mode production
     startCommand: gunicorn wsgi:app
     envVars:
       - key: FLASK_ENV
