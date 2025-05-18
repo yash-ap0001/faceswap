@@ -19,9 +19,12 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 def create_app():
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    template_dir = os.path.abspath(os.path.join(base_dir, '..', 'templates'))
+    static_dir = os.path.abspath(os.path.join(base_dir, '..', 'static'))
     app = Flask(__name__, 
-                static_folder='static',
-                template_folder='templates')
+                static_folder=static_dir,
+                template_folder=template_dir)
     
     # Configure the app
     app.config['SECRET_KEY'] = os.environ.get("SESSION_SECRET", "development_secret_key")
