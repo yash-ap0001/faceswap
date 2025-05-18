@@ -75,7 +75,14 @@ def create_app():
     @app.route('/static/<path:path>')
     def serve_static(path):
         try:
-            return send_from_directory('static', path)
+            static_folder = app.static_folder
+            if not os.path.exists(os.path.join(static_folder, path)):
+                logger.error(f"Static file not found: {path} in {static_folder}")
+                return jsonify({
+                    "error": "File Not Found",
+                    "message": f"Static file {path} not found in {static_folder}"
+                }), 404
+            return send_from_directory(static_folder, path)
         except Exception as e:
             logger.error(f"Error serving static file {path}: {str(e)}")
             return jsonify({"error": "File Not Found", "message": str(e)}), 404
@@ -84,7 +91,14 @@ def create_app():
     @app.route('/dist/<path:path>')
     def serve_dist(path):
         try:
-            return send_from_directory('static/dist', path)
+            dist_folder = os.path.join(app.static_folder, 'dist')
+            if not os.path.exists(os.path.join(dist_folder, path)):
+                logger.error(f"Dist file not found: {path} in {dist_folder}")
+                return jsonify({
+                    "error": "File Not Found",
+                    "message": f"Dist file {path} not found in {dist_folder}"
+                }), 404
+            return send_from_directory(dist_folder, path)
         except Exception as e:
             logger.error(f"Error serving dist file {path}: {str(e)}")
             return jsonify({"error": "File Not Found", "message": str(e)}), 404

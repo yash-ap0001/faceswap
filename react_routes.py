@@ -6,6 +6,7 @@ These routes serve the React application and provide API endpoints for it.
 import json
 import time
 import logging
+import os
 from flask import Blueprint, render_template, jsonify, request, current_app
 
 # Configure logging
@@ -28,12 +29,25 @@ def react_app(path=None):
     The catch-all route ensures all React routes are handled by the SPA.
     """
     try:
-        logger.debug("Rendering React app template")
+        # Check if template exists
+        template_path = os.path.join(current_app.template_folder, 'layout.html')
+        if not os.path.exists(template_path):
+            logger.error(f"Template not found at: {template_path}")
+            return jsonify({
+                "error": "Template Not Found",
+                "message": f"layout.html not found in {current_app.template_folder}"
+            }), 500
+
+        logger.debug(f"Rendering React app template from: {template_path}")
         return render_template('layout.html')
     except Exception as e:
         logger.error(f"Error rendering React app: {str(e)}")
         current_app.logger.error(f"Error rendering React app: {str(e)}")
-        return jsonify({"error": "Internal Server Error", "message": str(e)}), 500
+        return jsonify({
+            "error": "Internal Server Error",
+            "message": str(e),
+            "template_folder": current_app.template_folder
+        }), 500
 
 @api_bp.route('/menu')
 def api_menu():
