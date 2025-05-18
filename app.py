@@ -44,6 +44,14 @@ logger.setLevel(logging.DEBUG)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "development_secret_key")
 
+# Enable CORS
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Debug: Print all registered routes
+print("Registered routes:")
+for rule in app.url_map.iter_rules():
+    print(f"{rule.endpoint}: {rule.rule}")
+
 # Configure Flask app logging
 app.logger.setLevel(logging.DEBUG)
 app.logger.addHandler(file_handler)

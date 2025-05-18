@@ -1,1 +1,1 @@
-web: gunicorn wsgi:app 
+web: gunicorn serve:app --bind 0.0.0.0:$PORT --workers 2 --threads 2 --timeout 120 --log-level debug --access-logfile - --error-logfile - 
