@@ -30,7 +30,8 @@ def create_app():
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
     
     # Initialize extensions with app
-    db.init_app(app)
+    if app.config['SQLALCHEMY_DATABASE_URI']:
+        db.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
     
