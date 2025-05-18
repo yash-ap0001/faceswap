@@ -33,7 +33,6 @@ def create_app():
     if app.config['SQLALCHEMY_DATABASE_URI']:
         db.init_app(app)
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'
     
     # Configure logging
     logging.basicConfig(level=logging.DEBUG)
@@ -46,16 +45,12 @@ def create_app():
     os.makedirs('static/css', exist_ok=True)
     
     # Register blueprints
-    from app.routes import auth, bridal, salon, celebrity, venue, event_managers, react_bp
-    from app.routes.react_routes import api_bp  # Import the api_bp
-    app.register_blueprint(auth.bp)
-    app.register_blueprint(bridal.bp)
-    app.register_blueprint(salon.bp)
-    app.register_blueprint(celebrity.bp)
-    app.register_blueprint(venue.bp)
-    app.register_blueprint(event_managers.bp)
-    app.register_blueprint(react_bp)  # Register React blueprint
-    app.register_blueprint(api_bp)  # Register API blueprint
+    try:
+        from react_routes import react_bp, api_bp
+        app.register_blueprint(react_bp)  # Register React blueprint
+        app.register_blueprint(api_bp)  # Register API blueprint
+    except ImportError as e:
+        logging.warning(f"Could not import React routes: {e}")
     
     # Serve static files
     @app.route('/static/<path:path>')
