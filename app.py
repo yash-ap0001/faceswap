@@ -1834,7 +1834,11 @@ def bridal_swap():
                 ceremony = os.path.basename(template_path).split('_')[0]
                 ceremonies.append(ceremony)
                 
-                # Read template image
+                # Read template image - handle both absolute and relative paths
+                if template_path.startswith('/'):
+                    template_path = template_path[1:]  # Remove leading slash
+                if template_path.startswith('static/'):
+                    template_path = template_path[7:]  # Remove 'static/' prefix
                 template_img = cv2.imread(template_path)
                 if template_img is None:
                     logger.error(f"Failed to read template image: {template_path}")

@@ -237,7 +237,7 @@ const UniversalPageNew = () => {
     formData.append('multi', 'true');
     
     // Send the request
-    fetch('/bridal-swap', {
+    fetch('/api/bridal-swap', {
       method: 'POST',
       body: formData
     })
