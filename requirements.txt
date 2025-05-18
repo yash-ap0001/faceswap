@@ -1,4 +1,4 @@
-flask==2.0.1
+flask>=2.2.0
 numpy==1.24.3
 opencv-python==4.8.0.76
 git+https://github.com/deepinsight/insightface.git#subdirectory=python-package
