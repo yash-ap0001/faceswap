@@ -152,7 +152,7 @@ const UniversalPageNew = () => {
     const queryString = new URLSearchParams(params).toString();
     
     // Fetch templates
-    fetch(`/api/templates?${queryString}`)
+    fetch(`/get_templates?${queryString}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to fetch templates');
@@ -237,7 +237,7 @@ const UniversalPageNew = () => {
     formData.append('multi', 'true');
     
     // Send the request
-    fetch('/api/bridal-swap', {
+    fetch('/bridal-swap', {
       method: 'POST',
       body: formData
     })

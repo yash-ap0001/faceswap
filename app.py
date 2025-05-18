@@ -440,320 +440,268 @@ def react_direct(path=None):
     """Direct renderer for react routes"""
     return render_template('layout.html')
     
-@app.route('/get_templates')
-def get_templates_route():
+@app.route('/get_templates', methods=['GET'])
+def get_templates():
     """
     API endpoint to get available templates for a specific category.
-    This is a simplified version that directly serves templates from the Pinterest folder.
+    Returns templates for the requested category with URLs for display.
     
     Query parameters:
-    - ceremony_type: For bridal ceremonies
-    - category_type: 'bride' or 'groom'
-    - subcategory: e.g., 'bridal', 'outfits', 'jewelry' 
-    - item_category: Specific item category, e.g., 'haldi', 'casual', etc.
+    - category_type: Main category (bride, groom, salon, celebrity)
+    - subcategory: Subcategory within the main category
+    - item_category: Specific item within the subcategory
     """
-    # Get query parameters
-    ceremony_type = request.args.get('ceremony_type')
-    category_type = request.args.get('category_type', 'bride')
-    subcategory = request.args.get('subcategory', 'bridal')
-    item_category = request.args.get('item_category', ceremony_type)
+    # Get category parameters
+    category_type = request.args.get('category_type')
+    subcategory = request.args.get('subcategory')
+    item_category = request.args.get('item_category')
     
-    # For compatibility with older code
-    if ceremony_type and not item_category:
-        item_category = ceremony_type
+    app.logger.info(f"Template request: category_type={category_type}, subcategory={subcategory}, item_category={item_category}")
     
-    if not item_category:
-        return jsonify({'success': False, 'message': 'Missing required category parameter'}), 400
+    if not all([category_type, subcategory, item_category]):
+        return jsonify({'error': 'Missing required category parameters'}), 400
     
-    # Create path to template directory
+    # Define valid categories based on the new structure
+    valid_categories = {
+        'bride': {
+            'bridal': ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'],
+            'outfits': ['traditional', 'modern', 'fusion', 'casual'],
+            'jewelry': ['necklace', 'earrings', 'bangles', 'mang_tikka']
+        },
+        'groom': {
+            'traditional': ['sherwani', 'kurta', 'jodhpuri', 'bandhgala'],
+            'modern': ['tuxedo', 'suit', 'blazer', 'casual']
+        },
+        'salon': {
+            'men': ['haircut', 'beard', 'facial', 'grooming'],
+            'women': ['haircut', 'coloring', 'styling', 'facial']
+        },
+        'celebrity': {
+            'men': ['actors', 'singers', 'sports', 'models'],
+            'women': ['actresses', 'singers', 'models', 'sports'],
+            'tollywood': ['actors', 'actresses', 'classic', 'new-gen'],
+            'bollywood': ['actors', 'actresses', 'classic', 'new-gen']
+        }
+    }
+    
+    # Validate category parameters
+    if (category_type not in valid_categories or 
+        subcategory not in valid_categories[category_type] or 
+        item_category not in valid_categories[category_type][subcategory]):
+        return jsonify({'error': 'Invalid category combination'}), 400
+    
+    # Determine the target directory based on category type
     if category_type == 'bride' and subcategory == 'bridal':
-        template_dir = os.path.join('static', 'templates', 'bride', item_category)
+        # For bridal templates, use the unified structure
+        target_dir = os.path.join(app.static_folder, 'templates', category_type, subcategory, item_category)
+        app.logger.info(f"Looking for bridal templates in: {target_dir}")
     else:
-        template_dir = os.path.join('static', 'templates', category_type, subcategory, item_category)
+        # For all other categories, use the standard structure
+        target_dir = os.path.join(app.static_folder, 'templates', category_type, subcategory, item_category)
+        app.logger.info(f"Looking for templates in: {target_dir}")
     
-    # Check if directory exists
-    if not os.path.exists(template_dir):
-        # Try fallback directory
-        fallback_dir = os.path.join('templates', 'uploads', 'pinterest', item_category)
-        if os.path.exists(fallback_dir):
-            template_dir = fallback_dir
-        else:
-            return jsonify({
-                'success': False, 
-                'message': f'No templates found for {category_type}/{subcategory}/{item_category}',
-                'templates': []
-            }), 404
+    # Create directory if it doesn't exist
+    os.makedirs(target_dir, exist_ok=True)
     
-    # Get all image files in the directory
-    template_files = [f for f in os.listdir(template_dir) 
-                     if f.lower().endswith(('.jpg', '.jpeg', '.png')) and 
-                     os.path.isfile(os.path.join(template_dir, f))]
-    
-    # Sort files to ensure consistent order
-    template_files.sort()
-    
-    # Limit to 30 files for consistency
-    template_files = template_files[:30]
-    
-    # Create template objects
+    # Get all template files
     templates = []
-    for i, filename in enumerate(template_files):
-        template_path = os.path.join(template_dir, filename)
-        template_url = f"/{template_path}"
-        
-        templates.append({
-            "id": f"{item_category}_{i+1}",
-            "path": template_path,
-            "url": template_url,
-            "category_type": category_type,
-            "subcategory": subcategory,
-            "item_category": item_category,
-            "template_type": "pinterest"
-        })
+    template_id = 1
     
-    # Return results
+    if os.path.exists(target_dir):
+        app.logger.info(f"Directory exists: {target_dir}")
+        for file in sorted(os.listdir(target_dir)):
+            if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                file_path = os.path.join(target_dir, file)
+                if os.path.isfile(file_path):
+                    template_id_str = f"{category_type}_{subcategory}_{item_category}_{template_id}"
+                    
+                    # Calculate URL based on category type
+                    url_path = file_path.replace(app.static_folder, '/static')
+                    
+                    templates.append({
+                        'id': template_id_str,
+                        'category_type': category_type,
+                        'subcategory': subcategory,
+                        'item_category': item_category,
+                        'path': file_path,
+                        'url': f"{url_path}?t={int(time.time())}"
+                    })
+                    template_id += 1
+        app.logger.info(f"Found {len(templates)} templates")
+    else:
+        app.logger.warning(f"Directory does not exist: {target_dir}")
+    
     return jsonify({
-        'success': True,
         'templates': templates,
         'count': len(templates),
-        'has_templates': len(templates) > 0,
         'category_type': category_type,
         'subcategory': subcategory,
-        'item_category': item_category
+        'item_category': item_category,
+        'success': True,
+        'has_templates': len(templates) > 0,
+        'timestamp': int(time.time())
     })
 
-CATEGORIES_FILE = 'categories.json'
+@app.route('/bridal-swap', methods=['GET', 'POST'])
+def bridal_swap():
+    if request.method == 'GET':
+        return render_template('bridal_swap.html')
 
-def load_categories():
-    if not os.path.exists(CATEGORIES_FILE):
-        return []
-    with open(CATEGORIES_FILE, 'r', encoding='utf-8') as f:
-        return json.load(f)
-
-def save_categories(categories):
-    with open(CATEGORIES_FILE, 'w', encoding='utf-8') as f:
-        json.dump(categories, f, indent=2)
-
-@app.route('/api/categories', methods=['GET'])
-def get_categories():
-    categories = load_categories()
-    return jsonify({
-        "categories": categories["categories"],
-        "success": True
-    })
-
-@app.route('/api/categories', methods=['POST'])
-def add_category():
+    if 'source' not in request.files:
+        return jsonify({'error': 'No source file provided'}), 400
+    
+    source_file = request.files['source']
+    if source_file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    
+    # Get template paths from form data
+    template_paths = []
+    ceremonies = []
+    
+    # Check if this is a multi-template request
+    is_multi_request = request.form.get('multi') == 'true'
+    
+    if is_multi_request:
+        # Get templates from the array and remove any duplicates
+        templates = list(set(request.form.getlist('templates[]')))
+        if not templates:
+            return jsonify({'error': 'No templates provided'}), 400
+        template_paths = templates
+    else:
+        # Single template request
+        template_path = request.form.get('template_path')
+        if not template_path:
+            return jsonify({'error': 'No template path provided'}), 400
+        template_paths = [template_path]
+    
     try:
-        categories = load_categories()
-        data = request.get_json()
-        name = data.get('name', '').strip()
-        if not name:
-            return jsonify({'success': False, 'message': 'Category name required'}), 400
+        # Create uploads directory if it doesn't exist
+        upload_dir = os.path.join('templates', 'uploads', 'sources')
+        os.makedirs(upload_dir, exist_ok=True)
         
-        new_cat = {
-            'id': name.lower().replace(' ', '_'),
-            'key': name.lower().replace(' ', '_'),
-            'name': name,
-            'subcategories': []
-        }
+        # Save the source file temporarily with a unique name
+        timestamp = int(time.time())
+        source_filename = f"source_{timestamp}_{secure_filename(source_file.filename)}"
+        source_path = os.path.join(upload_dir, source_filename)
+        source_file.save(source_path)
         
-        if not isinstance(categories, dict):
-            categories = {"categories": []}
-        elif "categories" not in categories:
-            categories["categories"] = []
-            
-        categories["categories"].append(new_cat)
-        save_categories(categories)
-        return jsonify({'success': True, 'category': new_cat}), 201
+        # Read the source image for face detection
+        source_img = cv2.imread(source_path)
+        
+        if source_img is None:
+            return jsonify({'error': 'Failed to read source image'}), 400
+        
+        # Detect face in source image
+        source_faces = faceapp.get(source_img)
+        
+        if not source_faces:
+            return jsonify({'error': 'No face detected in your photo. Please upload a clear photo with your face visible.'}), 400
+        
+        # Process templates
+        results = []
+        processed_paths = set()  # Keep track of processed paths to avoid duplicates
+        
+        for i, template_path in enumerate(template_paths):
+            # Skip if we've already processed this template
+            if template_path in processed_paths:
+                continue
+                
+            try:
+                # Extract ceremony type from template path
+                ceremony = os.path.basename(template_path).split('_')[0]
+                ceremonies.append(ceremony)
+                
+                # Read template image - handle both absolute and relative paths
+                if template_path.startswith('/'):
+                    template_path = template_path[1:]  # Remove leading slash
+                if template_path.startswith('static/'):
+                    template_path = template_path[7:]  # Remove 'static/' prefix
+                template_img = cv2.imread(template_path)
+                if template_img is None:
+                    logger.error(f"Failed to read template image: {template_path}")
+                    continue
+                
+                # Detect face in template
+                target_faces = faceapp.get(template_img)
+                if not target_faces:
+                    logger.error(f"No face detected in template: {template_path}")
+                    continue
+                
+                # Get face detection results
+                source_face = source_faces[0]
+                target_face = target_faces[0]
+                
+                # Perform the swap
+                result_img = swapper.get(template_img, target_face, source_face, paste_back=True)
+                
+                # Apply face enhancement if requested
+                if request.form.get('enhance') == 'true':
+                    try:
+                        # Initialize the face enhancer if not already initialized
+                        global face_enhancer
+                        if face_enhancer is None:
+                            from face_enhancer import FaceEnhancer
+                            face_enhancer = FaceEnhancer()
+                        
+                        # Apply face enhancement
+                        enhance_method = request.form.get('enhance_method', 'gfpgan')
+                        result_img = face_enhancer.enhance(result_img, method=enhance_method, strength=0.8)
+                    except Exception as e:
+                        logger.error(f"Face enhancement failed: {str(e)}")
+                        # Continue with the unenhanced result
+                
+                # Create results directory if it doesn't exist
+                results_dir = os.path.join('static', 'results')
+                os.makedirs(results_dir, exist_ok=True)
+                
+                # Save result with unique filename per template
+                result_filename = f"{ceremony}_{timestamp}_{i}_{os.path.basename(template_path)}"
+                result_path = os.path.join(results_dir, result_filename)
+                
+                # Save the result
+                cv2.imwrite(result_path, result_img)
+                
+                # Add to results
+                results.append({
+                    'result_image': f'/static/results/{result_filename}',
+                    'template_path': template_path,
+                    'ceremony': ceremony,
+                    'index': i
+                })
+                
+                # Mark this template as processed
+                processed_paths.add(template_path)
+                
+            except Exception as e:
+                logger.error(f"Error processing template {i+1}/{len(template_paths)}: {str(e)}")
+                # Continue with next template
+        
+        # Clean up source file
+        try:
+            os.remove(source_path)
+        except Exception as e:
+            logger.error(f"Error cleaning up source file: {str(e)}")
+        
+        if not results:
+            return jsonify({'success': False, 'error': 'Failed to process any templates. Please try again.'}), 500
+        
+        # Return all results
+        return jsonify({
+            'success': True,
+            'results': results,
+            'count': len(results)
+        })
+        
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-@app.route('/api/categories/<cat_id>/subcategories', methods=['POST'])
-def add_subcategory(cat_id):
-    categories = load_categories()
-    data = request.get_json()
-    name = data.get('name', '').strip()
-    if not name:
-        return jsonify({'success': False, 'message': 'Subcategory name required'}), 400
-    for cat in categories["categories"]:
-        if cat['id'] == cat_id:
-            new_sub = {
-                'id': name.lower().replace(' ', '_'),
-                'key': name.lower().replace(' ', '_'),
-                'name': name,
-                'items': []
-            }
-            cat['subcategories'].append(new_sub)
-            save_categories(categories)
-            return jsonify({'success': True, 'subcategory': new_sub}), 201
-    return jsonify({'success': False, 'message': 'Category not found'}), 404
-
-@app.route('/api/categories/<cat_id>/subcategories/<sub_id>/items', methods=['POST'])
-def add_item(cat_id, sub_id):
-    categories = load_categories()
-    data = request.get_json()
-    name = data.get('name', '').strip()
-    if not name:
-        return jsonify({'success': False, 'message': 'Item name required'}), 400
-    for cat in categories["categories"]:
-        if cat['id'] == cat_id:
-            for sub in cat['subcategories']:
-                if sub['id'] == sub_id:
-                    new_item = {
-                        'id': name.lower().replace(' ', '_'),
-                        'key': name.lower().replace(' ', '_'),
-                        'name': name
-                    }
-                    sub['items'].append(new_item)
-                    save_categories(categories)
-                    return jsonify({'success': True, 'item': new_item}), 201
-    return jsonify({'success': False, 'message': 'Category or subcategory not found'}), 404
-
-@app.route('/api/categories/<cat_id>', methods=['PUT', 'DELETE'])
-def update_or_delete_category(cat_id):
-    categories = load_categories()
-    if request.method == 'PUT':
-        data = request.get_json()
-        name = data.get('name', '').strip()
-        for cat in categories["categories"]:
-            if cat['id'] == cat_id:
-                cat['name'] = name
-                save_categories(categories)
-                return jsonify({'success': True, 'category': cat})
-        return jsonify({'success': False, 'message': 'Category not found'}), 404
-    elif request.method == 'DELETE':
-        categories["categories"] = [cat for cat in categories["categories"] if cat['id'] != cat_id]
-        save_categories(categories)
-        return jsonify({'success': True})
-
-@app.route('/api/categories/<cat_id>/subcategories/<sub_id>', methods=['PUT', 'DELETE'])
-def update_or_delete_subcategory(cat_id, sub_id):
-    categories = load_categories()
-    for cat in categories["categories"]:
-        if cat['id'] == cat_id:
-            if request.method == 'PUT':
-                data = request.get_json()
-                name = data.get('name', '').strip()
-                for sub in cat['subcategories']:
-                    if sub['id'] == sub_id:
-                        sub['name'] = name
-                        save_categories(categories)
-                        return jsonify({'success': True, 'subcategory': sub})
-                return jsonify({'success': False, 'message': 'Subcategory not found'}), 404
-            elif request.method == 'DELETE':
-                original_count = len(cat['subcategories'])
-                cat['subcategories'] = [sub for sub in cat['subcategories'] if sub['id'] != sub_id]
-                if len(cat['subcategories']) < original_count:
-                    save_categories(categories)
-                    return jsonify({'success': True})
-                else:
-                    return jsonify({'success': False, 'message': 'Subcategory not found'}), 404
-    return jsonify({'success': False, 'message': 'Category not found'}), 404
-
-@app.route('/api/categories/<cat_id>/subcategories/<sub_id>/items/<item_id>', methods=['PUT', 'DELETE'])
-def update_or_delete_item(cat_id, sub_id, item_id):
-    categories = load_categories()
-    for cat in categories["categories"]:
-        if cat['id'] == cat_id:
-            for sub in cat['subcategories']:
-                if sub['id'] == sub_id:
-                    if request.method == 'PUT':
-                        data = request.get_json()
-                        name = data.get('name', '').strip()
-                        for item in sub['items']:
-                            if item['id'] == item_id:
-                                item['name'] = name
-                                save_categories(categories)
-                                return jsonify({'success': True, 'item': item})
-                        return jsonify({'success': False, 'message': 'Item not found'}), 404
-                    elif request.method == 'DELETE':
-                        original_count = len(sub['items'])
-                        sub['items'] = [item for item in sub['items'] if item['id'] != item_id]
-                        if len(sub['items']) < original_count:
-                            save_categories(categories)
-                            return jsonify({'success': True})
-                        else:
-                            return jsonify({'success': False, 'message': 'Item not found'}), 404
-    return jsonify({'success': False, 'message': 'Category or subcategory not found'}), 404
-
-@app.route('/api/menu')
-def api_menu():
-    """
-    API endpoint to get the menu structure for the React sidebar.
-    Returns a JSON object with the menu structure.
-    """
-    menu = [
-        {
-            "id": "bride",
-            "title": "Bride",
-            "icon": "fa-female",
-            "subItems": [
-                {"id": "bridal_gallery", "label": "Bridal Gallery", "link": "/bridal-gallery"},
-                {"id": "bridal_swap", "label": "Create Bride Look", "link": "/bridal-swap"},
-                {"id": "bridal_outfits", "label": "Bridal Outfits", "link": "/bridal-outfits"},
-                {"id": "jewelry_collections", "label": "Jewelry Collections", "link": "/jewelry-collections"},
-                {"id": "makeup_styles", "label": "Makeup Styles", "link": "/makeup-styles"}
-            ]
-        },
-        {
-            "id": "groom",
-            "title": "Groom",
-            "icon": "fa-male",
-            "subItems": [
-                {"id": "groom_face_swap", "label": "Create Groom Look", "link": "/groom-face-swap"},
-                {"id": "traditional_wear", "label": "Traditional Wear", "link": "/traditional-wear"},
-                {"id": "modern_suits", "label": "Modern Suits", "link": "/modern-suits"},
-                {"id": "groom_accessories", "label": "Accessories", "link": "/groom-accessories"}
-            ]
-        },
-        {
-            "id": "celebrity",
-            "title": "Celebrity",
-            "icon": "fa-star",
-            "subItems": [
-                {"id": "celebrity_men", "label": "Men", "link": "/celebrity-men"},
-                {"id": "celebrity_women", "label": "Women", "link": "/celebrity-women"},
-                {"id": "celebrity_tollywood", "label": "Tollywood", "link": "/celebrity-tollywood"},
-                {"id": "celebrity_bollywood", "label": "Bollywood", "link": "/celebrity-bollywood"},
-                {"id": "celebrity_item", "label": "Item", "link": "/celebrity-item"}
-            ]
-        },
-        {
-            "id": "services",
-            "title": "Services",
-            "icon": "fa-concierge-bell",
-            "subItems": [
-                {"id": "venue_search", "label": "Venue Search", "link": "/venue-search"},
-                {"id": "hall_comparison", "label": "Hall Comparison", "link": "/hall-comparison"},
-                {"id": "virtual_tours", "label": "Virtual Tours", "link": "/virtual-tours"},
-                {"id": "booking_management", "label": "Booking Management", "link": "/booking-management"},
-                {"id": "saloons", "label": "Saloons", "link": "/saloons"},
-                {"id": "event_managers", "label": "Event Managers", "link": "/event-managers"}
-            ]
-        }
-    ]
-    
-    return jsonify(menu)
-
-@app.route('/api/content/<path:page_id>')
-def api_content(page_id):
-    """
-    API endpoint to get the content for a specific page.
-    This allows the React app to fetch page content without full page reloads.
-    
-    Args:
-        page_id: The ID of the page to fetch
-        
-    Returns:
-        JSON object with the page content
-    """
-    # For now, just return a simple message
-    # Later, we can implement actual content fetching based on page_id
-    return jsonify({
-        "title": page_id.replace('_', ' ').title(),
-        "content": f"Content for {page_id} will be loaded here."
-    })
+        logger.error(f"Error in bridal_swap: {str(e)}")
+        logger.error(traceback.format_exc())
+        # Clean up files in case of error
+        if 'source_path' in locals() and os.path.exists(source_path):
+            try:
+                os.remove(source_path)
+            except Exception as cleanup_error:
+                logger.error(f"Error cleaning up source file: {str(cleanup_error)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/bridal-gallery')
 def bridal_gallery():
@@ -1764,269 +1712,6 @@ def process_template():
         import traceback
         app.logger.error(traceback.format_exc())
         return jsonify({'success': False, 'error': str(e)})
-
-@app.route('/bridal-swap', methods=['GET', 'POST'])
-def bridal_swap():
-    if request.method == 'GET':
-        return render_template('bridal_swap.html')
-
-    if 'source' not in request.files:
-        return jsonify({'error': 'No source file provided'}), 400
-    
-    source_file = request.files['source']
-    if source_file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-    
-    # Get template paths from form data
-    template_paths = []
-    ceremonies = []
-    
-    # Check if this is a multi-template request
-    is_multi_request = request.form.get('multi') == 'true'
-    
-    if is_multi_request:
-        # Get templates from the array and remove any duplicates
-        templates = list(set(request.form.getlist('templates[]')))
-        if not templates:
-            return jsonify({'error': 'No templates provided'}), 400
-        template_paths = templates
-    else:
-        # Single template request
-        template_path = request.form.get('template_path')
-        if not template_path:
-            return jsonify({'error': 'No template path provided'}), 400
-        template_paths = [template_path]
-    
-    try:
-        # Create uploads directory if it doesn't exist
-        upload_dir = os.path.join('templates', 'uploads', 'sources')
-        os.makedirs(upload_dir, exist_ok=True)
-        
-        # Save the source file temporarily with a unique name
-        timestamp = int(time.time())
-        source_filename = f"source_{timestamp}_{secure_filename(source_file.filename)}"
-        source_path = os.path.join(upload_dir, source_filename)
-        source_file.save(source_path)
-        
-        # Read the source image for face detection
-        source_img = cv2.imread(source_path)
-        
-        if source_img is None:
-            return jsonify({'error': 'Failed to read source image'}), 400
-        
-        # Detect face in source image
-        source_faces = faceapp.get(source_img)
-        
-        if not source_faces:
-            return jsonify({'error': 'No face detected in your photo. Please upload a clear photo with your face visible.'}), 400
-        
-        # Process templates
-        results = []
-        processed_paths = set()  # Keep track of processed paths to avoid duplicates
-        
-        for i, template_path in enumerate(template_paths):
-            # Skip if we've already processed this template
-            if template_path in processed_paths:
-                continue
-                
-            try:
-                # Extract ceremony type from template path
-                ceremony = os.path.basename(template_path).split('_')[0]
-                ceremonies.append(ceremony)
-                
-                # Read template image - handle both absolute and relative paths
-                if template_path.startswith('/'):
-                    template_path = template_path[1:]  # Remove leading slash
-                if template_path.startswith('static/'):
-                    template_path = template_path[7:]  # Remove 'static/' prefix
-                template_img = cv2.imread(template_path)
-                if template_img is None:
-                    logger.error(f"Failed to read template image: {template_path}")
-                    continue
-                
-                # Detect face in template
-                target_faces = faceapp.get(template_img)
-                if not target_faces:
-                    logger.error(f"No face detected in template: {template_path}")
-                    continue
-                
-                # Get face detection results
-                source_face = source_faces[0]
-                target_face = target_faces[0]
-                
-                # Perform the swap
-                result_img = swapper.get(template_img, target_face, source_face, paste_back=True)
-                
-                # Apply face enhancement if requested
-                if request.form.get('enhance') == 'true':
-                    try:
-                        # Initialize the face enhancer if not already initialized
-                        global face_enhancer
-                        if face_enhancer is None:
-                            from face_enhancer import FaceEnhancer
-                            face_enhancer = FaceEnhancer()
-                        
-                        # Apply face enhancement
-                        enhance_method = request.form.get('enhance_method', 'gfpgan')
-                        result_img = face_enhancer.enhance(result_img, method=enhance_method, strength=0.8)
-                    except Exception as e:
-                        logger.error(f"Face enhancement failed: {str(e)}")
-                        # Continue with the unenhanced result
-                
-                # Create results directory if it doesn't exist
-                results_dir = os.path.join('static', 'results')
-                os.makedirs(results_dir, exist_ok=True)
-                
-                # Save result with unique filename per template
-                result_filename = f"{ceremony}_{timestamp}_{i}_{os.path.basename(template_path)}"
-                result_path = os.path.join(results_dir, result_filename)
-                
-                # Save the result
-                cv2.imwrite(result_path, result_img)
-                
-                # Add to results
-                results.append({
-                    'result_image': f'/static/results/{result_filename}',
-                    'template_path': template_path,
-                    'ceremony': ceremony,
-                    'index': i
-                })
-                
-                # Mark this template as processed
-                processed_paths.add(template_path)
-                
-            except Exception as e:
-                logger.error(f"Error processing template {i+1}/{len(template_paths)}: {str(e)}")
-                # Continue with next template
-        
-        # Clean up source file
-        try:
-            os.remove(source_path)
-        except Exception as e:
-            logger.error(f"Error cleaning up source file: {str(e)}")
-        
-        if not results:
-            return jsonify({'success': False, 'error': 'Failed to process any templates. Please try again.'}), 500
-        
-        # Return all results
-        return jsonify({
-            'success': True,
-            'results': results,
-            'count': len(results)
-        })
-        
-    except Exception as e:
-        logger.error(f"Error in bridal_swap: {str(e)}")
-        logger.error(traceback.format_exc())
-        # Clean up files in case of error
-        if 'source_path' in locals() and os.path.exists(source_path):
-            try:
-                os.remove(source_path)
-            except Exception as cleanup_error:
-                logger.error(f"Error cleaning up source file: {str(cleanup_error)}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/api/templates', methods=['GET'])
-def get_templates():
-    """
-    API endpoint to get available templates for a specific category.
-    Returns templates for the requested category with URLs for display.
-    
-    Query parameters:
-    - category_type: Main category (bride, groom, salon, celebrity)
-    - subcategory: Subcategory within the main category
-    - item_category: Specific item within the subcategory
-    """
-    # Get category parameters
-    category_type = request.args.get('category_type')
-    subcategory = request.args.get('subcategory')
-    item_category = request.args.get('item_category')
-    
-    app.logger.info(f"Template request: category_type={category_type}, subcategory={subcategory}, item_category={item_category}")
-    
-    if not all([category_type, subcategory, item_category]):
-        return jsonify({'error': 'Missing required category parameters'}), 400
-    
-    # Define valid categories based on the new structure
-    valid_categories = {
-        'bride': {
-            'bridal': ['haldi', 'mehendi', 'sangeeth', 'wedding', 'reception'],
-            'outfits': ['traditional', 'modern', 'fusion', 'casual'],
-            'jewelry': ['necklace', 'earrings', 'bangles', 'mang_tikka']
-        },
-        'groom': {
-            'traditional': ['sherwani', 'kurta', 'jodhpuri', 'bandhgala'],
-            'modern': ['tuxedo', 'suit', 'blazer', 'casual']
-        },
-        'salon': {
-            'men': ['haircut', 'beard', 'facial', 'grooming'],
-            'women': ['haircut', 'coloring', 'styling', 'facial']
-        },
-        'celebrity': {
-            'men': ['actors', 'singers', 'sports', 'models'],
-            'women': ['actresses', 'singers', 'models', 'sports'],
-            'tollywood': ['actors', 'actresses', 'classic', 'new-gen'],
-            'bollywood': ['actors', 'actresses', 'classic', 'new-gen']
-        }
-    }
-    
-    # Validate category parameters
-    if (category_type not in valid_categories or 
-        subcategory not in valid_categories[category_type] or 
-        item_category not in valid_categories[category_type][subcategory]):
-        return jsonify({'error': 'Invalid category combination'}), 400
-    
-    # Determine the target directory based on category type
-    if category_type == 'bride' and subcategory == 'bridal':
-        # For bridal templates, use the unified structure
-        target_dir = os.path.join(app.static_folder, 'templates', category_type, subcategory, item_category)
-        app.logger.info(f"Looking for bridal templates in: {target_dir}")
-    else:
-        # For all other categories, use the standard structure
-        target_dir = os.path.join(app.static_folder, 'templates', category_type, subcategory, item_category)
-        app.logger.info(f"Looking for templates in: {target_dir}")
-    
-    # Create directory if it doesn't exist
-    os.makedirs(target_dir, exist_ok=True)
-    
-    # Get all template files
-    templates = []
-    template_id = 1
-    
-    if os.path.exists(target_dir):
-        app.logger.info(f"Directory exists: {target_dir}")
-        for file in sorted(os.listdir(target_dir)):
-            if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
-                file_path = os.path.join(target_dir, file)
-                if os.path.isfile(file_path):
-                    template_id_str = f"{category_type}_{subcategory}_{item_category}_{template_id}"
-                    
-                    # Calculate URL based on category type
-                    url_path = file_path.replace(app.static_folder, '/static')
-                    
-                    templates.append({
-                        'id': template_id_str,
-                        'category_type': category_type,
-                        'subcategory': subcategory,
-                        'item_category': item_category,
-                        'path': file_path,
-                        'url': f"{url_path}?t={int(time.time())}"
-                    })
-                    template_id += 1
-        app.logger.info(f"Found {len(templates)} templates")
-    else:
-        app.logger.warning(f"Directory does not exist: {target_dir}")
-    
-    return jsonify({
-        'templates': templates,
-        'count': len(templates),
-        'category_type': category_type,
-        'subcategory': subcategory,
-        'item_category': item_category,
-        'success': True,
-        'has_templates': len(templates) > 0,
-        'timestamp': int(time.time())
-    })
 
 @app.route('/move-template', methods=['POST'])
 def move_template():
