@@ -1,36 +1,30 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # exit on error
 set -o errexit
 
-# Install Python dependencies
-pip install --upgrade pip
-pip install sqlalchemy==1.4.23
-pip install -r requirements.txt
-
-# Install gunicorn explicitly
-pip install gunicorn==20.1.0
-
 # Create necessary directories
-mkdir -p static/templates
-mkdir -p static/results
-mkdir -p templates/uploads/sources
+mkdir -p models
+mkdir -p templates/uploads
 mkdir -p static/images/event_managers
 
-# Set permissions
-chmod -R 755 static
-chmod -R 755 templates
+# Download face detection model
+echo "Downloading face detection model..."
+curl -L "https://github.com/deepinsight/insightface/releases/download/v0.7/buffalo_l.zip" -o buffalo_l.zip
+unzip buffalo_l.zip -d models/
+rm buffalo_l.zip
 
-# Create .env file if it doesn't exist
-if [ ! -f .env ]; then
-    echo "Creating .env file..."
-    echo "FLASK_APP=app.py" > .env
-    echo "FLASK_ENV=production" >> .env
-    echo "SESSION_SECRET=$(openssl rand -hex 32)" >> .env
+# Download face swap model if not exists
+if [ ! -f "models/inswapper_128.onnx" ]; then
+    echo "Downloading face swap model..."
+    curl -L "https://github.com/deepinsight/insightface/releases/download/v0.7/inswapper_128.onnx" -o models/inswapper_128.onnx
 fi
 
-# Initialize database if needed
-python -c "
-from app import app, db
-with app.app_context():
-    db.create_all()
-" 
+# Install Python dependencies
+pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
+
+# Install Node.js dependencies and build frontend
+npm install
+npx webpack --mode production
+
+echo "Build completed successfully!" 
