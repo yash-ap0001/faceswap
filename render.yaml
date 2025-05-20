@@ -19,5 +19,5 @@ services:
         value: "1"
     disk:
       name: uploads
-      mountPath: /uploads
+      mountPath: /opt/render/project/src
       sizeGB: 1 

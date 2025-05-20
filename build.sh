@@ -4,11 +4,18 @@ set -o errexit
 
 echo "Starting build process..."
 
-# Create necessary directories
-echo "Creating directories..."
+# Create necessary directories and set permissions
+echo "Setting up directories..."
 mkdir -p models
+mkdir -p static/results
+mkdir -p static/templates
 mkdir -p templates/uploads
+mkdir -p templates/uploads/sources
 mkdir -p static/images/event_managers
+
+# Set permissions
+chmod -R 755 static
+chmod -R 755 templates
 
 # Download face detection model
 echo "Downloading face detection model..."
